@@ -31,7 +31,7 @@ This project simulates a **lab integration platform** that:
 
 ## 2. High-Level Solution
 
-LabConnect.NET is composed of:
+Healthcore .NET is composed of:
 
 - A **public Web API** (ASP.NET Core 8) for managing exam orders and results.
 - A **background worker** that consumes messages from **RabbitMQ** and updates exam status.
