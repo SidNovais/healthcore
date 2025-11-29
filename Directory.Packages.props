@@ -3,5 +3,6 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
+    <PackageVersion Include="MediatR" Version="13.1.0" />
   </ItemGroup>
 </Project>
