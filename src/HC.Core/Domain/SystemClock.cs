@@ -1,9 +1,11 @@
+using System;
+
 namespace HC.Core.Domain;
 
-public class SystemClock
+public static class SystemClock
 {
-    private static DateTime _custom = null;
-    public static DateTime Now => _custom is not null ? _custom : DateTime.UtcNow;
-    public static void Set(DateTime custom) => _custom = custom;
-    public static void Clear() => _custom = null;
+    private static DateTime _now = DateTime.UtcNow;
+    public static DateTime Now => _now;
+    public static void Set(DateTime custom) => _now = custom;
+    public static void Clear() => _now = DateTime.UtcNow;
 }

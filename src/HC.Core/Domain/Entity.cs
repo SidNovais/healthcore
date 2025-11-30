@@ -5,8 +5,6 @@ namespace HC.Core.Domain;
 
 public abstract class Entity
 {
-    public Guid Id { get; }
-
     private IList<IDomainEvent> _events = [];
 
     public IReadOnlyCollection<IDomainEvent> Events => _events.AsReadOnly();
