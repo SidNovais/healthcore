@@ -1,0 +1,43 @@
+<Project>
+  <ItemGroup>
+    <None Remove="bin\**" />
+    <None Remove="obj\**" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <!-- BaseDirectory é a pasta onde o arquivo Directory.Build.targets está localizado -->
+    <BaseDirectory Condition="'$(BaseDirectory)' == ''">$(MSBuildThisFileDirectory)</BaseDirectory>
+    <!-- Caminho absoluto para o projeto HC.Core -->
+    <CoreDomainPath>$(BaseDirectory)HC.Core\Domain\HC.Core.Domain.csproj</CoreDomainPath>
+    <!-- <CoreInfrastructure>$(BaseDirectory)HC.Core\Infrastructure\HC.Core.Infrastructure.csproj</CoreInfrastructure> -->
+    <!-- <CoreIntegrationTests>$(BaseDirectory)HC.Core\Tests\IntegrationTests\HC.Core.IntegrationTests.csproj</CoreIntegrationTests> -->
+  </PropertyGroup>
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Domain')) and !$(MSBuildProjectName.Contains('Core'))">
+    <ProjectReference Include="$(CoreDomainPath)" />
+  </ItemGroup>
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('UnitTests')) and !$(MSBuildProjectName.Contains('Core'))">
+    <ProjectReference Include="..\..\Domain\*.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('Core.UnitTests')) and $(MSBuildProjectName.Contains('Core'))">
+    <ProjectReference Include="..\..\Domain\*.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Application'))">
+    <ProjectReference Include="..\Domain\*.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.IntegrationTests')) and !$(MSBuildProjectName.Contains('Core'))">
+    <ProjectReference Include="..\..\Infrastructure\*.csproj" />
+    <ProjectReference Include="$(CoreIntegrationTests)" />
+  </ItemGroup>
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.ArchTests'))">
+    <ProjectReference Include="..\..\Infrastructure\*.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.IntegrationEvents')) and !$(MSBuildProjectName.Contains('Core'))">
+    <ProjectReference Include="$(CoreInfrastructure)" />
+  </ItemGroup>
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Application')) and !$(MSBuildProjectName.Contains('Core'))">
+    <ProjectReference Include="..\IntegrationEvents\*.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Infrastructure'))">
+    <ProjectReference Include="..\Application\*.csproj" />
+  </ItemGroup>
+</Project>
