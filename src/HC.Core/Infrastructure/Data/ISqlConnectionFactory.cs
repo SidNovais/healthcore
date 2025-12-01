@@ -1,10 +1,10 @@
 using System.Data;
 
-namespace HC.Core.Data;
+namespace HC.Core.Infrastructure.Data;
 
 public interface ISqlConnectionFactory
 {
-    IDbConnection GetConnection();
+    IDbConnection? GetConnection();
     IDbConnection CreateConnection();
 
 }
