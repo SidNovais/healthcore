@@ -9,7 +9,7 @@
     <BaseDirectory Condition="'$(BaseDirectory)' == ''">$(MSBuildThisFileDirectory)</BaseDirectory>
     <!-- Caminho absoluto para o projeto HC.Core -->
     <CoreDomainPath>$(BaseDirectory)HC.Core\Domain\HC.Core.Domain.csproj</CoreDomainPath>
-    <!-- <CoreInfrastructure>$(BaseDirectory)HC.Core\Infrastructure\HC.Core.Infrastructure.csproj</CoreInfrastructure> -->
+    <CoreInfrastructure>$(BaseDirectory)HC.Core\Infrastructure\HC.Core.Infrastructure.csproj</CoreInfrastructure>
     <!-- <CoreIntegrationTests>$(BaseDirectory)HC.Core\Tests\IntegrationTests\HC.Core.IntegrationTests.csproj</CoreIntegrationTests> -->
   </PropertyGroup>
   <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Domain')) and !$(MSBuildProjectName.Contains('Core'))">
