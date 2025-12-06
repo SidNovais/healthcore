@@ -2,6 +2,9 @@
 <div align="center">
   <img src="thumbnail.png" width="350" />
 </div>
+This project follows a modular monolith architecture inspired by the structure and principles demonstrated in the repository
+Modular Monolith with DDD – https://github.com/ardalis/modular-monolith-with-ddd
+
 A production-like **ASP.NET Core** application that simulates the core workflows of a medical laboratory:
 creating lab orders, processing results asynchronously via **RabbitMQ**, and exposing them to clinical systems
 through a secure REST API.
@@ -45,19 +48,19 @@ Healthcore .NET is composed of:
 
 ### 3.1 Logical Components
 
-- **LabConnect.Api**  
+- **LabConnect.Api**
   ASP.NET Core 8 Web API exposing endpoints for:
   - Creating lab orders
   - Listing pending exams
   - Updating and retrieving lab results
 
-- **LabConnect.Worker**  
+- **LabConnect.Worker**
   ASP.NET Core Background Service that:
   - Consumes messages from **RabbitMQ**
   - Simulates analyzer / LIS integrations
   - Applies **idempotency** rules to avoid duplicated processing
 
-- **LabConnect.Domain**  
+- **LabConnect.Domain**
   - Core business entities (LabOrder, Exam, Result, Patient).
   - Domain services and value objects.
 
