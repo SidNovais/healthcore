@@ -2,4 +2,5 @@
   <Project Path="../HC.Core/Domain/HC.Core.Domain.csproj" />
   <Project Path="../HC.Core/Application/HC.Core.Application.csproj" />
   <Project Path="../HC.Core/Infrastructure/HC.Core.Infrastructure.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/TestOrders/Domain/HC.LIS.Modules.TestOrders.Domain.csproj" />
 </Solution>
