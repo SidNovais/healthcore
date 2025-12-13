@@ -8,4 +8,5 @@
   <Project Path="../HC.LIS/HC.LIS.Modules/TestOrders/IntegrationEvents/HC.LIS.Modules.TestOrders.IntegrationEvents.csproj" />
   <Project Path="../HC.LIS/HC.LIS.Modules/TestOrders/Tests/UnitTests/HC.LIS.Modules.TestOrders.UnitTests.csproj" />
   <Project Path="../HC.LIS/HC.LIS.Modules/TestOrders/Tests/IntegrationTests/HC.LIS.Modules.TestOrders.IntegrationTests.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/TestOrders/Tests/ArchTests/HC.LIS.Modules.TestOrders.ArchTests.csproj" />
 </Solution>
