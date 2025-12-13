@@ -6,4 +6,5 @@
   <Project Path="../HC.LIS/HC.LIS.Modules/TestOrders/Application/HC.LIS.Modules.TestOrders.Application.csproj" />
   <Project Path="../HC.LIS/HC.LIS.Modules/TestOrders/Infrastructure/HC.LIS.Modules.TestOrders.Infrastructure.csproj" />
   <Project Path="../HC.LIS/HC.LIS.Modules/TestOrders/IntegrationEvents/HC.LIS.Modules.TestOrders.IntegrationEvents.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/TestOrders/Tests/UnitTests/HC.LIS.Modules.TestOrders.UnitTests.csproj" />
 </Solution>
