@@ -157,6 +157,8 @@ csharp_space_between_parentheses = false
 csharp_space_between_square_brackets = false
 dotnet_diagnostic.CA1040.severity = none
 dotnet_diagnostic.CA1515.severity = none
+dotnet_diagnostic.CS8618.severity = none
+dotnet_diagnostic.CA1062.severity = none
 
 # License header
 file_header_template = Licensed to the .NET Foundation under one or more agreements.\nThe .NET Foundation licenses this file to you under the MIT license.
