@@ -1,0 +1,32 @@
+using System;
+using HC.Core.Domain;
+using HC.LIS.Modules.TestOrders.Domain.Orders.Events;
+
+namespace HC.LIS.Modules.TestOrders.Domain.Orders;
+
+public class OrderItem : Entity
+{
+    internal OrderItemId OrderItemId { get; private set; }
+    internal SpecimenType _speciamentType;
+    internal OrderItemStatus _status;
+    internal DateTime _requestedAt;
+
+    public static OrderItem Request(
+        OrderItemRequestedDomainEvent domainEvent
+    )
+    {
+        OrderItem order = new();
+        order.Apply(domainEvent);
+        return order;
+    }
+
+    private void Apply(IDomainEvent domainEvent) => When((dynamic)domainEvent);
+
+    private void When(OrderItemRequestedDomainEvent domainEvent)
+    {
+        OrderItemId = new(domainEvent.OrderItemId);
+        _speciamentType = SpecimenType.Of(domainEvent.SpecimenType);
+        _status = OrderItemStatus.Requested;
+        _requestedAt = domainEvent.RequestedAt;
+    }
+}
