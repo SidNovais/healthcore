@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using HC.Core.Domain;
 using HC.Core.Domain.EventSourcing;
 using HC.LIS.Modules.TestOrders.Domain.Orders.Events;
@@ -12,6 +13,7 @@ public class Order : AggregateRoot
     private PatientId _patientId;
     private PhysicianId _requestedBy;
     private OrderPriority _orderPriority;
+    private IList<OrderItem> _items = [];
     private DateTime _requestedAt;
     private Order() { }
     protected override void Apply(IDomainEvent domainEvent) => When((dynamic)@domainEvent);
@@ -36,6 +38,23 @@ public class Order : AggregateRoot
         return order;
     }
 
+    public void RequestExam(
+        SpecimenRequirement specimenRequirement,
+        DateTime requestedAt
+    )
+    {
+        OrderItemRequestedDomainEvent orderItemRequestedDomainEvent = new(
+            Guid.CreateVersion7(),
+            specimenRequirement.SpecimenMnemonic,
+            specimenRequirement.MaterialType,
+            specimenRequirement.ContainerType,
+            requestedAt
+        );
+        Apply(orderItemRequestedDomainEvent);
+        AddDomainEvent(orderItemRequestedDomainEvent);
+    }
+
+
     private void When(OrderCreatedDomainEvent domainEvent)
     {
         Id = domainEvent.Id;
@@ -44,5 +63,7 @@ public class Order : AggregateRoot
         _orderPriority = OrderPriority.Of(domainEvent.OrderPriority);
         _requestedAt = domainEvent.RequestedAt;
     }
+    private void When(OrderItemRequestedDomainEvent domainEvent)
+        => _items.Add(OrderItem.Request(domainEvent));
 
 }
