@@ -7,7 +7,7 @@ namespace HC.LIS.Modules.TestOrders.Domain.Orders;
 public class OrderItem : Entity
 {
     internal OrderItemId OrderItemId { get; private set; }
-    internal SpecimenType _speciamentType;
+    internal SpecimenRequirement _speciamentRequirement;
     internal OrderItemStatus _status;
     internal DateTime _requestedAt;
 
@@ -25,7 +25,11 @@ public class OrderItem : Entity
     private void When(OrderItemRequestedDomainEvent domainEvent)
     {
         OrderItemId = new(domainEvent.OrderItemId);
-        _speciamentType = SpecimenType.Of(domainEvent.SpecimenType);
+        _speciamentRequirement = SpecimenRequirement.Of(
+            domainEvent.SpecimenMnemonic,
+            domainEvent.MaterialType,
+            domainEvent.ContainerType
+        );
         _status = OrderItemStatus.Requested;
         _requestedAt = domainEvent.RequestedAt;
     }
