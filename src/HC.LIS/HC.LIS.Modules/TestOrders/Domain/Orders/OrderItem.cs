@@ -40,6 +40,7 @@ public class OrderItem : Entity
     public void Accept(OrderItemAcceptedDomainEvent domainEvent)
     {
         CheckRule(new CannotAcceptOrderItemThanMoreOnceRule(_status));
+        CheckRule(new CannotAcceptOrderItemWhenIsCanceledRule(_status));
         Apply(domainEvent);
     }
     public void PlaceInProgress(OrderItemPlacedInProgressDomainEvent domainEvent)
