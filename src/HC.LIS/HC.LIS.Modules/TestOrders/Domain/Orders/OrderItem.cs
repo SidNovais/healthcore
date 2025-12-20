@@ -30,6 +30,7 @@ public class OrderItem : Entity
     public void Cancel(OrderItemCanceledDomainEvent domainEvent)
     {
         CheckRule(new CannotCancelOrderItemThanMoreOnceRule(_status));
+        CheckRule(new CannotCancelOrderItemWhenIsRejectedRule(_status));
         Apply(domainEvent);
     }
     public void PlaceOnHold(OrderItemPlacedOnHoldDomainEvent domainEvent)
