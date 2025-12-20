@@ -31,6 +31,7 @@ public class OrderItem : Entity
     {
         CheckRule(new CannotCancelOrderItemThanMoreOnceRule(_status));
         CheckRule(new CannotCancelOrderItemWhenIsRejectedRule(_status));
+        CheckRule(new CannotCancelOrderItemWhenIsPartiallyCompletedRule(_status));
         Apply(domainEvent);
     }
     public void PlaceOnHold(OrderItemPlacedOnHoldDomainEvent domainEvent)
