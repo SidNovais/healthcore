@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using HC.Core.Domain;
 using HC.Core.Domain.EventSourcing;
 using HC.LIS.Modules.TestOrders.Domain.Orders.Events;
@@ -54,6 +55,16 @@ public class Order : AggregateRoot
         AddDomainEvent(orderItemRequestedDomainEvent);
     }
 
+    public void CancelExam(OrderItemId orderItemId, DateTime canceledAt)
+    {
+        OrderItemCanceledDomainEvent orderItemCanceledDomainEvent = new(
+            orderItemId.Value,
+            canceledAt
+        );
+        Apply(orderItemCanceledDomainEvent);
+        AddDomainEvent(orderItemCanceledDomainEvent);
+    }
+
 
     private void When(OrderCreatedDomainEvent domainEvent)
     {
@@ -65,5 +76,7 @@ public class Order : AggregateRoot
     }
     private void When(OrderItemRequestedDomainEvent domainEvent)
         => _items.Add(OrderItem.Request(domainEvent));
+    private void When(OrderItemCanceledDomainEvent domainEvent)
+        => _items.Single(i => i.OrderItemId.Value == domainEvent.OrderItemId).Cancel(domainEvent);
 
 }

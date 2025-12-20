@@ -10,6 +10,7 @@ public class OrderItem : Entity
     internal SpecimenRequirement _speciamentRequirement;
     internal OrderItemStatus _status;
     internal DateTime _requestedAt;
+    internal DateTime _canceledAt;
 
     public static OrderItem Request(
         OrderItemRequestedDomainEvent domainEvent
@@ -19,6 +20,9 @@ public class OrderItem : Entity
         order.Apply(domainEvent);
         return order;
     }
+
+    public void Cancel(OrderItemCanceledDomainEvent domainEvent)
+        => Apply(domainEvent);
 
     private void Apply(IDomainEvent domainEvent) => When((dynamic)domainEvent);
 
@@ -32,5 +36,11 @@ public class OrderItem : Entity
         );
         _status = OrderItemStatus.Requested;
         _requestedAt = domainEvent.RequestedAt;
+    }
+
+    private void When(OrderItemCanceledDomainEvent domainEvent)
+    {
+        _status = OrderItemStatus.Canceled;
+        _canceledAt = domainEvent.CanceledAt;
     }
 }

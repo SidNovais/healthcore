@@ -12,7 +12,7 @@ public class OrderItemStatus : ValueObject
     public static OrderItemStatus PartiallyCompleted => new("PartiallyCompleted");
     public static OrderItemStatus Completed => new("Completed");
     public static OrderItemStatus Rejected => new("Rejected");
-    public static OrderItemStatus Cancelled => new("Cancelled");
+    public static OrderItemStatus Canceled => new("Canceled");
     private OrderItemStatus(string value)
     {
         Value = value;
@@ -25,5 +25,5 @@ public class OrderItemStatus : ValueObject
     internal bool IsPartiallyCompleted => Value == "PartiallyCompleted";
     internal bool IsCompleted => Value == "Completed";
     internal bool IsRejected => Value == "Rejected";
-    internal bool IsCancelled => Value == "Cancelled";
+    internal bool IsCanceled => Value == "Canceled";
 }
