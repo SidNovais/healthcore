@@ -119,6 +119,19 @@ public class Order : AggregateRoot
         AddDomainEvent(orderItemPartiallyCompletedDomainEvent);
     }
 
+    public void CompleteExam(
+        OrderItemId orderItemId,
+        DateTime completedAt
+    )
+    {
+        OrderItemCompletedDomainEvent orderItemCompletedDomainEvent = new(
+            orderItemId.Value,
+            completedAt
+        );
+        Apply(orderItemCompletedDomainEvent);
+        AddDomainEvent(orderItemCompletedDomainEvent);
+    }
+
 
     private void When(OrderCreatedDomainEvent domainEvent)
     {
@@ -140,5 +153,7 @@ public class Order : AggregateRoot
         => _items.Single(i => i.OrderItemId.Value == domainEvent.OrderItemId).PlaceInProgress(domainEvent);
     private void When(OrderItemPartiallyCompletedDomainEvent domainEvent)
         => _items.Single(i => i.OrderItemId.Value == domainEvent.OrderItemId).PartiallyComplete(domainEvent);
+    private void When(OrderItemCompletedDomainEvent domainEvent)
+        => _items.Single(i => i.OrderItemId.Value == domainEvent.OrderItemId).Complete(domainEvent);
 
 }

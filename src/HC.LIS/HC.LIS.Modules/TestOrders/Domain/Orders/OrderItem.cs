@@ -15,6 +15,7 @@ public class OrderItem : Entity
     internal DateTime _acceptedAt;
     internal DateTime _inProgressAt;
     internal DateTime _partiallyCompletedAt;
+    internal DateTime _completedAt;
 
     public static OrderItem Request(
         OrderItemRequestedDomainEvent domainEvent
@@ -34,6 +35,8 @@ public class OrderItem : Entity
     public void PlaceInProgress(OrderItemPlacedInProgressDomainEvent domainEvent)
         => Apply(domainEvent);
     public void PartiallyComplete(OrderItemPartiallyCompletedDomainEvent domainEvent)
+        => Apply(domainEvent);
+    public void Complete(OrderItemCompletedDomainEvent domainEvent)
         => Apply(domainEvent);
 
     private void Apply(IDomainEvent domainEvent) => When((dynamic)domainEvent);
@@ -78,5 +81,11 @@ public class OrderItem : Entity
     {
         _status = OrderItemStatus.PartiallyCompleted;
         _partiallyCompletedAt = domainEvent.PartiallyCompletedAt;
+    }
+
+    private void When(OrderItemCompletedDomainEvent domainEvent)
+    {
+        _status = OrderItemStatus.Completed;
+        _completedAt = domainEvent.CompletedAt;
     }
 }
