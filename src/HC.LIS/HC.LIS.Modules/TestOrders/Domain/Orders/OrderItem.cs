@@ -1,6 +1,7 @@
 using System;
 using HC.Core.Domain;
 using HC.LIS.Modules.TestOrders.Domain.Orders.Events;
+using HC.LIS.Modules.TestOrders.Domain.Orders.Rules;
 
 namespace HC.LIS.Modules.TestOrders.Domain.Orders;
 
@@ -27,7 +28,10 @@ public class OrderItem : Entity
     }
 
     public void Cancel(OrderItemCanceledDomainEvent domainEvent)
-        => Apply(domainEvent);
+    {
+        CheckRule(new CannotCancelOrderItemThanMoreOnceRule(_status));
+        Apply(domainEvent);
+    }
     public void PlaceOnHold(OrderItemPlacedOnHoldDomainEvent domainEvent)
         => Apply(domainEvent);
     public void Accept(OrderItemAcceptedDomainEvent domainEvent)
