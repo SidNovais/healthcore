@@ -80,6 +80,19 @@ public class Order : AggregateRoot
         AddDomainEvent(orderItemPlacedOnHoldDomainEvent);
     }
 
+    public void AcceptExam(
+        OrderItemId orderItemId,
+        DateTime acceptedAt
+    )
+    {
+        OrderItemAcceptedDomainEvent orderItemAcceptedDomainEvent = new(
+            orderItemId.Value,
+            acceptedAt
+        );
+        Apply(orderItemAcceptedDomainEvent);
+        AddDomainEvent(orderItemAcceptedDomainEvent);
+    }
+
 
     private void When(OrderCreatedDomainEvent domainEvent)
     {
@@ -95,5 +108,7 @@ public class Order : AggregateRoot
         => _items.Single(i => i.OrderItemId.Value == domainEvent.OrderItemId).Cancel(domainEvent);
     private void When(OrderItemPlacedOnHoldDomainEvent domainEvent)
         => _items.Single(i => i.OrderItemId.Value == domainEvent.OrderItemId).PlaceOnHold(domainEvent);
+    private void When(OrderItemAcceptedDomainEvent domainEvent)
+        => _items.Single(i => i.OrderItemId.Value == domainEvent.OrderItemId).Accept(domainEvent);
 
 }
