@@ -132,6 +132,21 @@ public class Order : AggregateRoot
         AddDomainEvent(orderItemCompletedDomainEvent);
     }
 
+    public void RejectExam(
+        OrderItemId orderItemId,
+        string reason,
+        DateTime rejectedAt
+    )
+    {
+        OrderItemRejectedDomainEvent orderItemRejectedDomainEvent = new(
+            orderItemId.Value,
+            reason,
+            rejectedAt
+        );
+        Apply(orderItemRejectedDomainEvent);
+        AddDomainEvent(orderItemRejectedDomainEvent);
+    }
+
 
     private void When(OrderCreatedDomainEvent domainEvent)
     {
@@ -155,5 +170,7 @@ public class Order : AggregateRoot
         => _items.Single(i => i.OrderItemId.Value == domainEvent.OrderItemId).PartiallyComplete(domainEvent);
     private void When(OrderItemCompletedDomainEvent domainEvent)
         => _items.Single(i => i.OrderItemId.Value == domainEvent.OrderItemId).Complete(domainEvent);
+    private void When(OrderItemRejectedDomainEvent domainEvent)
+        => _items.Single(i => i.OrderItemId.Value == domainEvent.OrderItemId).Reject(domainEvent);
 
 }

@@ -38,6 +38,8 @@ public class OrderItem : Entity
         => Apply(domainEvent);
     public void Complete(OrderItemCompletedDomainEvent domainEvent)
         => Apply(domainEvent);
+    public void Reject(OrderItemRejectedDomainEvent domainEvent)
+        => Apply(domainEvent);
 
     private void Apply(IDomainEvent domainEvent) => When((dynamic)domainEvent);
 
@@ -87,5 +89,11 @@ public class OrderItem : Entity
     {
         _status = OrderItemStatus.Completed;
         _completedAt = domainEvent.CompletedAt;
+    }
+
+    private void When(OrderItemRejectedDomainEvent domainEvent)
+    {
+        _status = OrderItemStatus.Rejected;
+        _completedAt = domainEvent.RejectedAt;
     }
 }
