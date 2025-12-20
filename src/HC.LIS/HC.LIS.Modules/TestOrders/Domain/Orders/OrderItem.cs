@@ -13,6 +13,7 @@ public class OrderItem : Entity
     internal DateTime _canceledAt;
     internal DateTime _onHoldAt;
     internal DateTime _acceptedAt;
+    internal DateTime _inProgressAt;
 
     public static OrderItem Request(
         OrderItemRequestedDomainEvent domainEvent
@@ -28,6 +29,8 @@ public class OrderItem : Entity
     public void PlaceOnHold(OrderItemPlacedOnHoldDomainEvent domainEvent)
         => Apply(domainEvent);
     public void Accept(OrderItemAcceptedDomainEvent domainEvent)
+        => Apply(domainEvent);
+    public void PlaceInProgress(OrderItemPlacedInProgressDomainEvent domainEvent)
         => Apply(domainEvent);
 
     private void Apply(IDomainEvent domainEvent) => When((dynamic)domainEvent);
@@ -60,5 +63,11 @@ public class OrderItem : Entity
     {
         _status = OrderItemStatus.Accepted;
         _acceptedAt = domainEvent.AcceptedAt;
+    }
+
+    private void When(OrderItemPlacedInProgressDomainEvent domainEvent)
+    {
+        _status = OrderItemStatus.InProgress;
+        _inProgressAt = domainEvent.PlaceInProgressAt;
     }
 }
