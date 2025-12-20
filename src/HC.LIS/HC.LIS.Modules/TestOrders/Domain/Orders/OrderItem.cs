@@ -11,6 +11,7 @@ public class OrderItem : Entity
     internal OrderItemStatus _status;
     internal DateTime _requestedAt;
     internal DateTime _canceledAt;
+    internal DateTime _onHoldAt;
 
     public static OrderItem Request(
         OrderItemRequestedDomainEvent domainEvent
@@ -22,6 +23,8 @@ public class OrderItem : Entity
     }
 
     public void Cancel(OrderItemCanceledDomainEvent domainEvent)
+        => Apply(domainEvent);
+    public void PlaceOnHold(OrderItemPlacedOnHoldDomainEvent domainEvent)
         => Apply(domainEvent);
 
     private void Apply(IDomainEvent domainEvent) => When((dynamic)domainEvent);
@@ -42,5 +45,11 @@ public class OrderItem : Entity
     {
         _status = OrderItemStatus.Canceled;
         _canceledAt = domainEvent.CanceledAt;
+    }
+
+    private void When(OrderItemPlacedOnHoldDomainEvent domainEvent)
+    {
+        _status = OrderItemStatus.OnHold;
+        _onHoldAt = domainEvent.PlaceOnHoldAt;
     }
 }
