@@ -21,7 +21,7 @@ public class CannotCancelOrderItemWhenIsRejectedRule(
 ) : IBusinessRule
 {
     private readonly OrderItemStatus _actualStatus = actualStatus;
-    public bool IsBroken() => _actualStatus.IsCanceled;
+    public bool IsBroken() => _actualStatus.IsRejected;
     public void ThrowException() => throw new CannotCancelOrderItemWhenIsRejectedException();
     public string Message => "Order item cannot be canceled when order is rejected";
 }
