@@ -38,7 +38,10 @@ public class OrderItem : Entity
     public void PlaceOnHold(OrderItemPlacedOnHoldDomainEvent domainEvent)
         => Apply(domainEvent);
     public void Accept(OrderItemAcceptedDomainEvent domainEvent)
-        => Apply(domainEvent);
+    {
+        CheckRule(new CannotAcceptOrderItemThanMoreOnceRule(_status));
+        Apply(domainEvent);
+    }
     public void PlaceInProgress(OrderItemPlacedInProgressDomainEvent domainEvent)
         => Apply(domainEvent);
     public void PartiallyComplete(OrderItemPartiallyCompletedDomainEvent domainEvent)
