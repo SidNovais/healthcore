@@ -49,6 +49,9 @@ public class Order : AggregateRoot
             specimenRequirement.SpecimenMnemonic,
             specimenRequirement.MaterialType,
             specimenRequirement.ContainerType,
+            specimenRequirement.Additive,
+            specimenRequirement.ProcessingType,
+            specimenRequirement.StorageCondition,
             requestedAt
         );
         Apply(orderItemRequestedDomainEvent);

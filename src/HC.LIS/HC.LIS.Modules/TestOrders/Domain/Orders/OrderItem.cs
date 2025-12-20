@@ -49,7 +49,10 @@ public class OrderItem : Entity
         _speciamentRequirement = SpecimenRequirement.Of(
             domainEvent.SpecimenMnemonic,
             domainEvent.MaterialType,
-            domainEvent.ContainerType
+            domainEvent.ContainerType,
+            domainEvent.Additive,
+            domainEvent.ProcessingType,
+            domainEvent.StorageCondition
         );
         _status = OrderItemStatus.Requested;
         _requestedAt = domainEvent.RequestedAt;
