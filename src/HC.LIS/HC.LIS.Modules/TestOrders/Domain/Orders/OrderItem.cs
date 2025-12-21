@@ -48,7 +48,10 @@ public class OrderItem : Entity
         Apply(domainEvent);
     }
     public void PlaceInProgress(OrderItemPlacedInProgressDomainEvent domainEvent)
-        => Apply(domainEvent);
+    {
+        CheckRule(new CannotPlaceInProgressOrderItemMoreThanOnceRule(_status));
+        Apply(domainEvent);
+    }
     public void PartiallyComplete(OrderItemPartiallyCompletedDomainEvent domainEvent)
         => Apply(domainEvent);
     public void Complete(OrderItemCompletedDomainEvent domainEvent)
