@@ -43,6 +43,7 @@ public class OrderItem : Entity
         CheckRule(new CannotAcceptOrderItemWhenIsCanceledRule(_status));
         CheckRule(new CannotAcceptOrderItemWhenIsInProgressRule(_status));
         CheckRule(new CannotAcceptOrderItemWhenIsPartiallyCompletedRule(_status));
+        CheckRule(new CannotAcceptOrderItemWhenIsCompletedRule(_status));
         Apply(domainEvent);
     }
     public void PlaceInProgress(OrderItemPlacedInProgressDomainEvent domainEvent)
