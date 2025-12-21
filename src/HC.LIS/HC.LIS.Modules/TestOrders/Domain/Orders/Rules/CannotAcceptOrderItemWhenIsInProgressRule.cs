@@ -2,17 +2,17 @@ using HC.Core.Domain;
 
 namespace HC.LIS.Modules.TestOrders.Domain.Orders.Rules;
 
-public class CannotAcceptOrderItemWhenIsInProgress : BaseBusinessRuleException
+public class CannotAcceptOrderItemWhenIsInProgressException : BaseBusinessRuleException
 {
-    public CannotAcceptOrderItemWhenIsInProgress(string message) : base(message)
+    public CannotAcceptOrderItemWhenIsInProgressException(string message) : base(message)
     {
     }
 
-    public CannotAcceptOrderItemWhenIsInProgress(string message, System.Exception innerException) : base(message, innerException)
+    public CannotAcceptOrderItemWhenIsInProgressException(string message, System.Exception innerException) : base(message, innerException)
     {
     }
 
-    public CannotAcceptOrderItemWhenIsInProgress()
+    public CannotAcceptOrderItemWhenIsInProgressException()
     {
     }
 }
@@ -22,6 +22,6 @@ public class CannotAcceptOrderItemWhenIsInProgressRule(
 {
     private readonly OrderItemStatus _actualStatus = actualStatus;
     public bool IsBroken() => _actualStatus.IsInProgress;
-    public void ThrowException() => throw new CannotAcceptOrderItemWhenIsInProgress();
+    public void ThrowException() => throw new CannotAcceptOrderItemWhenIsInProgressException();
     public string Message => "Order item cannot be accepted when the order is in progress.";
 }
