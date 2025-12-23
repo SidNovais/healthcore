@@ -59,6 +59,7 @@ public class OrderItem : Entity
     public void PartiallyComplete(OrderItemPartiallyCompletedDomainEvent domainEvent)
     {
         CheckRule(new CannotPartiallyCompleteOrderItemMoreThanOnceRule(_status));
+        CheckRule(new CannotPartiallyCompleteOrderItemWhenIsCanceledRule(_status));
         Apply(domainEvent);
     }
     public void Complete(OrderItemCompletedDomainEvent domainEvent)
