@@ -60,6 +60,7 @@ public class OrderItem : Entity
     {
         CheckRule(new CannotPartiallyCompleteOrderItemMoreThanOnceRule(_status));
         CheckRule(new CannotPartiallyCompleteOrderItemWhenIsCanceledRule(_status));
+        CheckRule(new CannotPartiallyCompleteOrderItemWhenIsCompletedRule(_status));
         CheckRule(new CannotPartiallyCompleteOrderItemWhenIsRejectedRule(_status));
         Apply(domainEvent);
     }
