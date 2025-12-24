@@ -23,5 +23,5 @@ public class CannotCompleteOrderItemWhenIsCanceledRule(
     private readonly OrderItemStatus _actualStatus = actualStatus;
     public bool IsBroken() => _actualStatus.IsCanceled;
     public void ThrowException() => throw new CannotCompleteOrderItemWhenIsCanceledException();
-    public string Message => "Order item cannot be canceled when order is canceled";
+    public string Message => "Order item cannot be complete when order is canceled";
 }
