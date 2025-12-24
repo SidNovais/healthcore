@@ -74,6 +74,7 @@ public class OrderItem : Entity
     public void Reject(OrderItemRejectedDomainEvent domainEvent)
     {
         CheckRule(new CannotRejectOrderItemMoreThanOnceRule(_status));
+        CheckRule(new CannotRejectOrderItemWhenIsCanceledRule(_status));
         Apply(domainEvent);
     }
 
