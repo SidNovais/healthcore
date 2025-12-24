@@ -72,7 +72,10 @@ public class OrderItem : Entity
         Apply(domainEvent);
     }
     public void Reject(OrderItemRejectedDomainEvent domainEvent)
-        => Apply(domainEvent);
+    {
+        CheckRule(new CannotRejectOrderItemMoreThanOnceRule(_status));
+        Apply(domainEvent);
+    }
 
     private void Apply(IDomainEvent domainEvent) => When((dynamic)domainEvent);
 
