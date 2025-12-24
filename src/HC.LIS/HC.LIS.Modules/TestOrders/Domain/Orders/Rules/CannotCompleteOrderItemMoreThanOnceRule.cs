@@ -21,7 +21,7 @@ public class CannotCompleteOrderItemMoreThanOnceRule(
 ) : IBusinessRule
 {
     private readonly OrderItemStatus _actualStatus = actualStatus;
-    public bool IsBroken() => _actualStatus.IsPartiallyCompleted;
+    public bool IsBroken() => _actualStatus.IsCompleted;
     public void ThrowException() => throw new CannotCompleteOrderItemMoreThanOnceException();
     public string Message => "Order item cannot be complete than more once";
 }
