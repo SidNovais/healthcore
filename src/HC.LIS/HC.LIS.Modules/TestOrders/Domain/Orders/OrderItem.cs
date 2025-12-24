@@ -65,7 +65,10 @@ public class OrderItem : Entity
         Apply(domainEvent);
     }
     public void Complete(OrderItemCompletedDomainEvent domainEvent)
-        => Apply(domainEvent);
+    {
+        CheckRule(new CannotCompleteOrderItemMoreThanOnceRule(_status));
+        Apply(domainEvent);
+    }
     public void Reject(OrderItemRejectedDomainEvent domainEvent)
         => Apply(domainEvent);
 
