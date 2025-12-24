@@ -75,6 +75,7 @@ public class OrderItem : Entity
     {
         CheckRule(new CannotRejectOrderItemMoreThanOnceRule(_status));
         CheckRule(new CannotRejectOrderItemWhenIsAcceptedRule(_status));
+        CheckRule(new CannotRejectOrderItemWhenIsInProgressRule(_status));
         CheckRule(new CannotRejectOrderItemWhenIsCanceledRule(_status));
         CheckRule(new CannotRejectOrderItemWhenIsPartiallyCompletedRule(_status));
         CheckRule(new CannotRejectOrderItemWhenIsCompletedRule(_status));
