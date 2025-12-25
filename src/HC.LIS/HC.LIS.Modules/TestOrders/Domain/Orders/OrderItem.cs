@@ -39,6 +39,7 @@ public class OrderItem : Entity
     {
         CheckRule(new CannotPlaceOnHoldOrderItemThanMoreOnceRule(_status));
         CheckRule(new CannotPlaceOnHoldOrderItemWhenIsCanceledRule(_status));
+        CheckRule(new CannotPlaceOnHoldOrderItemWhenIsRejectedRule(_status));
         Apply(domainEvent);
     }
     public void Accept(OrderItemAcceptedDomainEvent domainEvent)
