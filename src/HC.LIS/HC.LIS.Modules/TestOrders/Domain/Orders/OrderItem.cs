@@ -38,6 +38,7 @@ public class OrderItem : Entity
     public void PlaceOnHold(OrderItemPlacedOnHoldDomainEvent domainEvent)
     {
         CheckRule(new CannotPlaceOnHoldOrderItemThanMoreOnceRule(_status));
+        CheckRule(new CannotPlaceOnHoldOrderItemWhenIsCanceledRule(_status));
         Apply(domainEvent);
     }
     public void Accept(OrderItemAcceptedDomainEvent domainEvent)
