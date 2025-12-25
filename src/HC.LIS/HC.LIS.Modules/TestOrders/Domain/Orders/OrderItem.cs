@@ -36,7 +36,10 @@ public class OrderItem : Entity
         Apply(domainEvent);
     }
     public void PlaceOnHold(OrderItemPlacedOnHoldDomainEvent domainEvent)
-        => Apply(domainEvent);
+    {
+        CheckRule(new CannotPlaceOnHoldOrderItemThanMoreOnceRule(_status));
+        Apply(domainEvent);
+    }
     public void Accept(OrderItemAcceptedDomainEvent domainEvent)
     {
         CheckRule(new CannotAcceptOrderItemThanMoreOnceRule(_status));
