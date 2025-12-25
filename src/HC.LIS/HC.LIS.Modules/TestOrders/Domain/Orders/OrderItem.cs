@@ -41,6 +41,7 @@ public class OrderItem : Entity
         CheckRule(new CannotPlaceOnHoldOrderItemWhenIsAcceptedRule(_status));
         CheckRule(new CannotPlaceOnHoldOrderItemWhenIsCanceledRule(_status));
         CheckRule(new CannotPlaceOnHoldOrderItemWhenIsRejectedRule(_status));
+        CheckRule(new CannotPlaceOnHoldOrderItemWhenIsPartiallyCompletedRule(_status));
         CheckRule(new CannotPlaceOnHoldOrderItemWhenIsCompletedRule(_status));
         Apply(domainEvent);
     }

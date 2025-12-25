@@ -21,7 +21,7 @@ public class CannotPlaceOnHoldOrderItemWhenIsCompletedRule(
 ) : IBusinessRule
 {
     private readonly OrderItemStatus _actualStatus = actualStatus;
-    public bool IsBroken() => _actualStatus.IsCanceled;
+    public bool IsBroken() => _actualStatus.IsCompleted;
     public void ThrowException() => throw new CannotPlaceOnHoldOrderItemWhenIsCompletedException();
     public string Message => "Order item cannot be place on hold when the order is completed.";
 }
