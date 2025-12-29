@@ -71,8 +71,9 @@ public class OrderTests : TestBase
             OrderSampleData.RequestedAt
         );
         _sut.CancelExam(new OrderItemId(OrderSampleData.OrderItemId), canceledAt);
-        OrderItemCanceledDomainEvent orderItemRequestedDomainEvent = AssertPublishedDomainEvent<OrderItemCanceledDomainEvent>(_sut);
-        orderItemRequestedDomainEvent.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
-        orderItemRequestedDomainEvent.CanceledAt.Should().Be(canceledAt);
+        OrderItemCanceledDomainEvent orderItemCanceledDomainEvent = AssertPublishedDomainEvent<OrderItemCanceledDomainEvent>(_sut);
+        orderItemCanceledDomainEvent.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
+        orderItemCanceledDomainEvent.CanceledAt.Should().Be(canceledAt);
     }
+
 }
