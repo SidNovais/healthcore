@@ -1,4 +1,6 @@
+using System;
 using FluentAssertions;
+using HC.Core.Domain;
 using HC.Core.UnitTests;
 using HC.LIS.Modules.TestOrders.Domain.Orders;
 using HC.LIS.Modules.TestOrders.Domain.Orders.Events;
@@ -50,5 +52,27 @@ public class OrderTests : TestBase
         orderItemRequestedDomainEvent.ProcessingType.Should().Be(OrderSampleData.ProcessingType);
         orderItemRequestedDomainEvent.StorageCondition.Should().Be(OrderSampleData.StorageCondition);
         orderItemRequestedDomainEvent.RequestedAt.Should().Be(OrderSampleData.RequestedAt);
+    }
+
+    [Fact]
+    public void CancelExamIsSuccessful()
+    {
+        DateTime canceledAt = SystemClock.Now;
+        _sut.RequestExam(
+            OrderSampleData.OrderItemId,
+            SpecimenRequirement.Of(
+                OrderSampleData.SpecimenMnemonic,
+                OrderSampleData.MaterialType,
+                OrderSampleData.ContainerType,
+                OrderSampleData.Additive,
+                OrderSampleData.ProcessingType,
+                OrderSampleData.StorageCondition
+            ),
+            OrderSampleData.RequestedAt
+        );
+        _sut.CancelExam(new OrderItemId(OrderSampleData.OrderItemId), canceledAt);
+        OrderItemCanceledDomainEvent orderItemRequestedDomainEvent = AssertPublishedDomainEvent<OrderItemCanceledDomainEvent>(_sut);
+        orderItemRequestedDomainEvent.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
+        orderItemRequestedDomainEvent.CanceledAt.Should().Be(canceledAt);
     }
 }
