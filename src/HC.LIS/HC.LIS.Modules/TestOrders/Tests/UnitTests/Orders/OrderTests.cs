@@ -76,4 +76,32 @@ public class OrderTests : TestBase
         orderItemCanceledDomainEvent.CanceledAt.Should().Be(canceledAt);
     }
 
+    [Fact]
+    public void RejectExamIsSuccessful()
+    {
+        DateTime rejectedAt = SystemClock.Now;
+        string reason = "Test";
+        _sut.RequestExam(
+            OrderSampleData.OrderItemId,
+            SpecimenRequirement.Of(
+                OrderSampleData.SpecimenMnemonic,
+                OrderSampleData.MaterialType,
+                OrderSampleData.ContainerType,
+                OrderSampleData.Additive,
+                OrderSampleData.ProcessingType,
+                OrderSampleData.StorageCondition
+            ),
+            OrderSampleData.RequestedAt
+        );
+        _sut.RejectExam(
+            new OrderItemId(OrderSampleData.OrderItemId),
+            reason,
+            rejectedAt
+        );
+        OrderItemRejectedDomainEvent orderItemRejectedDomainEvent = AssertPublishedDomainEvent<OrderItemRejectedDomainEvent>(_sut);
+        orderItemRejectedDomainEvent.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
+        orderItemRejectedDomainEvent.Reason.Should().Be(reason);
+        orderItemRejectedDomainEvent.RejectedAt.Should().Be(rejectedAt);
+    }
+
 }
