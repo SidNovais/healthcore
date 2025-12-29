@@ -25,4 +25,30 @@ public class OrderTests : TestBase
         orderCreatedDomainEvent.OrderPriority.Should().Be(OrderSampleData.OrderPriority);
         orderCreatedDomainEvent.RequestedAt.Should().Be(OrderSampleData.RequestedAt);
     }
+
+    [Fact]
+    public void RequestExamIsSuccessful()
+    {
+        _sut.RequestExam(
+            OrderSampleData.OrderItemId,
+            SpecimenRequirement.Of(
+                OrderSampleData.SpecimenMnemonic,
+                OrderSampleData.MaterialType,
+                OrderSampleData.ContainerType,
+                OrderSampleData.Additive,
+                OrderSampleData.ProcessingType,
+                OrderSampleData.StorageCondition
+            ),
+            OrderSampleData.RequestedAt
+        );
+        OrderItemRequestedDomainEvent orderItemRequestedDomainEvent = AssertPublishedDomainEvent<OrderItemRequestedDomainEvent>(_sut);
+        orderItemRequestedDomainEvent.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
+        orderItemRequestedDomainEvent.SpecimenMnemonic.Should().Be(OrderSampleData.SpecimenMnemonic);
+        orderItemRequestedDomainEvent.MaterialType.Should().Be(OrderSampleData.MaterialType);
+        orderItemRequestedDomainEvent.ContainerType.Should().Be(OrderSampleData.ContainerType);
+        orderItemRequestedDomainEvent.Additive.Should().Be(OrderSampleData.Additive);
+        orderItemRequestedDomainEvent.ProcessingType.Should().Be(OrderSampleData.ProcessingType);
+        orderItemRequestedDomainEvent.StorageCondition.Should().Be(OrderSampleData.StorageCondition);
+        orderItemRequestedDomainEvent.RequestedAt.Should().Be(OrderSampleData.RequestedAt);
+    }
 }

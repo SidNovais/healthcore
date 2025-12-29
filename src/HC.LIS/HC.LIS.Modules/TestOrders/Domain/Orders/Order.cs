@@ -40,12 +40,13 @@ public class Order : AggregateRoot
     }
 
     public void RequestExam(
+        Guid orderItemId,
         SpecimenRequirement specimenRequirement,
         DateTime requestedAt
     )
     {
         OrderItemRequestedDomainEvent orderItemRequestedDomainEvent = new(
-            Guid.CreateVersion7(),
+            orderItemId,
             specimenRequirement.SpecimenMnemonic,
             specimenRequirement.MaterialType,
             specimenRequirement.ContainerType,
