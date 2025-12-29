@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using HC.Core.Domain;
+using HC.Core.Domain.EventSourcing;
 
 namespace HC.Core.UnitTests;
 
@@ -45,5 +46,28 @@ public abstract class TestBase
     {
         var businessRuleException = await testDelegate.Should().ThrowAsync<BaseBusinessRuleException>().ConfigureAwait(false);
         businessRuleException.Which.Rule.Should().BeOfType<TRule>();
+    }
+
+    public static T AssertPublishedDomainEvent<T>(AggregateRoot aggregate)
+        where T : IDomainEvent
+    {
+        T domainEvent = aggregate.GetDomainEvents().OfType<T>().SingleOrDefault()
+        ?? throw new InvalidOperationException($"{typeof(T).Name} event not published");
+        return domainEvent;
+    }
+    public static IList<T> AssertPublishedDomainEvents<T>(AggregateRoot aggregate)
+        where T : IDomainEvent
+    {
+        var domainEvents = aggregate.GetDomainEvents().OfType<T>().ToList();
+        if (domainEvents.Count == 0)
+            throw new InvalidOperationException($"{typeof(T).Name} event not published");
+        return domainEvents;
+    }
+
+    public static void AssertDomainEventNotPublished<T>(AggregateRoot aggregate)
+        where T : IDomainEvent
+    {
+        T? domainEvent = aggregate.GetDomainEvents().OfType<T>().SingleOrDefault();
+        domainEvent.Should().BeNull();
     }
 }
