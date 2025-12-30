@@ -122,4 +122,17 @@ public class OrderTests : TestBase
         orderItemPlacedInProgressDomainEvent.PlaceInProgressAt.Should().Be(placeInProgressAt);
     }
 
+    [Fact]
+    public void PartiallyCompleteExamIsSuccessful()
+    {
+        DateTime partiallyCompletedAt = SystemClock.Now;
+        _sut.PartiallyCompleteExam(
+            new OrderItemId(OrderSampleData.OrderItemId),
+            partiallyCompletedAt
+        );
+        OrderItemPartiallyCompletedDomainEvent orderItemPartiallyCompletedDomainEvent = AssertPublishedDomainEvent<OrderItemPartiallyCompletedDomainEvent>(_sut);
+        orderItemPartiallyCompletedDomainEvent.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
+        orderItemPartiallyCompletedDomainEvent.PartiallyCompletedAt.Should().Be(partiallyCompletedAt);
+    }
+
 }
