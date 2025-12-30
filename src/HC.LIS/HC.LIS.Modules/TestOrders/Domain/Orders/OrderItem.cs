@@ -29,7 +29,7 @@ public class OrderItem : Entity
 
     public void Cancel(OrderItemCanceledDomainEvent domainEvent)
     {
-        CheckRule(new CannotCancelOrderItemThanMoreOnceRule(_status));
+        CheckRule(new CannotCancelOrderItemMoreThanOnceRule(_status));
         CheckRule(new CannotCancelOrderItemWhenIsRejectedRule(_status));
         CheckRule(new CannotCancelOrderItemWhenIsPartiallyCompletedRule(_status));
         CheckRule(new CannotCancelOrderItemWhenIsCompletedRule(_status));
