@@ -4,17 +4,13 @@ namespace HC.LIS.Modules.TestOrders.Domain.Orders.Rules;
 
 public class CannotCancelOrderItemMoreThanOnceException : BaseBusinessRuleException
 {
-    public CannotCancelOrderItemMoreThanOnceException(string message) : base(message)
-    {
-    }
+    public CannotCancelOrderItemMoreThanOnceException() { }
 
-    public CannotCancelOrderItemMoreThanOnceException(string message, System.Exception innerException) : base(message, innerException)
-    {
-    }
+    public CannotCancelOrderItemMoreThanOnceException(string message) : base(message) { }
 
-    public CannotCancelOrderItemMoreThanOnceException()
-    {
-    }
+    public CannotCancelOrderItemMoreThanOnceException(string message, System.Exception innerException) : base(message, innerException) { }
+
+    public CannotCancelOrderItemMoreThanOnceException(IBusinessRule rule) : base(rule) { }
 }
 public class CannotCancelOrderItemMoreThanOnceRule(
     OrderItemStatus actualStatus
@@ -22,6 +18,6 @@ public class CannotCancelOrderItemMoreThanOnceRule(
 {
     private readonly OrderItemStatus _actualStatus = actualStatus;
     public bool IsBroken() => _actualStatus.IsCanceled;
-    public void ThrowException() => throw new CannotCancelOrderItemMoreThanOnceException();
+    public void ThrowException() => throw new CannotCancelOrderItemMoreThanOnceException(this);
     public string Message => "Order item cannot be canceled more than once";
 }

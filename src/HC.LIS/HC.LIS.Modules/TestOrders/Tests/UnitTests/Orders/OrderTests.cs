@@ -4,6 +4,7 @@ using HC.Core.Domain;
 using HC.Core.UnitTests;
 using HC.LIS.Modules.TestOrders.Domain.Orders;
 using HC.LIS.Modules.TestOrders.Domain.Orders.Events;
+using HC.LIS.Modules.TestOrders.Domain.Orders.Rules;
 using HC.LIS.Modules.TestOrders.UnitTests.Orders;
 
 namespace HC.Lis.Modules.TestOrders.UnitTests.Orders;
@@ -146,6 +147,24 @@ public class OrderTests : TestBase
         OrderItemCompletedDomainEvent orderItemCompletedDomainEvent = AssertPublishedDomainEvent<OrderItemCompletedDomainEvent>(_sut);
         orderItemCompletedDomainEvent.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
         orderItemCompletedDomainEvent.CompletedAt.Should().Be(completedAt);
+    }
+
+    [Fact]
+    public void CancelExamShouldBrokeCannotCancelOrderItemMoreThanOnceRuleWhenCancelMoreThanOnce()
+    {
+        DateTime canceledAt = SystemClock.Now;
+        _sut.CancelExam(
+            new OrderItemId(OrderSampleData.OrderItemId),
+            canceledAt
+        );
+        void action()
+        {
+            _sut.CancelExam(
+                new OrderItemId(OrderSampleData.OrderItemId),
+                canceledAt
+            );
+        }
+        AssertBrokenRule<CannotCancelOrderItemMoreThanOnceRule>(action);
     }
 
 }
