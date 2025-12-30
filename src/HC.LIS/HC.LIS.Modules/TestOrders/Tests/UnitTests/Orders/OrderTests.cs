@@ -135,4 +135,17 @@ public class OrderTests : TestBase
         orderItemPartiallyCompletedDomainEvent.PartiallyCompletedAt.Should().Be(partiallyCompletedAt);
     }
 
+    [Fact]
+    public void CompleteExamIsSuccessful()
+    {
+        DateTime completedAt = SystemClock.Now;
+        _sut.CompleteExam(
+            new OrderItemId(OrderSampleData.OrderItemId),
+            completedAt
+        );
+        OrderItemCompletedDomainEvent orderItemCompletedDomainEvent = AssertPublishedDomainEvent<OrderItemCompletedDomainEvent>(_sut);
+        orderItemCompletedDomainEvent.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
+        orderItemCompletedDomainEvent.CompletedAt.Should().Be(completedAt);
+    }
+
 }
