@@ -15,6 +15,18 @@ public class OrderTests : TestBase
     public OrderTests()
     {
         _sut = OrderFactory.Create();
+        _sut.RequestExam(
+            OrderSampleData.OrderItemId,
+            SpecimenRequirement.Of(
+                OrderSampleData.SpecimenMnemonic,
+                OrderSampleData.MaterialType,
+                OrderSampleData.ContainerType,
+                OrderSampleData.Additive,
+                OrderSampleData.ProcessingType,
+                OrderSampleData.StorageCondition
+            ),
+            OrderSampleData.RequestedAt
+        );
     }
 
     [Fact]
@@ -31,18 +43,6 @@ public class OrderTests : TestBase
     [Fact]
     public void RequestExamIsSuccessful()
     {
-        _sut.RequestExam(
-            OrderSampleData.OrderItemId,
-            SpecimenRequirement.Of(
-                OrderSampleData.SpecimenMnemonic,
-                OrderSampleData.MaterialType,
-                OrderSampleData.ContainerType,
-                OrderSampleData.Additive,
-                OrderSampleData.ProcessingType,
-                OrderSampleData.StorageCondition
-            ),
-            OrderSampleData.RequestedAt
-        );
         OrderItemRequestedDomainEvent orderItemRequestedDomainEvent = AssertPublishedDomainEvent<OrderItemRequestedDomainEvent>(_sut);
         orderItemRequestedDomainEvent.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
         orderItemRequestedDomainEvent.SpecimenMnemonic.Should().Be(OrderSampleData.SpecimenMnemonic);
@@ -58,18 +58,6 @@ public class OrderTests : TestBase
     public void CancelExamIsSuccessful()
     {
         DateTime canceledAt = SystemClock.Now;
-        _sut.RequestExam(
-            OrderSampleData.OrderItemId,
-            SpecimenRequirement.Of(
-                OrderSampleData.SpecimenMnemonic,
-                OrderSampleData.MaterialType,
-                OrderSampleData.ContainerType,
-                OrderSampleData.Additive,
-                OrderSampleData.ProcessingType,
-                OrderSampleData.StorageCondition
-            ),
-            OrderSampleData.RequestedAt
-        );
         _sut.CancelExam(new OrderItemId(OrderSampleData.OrderItemId), canceledAt);
         OrderItemCanceledDomainEvent orderItemCanceledDomainEvent = AssertPublishedDomainEvent<OrderItemCanceledDomainEvent>(_sut);
         orderItemCanceledDomainEvent.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
@@ -81,18 +69,6 @@ public class OrderTests : TestBase
     {
         DateTime rejectedAt = SystemClock.Now;
         string reason = "Test";
-        _sut.RequestExam(
-            OrderSampleData.OrderItemId,
-            SpecimenRequirement.Of(
-                OrderSampleData.SpecimenMnemonic,
-                OrderSampleData.MaterialType,
-                OrderSampleData.ContainerType,
-                OrderSampleData.Additive,
-                OrderSampleData.ProcessingType,
-                OrderSampleData.StorageCondition
-            ),
-            OrderSampleData.RequestedAt
-        );
         _sut.RejectExam(
             new OrderItemId(OrderSampleData.OrderItemId),
             reason,
@@ -109,18 +85,6 @@ public class OrderTests : TestBase
     {
         DateTime placeOnHoldAt = SystemClock.Now;
         string reason = "Test";
-        _sut.RequestExam(
-            OrderSampleData.OrderItemId,
-            SpecimenRequirement.Of(
-                OrderSampleData.SpecimenMnemonic,
-                OrderSampleData.MaterialType,
-                OrderSampleData.ContainerType,
-                OrderSampleData.Additive,
-                OrderSampleData.ProcessingType,
-                OrderSampleData.StorageCondition
-            ),
-            OrderSampleData.RequestedAt
-        );
         _sut.PlaceExamOnHold(
             new OrderItemId(OrderSampleData.OrderItemId),
             reason,
@@ -136,18 +100,6 @@ public class OrderTests : TestBase
     public void AcceptExamIsSuccessful()
     {
         DateTime acceptedAt = SystemClock.Now;
-        _sut.RequestExam(
-            OrderSampleData.OrderItemId,
-            SpecimenRequirement.Of(
-                OrderSampleData.SpecimenMnemonic,
-                OrderSampleData.MaterialType,
-                OrderSampleData.ContainerType,
-                OrderSampleData.Additive,
-                OrderSampleData.ProcessingType,
-                OrderSampleData.StorageCondition
-            ),
-            OrderSampleData.RequestedAt
-        );
         _sut.AcceptExam(
             new OrderItemId(OrderSampleData.OrderItemId),
             acceptedAt
@@ -161,18 +113,6 @@ public class OrderTests : TestBase
     public void PlaceExamInProgressIsSuccessful()
     {
         DateTime placeInProgressAt = SystemClock.Now;
-        _sut.RequestExam(
-            OrderSampleData.OrderItemId,
-            SpecimenRequirement.Of(
-                OrderSampleData.SpecimenMnemonic,
-                OrderSampleData.MaterialType,
-                OrderSampleData.ContainerType,
-                OrderSampleData.Additive,
-                OrderSampleData.ProcessingType,
-                OrderSampleData.StorageCondition
-            ),
-            OrderSampleData.RequestedAt
-        );
         _sut.PlaceExamInProgress(
             new OrderItemId(OrderSampleData.OrderItemId),
             placeInProgressAt
