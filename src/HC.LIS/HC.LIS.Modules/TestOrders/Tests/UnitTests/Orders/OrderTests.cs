@@ -132,7 +132,7 @@ public class OrderTests : TestBase
         orderItemPlacedOnHoldDomainEvent.PlaceOnHoldAt.Should().Be(placeOnHoldAt);
     }
 
-        [Fact]
+    [Fact]
     public void AcceptExamIsSuccessful()
     {
         DateTime acceptedAt = SystemClock.Now;
@@ -155,6 +155,31 @@ public class OrderTests : TestBase
         OrderItemAcceptedDomainEvent orderItemAcceptedDomainEvent = AssertPublishedDomainEvent<OrderItemAcceptedDomainEvent>(_sut);
         orderItemAcceptedDomainEvent.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
         orderItemAcceptedDomainEvent.AcceptedAt.Should().Be(acceptedAt);
+    }
+
+    [Fact]
+    public void PlaceExamInProgressIsSuccessful()
+    {
+        DateTime placeInProgressAt = SystemClock.Now;
+        _sut.RequestExam(
+            OrderSampleData.OrderItemId,
+            SpecimenRequirement.Of(
+                OrderSampleData.SpecimenMnemonic,
+                OrderSampleData.MaterialType,
+                OrderSampleData.ContainerType,
+                OrderSampleData.Additive,
+                OrderSampleData.ProcessingType,
+                OrderSampleData.StorageCondition
+            ),
+            OrderSampleData.RequestedAt
+        );
+        _sut.PlaceExamInProgress(
+            new OrderItemId(OrderSampleData.OrderItemId),
+            placeInProgressAt
+        );
+        OrderItemPlacedInProgressDomainEvent orderItemPlacedInProgressDomainEvent = AssertPublishedDomainEvent<OrderItemPlacedInProgressDomainEvent>(_sut);
+        orderItemPlacedInProgressDomainEvent.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
+        orderItemPlacedInProgressDomainEvent.PlaceInProgressAt.Should().Be(placeInProgressAt);
     }
 
 }
