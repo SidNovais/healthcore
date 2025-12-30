@@ -104,4 +104,32 @@ public class OrderTests : TestBase
         orderItemRejectedDomainEvent.RejectedAt.Should().Be(rejectedAt);
     }
 
+    [Fact]
+    public void PlaceExamOnHoldIsSuccessful()
+    {
+        DateTime placeOnHoldAt = SystemClock.Now;
+        string reason = "Test";
+        _sut.RequestExam(
+            OrderSampleData.OrderItemId,
+            SpecimenRequirement.Of(
+                OrderSampleData.SpecimenMnemonic,
+                OrderSampleData.MaterialType,
+                OrderSampleData.ContainerType,
+                OrderSampleData.Additive,
+                OrderSampleData.ProcessingType,
+                OrderSampleData.StorageCondition
+            ),
+            OrderSampleData.RequestedAt
+        );
+        _sut.PlaceExamOnHold(
+            new OrderItemId(OrderSampleData.OrderItemId),
+            reason,
+            placeOnHoldAt
+        );
+        OrderItemPlacedOnHoldDomainEvent orderItemPlacedOnHoldDomainEvent = AssertPublishedDomainEvent<OrderItemPlacedOnHoldDomainEvent>(_sut);
+        orderItemPlacedOnHoldDomainEvent.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
+        orderItemPlacedOnHoldDomainEvent.Reason.Should().Be(reason);
+        orderItemPlacedOnHoldDomainEvent.PlaceOnHoldAt.Should().Be(placeOnHoldAt);
+    }
+
 }
