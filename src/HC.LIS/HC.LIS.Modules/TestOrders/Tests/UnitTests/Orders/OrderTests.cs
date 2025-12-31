@@ -167,4 +167,25 @@ public class OrderTests : TestBase
         AssertBrokenRule<CannotCancelOrderItemMoreThanOnceRule>(action);
     }
 
+    [Fact]
+    public void RejectExamShouldBrokeCannotRejectOrderItemMoreThanOnceRuleWhenRejectMoreThanOnce()
+    {
+        DateTime rejectedAt = SystemClock.Now;
+        string reason = "Test";
+        _sut.RejectExam(
+            new OrderItemId(OrderSampleData.OrderItemId),
+            reason,
+            rejectedAt
+        );
+        void action()
+        {
+            _sut.RejectExam(
+                new OrderItemId(OrderSampleData.OrderItemId),
+                reason,
+                rejectedAt
+            );
+        }
+        AssertBrokenRule<CannotRejectOrderItemMoreThanOnceRule>(action);
+    }
+
 }
