@@ -15,6 +15,9 @@ public class CannotPlaceInProgressOrderItemMoreThanOnceException : BaseBusinessR
     public CannotPlaceInProgressOrderItemMoreThanOnceException()
     {
     }
+    public CannotPlaceInProgressOrderItemMoreThanOnceException(IBusinessRule rule) : base(rule)
+    {
+    }
 }
 public class CannotPlaceInProgressOrderItemMoreThanOnceRule(
     OrderItemStatus actualStatus
@@ -22,6 +25,6 @@ public class CannotPlaceInProgressOrderItemMoreThanOnceRule(
 {
     private readonly OrderItemStatus _actualStatus = actualStatus;
     public bool IsBroken() => _actualStatus.IsInProgress;
-    public void ThrowException() => throw new CannotPlaceInProgressOrderItemMoreThanOnceException();
+    public void ThrowException() => throw new CannotPlaceInProgressOrderItemMoreThanOnceException(this);
     public string Message => "Order item cannot be place in progress more than once";
 }
