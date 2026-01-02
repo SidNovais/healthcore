@@ -206,4 +206,22 @@ public class OrderTests : TestBase
         AssertBrokenRule<CannotPlaceInProgressOrderItemMoreThanOnceRule>(action);
     }
 
+    [Fact]
+    public void AcceptExamShouldBrokeCannotAcceptOrderItemMoreThanOnceRuleWhenAcceptExamMoreThanOnce()
+    {
+        DateTime acceptedAt = SystemClock.Now;
+        _sut.AcceptExam(
+            new OrderItemId(OrderSampleData.OrderItemId),
+            acceptedAt
+        );
+        void action()
+        {
+            _sut.AcceptExam(
+                new OrderItemId(OrderSampleData.OrderItemId),
+                acceptedAt
+            );
+        }
+        AssertBrokenRule<CannotAcceptOrderItemMoreThanOnceRule>(action);
+    }
+
 }

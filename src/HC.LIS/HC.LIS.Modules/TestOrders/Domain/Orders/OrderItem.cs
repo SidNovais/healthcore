@@ -47,7 +47,7 @@ public class OrderItem : Entity
     }
     public void Accept(OrderItemAcceptedDomainEvent domainEvent)
     {
-        CheckRule(new CannotAcceptOrderItemThanMoreOnceRule(_status));
+        CheckRule(new CannotAcceptOrderItemMoreThanOnceRule(_status));
         CheckRule(new CannotAcceptOrderItemWhenIsCanceledRule(_status));
         CheckRule(new CannotAcceptOrderItemWhenIsInProgressRule(_status));
         CheckRule(new CannotAcceptOrderItemWhenIsPartiallyCompletedRule(_status));
