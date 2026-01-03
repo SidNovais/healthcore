@@ -12,6 +12,9 @@ public class CannotPartiallyCompleteOrderItemMoreThanOnceException : BaseBusines
     {
     }
 
+    public CannotPartiallyCompleteOrderItemMoreThanOnceException(IBusinessRule rule) : base(rule)
+    {
+    }
     public CannotPartiallyCompleteOrderItemMoreThanOnceException()
     {
     }
@@ -22,6 +25,6 @@ public class CannotPartiallyCompleteOrderItemMoreThanOnceRule(
 {
     private readonly OrderItemStatus _actualStatus = actualStatus;
     public bool IsBroken() => _actualStatus.IsPartiallyCompleted;
-    public void ThrowException() => throw new CannotPartiallyCompleteOrderItemMoreThanOnceException();
+    public void ThrowException() => throw new CannotPartiallyCompleteOrderItemMoreThanOnceException(this);
     public string Message => "Order item cannot be partially complete than more once";
 }
