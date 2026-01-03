@@ -12,6 +12,9 @@ public class CannotCompleteOrderItemMoreThanOnceException : BaseBusinessRuleExce
     {
     }
 
+    public CannotCompleteOrderItemMoreThanOnceException(IBusinessRule rule) : base(rule)
+    {
+    }
     public CannotCompleteOrderItemMoreThanOnceException()
     {
     }
@@ -22,6 +25,6 @@ public class CannotCompleteOrderItemMoreThanOnceRule(
 {
     private readonly OrderItemStatus _actualStatus = actualStatus;
     public bool IsBroken() => _actualStatus.IsCompleted;
-    public void ThrowException() => throw new CannotCompleteOrderItemMoreThanOnceException();
+    public void ThrowException() => throw new CannotCompleteOrderItemMoreThanOnceException(this);
     public string Message => "Order item cannot be complete than more once";
 }

@@ -242,4 +242,22 @@ public class OrderTests : TestBase
         AssertBrokenRule<CannotPartiallyCompleteOrderItemMoreThanOnceRule>(action);
     }
 
+    [Fact]
+    public void CompleteExamShouldBrokeCannotCompleteOrderItemMoreThanOnceRuleWhenCompleteExamMoreThanOnce()
+    {
+        DateTime completedAt = SystemClock.Now;
+        _sut.CompleteExam(
+            new OrderItemId(OrderSampleData.OrderItemId),
+            completedAt
+        );
+        void action()
+        {
+            _sut.CompleteExam(
+                new OrderItemId(OrderSampleData.OrderItemId),
+                completedAt
+            );
+        }
+        AssertBrokenRule<CannotCompleteOrderItemMoreThanOnceRule>(action);
+    }
+
 }
