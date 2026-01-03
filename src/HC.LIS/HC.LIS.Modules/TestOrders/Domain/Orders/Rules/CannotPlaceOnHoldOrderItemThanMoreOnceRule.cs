@@ -12,6 +12,9 @@ public class CannotPlaceOnHoldOrderItemThanMoreOnceException : BaseBusinessRuleE
     {
     }
 
+    public CannotPlaceOnHoldOrderItemThanMoreOnceException(IBusinessRule rule) : base(rule)
+    {
+    }
     public CannotPlaceOnHoldOrderItemThanMoreOnceException()
     {
     }
@@ -22,6 +25,6 @@ public class CannotPlaceOnHoldOrderItemThanMoreOnceRule(
 {
     private readonly OrderItemStatus _actualStatus = actualStatus;
     public bool IsBroken() => _actualStatus.IsOnHold;
-    public void ThrowException() => throw new CannotPlaceOnHoldOrderItemThanMoreOnceException();
+    public void ThrowException() => throw new CannotPlaceOnHoldOrderItemThanMoreOnceException(this);
     public string Message => "Order item cannot be place on hold than more once";
 }

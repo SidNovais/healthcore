@@ -189,6 +189,27 @@ public class OrderTests : TestBase
     }
 
     [Fact]
+    public void PlaceExamOnHoldShouldBrokeCannotPlaceOnHoldOrderItemThanMoreOnceRuleWhenPlaceExamOnHoldMoreThanOnce()
+    {
+        DateTime placeExamOnHoldAt = SystemClock.Now;
+        string reason = "Test";
+        _sut.PlaceExamOnHold(
+            new OrderItemId(OrderSampleData.OrderItemId),
+            reason,
+            placeExamOnHoldAt
+        );
+        void action()
+        {
+            _sut.PlaceExamOnHold(
+                new OrderItemId(OrderSampleData.OrderItemId),
+                reason,
+                placeExamOnHoldAt
+            );
+        }
+        AssertBrokenRule<CannotPlaceOnHoldOrderItemThanMoreOnceRule>(action);
+    }
+
+    [Fact]
     public void PlaceExamInProgressShouldBrokeCannotPlaceInProgressOrderItemMoreThanOnceRuleWhenPlaceExamInProgressMoreThanOnce()
     {
         DateTime placeExamInProgressAt = SystemClock.Now;
