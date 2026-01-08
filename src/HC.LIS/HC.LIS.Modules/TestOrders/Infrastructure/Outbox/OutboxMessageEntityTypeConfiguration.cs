@@ -8,7 +8,7 @@ namespace HC.LIS.Modules.TestOrders.Infrastructure.Outbox;
   {
     public void Configure(EntityTypeBuilder<OutboxMessage> builder)
     {
-      builder.ToTable("OutboxMessages", "platform_billing");
+      builder.ToTable("OutboxMessages", "test_orders");
 
       builder.HasKey(b => b.Id);
       builder.Property(b => b.Id).ValueGeneratedNever();
