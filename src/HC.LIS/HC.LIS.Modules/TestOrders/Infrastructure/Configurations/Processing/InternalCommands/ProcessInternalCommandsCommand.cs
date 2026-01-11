@@ -1,6 +1,6 @@
 using HC.LIS.Modules.TestOrders.Application.Contracts;
 
-namespace HC.LIS.Modules.TestOrders.Infrastructure.Configurations.InternalCommands;
+namespace HC.LIS.Modules.TestOrders.Infrastructure.Configurations.Processing.InternalCommands;
 
 internal class ProcessInternalCommandsCommand : CommandBase, IRecurringCommand
 {

@@ -6,8 +6,9 @@ using HC.Core.Domain;
 using HC.Core.Infrastructure.Data;
 using HC.Core.Infrastructure.InternalCommands;
 using HC.LIS.Modules.TestOrders.Application.Configuration.Commands;
-using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.InternalCommands;
-using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.Processing;
+using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.Processing.InternalCommands;
+
+namespace HC.LIS.Modules.TestOrders.Infrastructure.Configurations.Processing.InternalCommands;
 
 internal class ProcessInternalCommandsCommandHandler(
     ISqlConnectionFactory sqlConnectionFactory,
