@@ -3,6 +3,7 @@
     <PackageReference Include="Autofac" />
     <PackageReference Include="Marten"/>
     <PackageReference Include="Dapper"/>
+    <PackageReference Include="Polly"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
     <PackageReference Include="Newtonsoft.Json" />
