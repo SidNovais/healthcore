@@ -5,7 +5,7 @@ using MediatR;
 
 namespace HC.LIS.Modules.TestOrders.Infrastructure.Configurations.Processing;
 
-public class Queries : IQueryExecutor
+public class QueryExecutor : IQueryExecutor
 {
     public async Task<TResult> GetAsync<TResult>(IQuery<TResult> query)
     {
