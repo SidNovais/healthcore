@@ -5,7 +5,7 @@ using HC.Core.Infrastructure;
 using HC.Core.Infrastructure.DomainEventsDispatching;
 using HC.LIS.Modules.TestOrders.Application.Configuration.Commands;
 using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.AggregateStore;
-using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.InternalCommands;
+using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.Processing.InternalCommands;
 
 namespace HC.LIS.Modules.TestOrders.Infrastructure.Configurations.Processing;
 
