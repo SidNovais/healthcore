@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Autofac;
 using Autofac.Core;
 using HC.Core.Application;
+using HC.Core.Application.Events;
 using HC.Core.Domain;
 using HC.Core.Infrastructure.Outbox;
 using HC.Core.Infrastructure.Serialization;

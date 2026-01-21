@@ -10,6 +10,7 @@ using HC.Core.Application;
 using HC.Core.Infrastructure.Data;
 using HC.Core.Infrastructure.DomainEventsDispatching;
 using HC.LIS.Modules.TestOrders.Application.Configuration.Commands;
+using HC.Core.Application.Events;
 
 namespace HC.LIS.Modules.TestOrders.Infrastructure.Configurations.Processing.Outbox;
 

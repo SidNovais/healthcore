@@ -18,7 +18,9 @@ public class OrderItem : Entity
     internal DateTime _partiallyCompletedAt;
     internal DateTime _completedAt;
 
-    public static OrderItem Request(
+    private OrderItem() { }
+
+    internal static OrderItem Request(
         OrderItemRequestedDomainEvent domainEvent
     )
     {
@@ -27,7 +29,7 @@ public class OrderItem : Entity
         return order;
     }
 
-    public void Cancel(OrderItemCanceledDomainEvent domainEvent)
+    internal void Cancel(OrderItemCanceledDomainEvent domainEvent)
     {
         CheckRule(new CannotCancelOrderItemMoreThanOnceRule(_status));
         CheckRule(new CannotCancelOrderItemWhenIsRejectedRule(_status));
@@ -35,7 +37,7 @@ public class OrderItem : Entity
         CheckRule(new CannotCancelOrderItemWhenIsCompletedRule(_status));
         Apply(domainEvent);
     }
-    public void PlaceOnHold(OrderItemPlacedOnHoldDomainEvent domainEvent)
+    internal void PlaceOnHold(OrderItemPlacedOnHoldDomainEvent domainEvent)
     {
         CheckRule(new CannotPlaceOnHoldOrderItemThanMoreOnceRule(_status));
         CheckRule(new CannotPlaceOnHoldOrderItemWhenIsAcceptedRule(_status));
@@ -45,7 +47,7 @@ public class OrderItem : Entity
         CheckRule(new CannotPlaceOnHoldOrderItemWhenIsCompletedRule(_status));
         Apply(domainEvent);
     }
-    public void Accept(OrderItemAcceptedDomainEvent domainEvent)
+    internal void Accept(OrderItemAcceptedDomainEvent domainEvent)
     {
         CheckRule(new CannotAcceptOrderItemMoreThanOnceRule(_status));
         CheckRule(new CannotAcceptOrderItemWhenIsCanceledRule(_status));
@@ -55,7 +57,7 @@ public class OrderItem : Entity
         CheckRule(new CannotAcceptOrderItemWhenIsRejectedRule(_status));
         Apply(domainEvent);
     }
-    public void PlaceInProgress(OrderItemPlacedInProgressDomainEvent domainEvent)
+    internal void PlaceInProgress(OrderItemPlacedInProgressDomainEvent domainEvent)
     {
         CheckRule(new CannotPlaceInProgressOrderItemMoreThanOnceRule(_status));
         CheckRule(new CannotPlaceInProgressOrderItemWhenIsCanceledRule(_status));
@@ -64,7 +66,7 @@ public class OrderItem : Entity
         CheckRule(new CannotPlaceInProgressOrderItemWhenIsRejectedRule(_status));
         Apply(domainEvent);
     }
-    public void PartiallyComplete(OrderItemPartiallyCompletedDomainEvent domainEvent)
+    internal void PartiallyComplete(OrderItemPartiallyCompletedDomainEvent domainEvent)
     {
         CheckRule(new CannotPartiallyCompleteOrderItemMoreThanOnceRule(_status));
         CheckRule(new CannotPartiallyCompleteOrderItemWhenIsCanceledRule(_status));
@@ -72,14 +74,14 @@ public class OrderItem : Entity
         CheckRule(new CannotPartiallyCompleteOrderItemWhenIsRejectedRule(_status));
         Apply(domainEvent);
     }
-    public void Complete(OrderItemCompletedDomainEvent domainEvent)
+    internal void Complete(OrderItemCompletedDomainEvent domainEvent)
     {
         CheckRule(new CannotCompleteOrderItemMoreThanOnceRule(_status));
         CheckRule(new CannotCompleteOrderItemWhenIsCanceledRule(_status));
         CheckRule(new CannotCompleteOrderItemWhenIsRejectedRule(_status));
         Apply(domainEvent);
     }
-    public void Reject(OrderItemRejectedDomainEvent domainEvent)
+    internal void Reject(OrderItemRejectedDomainEvent domainEvent)
     {
         CheckRule(new CannotRejectOrderItemMoreThanOnceRule(_status));
         CheckRule(new CannotRejectOrderItemWhenIsAcceptedRule(_status));

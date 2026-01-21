@@ -1,11 +1,11 @@
 using System;
 using HC.Core.Domain;
 
-namespace HC.Core.Application;
+namespace HC.Core.Application.Events;
 
-public class DomainEventBase<T>(Guid id, T eventNotification) : IDomainEventNotification<T>
-    where T : IDomainEvent
+public class DomainEventBase : IDomainEvent
 {
-    public Guid Id { get; } = id;
-    public T EventNotification { get; } = eventNotification;
+    public Guid Id { get; } = Guid.CreateVersion7();
+
+    public DateTime OcurredAt { get; } = SystemClock.Now;
 }

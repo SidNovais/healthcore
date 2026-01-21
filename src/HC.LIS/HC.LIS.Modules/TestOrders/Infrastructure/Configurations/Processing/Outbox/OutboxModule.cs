@@ -1,5 +1,6 @@
 using Autofac;
 using HC.Core.Application;
+using HC.Core.Application.Events;
 using HC.Core.Infrastructure;
 using HC.Core.Infrastructure.DomainEventsDispatching;
 using HC.Core.Infrastructure.Outbox;

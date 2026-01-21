@@ -1,7 +1,7 @@
 using System;
 using MediatR;
 
-namespace HC.Core.Application;
+namespace HC.Core.Application.Events;
 
 public interface IDomainEventNotification<out T> : IDomainEventNotification
 {
