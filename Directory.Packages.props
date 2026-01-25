@@ -5,6 +5,8 @@
   <ItemGroup>
     <PackageVersion Include="Dapper" Version="2.1.35" />
     <PackageVersion Include="Marten" Version="8.11.0" />
+    <PackageVersion Include="FluentMigrator" Version="6.2.0" />
+    <PackageVersion Include="FluentMigrator.Runner.Postgres" Version="6.2.0" />
     <PackageVersion Include="FluentValidation" Version="12.0.0" />
     <PackageVersion Include="Autofac" Version="9.0.0" />
     <PackageVersion Include="MediatR" Version="13.1.0" />
