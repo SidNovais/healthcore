@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="FluentMigrator"/>
+    <PackageReference Include="FluentMigrator.Runner.Postgres"/>
+    <PackageReference Include="Serilog"/>
+    <PackageReference Include="Serilog.Extensions.Logging"/>
+    <PackageReference Include="Serilog.Sinks.Console"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\HC.Core\Infrastructure\HC.Core.Infrastructure.csproj" />
+    <ProjectReference Include="..\HC.LIS.Modules\TestOrders\Infrastructure\HC.LIS.Modules.TestOrders.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>
