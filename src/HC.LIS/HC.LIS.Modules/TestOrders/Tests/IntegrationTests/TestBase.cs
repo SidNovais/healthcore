@@ -33,7 +33,7 @@ public class TestBase : IDisposable
 
     public TestBase(Guid UserId)
     {
-        const string connectionStringEnvironmentVariable = "ASPNETCORE_Wann_IntegrationTests_ConnectionString";
+        const string connectionStringEnvironmentVariable = "ASPNETCORE_HCLIS_IntegrationTests_ConnectionString";
         ConnectionString = EnvironmentVariablesProvider.GetVariable(connectionStringEnvironmentVariable);
         if (ConnectionString == null)
         {

@@ -1,0 +1,30 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build:database:migration",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/src/HC.LIS/HC.LIS.Database/HC.LIS.Database.csproj"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "docker:dev:up",
+      "type": "shell",
+      "command": "docker-compose -f development-compose.yaml up -d",
+      "problemMatcher": []
+    },
+    {
+      "label": "prepare:dev:docker",
+      "dependsOn": ["docker:dev:up", "build:database:migration"],
+      "problemMatcher": []
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Prepare DEV ENVIROMENT (Docker)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "prepare:dev:docker",
+      "program": "${workspaceFolder}/src/HC.LIS/HC.LIS.Database/bin/Debug/net10.0/HC.LIS.Database.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false,
+      "console": "integratedTerminal",
+      "env": {
+        "ASPNETCORE_HCLIS_DATABASE_CONNECTION_STRING": "Host=localhost;Port=5432;Database=Healthcore.Dev;Username=dev;Password=dev"
+      }
+    },
+    {
+      "name": "Healthcore.Database",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build:database:migration",
+      "program": "${workspaceFolder}/src/HC.LIS/HC.LIS.Database/bin/Debug/net10.0/HC.LIS.Database.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false,
+      "console": "integratedTerminal",
+      "env": {
+        "ASPNETCORE_HCLIS_DATABASE_CONNECTION_STRING": "Host=localhost;Port=5432;Database=Healthcore.Dev;Username=dev;Password=dev"
+      }
+    }
+  ]
+}
