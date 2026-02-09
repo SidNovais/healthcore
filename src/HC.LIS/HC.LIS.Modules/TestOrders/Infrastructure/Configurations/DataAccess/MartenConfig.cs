@@ -1,3 +1,4 @@
+using HC.LIS.Modules.TestOrders.Domain.Orders.Events;
 using JasperFx;
 using JasperFx.Events;
 using Marten;
@@ -15,6 +16,15 @@ public static class MartenConfig
             options.AutoCreateSchemaObjects = AutoCreate.None;
             options.Events.StreamIdentity = StreamIdentity.AsString;
             // Register all your event types
+            options.Events.AddEventType<OrderCreatedDomainEvent>();
+            options.Events.AddEventType<OrderItemAcceptedDomainEvent>();
+            options.Events.AddEventType<OrderItemCanceledDomainEvent>();
+            options.Events.AddEventType<OrderItemCompletedDomainEvent>();
+            options.Events.AddEventType<OrderItemPartiallyCompletedDomainEvent>();
+            options.Events.AddEventType<OrderItemPlacedInProgressDomainEvent>();
+            options.Events.AddEventType<OrderItemPlacedOnHoldDomainEvent>();
+            options.Events.AddEventType<OrderItemRejectedDomainEvent>();
+            options.Events.AddEventType<OrderItemRequestedDomainEvent>();
             // Add projections if you have them
             // options.Projections.Snapshot<UserAggregate>();
         });
