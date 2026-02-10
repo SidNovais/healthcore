@@ -1,3 +1,4 @@
+using HC.Core.Domain.EventSourcing;
 using HC.LIS.Modules.TestOrders.Application.Configuration.Commands;
 using HC.LIS.Modules.TestOrders.Domain.Orders;
 using HC.LIS.Modules.TestOrders.Domain.Patients;
@@ -6,10 +7,10 @@ using HC.LIS.Modules.TestOrders.Domain.Physicians;
 namespace HC.LIS.Modules.TestOrders.Application.Orders.CreateOrder;
 
 internal class CreateOrderCommandHandler(
-    IOrderRepository orderRepository
+    IAggregateStore aggregateStore
 ) : ICommandHandler<CreateOrderCommand, Guid>
 {
-    private readonly IOrderRepository _orderRepository = orderRepository;
+    private readonly IAggregateStore _aggregateStore = aggregateStore;
     public async Task<Guid> Handle(
         CreateOrderCommand command,
         CancellationToken cancellationToken
@@ -22,7 +23,7 @@ internal class CreateOrderCommandHandler(
             OrderPriority.Of(command.OrderPriority),
             command.RequestedAt
         );
-        await _orderRepository.AddAsync(order).ConfigureAwait(false);
+        _aggregateStore.Start(order);
         return order.Id;
     }
 }

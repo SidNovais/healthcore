@@ -1,13 +1,13 @@
+using System.Reflection;
 using Autofac;
+using Autofac.Core;
+using Autofac.Features.Variance;
 using FluentValidation;
 using MediatR;
 using MediatR.Pipeline;
 using HC.Core.Infrastructure;
 using HC.LIS.Modules.TestOrders.Application.Configuration.Commands;
 using HC.LIS.Modules.TestOrders.Application.Configuration.Queries;
-using System.Reflection;
-using Autofac.Core;
-using Autofac.Features.Variance;
 
 namespace HC.LIS.Modules.TestOrders.Infrastructure.Configurations.Mediation;
 
@@ -26,17 +26,17 @@ public class MediatorModule : Autofac.Module
 
         var mediatorOpenTypes = new[]
         {
-        typeof(ICommandHandler<>),
-        typeof(ICommandHandler<,>),
-        typeof(IQueryHandler<,>),
-        typeof(INotificationHandler<>),
-        typeof(IValidator<>),
-        typeof(IRequestPreProcessor<>),
-        typeof(IStreamRequestHandler<,>),
-        typeof(IRequestPostProcessor<,>),
-        typeof(IRequestExceptionHandler<,,>),
-        typeof(IRequestExceptionAction<,>),
-      };
+            typeof(ICommandHandler<>),
+            typeof(ICommandHandler<,>),
+            typeof(IQueryHandler<,>),
+            typeof(INotificationHandler<>),
+            typeof(IValidator<>),
+            typeof(IRequestPreProcessor<>),
+            typeof(IStreamRequestHandler<,>),
+            typeof(IRequestPostProcessor<,>),
+            typeof(IRequestExceptionHandler<,,>),
+            typeof(IRequestExceptionAction<,>),
+        };
         builder.RegisterSource(new ScopedContravariantRegistrationSource(
             mediatorOpenTypes));
         foreach (Type? mediatorOpenType in mediatorOpenTypes)
