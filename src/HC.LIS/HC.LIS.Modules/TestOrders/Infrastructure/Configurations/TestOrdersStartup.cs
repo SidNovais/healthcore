@@ -2,6 +2,7 @@ using Autofac;
 using HC.Core.Application;
 using HC.Core.Infrastructure;
 using HC.Core.Infrastructure.EventBus;
+using HC.LIS.Modules.TestOrders.Application.Orders.CreateOrder;
 using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.Authentication;
 using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.DataAccess;
 using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.EventBus;
@@ -52,6 +53,7 @@ public class TestOrdersStartup
         containerBuilder.RegisterModule(new MediatorModule());
         containerBuilder.RegisterModule(new AuthenticationModule());
         var domainNotificationsMap = new BiMap();
+        domainNotificationsMap.Add("OrderCreatedNotification", typeof(OrderCreatedNotification));
         containerBuilder.RegisterModule(new OutboxModule(domainNotificationsMap));
         BiMap internalCommandsMap = new();
         containerBuilder.RegisterModule(new InternalCommandsModule(internalCommandsMap));
