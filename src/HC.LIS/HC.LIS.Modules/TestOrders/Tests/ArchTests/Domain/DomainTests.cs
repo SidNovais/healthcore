@@ -15,7 +15,7 @@ public class DomainTests : TestBase
     {
         IEnumerable<Type> types = Types.InAssembly(DomainAssembly)
             .That()
-              .Inherit(typeof(DomainEventBase))
+              .Inherit(typeof(DomainEvent))
                 .Or()
               .ImplementInterface(typeof(IDomainEvent))
             .GetTypes();
@@ -50,7 +50,7 @@ public class DomainTests : TestBase
             .That()
             .ImplementInterface(typeof(IDomainEvent))
             .Or()
-            .Inherit(typeof(DomainEventBase))
+            .Inherit(typeof(DomainEvent))
             .Should().HaveNameEndingWith("DomainEvent", StringComparison.OrdinalIgnoreCase)
             .GetResult();
         AssertArchTestResult(result);
