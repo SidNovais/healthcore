@@ -5,7 +5,7 @@ namespace HC.Core.Application.Events;
 
 public interface IDomainEventNotification<out T> : IDomainEventNotification
 {
-    T EventNotification { get; }
+    T DomainEvent { get; }
 }
 
 public interface IDomainEventNotification : INotification

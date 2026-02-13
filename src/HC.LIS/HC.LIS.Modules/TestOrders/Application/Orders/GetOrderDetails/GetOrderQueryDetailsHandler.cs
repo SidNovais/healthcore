@@ -27,7 +27,7 @@ internal class GetOrderQueryDetailsHandler(
     ;
     IDbConnection? connection = _sqlConnectionFactory.GetConnection()
     ?? throw new InvalidOperationException("Must exist connection to get order details");
-    return await connection.QuerySingleAsync<OrderDetailsDto>(
+    return await connection.QueryFirstOrDefaultAsync<OrderDetailsDto>(
       sql,
       new
       {

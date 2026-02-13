@@ -67,7 +67,7 @@ public class DomainEventsDispatcher(
             {
                 var outboxMessage = new OutboxMessage(
                     domainEventNotification.Id,
-                    domainEventNotification.EventNotification.OcurredAt,
+                    domainEventNotification.DomainEvent.OcurredAt,
                     type,
                     data
                 );

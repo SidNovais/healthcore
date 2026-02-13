@@ -5,6 +5,7 @@ using HC.Core.Domain.EventSourcing;
 using HC.Core.Infastructure;
 using HC.Core.Infrastructure;
 using HC.Core.Infrastructure.Data;
+using HC.LIS.Modules.TestOrders.Application;
 using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.AggregateStore;
 using Marten;
 using Microsoft.EntityFrameworkCore;
@@ -38,7 +39,7 @@ internal class DataAccessModule(
           .As<DbContext>()
           .InstancePerLifetimeScope()
         ;
-        Assembly applicationAssembly = typeof(IProjector).Assembly;
+        Assembly applicationAssembly = typeof(ApplicationAssemblyInfo).Assembly;
         builder.RegisterAssemblyTypes(applicationAssembly)
           .Where(type => type.Name.EndsWith("Projector", StringComparison.Ordinal))
           .AsImplementedInterfaces()
