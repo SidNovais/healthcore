@@ -18,5 +18,6 @@ internal class CancelExamCommandHandler(
         Order? order = await _aggregateStore.Load(new OrderId(command.OrderId)).ConfigureAwait(false) ??
         throw new InvalidCommandException("Order must exist to cancel exam");
         order.CancelExam(new OrderItemId(command.ItemId), command.CanceledAt);
+        _aggregateStore.AppendChanges(order);
     }
 }

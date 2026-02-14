@@ -2,6 +2,7 @@ using Autofac;
 using HC.Core.Application;
 using HC.Core.Infrastructure;
 using HC.Core.Infrastructure.EventBus;
+using HC.LIS.Modules.TestOrders.Application.Orders.CancelExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.CreateOrder;
 using HC.LIS.Modules.TestOrders.Application.Orders.RequestExam;
 using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.Authentication;
@@ -56,6 +57,7 @@ public class TestOrdersStartup
         var domainNotificationsMap = new BiMap();
         domainNotificationsMap.Add("OrderCreatedNotification", typeof(OrderCreatedNotification));
         domainNotificationsMap.Add("ExamRequestedNotification", typeof(ExamRequestedNotification));
+        domainNotificationsMap.Add("ExamCanceledNotification", typeof(ExamCanceledNotification));
         containerBuilder.RegisterModule(new OutboxModule(domainNotificationsMap));
         BiMap internalCommandsMap = new();
         containerBuilder.RegisterModule(new InternalCommandsModule(internalCommandsMap));
