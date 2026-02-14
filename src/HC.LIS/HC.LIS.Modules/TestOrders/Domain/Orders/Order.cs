@@ -47,6 +47,7 @@ public class Order : AggregateRoot
     {
         OrderItemRequestedDomainEvent orderItemRequestedDomainEvent = new(
             orderItemId,
+            Id,
             specimenRequirement.SpecimenMnemonic,
             specimenRequirement.MaterialType,
             specimenRequirement.ContainerType,
@@ -154,7 +155,7 @@ public class Order : AggregateRoot
 
     private void When(OrderCreatedDomainEvent domainEvent)
     {
-        Id = domainEvent.Id;
+        Id = domainEvent.OrderId;
         _patientId = new(domainEvent.PatientId);
         _requestedBy = new(domainEvent.RequestedBy);
         _orderPriority = OrderPriority.Of(domainEvent.OrderPriority);

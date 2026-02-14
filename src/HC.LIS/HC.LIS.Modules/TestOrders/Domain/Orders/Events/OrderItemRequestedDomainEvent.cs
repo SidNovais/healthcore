@@ -5,6 +5,7 @@ namespace HC.LIS.Modules.TestOrders.Domain.Orders.Events;
 
 public class OrderItemRequestedDomainEvent(
   Guid orderItemId,
+  Guid orderId,
   string specimenMnemonic,
   string materialType,
   string containerType,
@@ -15,6 +16,7 @@ public class OrderItemRequestedDomainEvent(
 ) : DomainEvent
 {
     public Guid OrderItemId { get; } = orderItemId;
+    public Guid OrderId { get; } = orderId;
     public string SpecimenMnemonic { get; } = specimenMnemonic;
     public string MaterialType { get; } = materialType;
     public string ContainerType { get; } = containerType;

@@ -29,5 +29,6 @@ internal class RequestExamCommandHandler(
             ),
             command.RequestedAt
         );
+        _aggregateStore.AppendChanges(order);
     }
 }
