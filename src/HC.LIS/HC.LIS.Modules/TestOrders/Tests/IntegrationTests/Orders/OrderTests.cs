@@ -21,6 +21,19 @@ public class OrderTests : TestBase
             ),
             15000
         ).GetAwaiter().GetResult();
+        TestOrdersModule.ExecuteCommandAsync(
+          new RequestExamCommand(
+            OrderSampleData.OrderId,
+            OrderSampleData.OrderItemId,
+            OrderSampleData.SpecimenMnemonic,
+            OrderSampleData.MaterialType,
+            OrderSampleData.ContainerType,
+            OrderSampleData.Additive,
+            OrderSampleData.ProcessingType,
+            OrderSampleData.StorageCondition,
+            SystemClock.Now
+          )
+        ).GetAwaiter().GetResult();
     }
 
     [Fact]
@@ -35,20 +48,6 @@ public class OrderTests : TestBase
     [Fact]
     public async void RequestExamIsSuccessfully()
     {
-        await TestOrdersModule.ExecuteCommandAsync(
-          new RequestExamCommand(
-            OrderSampleData.OrderId,
-            OrderSampleData.OrderItemId,
-            OrderSampleData.SpecimenMnemonic,
-            OrderSampleData.MaterialType,
-            OrderSampleData.ContainerType,
-            OrderSampleData.Additive,
-            OrderSampleData.ProcessingType,
-            OrderSampleData.StorageCondition,
-            SystemClock.Now
-          )
-        ).ConfigureAwait(true);
-
         OrderItemDetailsDto? orderItemDetails = await GetEventually(
             new GetOrderItemDetailFromTestOrdersProbe(
                 OrderSampleData.OrderItemId,
@@ -69,19 +68,6 @@ public class OrderTests : TestBase
     [Fact]
     public async void CancelExamIsSuccessfully()
     {
-                await TestOrdersModule.ExecuteCommandAsync(
-          new RequestExamCommand(
-            OrderSampleData.OrderId,
-            OrderSampleData.OrderItemId,
-            OrderSampleData.SpecimenMnemonic,
-            OrderSampleData.MaterialType,
-            OrderSampleData.ContainerType,
-            OrderSampleData.Additive,
-            OrderSampleData.ProcessingType,
-            OrderSampleData.StorageCondition,
-            SystemClock.Now
-          )
-        ).ConfigureAwait(true);
         await TestOrdersModule.ExecuteCommandAsync(
           new CancelExamCommand(
             OrderSampleData.OrderId,
