@@ -58,4 +58,21 @@ internal class OrderItemDetailsProjector(
             orderItemCanceled.CanceledAt
         }).ConfigureAwait(false);
     }
+
+    private async Task When(OrderItemAcceptedDomainEvent orderItemAccepted)
+    {
+        string status = OrderItemStatus.Accepted.Value;
+        using var connection = _sqlConnectionFactory.CreateConnection();
+        await connection.ExecuteScalarAsync(
+        $@"UPDATE test_orders.""OrderItemDetails""
+        SET ""Status"" = @Status,
+        ""AcceptedAt"" = @AcceptedAt
+        WHERE ""Id"" = @OrderItemId ",
+        new
+        {
+            orderItemAccepted.OrderItemId,
+            Status = status,
+            orderItemAccepted.AcceptedAt
+        }).ConfigureAwait(false);
+    }
 }

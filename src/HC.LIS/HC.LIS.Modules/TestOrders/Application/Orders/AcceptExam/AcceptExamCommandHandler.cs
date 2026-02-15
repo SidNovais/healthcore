@@ -18,5 +18,6 @@ internal class AcceptExamCommandHandler(
         Order? order = await _aggregateStore.Load(new OrderId(command.OrderId)).ConfigureAwait(false) ??
         throw new InvalidCommandException("Order must exist to accept exam");
         order.AcceptExam(new OrderItemId(command.ItemId), command.AcceptedAt);
+        _aggregateStore.AppendChanges(order);
     }
 }
