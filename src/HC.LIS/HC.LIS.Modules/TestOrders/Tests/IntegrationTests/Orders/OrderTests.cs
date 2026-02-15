@@ -135,6 +135,7 @@ public class OrderTests : TestBase
         orderItemDetails?.OrderId.Should().Be(OrderSampleData.OrderId);
         orderItemDetails?.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
         orderItemDetails?.Status.Should().Be("Rejected");
+        // TODO: persist Reason in OrderItem.Reason orderItemDetails?.Reason.Should().NotBeNull();
         orderItemDetails?.RejectedAt.Should().NotBeNull();
     }
 }
