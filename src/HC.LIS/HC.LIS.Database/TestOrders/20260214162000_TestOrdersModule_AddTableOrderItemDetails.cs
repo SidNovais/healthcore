@@ -21,6 +21,7 @@ public class TestOrdersModuleAddTableOrderItemDetails : Migration
           .WithColumn("CanceledAt").AsCustom("TIMESTAMPTZ").Nullable()
           .WithColumn("OnHoldAt").AsCustom("TIMESTAMPTZ").Nullable()
           .WithColumn("AcceptedAt").AsCustom("TIMESTAMPTZ").Nullable()
+          .WithColumn("RejectedAt").AsCustom("TIMESTAMPTZ").Nullable()
           .WithColumn("InProgressAt").AsCustom("TIMESTAMPTZ").Nullable()
           .WithColumn("PartiallyCompletedAt").AsCustom("TIMESTAMPTZ").Nullable()
           .WithColumn("CompletedAt").AsCustom("TIMESTAMPTZ").Nullable()

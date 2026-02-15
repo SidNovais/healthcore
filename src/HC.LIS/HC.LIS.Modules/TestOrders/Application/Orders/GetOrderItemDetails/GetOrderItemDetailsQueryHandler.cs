@@ -30,6 +30,7 @@ internal class GetOrderItemDetailsQueryHandler(
         ""OrderItemDetails"".""CanceledAt"" AS ""{nameof(OrderItemDetailsDto.CanceledAt)}"",
         ""OrderItemDetails"".""OnHoldAt"" AS ""{nameof(OrderItemDetailsDto.OnHoldAt)}"",
         ""OrderItemDetails"".""AcceptedAt"" AS ""{nameof(OrderItemDetailsDto.AcceptedAt)}"",
+        ""OrderItemDetails"".""RejectedAt"" AS ""{nameof(OrderItemDetailsDto.RejectedAt)}"",
         ""OrderItemDetails"".""InProgressAt"" AS ""{nameof(OrderItemDetailsDto.InProgressAt)}"",
         ""OrderItemDetails"".""PartiallyCompletedAt"" AS ""{nameof(OrderItemDetailsDto.PartiallyCompletedAt)}"",
         ""OrderItemDetails"".""CompletedAt"" AS ""{nameof(OrderItemDetailsDto.CompletedAt)}""

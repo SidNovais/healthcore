@@ -5,6 +5,7 @@ using HC.LIS.Modules.TestOrders.Application.Orders.AcceptExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.CancelExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.GetOrderDetails;
 using HC.LIS.Modules.TestOrders.Application.Orders.GetOrderItemDetails;
+using HC.LIS.Modules.TestOrders.Application.Orders.RejectExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.RequestExam;
 
 namespace HC.LIS.Modules.TestOrders.IntegrationTests.Orders;
@@ -111,5 +112,29 @@ public class OrderTests : TestBase
         orderItemDetails?.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
         orderItemDetails?.Status.Should().Be("Accepted");
         orderItemDetails?.AcceptedAt.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async void RejectExamIsSuccessfully()
+    {
+        await TestOrdersModule.ExecuteCommandAsync(
+          new RejectExamCommand(
+            OrderSampleData.OrderId,
+            OrderSampleData.OrderItemId,
+            "Test",
+            SystemClock.Now
+          )
+        ).ConfigureAwait(true);
+        OrderItemDetailsDto? orderItemDetails = await GetEventually(
+            new GetOrderItemDetailFromTestOrdersProbe(
+                OrderSampleData.OrderItemId,
+                TestOrdersModule
+            ),
+            15000
+        ).ConfigureAwait(true);
+        orderItemDetails?.OrderId.Should().Be(OrderSampleData.OrderId);
+        orderItemDetails?.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
+        orderItemDetails?.Status.Should().Be("Rejected");
+        orderItemDetails?.RejectedAt.Should().NotBeNull();
     }
 }

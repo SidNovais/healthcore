@@ -14,6 +14,7 @@ public class OrderItemDetailsDto(
     DateTime? canceledAt = null,
     DateTime? onHoldAt = null,
     DateTime? acceptedAt = null,
+    DateTime? rejectedAt = null,
     DateTime? inProgressAt = null,
     DateTime? partiallyCompletedAt = null,
     DateTime? completedAt = null
@@ -32,6 +33,7 @@ public class OrderItemDetailsDto(
     public DateTime? CanceledAt { get; } = canceledAt;
     public DateTime? OnHoldAt { get; } = onHoldAt;
     public DateTime? AcceptedAt { get; } = acceptedAt;
+    public DateTime? RejectedAt { get; } = rejectedAt;
     public DateTime? InProgressAt { get; } = inProgressAt;
     public DateTime? PartiallyCompletedAt { get; } = partiallyCompletedAt;
     public DateTime? CompletedAt { get; } = completedAt;
