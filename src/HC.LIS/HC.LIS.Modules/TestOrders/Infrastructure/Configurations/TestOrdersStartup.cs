@@ -4,6 +4,7 @@ using HC.Core.Infrastructure;
 using HC.Core.Infrastructure.EventBus;
 using HC.LIS.Modules.TestOrders.Application.Orders.AcceptExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.CancelExam;
+using HC.LIS.Modules.TestOrders.Application.Orders.CompleteExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.CreateOrder;
 using HC.LIS.Modules.TestOrders.Application.Orders.RejectExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.RequestExam;
@@ -62,6 +63,7 @@ public class TestOrdersStartup
         domainNotificationsMap.Add("ExamCanceledNotification", typeof(ExamCanceledNotification));
         domainNotificationsMap.Add("ExamAcceptedNotification", typeof(ExamAcceptedNotification));
         domainNotificationsMap.Add("ExamRejectedNotification", typeof(ExamRejectedNotification));
+        domainNotificationsMap.Add("ExamCompletedNotification", typeof(ExamCompletedNotification));
         containerBuilder.RegisterModule(new OutboxModule(domainNotificationsMap));
         BiMap internalCommandsMap = new();
         containerBuilder.RegisterModule(new InternalCommandsModule(internalCommandsMap));

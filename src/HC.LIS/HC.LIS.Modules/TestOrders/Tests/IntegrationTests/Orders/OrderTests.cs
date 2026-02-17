@@ -3,6 +3,7 @@ using FluentAssertions;
 using HC.Core.Domain;
 using HC.LIS.Modules.TestOrders.Application.Orders.AcceptExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.CancelExam;
+using HC.LIS.Modules.TestOrders.Application.Orders.CompleteExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.GetOrderDetails;
 using HC.LIS.Modules.TestOrders.Application.Orders.GetOrderItemDetails;
 using HC.LIS.Modules.TestOrders.Application.Orders.RejectExam;
@@ -137,5 +138,28 @@ public class OrderTests : TestBase
         orderItemDetails?.Status.Should().Be("Rejected");
         orderItemDetails?.ReasonForRejection.Should().Be("Test");
         orderItemDetails?.RejectedAt.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async void CompleteExamIsSuccessfully()
+    {
+        await TestOrdersModule.ExecuteCommandAsync(
+          new CompleteExamCommand(
+            OrderSampleData.OrderId,
+            OrderSampleData.OrderItemId,
+            SystemClock.Now
+          )
+        ).ConfigureAwait(true);
+        OrderItemDetailsDto? orderItemDetails = await GetEventually(
+            new GetOrderItemDetailFromTestOrdersProbe(
+                OrderSampleData.OrderItemId,
+                TestOrdersModule
+            ),
+            15000
+        ).ConfigureAwait(true);
+        orderItemDetails?.OrderId.Should().Be(OrderSampleData.OrderId);
+        orderItemDetails?.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
+        orderItemDetails?.Status.Should().Be("Completed");
+        orderItemDetails?.CompletedAt.Should().NotBeNull();
     }
 }

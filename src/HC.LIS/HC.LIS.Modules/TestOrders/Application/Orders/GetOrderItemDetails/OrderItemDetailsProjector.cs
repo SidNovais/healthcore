@@ -94,4 +94,21 @@ internal class OrderItemDetailsProjector(
             orderItemRejected.RejectedAt
         }).ConfigureAwait(false);
     }
+
+    private async Task When(OrderItemCompletedDomainEvent orderItemCompleted)
+    {
+        string status = OrderItemStatus.Completed.Value;
+        using var connection = _sqlConnectionFactory.CreateConnection();
+        await connection.ExecuteScalarAsync(
+        $@"UPDATE test_orders.""OrderItemDetails""
+        SET ""Status"" = @Status,
+        ""CompletedAt"" = @CompletedAt
+        WHERE ""Id"" = @OrderItemId ",
+        new
+        {
+            orderItemCompleted.OrderItemId,
+            Status = status,
+            orderItemCompleted.CompletedAt
+        }).ConfigureAwait(false);
+    }
 }
