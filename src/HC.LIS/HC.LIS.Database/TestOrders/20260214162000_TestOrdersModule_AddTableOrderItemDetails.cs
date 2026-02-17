@@ -17,6 +17,7 @@ public class TestOrdersModuleAddTableOrderItemDetails : Migration
           .WithColumn("ProcessingType").AsString(20).NotNullable()
           .WithColumn("StorageCondition").AsString(20).NotNullable()
           .WithColumn("Status").AsString(18).NotNullable()
+          .WithColumn("ReasonForRejection").AsString(255).Nullable()
           .WithColumn("RequestedAt").AsCustom("TIMESTAMPTZ").NotNullable()
           .WithColumn("CanceledAt").AsCustom("TIMESTAMPTZ").Nullable()
           .WithColumn("OnHoldAt").AsCustom("TIMESTAMPTZ").Nullable()

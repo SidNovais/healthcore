@@ -83,12 +83,14 @@ internal class OrderItemDetailsProjector(
         await connection.ExecuteScalarAsync(
         $@"UPDATE test_orders.""OrderItemDetails""
         SET ""Status"" = @Status,
+        ""ReasonForRejection"" = @Reason,
         ""RejectedAt"" = @RejectedAt
         WHERE ""Id"" = @OrderItemId ",
         new
         {
             orderItemRejected.OrderItemId,
             Status = status,
+            orderItemRejected.Reason,
             orderItemRejected.RejectedAt
         }).ConfigureAwait(false);
     }

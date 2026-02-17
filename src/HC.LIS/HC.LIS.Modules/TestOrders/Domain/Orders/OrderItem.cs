@@ -10,12 +10,14 @@ public class OrderItem : Entity
     internal OrderItemId OrderItemId { get; private set; }
     internal SpecimenRequirement _speciamentRequirement;
     internal OrderItemStatus _status;
+    internal string _reasonForRejection;
     internal DateTime _requestedAt;
     internal DateTime _canceledAt;
     internal DateTime _onHoldAt;
     internal DateTime _acceptedAt;
     internal DateTime _inProgressAt;
     internal DateTime _partiallyCompletedAt;
+    internal DateTime _rejectedAt;
     internal DateTime _completedAt;
 
     private OrderItem() { }
@@ -148,6 +150,7 @@ public class OrderItem : Entity
     private void When(OrderItemRejectedDomainEvent domainEvent)
     {
         _status = OrderItemStatus.Rejected;
-        _completedAt = domainEvent.RejectedAt;
+        _rejectedAt = domainEvent.RejectedAt;
+        _reasonForRejection = domainEvent.Reason;
     }
 }

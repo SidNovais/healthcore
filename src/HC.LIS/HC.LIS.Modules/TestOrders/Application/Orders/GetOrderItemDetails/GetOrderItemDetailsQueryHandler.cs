@@ -26,6 +26,7 @@ internal class GetOrderItemDetailsQueryHandler(
         ""OrderItemDetails"".""ProcessingType"" AS ""{nameof(OrderItemDetailsDto.ProcessingType)}"",
         ""OrderItemDetails"".""StorageCondition"" AS ""{nameof(OrderItemDetailsDto.StorageCondition)}"",
         ""OrderItemDetails"".""Status"" AS ""{nameof(OrderItemDetailsDto.Status)}"",
+        ""OrderItemDetails"".""ReasonForRejection"" AS ""{nameof(OrderItemDetailsDto.ReasonForRejection)}"",
         ""OrderItemDetails"".""RequestedAt"" AS ""{nameof(OrderItemDetailsDto.RequestedAt)}"",
         ""OrderItemDetails"".""CanceledAt"" AS ""{nameof(OrderItemDetailsDto.CanceledAt)}"",
         ""OrderItemDetails"".""OnHoldAt"" AS ""{nameof(OrderItemDetailsDto.OnHoldAt)}"",

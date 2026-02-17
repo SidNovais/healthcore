@@ -10,6 +10,7 @@ public class OrderItemDetailsDto(
     string processingType,
     string storageCondition,
     string status,
+    string reasonForRejection,
     DateTime requestedAt,
     DateTime? canceledAt = null,
     DateTime? onHoldAt = null,
@@ -28,6 +29,7 @@ public class OrderItemDetailsDto(
     public string Additive { get; } = additive;
     public string ProcessingType { get; } = processingType;
     public string StorageCondition { get; } = storageCondition;
+    public string ReasonForRejection { get; } = reasonForRejection;
     public string Status { get; } = status;
     public DateTime RequestedAt { get; } = requestedAt;
     public DateTime? CanceledAt { get; } = canceledAt;
