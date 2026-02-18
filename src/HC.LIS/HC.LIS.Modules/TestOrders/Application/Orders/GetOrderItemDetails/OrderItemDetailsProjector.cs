@@ -111,4 +111,21 @@ internal class OrderItemDetailsProjector(
             orderItemCompleted.CompletedAt
         }).ConfigureAwait(false);
     }
+
+    private async Task When(OrderItemPartiallyCompletedDomainEvent orderItemPartiallyCompleted)
+    {
+        string status = OrderItemStatus.PartiallyCompleted.Value;
+        using var connection = _sqlConnectionFactory.CreateConnection();
+        await connection.ExecuteScalarAsync(
+        $@"UPDATE test_orders.""OrderItemDetails""
+        SET ""Status"" = @Status,
+        ""PartiallyCompletedAt"" = @PartiallyCompletedAt
+        WHERE ""Id"" = @OrderItemId ",
+        new
+        {
+            orderItemPartiallyCompleted.OrderItemId,
+            Status = status,
+            orderItemPartiallyCompleted.PartiallyCompletedAt
+        }).ConfigureAwait(false);
+    }
 }

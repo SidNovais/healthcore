@@ -6,6 +6,7 @@ using HC.LIS.Modules.TestOrders.Application.Orders.CancelExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.CompleteExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.GetOrderDetails;
 using HC.LIS.Modules.TestOrders.Application.Orders.GetOrderItemDetails;
+using HC.LIS.Modules.TestOrders.Application.Orders.PartiallyCompleteExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.RejectExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.RequestExam;
 
@@ -161,5 +162,28 @@ public class OrderTests : TestBase
         orderItemDetails?.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
         orderItemDetails?.Status.Should().Be("Completed");
         orderItemDetails?.CompletedAt.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async void PartiallyCompleteExamIsSuccessfully()
+    {
+        await TestOrdersModule.ExecuteCommandAsync(
+          new PartiallyCompleteExamCommand(
+            OrderSampleData.OrderId,
+            OrderSampleData.OrderItemId,
+            SystemClock.Now
+          )
+        ).ConfigureAwait(true);
+        OrderItemDetailsDto? orderItemDetails = await GetEventually(
+            new GetOrderItemDetailFromTestOrdersProbe(
+                OrderSampleData.OrderItemId,
+                TestOrdersModule
+            ),
+            15000
+        ).ConfigureAwait(true);
+        orderItemDetails?.OrderId.Should().Be(OrderSampleData.OrderId);
+        orderItemDetails?.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
+        orderItemDetails?.Status.Should().Be("PartiallyCompleted");
+        orderItemDetails?.PartiallyCompletedAt.Should().NotBeNull();
     }
 }

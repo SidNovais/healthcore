@@ -18,5 +18,6 @@ internal class PartiallyCompleteExamCommandHandler(
         Order? order = await _aggregateStore.Load(new OrderId(command.OrderId)).ConfigureAwait(false) ??
         throw new InvalidCommandException("Order must exist to partially complete exam");
         order.PartiallyCompleteExam(new OrderItemId(command.ItemId), command.PartiallyCompletedAt);
+        _aggregateStore.AppendChanges(order);
     }
 }
