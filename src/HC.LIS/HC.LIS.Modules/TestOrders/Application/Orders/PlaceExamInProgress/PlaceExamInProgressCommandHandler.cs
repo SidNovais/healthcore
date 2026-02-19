@@ -18,5 +18,6 @@ internal class PlaceExamInProgressCommandHandler(
         Order? order = await _aggregateStore.Load(new OrderId(command.OrderId)).ConfigureAwait(false) ??
         throw new InvalidCommandException("Order must exist to place exam in progress");
         order.PlaceExamInProgress(new OrderItemId(command.ItemId), command.PlacedAt);
+        _aggregateStore.AppendChanges(order);
     }
 }
