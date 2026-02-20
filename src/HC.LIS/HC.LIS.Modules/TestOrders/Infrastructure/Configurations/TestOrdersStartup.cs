@@ -8,6 +8,7 @@ using HC.LIS.Modules.TestOrders.Application.Orders.CompleteExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.CreateOrder;
 using HC.LIS.Modules.TestOrders.Application.Orders.PartiallyCompleteExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.PlaceExamInProgress;
+using HC.LIS.Modules.TestOrders.Application.Orders.PlaceExamOnHold;
 using HC.LIS.Modules.TestOrders.Application.Orders.RejectExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.RequestExam;
 using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.Authentication;
@@ -68,6 +69,7 @@ public class TestOrdersStartup
         domainNotificationsMap.Add("ExamCompletedNotification", typeof(ExamCompletedNotification));
         domainNotificationsMap.Add("ExamPartiallyCompletedNotification", typeof(ExamPartiallyCompletedNotification));
         domainNotificationsMap.Add("ExamPlacedInProgressNotification", typeof(ExamPlacedInProgressNotification));
+        domainNotificationsMap.Add("ExamPlacedOnHoldNotification", typeof(ExamPlacedOnHoldNotification));
         containerBuilder.RegisterModule(new OutboxModule(domainNotificationsMap));
         BiMap internalCommandsMap = new();
         containerBuilder.RegisterModule(new InternalCommandsModule(internalCommandsMap));

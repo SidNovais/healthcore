@@ -8,6 +8,7 @@ using HC.LIS.Modules.TestOrders.Application.Orders.GetOrderDetails;
 using HC.LIS.Modules.TestOrders.Application.Orders.GetOrderItemDetails;
 using HC.LIS.Modules.TestOrders.Application.Orders.PartiallyCompleteExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.PlaceExamInProgress;
+using HC.LIS.Modules.TestOrders.Application.Orders.PlaceExamOnHold;
 using HC.LIS.Modules.TestOrders.Application.Orders.RejectExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.RequestExam;
 
@@ -164,6 +165,31 @@ public class OrderTests : TestBase
         orderItemDetails?.Status.Should().Be("InProgress");
         orderItemDetails?.InProgressAt.Should().NotBeNull();
     }
+
+    [Fact]
+    public async void PlaceExamOnHoldIsSuccessfully()
+    {
+        await TestOrdersModule.ExecuteCommandAsync(
+          new PlaceExamOnHoldCommand(
+            OrderSampleData.OrderId,
+            OrderSampleData.OrderItemId,
+            "Test",
+            SystemClock.Now
+          )
+        ).ConfigureAwait(true);
+        OrderItemDetailsDto? orderItemDetails = await GetEventually(
+            new GetOrderItemDetailFromTestOrdersProbe(
+                OrderSampleData.OrderItemId,
+                TestOrdersModule
+            ),
+            15000
+        ).ConfigureAwait(true);
+        orderItemDetails?.OrderId.Should().Be(OrderSampleData.OrderId);
+        orderItemDetails?.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
+        orderItemDetails?.Status.Should().Be("OnHold");
+        orderItemDetails?.OnHoldAt.Should().NotBeNull();
+    }
+
     [Fact]
     public async void CompleteExamIsSuccessfully()
     {

@@ -111,6 +111,24 @@ internal class OrderItemDetailsProjector(
             orderItemPlacedInProgress.PlaceInProgressAt
         }).ConfigureAwait(false);
     }
+
+    private async Task When(OrderItemPlacedOnHoldDomainEvent orderItemPlacedOnHold)
+    {
+        string status = OrderItemStatus.OnHold.Value;
+        using var connection = _sqlConnectionFactory.CreateConnection();
+        await connection.ExecuteScalarAsync(
+        $@"UPDATE test_orders.""OrderItemDetails""
+        SET ""Status"" = @Status,
+        ""OnHoldAt"" = @PlaceOnHoldAt
+        WHERE ""Id"" = @OrderItemId ",
+        new
+        {
+            orderItemPlacedOnHold.OrderItemId,
+            Status = status,
+            orderItemPlacedOnHold.PlaceOnHoldAt
+        }).ConfigureAwait(false);
+    }
+
     private async Task When(OrderItemCompletedDomainEvent orderItemCompleted)
     {
         string status = OrderItemStatus.Completed.Value;

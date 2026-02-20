@@ -18,5 +18,6 @@ internal class PlaceExamOnHoldCommandHandler(
         Order? order = await _aggregateStore.Load(new OrderId(command.OrderId)).ConfigureAwait(false) ??
         throw new InvalidCommandException("Order must exist to place exam on hold");
         order.PlaceExamOnHold(new OrderItemId(command.ItemId), command.Reason, command.PlacedAt);
+        _aggregateStore.AppendChanges(order);
     }
 }
