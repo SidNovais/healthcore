@@ -1,0 +1,37 @@
+using HC.Core.Infrastructure;
+using HC.Core.Infrastructure.DomainEventsDispatching;
+using HC.Core.Infrastructure.Outbox;
+using Marten;
+
+namespace HC.LIS.Modules.LabAnalysis.Infrastructure.Configurations.Processing;
+
+public class LabAnalysisUnitOfWork(
+  IDomainEventsDispatcher domainEventsDispatcher,
+  IDocumentSession documentSession,
+  IOutbox outbox
+) : IUnitOfWork
+{
+    private readonly IDomainEventsDispatcher _domainEventsDispatcher = domainEventsDispatcher;
+    private readonly IDocumentSession _documentSession = documentSession;
+    private readonly IOutbox _outbox = outbox;
+    public async Task<int> CommitAsync(
+    Guid? internalCommandId = null,
+    CancellationToken cancellationToken = default
+  )
+    {
+        await _domainEventsDispatcher.DispatchEventsAsync().ConfigureAwait(false);
+        await _outbox.Save().ConfigureAwait(false);
+        if (internalCommandId.HasValue)
+        {
+            _documentSession.QueueSqlCommand(
+              @$"UPDATE ""lab_analysis"".""InternalCommands""
+                SET ""ProcessedDate"" = ?
+                WHERE ""Id"" = ?",
+              DateTimeOffset.UtcNow,
+              internalCommandId.Value
+            );
+        }
+        await _documentSession.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        return 0;
+    }
+}
