@@ -5,7 +5,7 @@ using HC.LIS.Modules.TestOrders.Application.Configuration.Queries;
 
 namespace HC.LIS.Modules.TestOrders.Application.Orders.GetOrderDetails;
 
-internal class GetOrderQueryDetailsHandler(
+internal class GetOrderDetailsQueryHandler(
   ISqlConnectionFactory sqlConnectionFactory
 ) : IQueryHandler<GetOrderDetailsQuery, OrderDetailsDto?>
 {
