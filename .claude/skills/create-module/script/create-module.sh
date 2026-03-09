@@ -27,3 +27,22 @@ bash "${SCRIPT_DIR}/create-unit-test-layer.sh" "$MODULE_NAME" "$ROOT_NS" "$BASE_
 bash "${SCRIPT_DIR}/create-integration-test-layer.sh" "$MODULE_NAME" "$ROOT_NS" "$BASE_MODULES_DIR"
 
 find "${BASE_MODULE_DIR}" -type f -name "Class1.cs" -delete
+
+# Add projects to HC.LIS.slnx
+SLNX_FILE="${REPO_ROOT:-$(git rev-parse --show-toplevel)}/src/HC.LIS/HC.LIS.slnx"
+if [ -f "${SLNX_FILE}" ]; then
+  LAYERS=(
+    "Domain/${ROOT_NS}.Modules.${MODULE_NAME}.Domain.csproj"
+    "Application/${ROOT_NS}.Modules.${MODULE_NAME}.Application.csproj"
+    "Infrastructure/${ROOT_NS}.Modules.${MODULE_NAME}.Infrastructure.csproj"
+    "IntegrationEvents/${ROOT_NS}.Modules.${MODULE_NAME}.IntegrationEvents.csproj"
+    "Tests/UnitTests/${ROOT_NS}.Modules.${MODULE_NAME}.UnitTests.csproj"
+    "Tests/IntegrationTests/${ROOT_NS}.Modules.${MODULE_NAME}.IntegrationTests.csproj"
+    "Tests/ArchTests/${ROOT_NS}.Modules.${MODULE_NAME}.ArchTests.csproj"
+  )
+  for LAYER in "${LAYERS[@]}"; do
+    PROJECT_LINE="  <Project Path=\"../HC.LIS/HC.LIS.Modules/${MODULE_NAME}/${LAYER}\" />"
+    sed -i "s|</Solution>|${PROJECT_LINE}\n</Solution>|" "${SLNX_FILE}"
+  done
+  echo "Added ${MODULE_NAME} projects to HC.LIS.slnx"
+fi
