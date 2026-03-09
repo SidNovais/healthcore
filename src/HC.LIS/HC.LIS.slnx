@@ -9,5 +9,19 @@
   <Project Path="../HC.LIS/HC.LIS.Modules/TestOrders/Tests/UnitTests/HC.LIS.Modules.TestOrders.UnitTests.csproj" />
   <Project Path="../HC.LIS/HC.LIS.Modules/TestOrders/Tests/IntegrationTests/HC.LIS.Modules.TestOrders.IntegrationTests.csproj" />
   <Project Path="../HC.LIS/HC.LIS.Modules/TestOrders/Tests/ArchTests/HC.LIS.Modules.TestOrders.ArchTests.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/LabAnalysis/Domain/HC.LIS.Modules.LabAnalysis.Domain.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/LabAnalysis/Application/HC.LIS.Modules.LabAnalysis.Application.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/LabAnalysis/Infrastructure/HC.LIS.Modules.LabAnalysis.Infrastructure.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/LabAnalysis/IntegrationEvents/HC.LIS.Modules.LabAnalysis.IntegrationEvents.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/LabAnalysis/Tests/UnitTests/HC.LIS.Modules.LabAnalysis.UnitTests.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/LabAnalysis/Tests/IntegrationTests/HC.LIS.Modules.LabAnalysis.IntegrationTests.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/LabAnalysis/Tests/ArchTests/HC.LIS.Modules.LabAnalysis.ArchTests.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/SampleCollection/Domain/HC.LIS.Modules.SampleCollection.Domain.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/SampleCollection/Application/HC.LIS.Modules.SampleCollection.Application.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/SampleCollection/Infrastructure/HC.LIS.Modules.SampleCollection.Infrastructure.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/SampleCollection/IntegrationEvents/HC.LIS.Modules.SampleCollection.IntegrationEvents.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/SampleCollection/Tests/UnitTests/HC.LIS.Modules.SampleCollection.UnitTests.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/SampleCollection/Tests/IntegrationTests/HC.LIS.Modules.SampleCollection.IntegrationTests.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/SampleCollection/Tests/ArchTests/HC.LIS.Modules.SampleCollection.ArchTests.csproj" />
   <Project Path="HC.LIS.Database/HC.LIS.Database.csproj" />
 </Solution>
