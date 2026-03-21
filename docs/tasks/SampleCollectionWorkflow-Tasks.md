@@ -25,6 +25,9 @@
 - `CallPatientCommand` carries `TechnicianId (Guid)` and `CalledAt (DateTime)` in addition to `CollectionRequestId` — the task description omitted them but `CallPatient(Guid technicianId, DateTime calledAt)` requires both
 - `PatientCalledNotification` co-located in `CallPatient/` folder; BiMap key is `"PatientCalledNotification"`
 - Build: 0 warnings, 0 errors. Unit tests: 14 passed. Step 4 complete.
+- `CreateBarcodeCommand` carries `TubeType (string)`, `BarcodeValue (string)`, `TechnicianId (Guid)`, `CreatedAt (DateTime)` in addition to `CollectionRequestId` — the task description omitted them but `CreateBarcode(string tubeType, string barcodeValue, Guid technicianId, DateTime createdAt)` requires all four
+- `BarcodeCreatedNotification` co-located in `CreateBarcode/` folder; BiMap key is `"BarcodeCreatedNotification"` (4th entry, now 4/7 wired)
+- Build: 0 warnings, 0 errors. Unit tests: 14 passed. Step 5 complete.
 
 ---
 
@@ -71,10 +74,10 @@ One subfolder per step under `Application/Collections/`.
 
 ### Step 5 — CreateBarcode
 
-- [ ] `Application/Collections/CreateBarcode/CreateBarcodeCommand.cs`
+- [x] `Application/Collections/CreateBarcode/CreateBarcodeCommand.cs`
   - Properties: `CollectionRequestId`, `SampleId` (both `Guid`)
   - Implements `ICommand`
-- [ ] `Application/Collections/CreateBarcode/CreateBarcodeCommandHandler.cs`
+- [x] `Application/Collections/CreateBarcode/CreateBarcodeCommandHandler.cs`
   - Loads aggregate, calls `CollectionRequest.CreateBarcode(command.SampleId)`
   - Saves aggregate
 
@@ -109,7 +112,7 @@ One notification class per domain event. Notifications with an integration event
 - [ ] `Application/Collections/CreateCollectionRequest/PatientArrivedNotificationHandler.cs` — publishes `PatientArrivedIntegrationEvent` via `IEventsBus`
 - [x] `Application/Collections/MovePatientToWaiting/PatientWaitingNotification.cs` *(co-located with command)*
 - [x] `Application/Collections/CallPatient/PatientCalledNotification.cs` *(co-located with command)*
-- [ ] `Application/Collections/BarcodeCreated/BarcodeCreatedNotification.cs`
+- [x] `Application/Collections/CreateBarcode/BarcodeCreatedNotification.cs` *(co-located with command)*
 - [ ] `Application/Collections/BarcodeCreated/BarcodeCreatedNotificationHandler.cs` — publishes `BarcodeCreatedIntegrationEvent` via `IEventsBus`
 - [ ] `Application/Collections/SampleCollected/SampleCollectedNotification.cs`
 - [ ] `Application/Collections/SampleCollected/SampleCollectedNotificationHandler.cs` — publishes `SampleCollectedIntegrationEvent` via `IEventsBus`
@@ -153,7 +156,7 @@ options.Events.AddEventType<ExamAddedToExistingSampleDomainEvent>();
 ### SampleCollectionStartup — OutboxModule BiMap
 
 - [ ] `Infrastructure/Configurations/SampleCollectionStartup.cs`
-  - Populate BiMap with all 7 domain event → notification type mappings (1/7 done: `PatientArrivedNotification`):
+  - Populate BiMap with all 7 domain event → notification type mappings (4/7 done: `PatientArrivedNotification`, `PatientWaitingNotification`, `PatientCalledNotification`, `BarcodeCreatedNotification`):
 
 ```csharp
 // Pattern (adapt to actual notification class names):
