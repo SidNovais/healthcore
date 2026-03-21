@@ -22,6 +22,9 @@
 - `MovePatientToWaitingCommand` carries `WaitingAt (DateTime)` in addition to `CollectionRequestId` — the task description omitted it but `MoveToWaiting(DateTime waitingAt)` requires it
 - `PatientWaitingNotification` co-located in `MovePatientToWaiting/` folder; BiMap key is `"PatientWaitingNotification"` (full class name, matching the existing `"PatientArrivedNotification"` pattern)
 - Build: 0 warnings, 0 errors. Step 3 complete.
+- `CallPatientCommand` carries `TechnicianId (Guid)` and `CalledAt (DateTime)` in addition to `CollectionRequestId` — the task description omitted them but `CallPatient(Guid technicianId, DateTime calledAt)` requires both
+- `PatientCalledNotification` co-located in `CallPatient/` folder; BiMap key is `"PatientCalledNotification"`
+- Build: 0 warnings, 0 errors. Unit tests: 14 passed. Step 4 complete.
 
 ---
 
@@ -59,10 +62,10 @@ One subfolder per step under `Application/Collections/`.
 
 ### Step 4 — CallPatient
 
-- [ ] `Application/Collections/CallPatient/CallPatientCommand.cs`
+- [x] `Application/Collections/CallPatient/CallPatientCommand.cs`
   - Property: `CollectionRequestId` (`Guid`)
   - Implements `ICommand`
-- [ ] `Application/Collections/CallPatient/CallPatientCommandHandler.cs`
+- [x] `Application/Collections/CallPatient/CallPatientCommandHandler.cs`
   - Loads aggregate, calls `CollectionRequest.CallPatient()`
   - Saves aggregate
 
@@ -105,7 +108,7 @@ One notification class per domain event. Notifications with an integration event
 - [x] `Application/Collections/CreateCollectionRequest/PatientArrivedNotification.cs` *(co-located with command, not in a separate folder)*
 - [ ] `Application/Collections/CreateCollectionRequest/PatientArrivedNotificationHandler.cs` — publishes `PatientArrivedIntegrationEvent` via `IEventsBus`
 - [x] `Application/Collections/MovePatientToWaiting/PatientWaitingNotification.cs` *(co-located with command)*
-- [ ] `Application/Collections/PatientCalled/PatientCalledNotification.cs`
+- [x] `Application/Collections/CallPatient/PatientCalledNotification.cs` *(co-located with command)*
 - [ ] `Application/Collections/BarcodeCreated/BarcodeCreatedNotification.cs`
 - [ ] `Application/Collections/BarcodeCreated/BarcodeCreatedNotificationHandler.cs` — publishes `BarcodeCreatedIntegrationEvent` via `IEventsBus`
 - [ ] `Application/Collections/SampleCollected/SampleCollectedNotification.cs`
