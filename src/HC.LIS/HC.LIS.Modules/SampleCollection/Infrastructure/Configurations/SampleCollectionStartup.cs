@@ -2,6 +2,7 @@ using Autofac;
 using HC.Core.Application;
 using HC.Core.Infrastructure;
 using HC.Core.Infrastructure.EventBus;
+using HC.LIS.Modules.SampleCollection.Application.Collections.CreateCollectionRequest;
 using HC.LIS.Modules.SampleCollection.Infrastructure.Configurations.Authentication;
 using HC.LIS.Modules.SampleCollection.Infrastructure.Configurations.DataAccess;
 using HC.LIS.Modules.SampleCollection.Infrastructure.Configurations.EventBus;
@@ -53,6 +54,7 @@ public class SampleCollectionStartup
         containerBuilder.RegisterModule(new MediatorModule());
         containerBuilder.RegisterModule(new AuthenticationModule());
         var domainNotificationsMap = new BiMap();
+        domainNotificationsMap.Add("PatientArrivedNotification", typeof(PatientArrivedNotification));
         containerBuilder.RegisterModule(new OutboxModule(domainNotificationsMap));
         BiMap internalCommandsMap = new();
         containerBuilder.RegisterModule(new InternalCommandsModule(internalCommandsMap));
