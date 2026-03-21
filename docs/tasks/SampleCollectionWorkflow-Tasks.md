@@ -37,6 +37,10 @@
 - `SampleCreatedForExamNotification` and `ExamAddedToExistingSampleNotification` co-located in `AddExamToCollection/` folder — both domain events fire from the same `AddExam()` domain method depending on whether a sample already exists for the tube type
 - BiMap now 7/7: added `"SampleCreatedForExamNotification"` and `"ExamAddedToExistingSampleNotification"` entries to `SampleCollectionStartup`
 - Build: 0 warnings, 0 errors. Unit tests: 14 passed.
+- Integration events added: `PatientArrivedIntegrationEvent`, `BarcodeCreatedIntegrationEvent`, `SampleCollectedIntegrationEvent` — all in `IntegrationEvents/` project, inherit `IntegrationEvent(id, occurredAt)` from `HC.COre.Infrastructure.EventBus` (note typo in namespace — matches rest of project)
+- Publish handlers added: `PatientArrivedPublishEventNotificationHandler`, `BarcodeCreatedPublishEventNotificationHandler`, `SampleCollectedPublishEventNotificationHandler` — each implements `INotificationHandler<T>`, injects `IEventsBus`, constructs event from `notification.DomainEvent`, uses `notification.Id` as event id
+- `BarcodeCreated` maps `domainEvent.BarcodeValue` → integration event `Barcode` property (task spec uses `Barcode` not `BarcodeValue`)
+- Build: 0 warnings, 0 errors.
 
 ---
 
@@ -118,13 +122,13 @@ One notification class per domain event. Notifications with an integration event
 ### Notification files
 
 - [x] `Application/Collections/CreateCollectionRequest/PatientArrivedNotification.cs` *(co-located with command, not in a separate folder)*
-- [ ] `Application/Collections/CreateCollectionRequest/PatientArrivedPublishEventNotificationHandler.cs` — publishes `PatientArrivedIntegrationEvent` via `IEventsBus`
+- [x] `Application/Collections/CreateCollectionRequest/PatientArrivedPublishEventNotificationHandler.cs` — publishes `PatientArrivedIntegrationEvent` via `IEventsBus`
 - [x] `Application/Collections/MovePatientToWaiting/PatientWaitingNotification.cs` *(co-located with command)*
 - [x] `Application/Collections/CallPatient/PatientCalledNotification.cs` *(co-located with command)*
 - [x] `Application/Collections/CreateBarcode/BarcodeCreatedNotification.cs` *(co-located with command)*
-- [ ] `Application/Collections/CreateBarcode/BarcodeCreatedPublishEventNotificationHandler.cs` — publishes `BarcodeCreatedIntegrationEvent` via `IEventsBus`
+- [x] `Application/Collections/CreateBarcode/BarcodeCreatedPublishEventNotificationHandler.cs` — publishes `BarcodeCreatedIntegrationEvent` via `IEventsBus`
 - [x] `Application/Collections/RecordSampleCollection/SampleCollectedNotification.cs` *(co-located with command)*
-- [ ] `Application/Collections/RecordSampleCollection/SampleCollectedPublishEventNotificationHandler.cs` — publishes `SampleCollectedIntegrationEvent` via `IEventsBus`
+- [x] `Application/Collections/RecordSampleCollection/SampleCollectedPublishEventNotificationHandler.cs` — publishes `SampleCollectedIntegrationEvent` via `IEventsBus`
 - [x] `Application/Collections/AddExamToCollection/SampleCreatedForExamNotification.cs`
 - [x] `Application/Collections/AddExamToCollection/ExamAddedToExistingSampleNotification.cs`
 
@@ -135,11 +139,11 @@ One notification class per domain event. Notifications with an integration event
 Location: `IntegrationEvents/`
 Pattern: inherit `IntegrationEvent(Guid id, DateTime occurredAt)`, immutable properties, JSON-serializable.
 
-- [ ] `IntegrationEvents/PatientArrivedIntegrationEvent.cs`
+- [x] `IntegrationEvents/PatientArrivedIntegrationEvent.cs`
   - Properties: `CollectionRequestId` (`Guid`), `PatientId` (`Guid`)
-- [ ] `IntegrationEvents/BarcodeCreatedIntegrationEvent.cs`
+- [x] `IntegrationEvents/BarcodeCreatedIntegrationEvent.cs`
   - Properties: `CollectionRequestId` (`Guid`), `SampleId` (`Guid`), `Barcode` (`string`)
-- [ ] `IntegrationEvents/SampleCollectedIntegrationEvent.cs`
+- [x] `IntegrationEvents/SampleCollectedIntegrationEvent.cs`
   - Properties: `CollectionRequestId` (`Guid`), `SampleId` (`Guid`)
 
 ---
