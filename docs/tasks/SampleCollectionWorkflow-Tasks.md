@@ -118,13 +118,13 @@ One notification class per domain event. Notifications with an integration event
 ### Notification files
 
 - [x] `Application/Collections/CreateCollectionRequest/PatientArrivedNotification.cs` *(co-located with command, not in a separate folder)*
-- [ ] `Application/Collections/CreateCollectionRequest/PatientArrivedNotificationHandler.cs` — publishes `PatientArrivedIntegrationEvent` via `IEventsBus`
+- [ ] `Application/Collections/CreateCollectionRequest/PatientArrivedPublishEventNotificationHandler.cs` — publishes `PatientArrivedIntegrationEvent` via `IEventsBus`
 - [x] `Application/Collections/MovePatientToWaiting/PatientWaitingNotification.cs` *(co-located with command)*
 - [x] `Application/Collections/CallPatient/PatientCalledNotification.cs` *(co-located with command)*
 - [x] `Application/Collections/CreateBarcode/BarcodeCreatedNotification.cs` *(co-located with command)*
-- [ ] `Application/Collections/BarcodeCreated/BarcodeCreatedNotificationHandler.cs` — publishes `BarcodeCreatedIntegrationEvent` via `IEventsBus`
+- [ ] `Application/Collections/CreateBarcode/BarcodeCreatedPublishEventNotificationHandler.cs` — publishes `BarcodeCreatedIntegrationEvent` via `IEventsBus`
 - [x] `Application/Collections/RecordSampleCollection/SampleCollectedNotification.cs` *(co-located with command)*
-- [ ] `Application/Collections/RecordSampleCollection/SampleCollectedNotificationHandler.cs` — publishes `SampleCollectedIntegrationEvent` via `IEventsBus`
+- [ ] `Application/Collections/RecordSampleCollection/SampleCollectedPublishEventNotificationHandler.cs` — publishes `SampleCollectedIntegrationEvent` via `IEventsBus`
 - [x] `Application/Collections/AddExamToCollection/SampleCreatedForExamNotification.cs`
 - [x] `Application/Collections/AddExamToCollection/ExamAddedToExistingSampleNotification.cs`
 
