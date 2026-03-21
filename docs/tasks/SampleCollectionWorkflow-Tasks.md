@@ -32,6 +32,12 @@
 - `SampleCollectedNotification` co-located in `RecordSampleCollection/` folder; BiMap key is `"SampleCollectedNotification"` (5th entry, now 5/7 wired)
 - Build: 0 warnings, 0 errors. Unit tests: 14 passed. Step 6 complete.
 
+### Session notes — 2026-03-21
+
+- `SampleCreatedForExamNotification` and `ExamAddedToExistingSampleNotification` co-located in `AddExamToCollection/` folder — both domain events fire from the same `AddExam()` domain method depending on whether a sample already exists for the tube type
+- BiMap now 7/7: added `"SampleCreatedForExamNotification"` and `"ExamAddedToExistingSampleNotification"` entries to `SampleCollectionStartup`
+- Build: 0 warnings, 0 errors. Unit tests: 14 passed.
+
 ---
 
 ## Layer 1: Application — Commands & Handlers
@@ -119,8 +125,8 @@ One notification class per domain event. Notifications with an integration event
 - [ ] `Application/Collections/BarcodeCreated/BarcodeCreatedNotificationHandler.cs` — publishes `BarcodeCreatedIntegrationEvent` via `IEventsBus`
 - [x] `Application/Collections/RecordSampleCollection/SampleCollectedNotification.cs` *(co-located with command)*
 - [ ] `Application/Collections/RecordSampleCollection/SampleCollectedNotificationHandler.cs` — publishes `SampleCollectedIntegrationEvent` via `IEventsBus`
-- [ ] `Application/Collections/SampleCreatedForExam/SampleCreatedForExamNotification.cs`
-- [ ] `Application/Collections/ExamAddedToExistingSample/ExamAddedToExistingSampleNotification.cs`
+- [x] `Application/Collections/AddExamToCollection/SampleCreatedForExamNotification.cs`
+- [x] `Application/Collections/AddExamToCollection/ExamAddedToExistingSampleNotification.cs`
 
 ---
 
@@ -158,8 +164,8 @@ options.Events.AddEventType<ExamAddedToExistingSampleDomainEvent>();
 
 ### SampleCollectionStartup — OutboxModule BiMap
 
-- [ ] `Infrastructure/Configurations/SampleCollectionStartup.cs`
-  - Populate BiMap with all 7 domain event → notification type mappings (5/7 done: `PatientArrivedNotification`, `PatientWaitingNotification`, `PatientCalledNotification`, `BarcodeCreatedNotification`, `SampleCollectedNotification`):
+- [x] `Infrastructure/Configurations/SampleCollectionStartup.cs`
+  - Populate BiMap with all 7 domain event → notification type mappings (7/7 done):
 
 ```csharp
 // Pattern (adapt to actual notification class names):
