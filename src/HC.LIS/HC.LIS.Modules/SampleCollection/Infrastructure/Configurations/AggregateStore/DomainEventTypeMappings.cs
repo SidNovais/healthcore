@@ -1,3 +1,5 @@
+using HC.LIS.Modules.SampleCollection.Domain.Collections.Events;
+
 namespace HC.LIS.Modules.SampleCollection.Infrastructure.Configurations.AggregateStore;
 
 internal static class DomainEventTypeMappings
@@ -8,8 +10,13 @@ internal static class DomainEventTypeMappings
     {
         Dictionary = new Dictionary<string, Type>
         {
-            // Register domain event type mappings here, e.g.:
-            // { "MyDomainEvent", typeof(MyDomainEvent) },
+            { "PatientArrivedDomainEvent", typeof(PatientArrivedDomainEvent) },
+            { "SampleCreatedForExamDomainEvent", typeof(SampleCreatedForExamDomainEvent) },
+            { "ExamAddedToExistingSampleDomainEvent", typeof(ExamAddedToExistingSampleDomainEvent) },
+            { "PatientWaitingDomainEvent", typeof(PatientWaitingDomainEvent) },
+            { "PatientCalledDomainEvent", typeof(PatientCalledDomainEvent) },
+            { "BarcodeCreatedDomainEvent", typeof(BarcodeCreatedDomainEvent) },
+            { "SampleCollectedDomainEvent", typeof(SampleCollectedDomainEvent) },
         };
     }
 }
