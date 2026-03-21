@@ -3,6 +3,7 @@ using HC.Core.Application;
 using HC.Core.Infrastructure;
 using HC.Core.Infrastructure.EventBus;
 using HC.LIS.Modules.SampleCollection.Application.Collections.CreateCollectionRequest;
+using HC.LIS.Modules.SampleCollection.Application.Collections.CallPatient;
 using HC.LIS.Modules.SampleCollection.Application.Collections.MovePatientToWaiting;
 using HC.LIS.Modules.SampleCollection.Infrastructure.Configurations.Authentication;
 using HC.LIS.Modules.SampleCollection.Infrastructure.Configurations.DataAccess;
@@ -57,6 +58,7 @@ public class SampleCollectionStartup
         var domainNotificationsMap = new BiMap();
         domainNotificationsMap.Add("PatientArrivedNotification", typeof(PatientArrivedNotification));
         domainNotificationsMap.Add("PatientWaitingNotification", typeof(PatientWaitingNotification));
+        domainNotificationsMap.Add("PatientCalledNotification", typeof(PatientCalledNotification));
         containerBuilder.RegisterModule(new OutboxModule(domainNotificationsMap));
         BiMap internalCommandsMap = new();
         containerBuilder.RegisterModule(new InternalCommandsModule(internalCommandsMap));
