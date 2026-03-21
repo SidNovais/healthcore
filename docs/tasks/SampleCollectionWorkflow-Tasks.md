@@ -4,6 +4,8 @@
 **Domain layer:** Complete (aggregate, events, rules, unit tests)
 **Remaining:** Application, IntegrationEvents, Infrastructure, Integration Tests
 
+> **Convention:** After finishing each step, update this file — check off completed items and add a session note with any implementation details worth remembering.
+
 ### Session notes — 2026-03-20
 
 - `CreateCollectionRequestCommand` + handler implemented (Step 1 complete)
@@ -12,6 +14,11 @@
 - `SampleCollectionStartup` BiMap wired for `PatientArrivedNotification` only (remaining notifications to be added as each step is implemented)
 - `CollectionRequest.Create` takes plain `Guid` params, **not** typed IDs — task descriptions above that say `new PatientId(...)` are inaccurate; just pass `command.PatientId` directly
 - Build: 0 warnings, 0 errors. Unit tests: 14 passed.
+- `AddExamToCollectionCommand` + handler implemented (Step 2 complete)
+- `AddExamToCollectionCommand` has `TubeType (string)` in addition to `CollectionRequestId` and `ExamId` — the task description omitted it but the domain `AddExam(Guid examId, string tubeType)` requires it
+- Load pattern uses `CollectionRequestId` typed ID: `_aggregateStore.Load<CollectionRequest>(new CollectionRequestId(command.CollectionRequestId))` — same pattern needed for all remaining handlers
+- Save pattern uses `AppendChanges`: `_aggregateStore.AppendChanges(request)` — not `Append`
+- Build: 0 warnings, 0 errors.
 
 ---
 
@@ -31,12 +38,12 @@ One subfolder per step under `Application/Collections/`.
 
 ### Step 2 — AddExamToCollection
 
-- [ ] `Application/Collections/AddExamToCollection/AddExamToCollectionCommand.cs`
-  - Properties: `CollectionRequestId`, `ExamId` (both `Guid`)
-  - Implements `ICommand`
-- [ ] `Application/Collections/AddExamToCollection/AddExamToCollectionCommandHandler.cs`
-  - Loads aggregate, calls `CollectionRequest.AddExam(command.ExamId)`
-  - Saves aggregate
+- [x] `Application/Collections/AddExamToCollection/AddExamToCollectionCommand.cs`
+  - Properties: `CollectionRequestId`, `ExamId` (both `Guid`), `TubeType (string)`
+  - Extends `CommandBase`
+- [x] `Application/Collections/AddExamToCollection/AddExamToCollectionCommandHandler.cs`
+  - Loads aggregate, calls `CollectionRequest.AddExam(command.ExamId, command.TubeType)`
+  - Appends via `AppendChanges`
 
 ### Step 3 — MovePatientToWaiting
 
