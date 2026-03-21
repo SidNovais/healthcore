@@ -19,6 +19,9 @@
 - Load pattern uses `CollectionRequestId` typed ID: `_aggregateStore.Load<CollectionRequest>(new CollectionRequestId(command.CollectionRequestId))` — same pattern needed for all remaining handlers
 - Save pattern uses `AppendChanges`: `_aggregateStore.AppendChanges(request)` — not `Append`
 - Build: 0 warnings, 0 errors.
+- `MovePatientToWaitingCommand` carries `WaitingAt (DateTime)` in addition to `CollectionRequestId` — the task description omitted it but `MoveToWaiting(DateTime waitingAt)` requires it
+- `PatientWaitingNotification` co-located in `MovePatientToWaiting/` folder; BiMap key is `"PatientWaitingNotification"` (full class name, matching the existing `"PatientArrivedNotification"` pattern)
+- Build: 0 warnings, 0 errors. Step 3 complete.
 
 ---
 
@@ -47,12 +50,12 @@ One subfolder per step under `Application/Collections/`.
 
 ### Step 3 — MovePatientToWaiting
 
-- [ ] `Application/Collections/MovePatientToWaiting/MovePatientToWaitingCommand.cs`
-  - Property: `CollectionRequestId` (`Guid`)
-  - Implements `ICommand`
-- [ ] `Application/Collections/MovePatientToWaiting/MovePatientToWaitingCommandHandler.cs`
-  - Loads aggregate, calls `CollectionRequest.MoveToWaiting()`
-  - Saves aggregate
+- [x] `Application/Collections/MovePatientToWaiting/MovePatientToWaitingCommand.cs`
+  - Properties: `CollectionRequestId` (`Guid`), `WaitingAt` (`DateTime`)
+  - Extends `CommandBase`
+- [x] `Application/Collections/MovePatientToWaiting/MovePatientToWaitingCommandHandler.cs`
+  - Loads aggregate, calls `CollectionRequest.MoveToWaiting(command.WaitingAt)`
+  - Appends via `AppendChanges`
 
 ### Step 4 — CallPatient
 
@@ -101,7 +104,7 @@ One notification class per domain event. Notifications with an integration event
 
 - [x] `Application/Collections/CreateCollectionRequest/PatientArrivedNotification.cs` *(co-located with command, not in a separate folder)*
 - [ ] `Application/Collections/CreateCollectionRequest/PatientArrivedNotificationHandler.cs` — publishes `PatientArrivedIntegrationEvent` via `IEventsBus`
-- [ ] `Application/Collections/PatientWaiting/PatientWaitingNotification.cs`
+- [x] `Application/Collections/MovePatientToWaiting/PatientWaitingNotification.cs` *(co-located with command)*
 - [ ] `Application/Collections/PatientCalled/PatientCalledNotification.cs`
 - [ ] `Application/Collections/BarcodeCreated/BarcodeCreatedNotification.cs`
 - [ ] `Application/Collections/BarcodeCreated/BarcodeCreatedNotificationHandler.cs` — publishes `BarcodeCreatedIntegrationEvent` via `IEventsBus`
