@@ -1,9 +1,10 @@
 using System.Globalization;
 using FluentMigrator.Runner;
-using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.DataAccess;
 using Marten;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using TestOrdersMartenConfig = HC.LIS.Modules.TestOrders.Infrastructure.Configurations.DataAccess.MartenConfig;
+using SampleCollectionMartenConfig = HC.LIS.Modules.SampleCollection.Infrastructure.Configurations.DataAccess.MartenConfig;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console(
@@ -16,18 +17,25 @@ using (IServiceScope scope = serviceProvider.CreateScope())
 {
     UpdateDatabase(scope.ServiceProvider);
 }
-IDocumentStore store = MartenConfig.BuildDocumentStore(Environment.GetEnvironmentVariable("ASPNETCORE_HCLIS_DATABASE_CONNECTION_STRING")!);
-store.Storage.ApplyAllConfiguredChangesToDatabaseAsync().Wait();
+
+string connectionString = Environment.GetEnvironmentVariable("ASPNETCORE_HCLIS_DATABASE_CONNECTION_STRING")!;
+
+IDocumentStore testOrdersStore = TestOrdersMartenConfig.BuildDocumentStore(connectionString);
+testOrdersStore.Storage.ApplyAllConfiguredChangesToDatabaseAsync().Wait();
+
+IDocumentStore sampleCollectionStore = SampleCollectionMartenConfig.BuildDocumentStore(connectionString);
+sampleCollectionStore.Storage.ApplyAllConfiguredChangesToDatabaseAsync().Wait();
+
 Log.Logger.Information("Migration executed!");
 Log.CloseAndFlush();
 ServiceProvider CreateServices()
 {
-    string? connectionString = Environment.GetEnvironmentVariable("ASPNETCORE_HCLIS_DATABASE_CONNECTION_STRING");
+    string? dbConnectionString = Environment.GetEnvironmentVariable("ASPNETCORE_HCLIS_DATABASE_CONNECTION_STRING");
     return new ServiceCollection()
         .AddFluentMigratorCore()
         .ConfigureRunner(rb => rb
             .AddPostgres()
-            .WithGlobalConnectionString(connectionString)
+            .WithGlobalConnectionString(dbConnectionString)
             .ScanIn(typeof(Program).Assembly).For.Migrations())
         .AddLogging(lb =>
         {
