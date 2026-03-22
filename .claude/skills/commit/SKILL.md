@@ -80,20 +80,56 @@ A commit with `BREAKING CHANGE:` in the footer (or a `!` after the type/scope) i
 Run these in parallel:
 
 1. `git status --short` — see staged vs unstaged files
-2. `git diff --staged` — full diff of what is staged
+2. `git diff` — full diff of all unstaged changes (includes untracked via `git diff HEAD`)
 3. `git log --oneline -5` — recent commits (to match the project's style and scope vocabulary)
 
-If **nothing is staged**, check `git diff --stat` (unstaged). If there are unstaged changes, tell the user what you found and ask:
-- Should I stage everything (`git add -A`) and commit?
-- Or should I stage specific files? (list them)
+If **something is staged**, treat staged changes as the intended commit and proceed to Phase 2.
 
-Do not stage or commit without confirmation when nothing is staged.
+If **nothing is staged**, inspect all unstaged + untracked changes, then go to Phase 1b.
+
+---
+
+## Phase 1b — Group changes into logical commits
+
+When nothing is staged, **do not ask the user to choose files**. Instead, analyze the full diff and group changed files into the smallest possible cohesive commits where each one:
+
+- Builds and passes tests on its own (never leaves the codebase broken)
+- Represents a single logical concern (e.g., "add migration files" is one commit; "register events in MartenConfig" is another)
+- Has a clear, standalone commit message
+
+**Grouping heuristics:**
+- Files that only make sense together (e.g., a command + its handler + its test) → same commit
+- Infrastructure wiring that enables a feature (e.g., project reference + Marten init) → can be split if each layer is independently meaningful
+- Test changes that accompany production code → same commit as the production change, unless they test a previously committed feature
+- Migrations → one commit per module; group all migration files for a module together
+- Build/config changes (`.csproj`, `Directory.Build.props`) that are prerequisites → commit first, before the code that depends on them
+
+Present the proposed grouping to the user before staging anything:
+
+```
+I found N groups of changes:
+
+1. build(database): add SampleCollection project reference
+   → HC.LIS.Database.csproj
+
+2. feat(sample-collection): register domain events in MartenConfig
+   → Infrastructure/Configurations/DataAccess/MartenConfig.cs
+
+3. feat(database): add SampleCollection migration files
+   → Database/SampleCollection/*.cs
+
+Commit them in this order? (yes / edit / cancel)
+```
+
+- **yes** — stage and commit each group sequentially, showing the message and confirming before each one
+- **edit** — ask what to change in the grouping, then re-present before proceeding
+- **cancel** — stop; do not stage or commit anything
 
 ---
 
 ## Phase 2 — Analyze and draft
 
-Using the diff:
+For each group (or for the staged diff):
 
 1. **Identify the type** — is this new behaviour, a fix, docs, test-only, etc.?
 2. **Identify the scope** — which module or layer is touched? Use the folder name as a guide (`SampleCollection` → `sample-collection`).
@@ -107,7 +143,7 @@ Using the diff:
 
 ---
 
-## Phase 3 — Show and confirm
+## Phase 3 — Show and confirm (per commit)
 
 Display the full proposed commit message in a code block, like this:
 
@@ -130,9 +166,15 @@ Then ask the user:
 
 ---
 
-## Phase 4 — Execute
+## Phase 4 — Execute (per commit)
 
-Run the commit using a HEREDOC to preserve formatting exactly:
+Stage only the files for this commit using explicit paths — never `git add -A` or `git add .`:
+
+```bash
+git add path/to/file1 path/to/file2
+```
+
+Then run the commit using a HEREDOC to preserve formatting exactly:
 
 ```bash
 git commit -m "$(cat <<'EOF'
@@ -142,6 +184,8 @@ EOF
 ```
 
 After the commit succeeds, show the one-line output from `git log --oneline -1`.
+
+If there are more groups remaining, move to the next one (Phase 2 → 3 → 4) until all groups are committed.
 
 If the pre-commit hook fails:
 1. Read the hook output carefully.
@@ -158,3 +202,4 @@ If the pre-commit hook fails:
 - **Never** amend unless the user explicitly requests it.
 - **Never** push; only commit.
 - **Never** commit files that likely contain secrets (`.env`, `*credentials*`, `*secret*`). Warn the user instead.
+- **Never** create a commit that leaves the codebase in a broken state (missing dependency, unresolved reference, failing build).
