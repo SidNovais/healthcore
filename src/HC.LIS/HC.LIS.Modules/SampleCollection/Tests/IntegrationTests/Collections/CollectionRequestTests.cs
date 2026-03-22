@@ -6,6 +6,7 @@ using HC.LIS.Modules.SampleCollection.Application.Collections.CreateBarcode;
 using HC.LIS.Modules.SampleCollection.Application.Collections.CreateCollectionRequest;
 using HC.LIS.Modules.SampleCollection.Application.Collections.MovePatientToWaiting;
 using HC.LIS.Modules.SampleCollection.Application.Collections.RecordSampleCollection;
+using HC.LIS.Modules.SampleCollection.Domain.Collections;
 
 namespace HC.LIS.Modules.SampleCollection.IntegrationTests.Collections;
 
@@ -18,10 +19,18 @@ public class CollectionRequestTests : TestBase
     {
         await CollectionRequestFactory.CreateAsync(SampleCollectionModule).ConfigureAwait(true);
 
-        var message = await GetLastOutboxMessage<PatientArrivedNotification>().ConfigureAwait(true);
+        var details = await GetEventually(
+            new GetCollectionRequestDetailsFromSampleCollectionProbe(
+                CollectionRequestSampleData.CollectionRequestId,
+                SampleCollectionModule),
+            15000).ConfigureAwait(true);
 
-        message.Should().NotBeNull();
-        message!.DomainEvent.CollectionRequestId.Should().Be(CollectionRequestSampleData.CollectionRequestId);
+        details.Should().NotBeNull();
+        details!.CollectionRequestId.Should().Be(CollectionRequestSampleData.CollectionRequestId);
+        details.PatientId.Should().Be(CollectionRequestSampleData.PatientId);
+        details.OrderId.Should().Be(CollectionRequestSampleData.OrderId);
+        details.Status.Should().Be(CollectionStatus.Arrived.Value);
+        details.ArrivedAt.Should().Be(CollectionRequestSampleData.ArrivedAt);
     }
 
     [Fact]
@@ -34,10 +43,18 @@ public class CollectionRequestTests : TestBase
                 CollectionRequestSampleData.ExamId,
                 CollectionRequestSampleData.TubeType)).ConfigureAwait(true);
 
-        var message = await GetLastOutboxMessage<SampleCreatedForExamNotification>().ConfigureAwait(true);
+        var sampleNotification = await GetLastOutboxMessage<SampleCreatedForExamNotification>().ConfigureAwait(true);
+        var sampleId = sampleNotification!.DomainEvent.SampleId;
 
-        message.Should().NotBeNull();
-        message!.DomainEvent.CollectionRequestId.Should().Be(CollectionRequestSampleData.CollectionRequestId);
+        var details = await GetEventually(
+            new GetSampleDetailsFromSampleCollectionProbe(sampleId, SampleCollectionModule),
+            15000).ConfigureAwait(true);
+
+        details.Should().NotBeNull();
+        details!.SampleId.Should().Be(sampleId);
+        details.CollectionRequestId.Should().Be(CollectionRequestSampleData.CollectionRequestId);
+        details.TubeType.Should().Be(CollectionRequestSampleData.TubeType);
+        details.Status.Should().Be(SampleStatus.Pending.Value);
     }
 
     [Fact]
@@ -49,10 +66,15 @@ public class CollectionRequestTests : TestBase
                 CollectionRequestSampleData.CollectionRequestId,
                 CollectionRequestSampleData.WaitingAt)).ConfigureAwait(true);
 
-        var message = await GetLastOutboxMessage<PatientWaitingNotification>().ConfigureAwait(true);
+        var details = await GetEventually(
+            new GetCollectionRequestDetailsFromSampleCollectionProbe(
+                CollectionRequestSampleData.CollectionRequestId,
+                SampleCollectionModule),
+            15000).ConfigureAwait(true);
 
-        message.Should().NotBeNull();
-        message!.DomainEvent.CollectionRequestId.Should().Be(CollectionRequestSampleData.CollectionRequestId);
+        details.Should().NotBeNull();
+        details!.Status.Should().Be(CollectionStatus.Waiting.Value);
+        details.WaitingAt.Should().Be(CollectionRequestSampleData.WaitingAt);
     }
 
     [Fact]
@@ -69,10 +91,15 @@ public class CollectionRequestTests : TestBase
                 CollectionRequestSampleData.TechnicianId,
                 CollectionRequestSampleData.CalledAt)).ConfigureAwait(true);
 
-        var message = await GetLastOutboxMessage<PatientCalledNotification>().ConfigureAwait(true);
+        var details = await GetEventually(
+            new GetCollectionRequestDetailsFromSampleCollectionProbe(
+                CollectionRequestSampleData.CollectionRequestId,
+                SampleCollectionModule),
+            15000).ConfigureAwait(true);
 
-        message.Should().NotBeNull();
-        message!.DomainEvent.CollectionRequestId.Should().Be(CollectionRequestSampleData.CollectionRequestId);
+        details.Should().NotBeNull();
+        details!.Status.Should().Be(CollectionStatus.Called.Value);
+        details.CalledAt.Should().Be(CollectionRequestSampleData.CalledAt);
     }
 
     [Fact]
@@ -84,6 +111,10 @@ public class CollectionRequestTests : TestBase
                 CollectionRequestSampleData.CollectionRequestId,
                 CollectionRequestSampleData.ExamId,
                 CollectionRequestSampleData.TubeType)).ConfigureAwait(true);
+
+        var sampleNotification = await GetLastOutboxMessage<SampleCreatedForExamNotification>().ConfigureAwait(true);
+        var sampleId = sampleNotification!.DomainEvent.SampleId;
+
         await SampleCollectionModule.ExecuteCommandAsync(
             new MovePatientToWaitingCommand(
                 CollectionRequestSampleData.CollectionRequestId,
@@ -96,10 +127,13 @@ public class CollectionRequestTests : TestBase
                 CollectionRequestSampleData.TechnicianId,
                 CollectionRequestSampleData.BarcodeCreatedAt)).ConfigureAwait(true);
 
-        var message = await GetLastOutboxMessage<BarcodeCreatedNotification>().ConfigureAwait(true);
+        var details = await GetEventually(
+            new GetSampleDetailsFromSampleCollectionProbe(sampleId, SampleCollectionModule),
+            15000).ConfigureAwait(true);
 
-        message.Should().NotBeNull();
-        message!.DomainEvent.CollectionRequestId.Should().Be(CollectionRequestSampleData.CollectionRequestId);
+        details.Should().NotBeNull();
+        details!.Barcode.Should().Be(CollectionRequestSampleData.BarcodeValue);
+        details.Status.Should().Be(SampleStatus.BarcodeCreated.Value);
     }
 
     [Fact]
@@ -138,9 +172,12 @@ public class CollectionRequestTests : TestBase
                 CollectionRequestSampleData.TechnicianId,
                 CollectionRequestSampleData.CollectedAt)).ConfigureAwait(true);
 
-        var message = await GetLastOutboxMessage<SampleCollectedNotification>().ConfigureAwait(true);
+        var details = await GetEventually(
+            new GetSampleDetailsFromSampleCollectionProbe(sampleId, SampleCollectionModule),
+            15000).ConfigureAwait(true);
 
-        message.Should().NotBeNull();
-        message!.DomainEvent.CollectionRequestId.Should().Be(CollectionRequestSampleData.CollectionRequestId);
+        details.Should().NotBeNull();
+        details!.Status.Should().Be(SampleStatus.Collected.Value);
+        details.CollectedAt.Should().Be(CollectionRequestSampleData.CollectedAt);
     }
 }
