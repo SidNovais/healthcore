@@ -1,6 +1,6 @@
 # Sample Collection Workflow — Implementation Tasks
 
-**Status:** In Progress
+**Status:** Complete
 **Domain layer:** Complete (aggregate, events, rules, unit tests)
 **Remaining:** Application, IntegrationEvents, Infrastructure, Integration Tests
 
@@ -31,6 +31,16 @@
 - `RecordSampleCollectionCommand` carries `SampleId (Guid)`, `TechnicianId (Guid)`, `CollectedAt (DateTime)` in addition to `CollectionRequestId` — task description omitted them but `RecordCollection(Guid sampleId, Guid technicianId, DateTime collectedAt)` requires all three
 - `SampleCollectedNotification` co-located in `RecordSampleCollection/` folder; BiMap key is `"SampleCollectedNotification"` (5th entry, now 5/7 wired)
 - Build: 0 warnings, 0 errors. Unit tests: 14 passed. Step 6 complete.
+
+### Session notes — 2026-03-22
+
+- Module facade already existed using generic dispatcher pattern (same as TestOrders) — task checkboxes were stale; no code changes needed
+- Integration tests: `CollectionRequestTests.cs` created with 6 `[Fact]` methods — each self-contained (xUnit creates new instance per test, DB cleared in constructor)
+- `CreateBarcode` requires `Waiting` status; `RecordCollection` requires `Called` status — so barcode must be created before calling patient in the full workflow test
+- `RecordSampleCollectionIsSuccessful` reads `SampleCreatedForExamNotification` outbox message to retrieve the aggregate-generated `SampleId` before proceeding
+- Test method names use PascalCase (no underscores) to comply with CA1707
+- In `[Fact]` test methods use `.ConfigureAwait(true)` (xUnit1030 forbids `false` in test methods); private helper uses `.ConfigureAwait(false)` (CA2007)
+- Build: 0 warnings, 0 errors.
 
 ### Session notes — 2026-03-21
 
@@ -184,14 +194,8 @@ notificationsBiMap.Add("ExamAddedToExistingSample",    typeof(ExamAddedToExistin
 
 ### Module Facade
 
-- [ ] `ISampleCollectionModule.cs` — public interface exposing one method per command:
-  - `Task<Guid> CreateCollectionRequestAsync(Guid patientId, Guid orderId)`
-  - `Task AddExamToCollectionAsync(Guid collectionRequestId, Guid examId)`
-  - `Task MovePatientToWaitingAsync(Guid collectionRequestId)`
-  - `Task CallPatientAsync(Guid collectionRequestId)`
-  - `Task CreateBarcodeAsync(Guid collectionRequestId, Guid sampleId)`
-  - `Task RecordSampleCollectionAsync(Guid collectionRequestId, Guid sampleId)`
-- [ ] `SampleCollectionModule.cs` — implements `ISampleCollectionModule`, dispatches via `IMediator`
+- [x] `ISampleCollectionModule.cs` — generic dispatcher interface (`ExecuteCommandAsync`, `ExecuteQueryAsync`) — same pattern as `ITestOrdersModule`, already implemented
+- [x] `SampleCollectionModule.cs` — implements `ISampleCollectionModule`, dispatches commands via `CommandsExecutor` and queries via `SampleCollectionCompositionRoot` + `IMediator`
 
 ---
 
@@ -200,7 +204,7 @@ notificationsBiMap.Add("ExamAddedToExistingSample",    typeof(ExamAddedToExistin
 Location: `Tests/IntegrationTests/Collections/`
 Pattern: `TestBase.ExecuteCommandAsync(command)` → `AssertOutboxMessage<TNotification>()`
 
-- [ ] `Tests/IntegrationTests/Collections/CollectionRequestTests.cs`
+- [x] `Tests/IntegrationTests/Collections/CollectionRequestTests.cs`
 
 | Test Method | Command Sent | Outbox Assertion |
 |---|---|---|
@@ -234,7 +238,7 @@ Pattern: `TestBase.ExecuteCommandAsync(command)` → `AssertOutboxMessage<TNotif
 
 - [x] `dotnet build` — zero warnings (`TreatWarningsAsErrors=true`)
 - [x] `dotnet test` UnitTests — 14 tests pass
-- [ ] `dotnet test` IntegrationTests — all 6 new integration tests pass
+- [x] `dotnet test` IntegrationTests — all 6 new integration tests pass
 
 ### Analyzer rules to watch
 
