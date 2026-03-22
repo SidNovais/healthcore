@@ -74,8 +74,13 @@ public class TestBase
     private static async Task ClearDatabase(IDbConnection connection)
     {
         const string sql = @"DELETE FROM ""sample_collection"".""InboxMessages"";
-                             DELETE FROM ""sample_collection"".""InternalCommands"";
-                             DELETE FROM ""sample_collection"".""OutboxMessages"";";
+                            DELETE FROM ""sample_collection"".""InternalCommands"";
+                            DELETE FROM ""sample_collection"".""OutboxMessages"";
+                            DELETE FROM ""sample_collection"".""mt_doc_deadletterevent"";
+                            DELETE FROM ""sample_collection"".""mt_event_progression"";
+                            DELETE FROM ""sample_collection"".""mt_events"";
+                            DELETE FROM ""sample_collection"".""mt_streams"";"
+        ;
 
         await connection.ExecuteScalarAsync(sql).ConfigureAwait(false);
     }
