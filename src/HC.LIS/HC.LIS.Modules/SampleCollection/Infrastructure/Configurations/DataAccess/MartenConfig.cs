@@ -1,3 +1,4 @@
+using HC.LIS.Modules.SampleCollection.Domain.Collections.Events;
 using JasperFx;
 using JasperFx.Events;
 using Marten;
@@ -14,8 +15,13 @@ public static class MartenConfig
             options.DatabaseSchemaName = "sample_collection";
             options.AutoCreateSchemaObjects = AutoCreate.None;
             options.Events.StreamIdentity = StreamIdentity.AsString;
-            // Register domain event types here, e.g.:
-            // options.Events.AddEventType<MyDomainEvent>();
+            options.Events.AddEventType<PatientArrivedDomainEvent>();
+            options.Events.AddEventType<SampleCreatedForExamDomainEvent>();
+            options.Events.AddEventType<ExamAddedToExistingSampleDomainEvent>();
+            options.Events.AddEventType<PatientWaitingDomainEvent>();
+            options.Events.AddEventType<PatientCalledDomainEvent>();
+            options.Events.AddEventType<BarcodeCreatedDomainEvent>();
+            options.Events.AddEventType<SampleCollectedDomainEvent>();
         });
         return store;
     }
