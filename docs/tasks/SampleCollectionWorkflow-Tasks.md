@@ -247,3 +247,101 @@ Pattern: `TestBase.ExecuteCommandAsync(command)` → `AssertOutboxMessage<TNotif
 - `CA2007`: `.ConfigureAwait(false)` on all awaited tasks
 - `CA1707`: no underscores in public/test method names (use `PascalCase`)
 - `CA1716`: avoid reserved keywords in namespaces
+
+---
+
+## Layer 6: Projections & Queries
+
+Two read models, each with a projector, notification projections, query handler, DTO, and integration tests.
+Pattern: identical to `TestOrders` (`OrderDetailsProjector`, `OrderItemDetailsProjector`).
+
+### Read Model 1 — CollectionRequestDetails
+
+Tracks the overall collection request lifecycle.
+
+| Column | Type | Populated by |
+|---|---|---|
+| `Id` | GUID PK | `PatientArrivedDomainEvent` |
+| `PatientId` | GUID | `PatientArrivedDomainEvent` |
+| `OrderId` | GUID | `PatientArrivedDomainEvent` |
+| `Status` | VARCHAR(50) | All status transitions |
+| `ArrivedAt` | TIMESTAMPTZ | `PatientArrivedDomainEvent` |
+| `WaitingAt` | TIMESTAMPTZ NULL | `PatientWaitingDomainEvent` |
+| `CalledAt` | TIMESTAMPTZ NULL | `PatientCalledDomainEvent` |
+
+#### Application files
+- [x] `Application/Collections/GetCollectionRequestDetails/CollectionRequestDetailsDto.cs`
+- [x] `Application/Collections/GetCollectionRequestDetails/GetCollectionRequestDetailsQuery.cs`
+- [x] `Application/Collections/GetCollectionRequestDetails/GetCollectionRequestDetailsQueryHandler.cs` — Dapper SELECT
+- [x] `Application/Collections/GetCollectionRequestDetails/CollectionRequestDetailsProjector.cs`
+  - `When(PatientArrivedDomainEvent)` → INSERT
+  - `When(PatientWaitingDomainEvent)` → UPDATE Status, WaitingAt
+  - `When(PatientCalledDomainEvent)` → UPDATE Status, CalledAt
+  - `When(IDomainEvent)` → fall-through (no-op)
+- [x] `Application/Collections/CreateCollectionRequest/PatientArrivedNotificationProjection.cs` — co-located with command *(not in GetCollectionRequestDetails/)*
+- [x] `Application/Collections/MovePatientToWaiting/PatientWaitingNotificationProjection.cs` — co-located with command
+- [x] `Application/Collections/CallPatient/PatientCalledNotificationProjection.cs` — co-located with command
+
+### Read Model 2 — SampleDetails
+
+Tracks individual sample lifecycle.
+
+| Column | Type | Populated by |
+|---|---|---|
+| `Id` | GUID PK | `SampleCreatedForExamDomainEvent` |
+| `CollectionRequestId` | GUID | `SampleCreatedForExamDomainEvent` |
+| `TubeType` | VARCHAR(255) | `SampleCreatedForExamDomainEvent` |
+| `Barcode` | VARCHAR(255) NULL | `BarcodeCreatedDomainEvent` |
+| `Status` | VARCHAR(50) | `SampleCreated`, `BarcodeCreated`, `SampleCollected` |
+| `CollectedAt` | TIMESTAMPTZ NULL | `SampleCollectedDomainEvent` |
+
+> Note: `ExamAddedToExistingSampleDomainEvent` does not alter SampleDetails (no exam tracking needed in this read model).
+
+#### Application files
+- [x] `Application/Collections/GetSampleDetails/SampleDetailsDto.cs`
+- [x] `Application/Collections/GetSampleDetails/GetSampleDetailsQuery.cs`
+- [x] `Application/Collections/GetSampleDetails/GetSampleDetailsQueryHandler.cs` — Dapper SELECT
+- [x] `Application/Collections/GetSampleDetails/SampleDetailsProjector.cs`
+  - `When(SampleCreatedForExamDomainEvent)` → INSERT (Status = "Pending")
+  - `When(BarcodeCreatedDomainEvent)` → UPDATE Barcode, Status = "BarcodeCreated"
+  - `When(SampleCollectedDomainEvent)` → UPDATE Status = "Collected", CollectedAt
+  - `When(IDomainEvent)` → fall-through (no-op)
+- [x] `Application/Collections/AddExamToCollection/SampleCreatedForExamNotificationProjection.cs` — co-located with command *(not in GetSampleDetails/)*
+- [x] `Application/Collections/CreateBarcode/BarcodeCreatedNotificationProjection.cs` — co-located with command (second handler alongside publish handler)
+- [x] `Application/Collections/RecordSampleCollection/SampleCollectedNotificationProjection.cs` — co-located with command (second handler alongside publish handler)
+
+### Database Migrations
+
+- [x] `src/HC.LIS/HC.LIS.Database/SampleCollection/20260322185000_SampleCollectionModule_AddTableCollectionRequestDetails.cs`
+- [x] `src/HC.LIS/HC.LIS.Database/SampleCollection/20260322185100_SampleCollectionModule_AddTableSampleDetails.cs`
+
+### Integration Tests
+
+- [x] `Tests/IntegrationTests/Collections/GetCollectionRequestDetailsFromSampleCollectionProbe.cs` — `IProbe<CollectionRequestDetailsDto>`
+- [x] `Tests/IntegrationTests/Collections/GetSampleDetailsFromSampleCollectionProbe.cs` — `IProbe<SampleDetailsDto>`
+- [x] `Tests/IntegrationTests/TestBase.cs` — `ClearDatabase()` now truncates `CollectionRequestDetails` and `SampleDetails`; added `GetEventually()` method and `IDisposable` (calls `SampleCollectionStartup.Stop()`)
+- [x] `Tests/IntegrationTests/Collections/CollectionRequestTests.cs` — all 6 tests refactored to assert on projected read model state via `GetEventually(probe, 15000)`
+
+| Test | After Command | Assertion |
+|---|---|---|
+| `CreateCollectionRequestIsSuccessful` | `CreateCollectionRequestCommand` | `CollectionRequestDetails.Status == "Arrived"`, `PatientId`, `OrderId`, `ArrivedAt` |
+| `MovePatientToWaitingIsSuccessful` | `MovePatientToWaitingCommand` | `Status == "Waiting"`, `WaitingAt` set |
+| `CallPatientIsSuccessful` | `CallPatientCommand` | `Status == "Called"`, `CalledAt` set |
+| `AddExamToCollectionIsSuccessful` | `AddExamToCollectionCommand` | `SampleDetails.Status == "Pending"`, `TubeType`, `CollectionRequestId` |
+| `CreateBarcodeIsSuccessful` | `CreateBarcodeCommand` | `SampleDetails.Barcode` set, `Status == "BarcodeCreated"` |
+| `RecordSampleCollectionIsSuccessful` | `RecordSampleCollectionCommand` | `Status == "Collected"`, `CollectedAt` set |
+
+### Verification
+
+- [x] `dotnet build` — zero warnings
+- [x] `dotnet test` UnitTests — 14 tests pass (no domain changes)
+- [ ] `dotnet test` IntegrationTests — pending DB migration run
+
+### Session notes — 2026-03-22
+
+- Notification projection classes co-located with their command folder (same pattern as TestOrders), **not** inside the read model folder — e.g. `PatientArrivedNotificationProjection` lives in `CreateCollectionRequest/`, not `GetCollectionRequestDetails/`
+- Projectors (`CollectionRequestDetailsProjector`, `SampleDetailsProjector`) are auto-registered by `DataAccessModule` assembly scan — no manual DI wiring needed
+- `TestBase` now implements `IDisposable` and calls `SampleCollectionStartup.Stop()` on disposal
+- `GetEventually()` added as a `public static` method on `TestBase`, identical signature to TestOrders
+- `AddExamToCollection`, `CreateBarcode`, and `RecordSampleCollection` tests keep one `GetLastOutboxMessage<SampleCreatedForExamNotification>()` call to retrieve the aggregate-generated `SampleId`, then assert via projection
+- Build: 0 warnings, 0 errors. Unit tests: 14 passed.
