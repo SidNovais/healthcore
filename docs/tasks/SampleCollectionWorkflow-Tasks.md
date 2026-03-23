@@ -335,7 +335,7 @@ Tracks individual sample lifecycle.
 
 - [x] `dotnet build` — zero warnings
 - [x] `dotnet test` UnitTests — 14 tests pass (no domain changes)
-- [ ] `dotnet test` IntegrationTests — pending DB migration run
+- [x] `dotnet test` IntegrationTests — 6/6 passed (2026-03-23)
 
 ### Session notes — 2026-03-22
 
