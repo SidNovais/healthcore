@@ -72,6 +72,7 @@ public class TestOrdersStartup
         domainNotificationsMap.Add("ExamPlacedOnHoldNotification", typeof(ExamPlacedOnHoldNotification));
         containerBuilder.RegisterModule(new OutboxModule(domainNotificationsMap));
         BiMap internalCommandsMap = new();
+        internalCommandsMap.Add("PlaceExamInProgressInternalCommand", typeof(PlaceExamInProgressInternalCommand));
         containerBuilder.RegisterModule(new InternalCommandsModule(internalCommandsMap));
         containerBuilder.RegisterModule(new QuartzModule());
         containerBuilder.RegisterInstance(executionContextAccessor);
