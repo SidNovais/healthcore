@@ -2,6 +2,7 @@ using Autofac;
 using Serilog;
 using HC.Core.Infrastructure.EventBus;
 using HC.COre.Infrastructure.EventBus;
+using HC.LIS.Modules.TestOrders.IntegrationEvents;
 
 namespace HC.LIS.Modules.SampleCollection.Infrastructure.Configurations.EventBus;
 
@@ -17,6 +18,7 @@ internal static class EventsBusStartup
     private static void SubscribeToIntegrationEvents(ILogger logger)
     {
         IEventsBus eventBus = SampleCollectionCompositionRoot.BeginLifetimeScope().Resolve<IEventsBus>();
+        SubscribeToIntegrationEvent<OrderItemAcceptedIntegrationEvent>(eventBus, logger);
     }
 
     private static void SubscribeToIntegrationEvent<T>(IEventsBus eventBus, ILogger logger)

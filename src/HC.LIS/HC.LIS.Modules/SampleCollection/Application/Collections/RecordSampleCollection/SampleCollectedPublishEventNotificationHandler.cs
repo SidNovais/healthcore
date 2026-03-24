@@ -20,7 +20,8 @@ public class SampleCollectedPublishEventNotificationHandler(IEventsBus eventsBus
             notification.Id,
             notification.DomainEvent.OcurredAt,
             notification.DomainEvent.CollectionRequestId,
-            notification.DomainEvent.SampleId
+            notification.DomainEvent.SampleId,
+            notification.DomainEvent.ExamIds
         )).ConfigureAwait(false);
     }
 }
