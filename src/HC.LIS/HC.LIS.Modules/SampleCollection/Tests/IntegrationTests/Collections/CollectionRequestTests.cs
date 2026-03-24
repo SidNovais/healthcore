@@ -1,5 +1,11 @@
+using System;
 using System.Threading.Tasks;
+using Dapper;
 using FluentAssertions;
+using Newtonsoft.Json;
+using Npgsql;
+using HC.Core.Domain;
+using HC.Core.Infrastructure.Serialization;
 using HC.LIS.Modules.SampleCollection.Application.Collections.AddExamToCollection;
 using HC.LIS.Modules.SampleCollection.Application.Collections.CallPatient;
 using HC.LIS.Modules.SampleCollection.Application.Collections.CreateBarcode;
@@ -7,6 +13,7 @@ using HC.LIS.Modules.SampleCollection.Application.Collections.CreateCollectionRe
 using HC.LIS.Modules.SampleCollection.Application.Collections.MovePatientToWaiting;
 using HC.LIS.Modules.SampleCollection.Application.Collections.RecordSampleCollection;
 using HC.LIS.Modules.SampleCollection.Domain.Collections;
+using HC.LIS.Modules.TestOrders.IntegrationEvents;
 
 namespace HC.LIS.Modules.SampleCollection.IntegrationTests.Collections;
 
@@ -28,7 +35,6 @@ public class CollectionRequestTests : TestBase
         details.Should().NotBeNull();
         details!.CollectionRequestId.Should().Be(CollectionRequestSampleData.CollectionRequestId);
         details.PatientId.Should().Be(CollectionRequestSampleData.PatientId);
-        details.OrderId.Should().Be(CollectionRequestSampleData.OrderId);
         details.Status.Should().Be(CollectionStatus.Arrived.Value);
         details.ArrivedAt.Should().Be(CollectionRequestSampleData.ArrivedAt);
     }
@@ -179,5 +185,40 @@ public class CollectionRequestTests : TestBase
         details.Should().NotBeNull();
         details!.Status.Should().Be(SampleStatus.Collected.Value);
         details.CollectedAt.Should().Be(CollectionRequestSampleData.CollectedAt);
+    }
+
+    [Fact]
+    public async Task HandleExamAcceptedCreatesCollectionRequestIsSuccessful()
+    {
+        var integrationEvent = new OrderItemAcceptedIntegrationEvent(
+            Guid.CreateVersion7(),
+            SystemClock.Now,
+            CollectionRequestSampleData.ExamId,
+            CollectionRequestSampleData.CollectionRequestId,
+            CollectionRequestSampleData.PatientId,
+            CollectionRequestSampleData.TubeType
+        );
+
+        using (var connection = new NpgsqlConnection(ConnectionString))
+        {
+            string? type = integrationEvent.GetType().FullName;
+            string data = JsonConvert.SerializeObject(integrationEvent, new JsonSerializerSettings
+            {
+                ContractResolver = new AllPropertiesContractResolver()
+            });
+            await connection.ExecuteScalarAsync(
+                @"INSERT INTO ""sample_collection"".""InboxMessages"" (""Id"", ""OccurredAt"", ""Type"", ""Data"") VALUES (@Id, @OccurredAt, @Type, @Data)",
+                new { integrationEvent.Id, integrationEvent.OccurredAt, type, data }
+            ).ConfigureAwait(true);
+        }
+
+        var details = await GetEventually(
+            new GetCollectionRequestByIdProbe(CollectionRequestSampleData.CollectionRequestId, ConnectionString),
+            15000
+        ).ConfigureAwait(true);
+
+        details.Should().NotBeNull();
+        details!.PatientId.Should().Be(CollectionRequestSampleData.PatientId);
+        details.Status.Should().Be(CollectionStatus.Arrived.Value);
     }
 }

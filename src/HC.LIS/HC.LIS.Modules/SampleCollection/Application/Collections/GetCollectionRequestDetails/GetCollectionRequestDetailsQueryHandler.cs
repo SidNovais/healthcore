@@ -19,7 +19,6 @@ internal class GetCollectionRequestDetailsQueryHandler(
         string sql = @$"SELECT
             ""CollectionRequestDetails"".""Id"" AS ""{nameof(CollectionRequestDetailsDto.CollectionRequestId)}"",
             ""CollectionRequestDetails"".""PatientId"" AS ""{nameof(CollectionRequestDetailsDto.PatientId)}"",
-            ""CollectionRequestDetails"".""OrderId"" AS ""{nameof(CollectionRequestDetailsDto.OrderId)}"",
             ""CollectionRequestDetails"".""Status"" AS ""{nameof(CollectionRequestDetailsDto.Status)}"",
             ""CollectionRequestDetails"".""ArrivedAt"" AS ""{nameof(CollectionRequestDetailsDto.ArrivedAt)}"",
             ""CollectionRequestDetails"".""WaitingAt"" AS ""{nameof(CollectionRequestDetailsDto.WaitingAt)}"",

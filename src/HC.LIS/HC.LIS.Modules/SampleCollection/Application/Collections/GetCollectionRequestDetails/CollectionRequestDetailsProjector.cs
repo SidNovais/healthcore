@@ -23,13 +23,12 @@ internal class CollectionRequestDetailsProjector(
         using var connection = _sqlConnectionFactory.CreateConnection();
         await connection.ExecuteScalarAsync(
             @"INSERT INTO sample_collection.""CollectionRequestDetails""
-              (""Id"", ""PatientId"", ""OrderId"", ""Status"", ""ArrivedAt"")
-              VALUES (@CollectionRequestId, @PatientId, @OrderId, @Status, @ArrivedAt)",
+              (""Id"", ""PatientId"", ""Status"", ""ArrivedAt"")
+              VALUES (@CollectionRequestId, @PatientId, @Status, @ArrivedAt)",
             new
             {
                 e.CollectionRequestId,
                 e.PatientId,
-                e.OrderId,
                 Status = CollectionStatus.Arrived.Value,
                 e.ArrivedAt
             }

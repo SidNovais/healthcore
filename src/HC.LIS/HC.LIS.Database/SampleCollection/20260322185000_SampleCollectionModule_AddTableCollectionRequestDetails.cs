@@ -10,7 +10,6 @@ public class SampleCollectionModuleAddTableCollectionRequestDetails : Migration
         Create.Table("CollectionRequestDetails").InSchema("sample_collection")
           .WithColumn("Id").AsGuid().NotNullable().PrimaryKey()
           .WithColumn("PatientId").AsGuid().NotNullable()
-          .WithColumn("OrderId").AsGuid().NotNullable()
           .WithColumn("Status").AsString(50).NotNullable()
           .WithColumn("ArrivedAt").AsCustom("TIMESTAMPTZ").NotNullable()
           .WithColumn("WaitingAt").AsCustom("TIMESTAMPTZ").Nullable()
