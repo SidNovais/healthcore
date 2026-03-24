@@ -23,7 +23,6 @@ public class CollectionRequestTests : TestBase
         PatientArrivedDomainEvent evt = AssertPublishedDomainEvent<PatientArrivedDomainEvent>(_sut);
         evt.CollectionRequestId.Should().Be(CollectionRequestSampleData.CollectionRequestId);
         evt.PatientId.Should().Be(CollectionRequestSampleData.PatientId);
-        evt.OrderId.Should().Be(CollectionRequestSampleData.OrderId);
         evt.ExamPreparationVerified.Should().Be(CollectionRequestSampleData.ExamPreparationVerified);
         evt.ArrivedAt.Should().Be(CollectionRequestSampleData.ArrivedAt);
     }
@@ -99,7 +98,6 @@ public class CollectionRequestTests : TestBase
         evt.CollectionRequestId.Should().Be(CollectionRequestSampleData.CollectionRequestId);
         evt.SampleId.Should().Be(sampleId);
         evt.PatientId.Should().Be(CollectionRequestSampleData.PatientId);
-        evt.OrderId.Should().Be(CollectionRequestSampleData.OrderId);
         evt.BarcodeValue.Should().Be(CollectionRequestSampleData.BarcodeValue);
         evt.TubeType.Should().Be(CollectionRequestSampleData.TubeType);
         evt.TechnicianId.Should().Be(CollectionRequestSampleData.TechnicianId);
@@ -135,7 +133,6 @@ public class CollectionRequestTests : TestBase
         CollectionRequest sut = CollectionRequest.Create(
             CollectionRequestSampleData.CollectionRequestId,
             CollectionRequestSampleData.PatientId,
-            CollectionRequestSampleData.OrderId,
             examPreparationVerified: false,
             CollectionRequestSampleData.ArrivedAt
         );

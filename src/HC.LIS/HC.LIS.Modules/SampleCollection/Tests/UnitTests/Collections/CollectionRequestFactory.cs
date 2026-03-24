@@ -11,7 +11,6 @@ internal static class CollectionRequestFactory
         CollectionRequest.Create(
             CollectionRequestSampleData.CollectionRequestId,
             CollectionRequestSampleData.PatientId,
-            CollectionRequestSampleData.OrderId,
             CollectionRequestSampleData.ExamPreparationVerified,
             CollectionRequestSampleData.ArrivedAt
         );

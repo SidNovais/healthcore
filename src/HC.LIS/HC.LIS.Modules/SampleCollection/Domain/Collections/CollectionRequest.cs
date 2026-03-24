@@ -5,7 +5,6 @@ using HC.Core.Domain;
 using HC.Core.Domain.EventSourcing;
 using HC.LIS.Modules.SampleCollection.Domain.Collections.Events;
 using HC.LIS.Modules.SampleCollection.Domain.Collections.Rules;
-using HC.LIS.Modules.SampleCollection.Domain.Orders;
 using HC.LIS.Modules.SampleCollection.Domain.Patients;
 
 namespace HC.LIS.Modules.SampleCollection.Domain.Collections;
@@ -13,7 +12,6 @@ namespace HC.LIS.Modules.SampleCollection.Domain.Collections;
 public class CollectionRequest : AggregateRoot
 {
     private PatientId _patientId = null!;
-    private OrderId _orderId = null!;
     private bool _examPreparationVerified;
     private CollectionStatus _status = null!;
     private IList<Sample> _samples = [];
@@ -25,7 +23,6 @@ public class CollectionRequest : AggregateRoot
     public static CollectionRequest Create(
         Guid id,
         Guid patientId,
-        Guid orderId,
         bool examPreparationVerified,
         DateTime arrivedAt
     )
@@ -34,7 +31,6 @@ public class CollectionRequest : AggregateRoot
         PatientArrivedDomainEvent patientArrivedDomainEvent = new(
             id,
             patientId,
-            orderId,
             examPreparationVerified,
             arrivedAt
         );
@@ -112,7 +108,6 @@ public class CollectionRequest : AggregateRoot
             Id,
             pendingSample!.SampleId.Value,
             _patientId.Value,
-            _orderId.Value,
             barcodeValue,
             tubeType,
             technicianId,
@@ -126,11 +121,13 @@ public class CollectionRequest : AggregateRoot
     public void RecordCollection(Guid sampleId, Guid technicianId, DateTime collectedAt)
     {
         CheckRule(new CannotCollectSampleBeforePatientIsCalledRule(_status));
+        Sample sample = _samples.Single(s => s.SampleId.Value == sampleId);
         SampleCollectedDomainEvent sampleCollectedDomainEvent = new(
             Id,
             sampleId,
             _patientId.Value,
             technicianId,
+            sample.ExamIds,
             collectedAt
         );
         Apply(sampleCollectedDomainEvent);
@@ -141,7 +138,6 @@ public class CollectionRequest : AggregateRoot
     {
         Id = domainEvent.CollectionRequestId;
         _patientId = new(domainEvent.PatientId);
-        _orderId = new(domainEvent.OrderId);
         _examPreparationVerified = domainEvent.ExamPreparationVerified;
         _status = CollectionStatus.Arrived;
     }

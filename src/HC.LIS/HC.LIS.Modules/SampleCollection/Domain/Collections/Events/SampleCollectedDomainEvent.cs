@@ -8,6 +8,7 @@ public class SampleCollectedDomainEvent(
     Guid sampleId,
     Guid patientId,
     Guid technicianId,
+    IReadOnlyCollection<Guid> examIds,
     DateTime collectedAt
 ) : DomainEvent
 {
@@ -15,5 +16,6 @@ public class SampleCollectedDomainEvent(
     public Guid SampleId { get; } = sampleId;
     public Guid PatientId { get; } = patientId;
     public Guid TechnicianId { get; } = technicianId;
+    public IReadOnlyCollection<Guid> ExamIds { get; } = examIds;
     public DateTime CollectedAt { get; } = collectedAt;
 }

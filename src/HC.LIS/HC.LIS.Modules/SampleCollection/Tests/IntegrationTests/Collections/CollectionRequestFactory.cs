@@ -12,7 +12,6 @@ internal static class CollectionRequestFactory
             new CreateCollectionRequestCommand(
                 CollectionRequestSampleData.CollectionRequestId,
                 CollectionRequestSampleData.PatientId,
-                CollectionRequestSampleData.OrderId,
                 true,
                 CollectionRequestSampleData.ArrivedAt
             )

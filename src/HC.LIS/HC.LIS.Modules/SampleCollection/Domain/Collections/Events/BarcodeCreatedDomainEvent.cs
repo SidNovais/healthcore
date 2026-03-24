@@ -8,7 +8,6 @@ public class BarcodeCreatedDomainEvent(
     Guid collectionRequestId,
     Guid sampleId,
     Guid patientId,
-    Guid orderId,
     string barcodeValue,
     string tubeType,
     Guid technicianId,
@@ -19,7 +18,6 @@ public class BarcodeCreatedDomainEvent(
     public Guid CollectionRequestId { get; } = collectionRequestId;
     public Guid SampleId { get; } = sampleId;
     public Guid PatientId { get; } = patientId;
-    public Guid OrderId { get; } = orderId;
     public string BarcodeValue { get; } = barcodeValue;
     public string TubeType { get; } = tubeType;
     public Guid TechnicianId { get; } = technicianId;
