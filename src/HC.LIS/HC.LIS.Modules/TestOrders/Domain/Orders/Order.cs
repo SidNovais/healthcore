@@ -90,8 +90,12 @@ public class Order : AggregateRoot
         DateTime acceptedAt
     )
     {
+        OrderItem item = _items.Single(i => i.OrderItemId.Value == orderItemId.Value);
         OrderItemAcceptedDomainEvent orderItemAcceptedDomainEvent = new(
             orderItemId.Value,
+            Id,
+            _patientId.Value,
+            item._speciamentRequirement.ContainerType,
             acceptedAt
         );
         Apply(orderItemAcceptedDomainEvent);

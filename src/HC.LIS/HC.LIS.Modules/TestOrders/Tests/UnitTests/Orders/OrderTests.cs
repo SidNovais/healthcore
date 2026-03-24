@@ -107,6 +107,9 @@ public class OrderTests : TestBase
         );
         OrderItemAcceptedDomainEvent orderItemAcceptedDomainEvent = AssertPublishedDomainEvent<OrderItemAcceptedDomainEvent>(_sut);
         orderItemAcceptedDomainEvent.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
+        orderItemAcceptedDomainEvent.OrderId.Should().Be(OrderSampleData.OrderId);
+        orderItemAcceptedDomainEvent.PatientId.Should().Be(OrderSampleData.PatientId);
+        orderItemAcceptedDomainEvent.ContainerType.Should().Be(OrderSampleData.ContainerType);
         orderItemAcceptedDomainEvent.AcceptedAt.Should().Be(acceptedAt);
     }
 
