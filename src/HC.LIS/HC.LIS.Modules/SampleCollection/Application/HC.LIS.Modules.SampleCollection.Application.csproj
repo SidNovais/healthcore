@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\TestOrders\IntegrationEvents\HC.LIS.Modules.TestOrders.IntegrationEvents.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -18,7 +18,6 @@ internal class CreateCollectionRequestCommandHandler(
         CollectionRequest request = CollectionRequest.Create(
             command.CollectionRequestId,
             command.PatientId,
-            command.OrderId,
             command.ExamPreparationVerified,
             command.ArrivedAt
         );
