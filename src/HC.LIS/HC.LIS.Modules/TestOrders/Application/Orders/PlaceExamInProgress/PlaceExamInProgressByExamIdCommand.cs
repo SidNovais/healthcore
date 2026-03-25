@@ -4,7 +4,7 @@ using HC.LIS.Modules.TestOrders.Application.Configuration.Commands;
 namespace HC.LIS.Modules.TestOrders.Application.Orders.PlaceExamInProgress;
 
 [method: JsonConstructor]
-public class PlaceExamInProgressInternalCommand(
+public class PlaceExamInProgressByExamIdCommand(
     Guid id,
     Guid orderId,
     Guid orderItemId,

@@ -100,9 +100,12 @@ The public API of each module is a single facade class (e.g., `TestOrdersModule`
 |---|---|
 | Domain Event | `OrderItemAcceptedDomainEvent` |
 | Command + Handler | `AcceptExamCommand` + `AcceptExamCommandHandler` |
+| Internal Command + Handler | `PlaceExamInProgressByExamIdCommand` + `PlaceExamInProgressByExamIdCommandHandler` |
 | Notification | `ExamAcceptedNotification` |
 | Business Rule | `CannotAcceptOrderItemMoreThanOnceRule` |
 | Integration Event | `OrderItemAcceptedIntegrationEvent` |
+
+> **Never** use `InternalCommand` as a suffix on class names. Internal commands (those extending `InternalCommandBase`) must be named to convey their specific purpose — typically describing *what* they do and *by what identifier* (e.g., `PlaceExamInProgressByExamIdCommand`, not `PlaceExamInProgressInternalCommand`).
 
 ### Code Style (.editorconfig)
 

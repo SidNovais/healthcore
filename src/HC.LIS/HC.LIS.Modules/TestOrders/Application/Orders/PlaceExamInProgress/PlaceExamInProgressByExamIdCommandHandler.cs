@@ -5,14 +5,14 @@ using HC.LIS.Modules.TestOrders.Domain.Orders;
 
 namespace HC.LIS.Modules.TestOrders.Application.Orders.PlaceExamInProgress;
 
-internal class PlaceExamInProgressInternalCommandHandler(
+internal class PlaceExamInProgressByExamIdCommandHandler(
     IAggregateStore aggregateStore
-) : ICommandHandler<PlaceExamInProgressInternalCommand>
+) : ICommandHandler<PlaceExamInProgressByExamIdCommand>
 {
     private readonly IAggregateStore _aggregateStore = aggregateStore;
 
     public async Task Handle(
-        PlaceExamInProgressInternalCommand command,
+        PlaceExamInProgressByExamIdCommand command,
         CancellationToken cancellationToken
     )
     {

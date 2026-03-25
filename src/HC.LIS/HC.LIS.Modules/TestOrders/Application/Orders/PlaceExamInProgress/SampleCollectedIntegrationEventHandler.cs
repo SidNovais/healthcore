@@ -17,7 +17,7 @@ public class SampleCollectedIntegrationEventNotificationHandler(ICommandsSchedul
     {
         foreach (Guid examId in notification.ExamIds)
         {
-            await _commandsScheduler.EnqueueAsync(new PlaceExamInProgressInternalCommand(
+            await _commandsScheduler.EnqueueAsync(new PlaceExamInProgressByExamIdCommand(
                 Guid.CreateVersion7(),
                 notification.CollectionRequestId,
                 examId,
