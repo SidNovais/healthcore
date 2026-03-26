@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using TestOrdersMartenConfig = HC.LIS.Modules.TestOrders.Infrastructure.Configurations.DataAccess.MartenConfig;
 using SampleCollectionMartenConfig = HC.LIS.Modules.SampleCollection.Infrastructure.Configurations.DataAccess.MartenConfig;
+using LabAnalysisMartenConfig = HC.LIS.Modules.LabAnalysis.Infrastructure.Configurations.DataAccess.MartenConfig;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console(
@@ -25,6 +26,9 @@ testOrdersStore.Storage.ApplyAllConfiguredChangesToDatabaseAsync().Wait();
 
 IDocumentStore sampleCollectionStore = SampleCollectionMartenConfig.BuildDocumentStore(connectionString);
 sampleCollectionStore.Storage.ApplyAllConfiguredChangesToDatabaseAsync().Wait();
+
+IDocumentStore labAnalysisStore = LabAnalysisMartenConfig.BuildDocumentStore(connectionString);
+labAnalysisStore.Storage.ApplyAllConfiguredChangesToDatabaseAsync().Wait();
 
 Log.Logger.Information("Migration executed!");
 Log.CloseAndFlush();

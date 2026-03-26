@@ -15,5 +15,6 @@
     <ProjectReference Include="..\..\HC.Core\Infrastructure\HC.Core.Infrastructure.csproj" />
     <ProjectReference Include="..\HC.LIS.Modules\TestOrders\Infrastructure\HC.LIS.Modules.TestOrders.Infrastructure.csproj" />
     <ProjectReference Include="..\HC.LIS.Modules\SampleCollection\Infrastructure\HC.LIS.Modules.SampleCollection.Infrastructure.csproj" />
+    <ProjectReference Include="..\HC.LIS.Modules\LabAnalysis\Infrastructure\HC.LIS.Modules.LabAnalysis.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

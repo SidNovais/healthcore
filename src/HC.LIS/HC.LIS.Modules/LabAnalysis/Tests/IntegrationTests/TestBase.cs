@@ -75,8 +75,17 @@ public class TestBase
     {
         const string sql = @"DELETE FROM ""lab_analysis"".""InboxMessages"";
                              DELETE FROM ""lab_analysis"".""InternalCommands"";
-                             DELETE FROM ""lab_analysis"".""OutboxMessages"";";
+                             DELETE FROM ""lab_analysis"".""OutboxMessages"";
+                             DELETE FROM ""lab_analysis"".""mt_doc_deadletterevent"";
+                             DELETE FROM ""lab_analysis"".""mt_event_progression"";
+                             DELETE FROM ""lab_analysis"".""mt_events"";
+                             DELETE FROM ""lab_analysis"".""mt_streams"";";
 
         await connection.ExecuteScalarAsync(sql).ConfigureAwait(false);
+    }
+
+    public void Dispose()
+    {
+        LabAnalysisStartup.Stop();
     }
 }
