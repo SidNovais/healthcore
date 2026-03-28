@@ -1,3 +1,5 @@
+using HC.LIS.Modules.LabAnalysis.Domain.WorklistItems.Events;
+
 namespace HC.LIS.Modules.LabAnalysis.Infrastructure.Configurations.AggregateStore;
 
 internal static class DomainEventTypeMappings
@@ -8,8 +10,10 @@ internal static class DomainEventTypeMappings
     {
         Dictionary = new Dictionary<string, Type>
         {
-            // Register domain event type mappings here, e.g.:
-            // { "MyDomainEvent", typeof(MyDomainEvent) },
+            { "WorklistItemCreatedDomainEvent",      typeof(WorklistItemCreatedDomainEvent) },
+            { "AnalysisResultRecordedDomainEvent",   typeof(AnalysisResultRecordedDomainEvent) },
+            { "ReportGeneratedDomainEvent",          typeof(ReportGeneratedDomainEvent) },
+            { "WorklistItemCompletedDomainEvent",    typeof(WorklistItemCompletedDomainEvent) },
         };
     }
 }

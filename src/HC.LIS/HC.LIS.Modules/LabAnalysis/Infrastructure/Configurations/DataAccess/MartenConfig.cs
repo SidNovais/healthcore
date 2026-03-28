@@ -1,6 +1,7 @@
 using JasperFx;
 using JasperFx.Events;
 using Marten;
+using HC.LIS.Modules.LabAnalysis.Domain.WorklistItems.Events;
 
 namespace HC.LIS.Modules.LabAnalysis.Infrastructure.Configurations.DataAccess;
 
@@ -14,8 +15,10 @@ public static class MartenConfig
             options.DatabaseSchemaName = "lab_analysis";
             options.AutoCreateSchemaObjects = AutoCreate.None;
             options.Events.StreamIdentity = StreamIdentity.AsString;
-            // Register domain event types here, e.g.:
-            // options.Events.AddEventType<MyDomainEvent>();
+            options.Events.AddEventType<WorklistItemCreatedDomainEvent>();
+            options.Events.AddEventType<AnalysisResultRecordedDomainEvent>();
+            options.Events.AddEventType<ReportGeneratedDomainEvent>();
+            options.Events.AddEventType<WorklistItemCompletedDomainEvent>();
         });
         return store;
     }

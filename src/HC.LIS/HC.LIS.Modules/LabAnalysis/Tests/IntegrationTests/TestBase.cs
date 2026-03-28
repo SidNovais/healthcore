@@ -10,6 +10,7 @@ using Serilog;
 using HC.Core.Application;
 using HC.Core.Domain;
 using HC.Core.IntegrationTests;
+using HC.Core.IntegrationTests.Probing;
 using HC.LIS.Modules.LabAnalysis.Application;
 using HC.LIS.Modules.LabAnalysis.Application.Contracts;
 using HC.LIS.Modules.LabAnalysis.Infrastructure;
@@ -18,8 +19,12 @@ using HC.LIS.Modules.LabAnalysis.Infrastructure.Configurations;
 namespace HC.LIS.Modules.LabAnalysis.IntegrationTests;
 
 [Collection("IntegrationTests")]
-public class TestBase
+public class TestBase : IDisposable
 {
+    #pragma warning disable CA1805
+    private bool _disposed = false;
+    #pragma warning restore CA1805
+
     protected string? ConnectionString { get; private set; }
     protected ILogger Logger { get; private set; }
     protected ILabAnalysisModule LabAnalysisModule { get; private set; }
@@ -71,11 +76,19 @@ public class TestBase
         }
     }
 
+    public static async Task<T?> GetEventually<T>(IProbe<T> probe, int timeout)
+        where T : class
+    {
+        Poller poller = new(timeout);
+        return await poller.GetAsync(probe).ConfigureAwait(false);
+    }
+
     private static async Task ClearDatabase(IDbConnection connection)
     {
         const string sql = @"DELETE FROM ""lab_analysis"".""InboxMessages"";
                              DELETE FROM ""lab_analysis"".""InternalCommands"";
                              DELETE FROM ""lab_analysis"".""OutboxMessages"";
+                             DELETE FROM lab_analysis.worklist_item_details;
                              DELETE FROM ""lab_analysis"".""mt_doc_deadletterevent"";
                              DELETE FROM ""lab_analysis"".""mt_event_progression"";
                              DELETE FROM ""lab_analysis"".""mt_events"";
@@ -86,6 +99,22 @@ public class TestBase
 
     public void Dispose()
     {
-        LabAnalysisStartup.Stop();
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed) return;
+        if (disposing)
+        {
+            LabAnalysisStartup.Stop();
+        }
+        _disposed = true;
+    }
+
+    ~TestBase()
+    {
+        Dispose(false);
     }
 }
