@@ -1,6 +1,6 @@
 # LabAnalysis Module — Implementation Tasks
 
-**Status:** Not started
+**Status:** Implementation complete — code review done 2026-03-28, bugs and design issues logged below
 **Spec reference:** [docs/specs/LabAnalysis-TechSpec.md](../specs/LabAnalysis-TechSpec.md)
 **PRD reference:** [docs/prd/LabAnalysis.md](../prd/LabAnalysis.md)
 
@@ -10,13 +10,15 @@
 
 ## Prerequisites
 
-- [ ] Extend `SampleCollectedIntegrationEvent` (in SampleCollection module) with three new fields:
+- [x] Extend `SampleCollectedIntegrationEvent` (in SampleCollection module) with three new fields:
   - `SampleBarcode (string)`
   - `PatientId (Guid)`
   - `ExamCodes (IReadOnlyCollection<string>)` — one entry per exam ordered on this sample; **not** a single string, because the same collected sample may carry multiple ordered exams, each producing a distinct analyte
   - File: `src/HC.LIS/HC.LIS.Modules/SampleCollection/IntegrationEvents/SampleCollectedIntegrationEvent.cs`
   - Also update `RecordSampleCollection/SampleCollectedPublishEventNotificationHandler.cs` to populate the new fields from `notification.DomainEvent`
   - Verify unit + integration tests in SampleCollection still pass
+
+> **Session note:** `ExamCodes` is mapped from `ExamIds (IReadOnlyCollection<Guid>)` on the domain event using `.Select(id => id.ToString())`. The domain only has GUIDs; string exam codes are a LabAnalysis-layer concept. TestOrders `SampleCollectedIntegrationEventHandler` was updated to `Guid.Parse` each code back. Old `ExamIds` property was removed from integration event.
 
 ---
 
@@ -26,8 +28,8 @@ One subfolder per concern under `Domain/`.
 
 ### Aggregate
 
-- [ ] `Domain/WorklistItems/WorklistItemId.cs` — typed ID wrapping `Guid`
-- [ ] `Domain/WorklistItems/WorklistItem.cs` — aggregate root
+- [x] `Domain/WorklistItems/WorklistItemId.cs` — typed ID wrapping `Guid`
+- [x] `Domain/WorklistItems/WorklistItem.cs` — aggregate root
   - `Create(Guid worklistItemId, Guid sampleId, string sampleBarcode, string examCode, Guid patientId, DateTime createdAt)` → `WorklistItemCreatedDomainEvent`
   - `RecordResult(string resultValue, Guid analystId, DateTime recordedAt)` → checks `CannotRecordResultForNonPendingWorklistItemRule` → `AnalysisResultRecordedDomainEvent`
   - `GenerateReport(string reportPath, DateTime generatedAt)` → checks `CannotGenerateReportWithoutResultRule` → `ReportGeneratedDomainEvent`
@@ -36,22 +38,22 @@ One subfolder per concern under `Domain/`.
 
 ### Domain Events
 
-- [ ] `Domain/WorklistItems/Events/WorklistItemCreatedDomainEvent.cs`
+- [x] `Domain/WorklistItems/Events/WorklistItemCreatedDomainEvent.cs`
   - Properties: `WorklistItemId (Guid)`, `SampleId (Guid)`, `SampleBarcode (string)`, `ExamCode (string)`, `PatientId (Guid)`, `CreatedAt (DateTime)`
-- [ ] `Domain/WorklistItems/Events/AnalysisResultRecordedDomainEvent.cs`
+- [x] `Domain/WorklistItems/Events/AnalysisResultRecordedDomainEvent.cs`
   - Properties: `WorklistItemId (Guid)`, `ResultValue (string)`, `AnalystId (Guid)`, `RecordedAt (DateTime)`
-- [ ] `Domain/WorklistItems/Events/ReportGeneratedDomainEvent.cs`
+- [x] `Domain/WorklistItems/Events/ReportGeneratedDomainEvent.cs`
   - Properties: `WorklistItemId (Guid)`, `ReportPath (string)`, `GeneratedAt (DateTime)`
-- [ ] `Domain/WorklistItems/Events/WorklistItemCompletedDomainEvent.cs`
+- [x] `Domain/WorklistItems/Events/WorklistItemCompletedDomainEvent.cs`
   - Properties: `WorklistItemId (Guid)`, `SampleId (Guid)`, `ExamCode (string)`, `CompletionType (string)`, `CompletedAt (DateTime)`
 
 ### Business Rules
 
-- [ ] `Domain/WorklistItems/Rules/CannotRecordResultForNonPendingWorklistItemRule.cs`
+- [x] `Domain/WorklistItems/Rules/CannotRecordResultForNonPendingWorklistItemRule.cs`
   - Broken when status != `"Pending"`
-- [ ] `Domain/WorklistItems/Rules/CannotGenerateReportWithoutResultRule.cs`
+- [x] `Domain/WorklistItems/Rules/CannotGenerateReportWithoutResultRule.cs`
   - Broken when status != `"ResultReceived"`
-- [ ] `Domain/WorklistItems/Rules/CannotCompleteWorklistItemWithoutReportRule.cs`
+- [x] `Domain/WorklistItems/Rules/CannotCompleteWorklistItemWithoutReportRule.cs`
   - Broken when status != `"ReportGenerated"`
 
 ---
@@ -60,7 +62,7 @@ One subfolder per concern under `Domain/`.
 
 Write tests before or alongside domain implementation (TDD).
 
-- [ ] `Tests/UnitTests/WorklistItems/WorklistItemTests.cs`
+- [x] `Tests/UnitTests/WorklistItems/WorklistItemTests.cs`
 
 | Test Method | Validates |
 |---|---|
@@ -73,7 +75,9 @@ Write tests before or alongside domain implementation (TDD).
 | `CompleteThrowsWhenReportNotGenerated` | `BaseBusinessRuleException` for `CannotCompleteWorklistItemWithoutReportRule` |
 
 Supporting test infrastructure:
-- [ ] `Tests/UnitTests/WorklistItems/WorklistItemFactory.cs` — builds `WorklistItem` aggregates at various states for test setup
+- [x] `Tests/UnitTests/WorklistItems/WorklistItemFactory.cs` — builds `WorklistItem` aggregates at various states for test setup
+
+> **Session note:** `WorklistItem` extends `AggregateRoot` (not `Entity`), so `TestBase` needed `AggregateRoot` overloads for `AssertPublishedDomainEvent<T>`. `WorklistItemSampleData` fields must be `const string`, not `static readonly string` (CA1802).
 
 ---
 
@@ -83,35 +87,35 @@ One subfolder per command under `Application/WorklistItems/`.
 
 ### Step 1 — CreateWorklistItem
 
-- [ ] `Application/WorklistItems/CreateWorklistItem/CreateWorklistItemCommand.cs`
+- [x] `Application/WorklistItems/CreateWorklistItem/CreateWorklistItemCommand.cs`
   - Properties: `WorklistItemId`, `SampleId`, `PatientId` (all `Guid`), `SampleBarcode`, `ExamCode` (both `string`), `CreatedAt` (`DateTime`)
   - Extends `CommandBase<Guid>`
-- [ ] `Application/WorklistItems/CreateWorklistItem/CreateWorklistItemCommandHandler.cs`
+- [x] `Application/WorklistItems/CreateWorklistItem/CreateWorklistItemCommandHandler.cs`
   - Calls `WorklistItem.Create(...)`, persists via `IAggregateStore.Start()`
   - Returns `command.WorklistItemId`
 
 ### Step 2 — RecordAnalysisResult
 
-- [ ] `Application/WorklistItems/RecordAnalysisResult/RecordAnalysisResultCommand.cs`
+- [x] `Application/WorklistItems/RecordAnalysisResult/RecordAnalysisResultCommand.cs`
   - Properties: `WorklistItemId (Guid)`, `ResultValue (string)`, `AnalystId (Guid)`, `RecordedAt (DateTime)`
   - Extends `CommandBase`
-- [ ] `Application/WorklistItems/RecordAnalysisResult/RecordAnalysisResultCommandHandler.cs`
+- [x] `Application/WorklistItems/RecordAnalysisResult/RecordAnalysisResultCommandHandler.cs`
   - Loads via `new WorklistItemId(command.WorklistItemId)`, calls `RecordResult(...)`, saves via `AppendChanges`
 
 ### Step 3 — GenerateReport
 
-- [ ] `Application/WorklistItems/GenerateReport/GenerateReportCommand.cs`
+- [x] `Application/WorklistItems/GenerateReport/GenerateReportCommand.cs`
   - Properties: `WorklistItemId (Guid)`, `ReportPath (string)`, `GeneratedAt (DateTime)`
   - Extends `CommandBase`
-- [ ] `Application/WorklistItems/GenerateReport/GenerateReportCommandHandler.cs`
+- [x] `Application/WorklistItems/GenerateReport/GenerateReportCommandHandler.cs`
   - Loads, calls `GenerateReport(...)`, saves
 
 ### Step 4 — CompleteWorklistItem
 
-- [ ] `Application/WorklistItems/CompleteWorklistItem/CompleteWorklistItemCommand.cs`
+- [x] `Application/WorklistItems/CompleteWorklistItem/CompleteWorklistItemCommand.cs`
   - Properties: `WorklistItemId (Guid)`, `CompletionType (string)`, `CompletedAt (DateTime)`
   - Extends `CommandBase`
-- [ ] `Application/WorklistItems/CompleteWorklistItem/CompleteWorklistItemCommandHandler.cs`
+- [x] `Application/WorklistItems/CompleteWorklistItem/CompleteWorklistItemCommandHandler.cs`
   - Loads, calls `Complete(...)`, saves
 
 ---
@@ -120,13 +124,13 @@ One subfolder per command under `Application/WorklistItems/`.
 
 ### Notification files
 
-- [ ] `Application/WorklistItems/CreateWorklistItem/WorklistItemCreatedNotification.cs`
-- [ ] `Application/WorklistItems/CreateWorklistItem/WorklistItemCreatedPublishEventNotificationHandler.cs`
+- [x] `Application/WorklistItems/CreateWorklistItem/WorklistItemCreatedNotification.cs`
+- [x] `Application/WorklistItems/CreateWorklistItem/WorklistItemCreatedPublishEventNotificationHandler.cs`
   — publishes `WorklistItemCreatedIntegrationEvent` via `IEventsBus`
-- [ ] `Application/WorklistItems/RecordAnalysisResult/AnalysisResultRecordedNotification.cs`
-- [ ] `Application/WorklistItems/GenerateReport/ReportGeneratedNotification.cs`
-- [ ] `Application/WorklistItems/CompleteWorklistItem/WorklistItemCompletedNotification.cs`
-- [ ] `Application/WorklistItems/CompleteWorklistItem/WorklistItemCompletedPublishEventNotificationHandler.cs`
+- [x] `Application/WorklistItems/RecordAnalysisResult/AnalysisResultRecordedNotification.cs`
+- [x] `Application/WorklistItems/GenerateReport/ReportGeneratedNotification.cs`
+- [x] `Application/WorklistItems/CompleteWorklistItem/WorklistItemCompletedNotification.cs`
+- [x] `Application/WorklistItems/CompleteWorklistItem/WorklistItemCompletedPublishEventNotificationHandler.cs`
   — publishes `WorklistItemCompletedIntegrationEvent` via `IEventsBus`
 
 ---
@@ -136,9 +140,9 @@ One subfolder per command under `Application/WorklistItems/`.
 Location: `IntegrationEvents/`
 Pattern: inherit `IntegrationEvent(Guid id, DateTime occurredAt)`, immutable, JSON-serializable.
 
-- [ ] `IntegrationEvents/WorklistItemCreatedIntegrationEvent.cs`
+- [x] `IntegrationEvents/WorklistItemCreatedIntegrationEvent.cs`
   - Properties: `WorklistItemId (Guid)`, `PatientId (Guid)`, `SampleBarcode (string)`, `ExamCode (string)`
-- [ ] `IntegrationEvents/WorklistItemCompletedIntegrationEvent.cs`
+- [x] `IntegrationEvents/WorklistItemCompletedIntegrationEvent.cs`
   - Properties: `WorklistItemId (Guid)`, `SampleId (Guid)`, `ExamCode (string)`, `CompletionType (string)`
 
 ---
@@ -147,7 +151,7 @@ Pattern: inherit `IntegrationEvent(Guid id, DateTime occurredAt)`, immutable, JS
 
 ### DomainEventTypeMappings
 
-- [ ] `Infrastructure/Configurations/AggregateStore/DomainEventTypeMappings.cs`
+- [x] `Infrastructure/Configurations/AggregateStore/DomainEventTypeMappings.cs`
   - Register all 4 domain events (both via `Dictionary` and `MartenConfig.cs` `AddEventType<>`)
 
 ```csharp
@@ -166,7 +170,7 @@ options.Events.AddEventType<WorklistItemCompletedDomainEvent>();
 
 ### LabAnalysisStartup — OutboxModule BiMap
 
-- [ ] `Infrastructure/Configurations/LabAnalysisStartup.cs`
+- [x] `Infrastructure/Configurations/LabAnalysisStartup.cs`
   - Populate BiMap with all 4 notification mappings (4/4):
 
 ```csharp
@@ -178,29 +182,18 @@ notificationsBiMap.Add("WorklistItemCompletedNotification",    typeof(WorklistIt
 
 ### EventsBus Subscription
 
-- [ ] `Infrastructure/Configurations/EventsBus/EventsBusStartup.cs`
-  - Register subscription to `SampleCollectedIntegrationEvent` → `SampleCollectedIntegrationEventHandler`
-- [ ] `Infrastructure/Configurations/EventsBus/SampleCollectedIntegrationEventHandler.cs`
-  - Implements `IIntegrationEventHandler<SampleCollectedIntegrationEvent>`
-  - Iterates `integrationEvent.ExamCodes` — dispatches **one `CreateWorklistItemCommand` per exam code**, each with its own `Guid.NewGuid()` as `WorklistItemId`
-  - Example:
-    ```csharp
-    foreach (var examCode in integrationEvent.ExamCodes)
-    {
-        await _commandsScheduler.EnqueueAsync(new CreateWorklistItemCommand(
-            Guid.NewGuid(),
-            integrationEvent.SampleId,
-            integrationEvent.SampleBarcode,
-            examCode,
-            integrationEvent.PatientId,
-            integrationEvent.OccurredAt));
-    }
-    ```
+- [x] `Infrastructure/Configurations/EventsBus/EventsBusStartup.cs`
+  - Register subscription to `SampleCollectedIntegrationEvent` → `SampleCollectedIntegrationEventNotificationHandler`
+- [x] `Infrastructure/Configurations/EventsBus/SampleCollectedIntegrationEventNotificationHandler.cs`
+  - Implements `INotificationHandler<SampleCollectedIntegrationEvent>`
+  - Iterates `integrationEvent.ExamCodes` — dispatches **one `CreateWorklistItemCommand` per exam code**, each with its own `Guid.CreateVersion7()` as `WorklistItemId`
+
+> **Session note:** Handler must end in `NotificationHandler`, not `EventHandler` (CA1711). The Application project needs a `<ProjectReference>` to `SampleCollection.IntegrationEvents.csproj`.
 
 ### Module Facade
 
-- [ ] `ILabAnalysisModule.cs` — already scaffolded, no changes needed
-- [ ] `LabAnalysisModule.cs` — already scaffolded, no changes needed
+- [x] `ILabAnalysisModule.cs` — already scaffolded, no changes needed
+- [x] `LabAnalysisModule.cs` — already scaffolded, no changes needed
 
 ---
 
@@ -208,7 +201,7 @@ notificationsBiMap.Add("WorklistItemCompletedNotification",    typeof(WorklistIt
 
 ### Database Migration
 
-- [ ] `src/HC.LIS/HC.LIS.Database/LabAnalysis/20260326120400_LabAnalysisModule_AddTableWorklistItemDetails.cs`
+- [x] `src/HC.LIS/HC.LIS.Database/LabAnalysis/20260326120400_LabAnalysisModule_AddTableWorklistItemDetails.cs`
 
 ```sql
 -- Schema: lab_analysis
@@ -229,13 +222,13 @@ CREATE TABLE lab_analysis.worklist_item_details (
 
 ### Application Files
 
-- [ ] `Application/WorklistItems/GetWorklistItemDetails/WorklistItemDetailsDto.cs`
+- [x] `Application/WorklistItems/GetWorklistItemDetails/WorklistItemDetailsDto.cs`
   - All columns above as public properties
-- [ ] `Application/WorklistItems/GetWorklistItemDetails/GetWorklistItemDetailsQuery.cs`
+- [x] `Application/WorklistItems/GetWorklistItemDetails/GetWorklistItemDetailsQuery.cs`
   - Property: `WorklistItemId (Guid)`, extends `QueryBase<WorklistItemDetailsDto>`
-- [ ] `Application/WorklistItems/GetWorklistItemDetails/GetWorklistItemDetailsQueryHandler.cs`
+- [x] `Application/WorklistItems/GetWorklistItemDetails/GetWorklistItemDetailsQueryHandler.cs`
   - Dapper SELECT from `lab_analysis.worklist_item_details WHERE id = @worklistItemId`
-- [ ] `Application/WorklistItems/GetWorklistItemDetails/WorklistItemDetailsProjector.cs`
+- [x] `Application/WorklistItems/GetWorklistItemDetails/WorklistItemDetailsProjector.cs`
   - `When(WorklistItemCreatedDomainEvent)` → INSERT, Status = `"Pending"`
   - `When(AnalysisResultRecordedDomainEvent)` → UPDATE ResultValue, Status = `"ResultReceived"`
   - `When(ReportGeneratedDomainEvent)` → UPDATE ReportPath, Status = `"ReportGenerated"`
@@ -244,10 +237,10 @@ CREATE TABLE lab_analysis.worklist_item_details (
 
 ### Notification Projection Handlers (co-located with commands)
 
-- [ ] `Application/WorklistItems/CreateWorklistItem/WorklistItemCreatedNotificationProjection.cs`
-- [ ] `Application/WorklistItems/RecordAnalysisResult/AnalysisResultRecordedNotificationProjection.cs`
-- [ ] `Application/WorklistItems/GenerateReport/ReportGeneratedNotificationProjection.cs`
-- [ ] `Application/WorklistItems/CompleteWorklistItem/WorklistItemCompletedNotificationProjection.cs`
+- [x] `Application/WorklistItems/CreateWorklistItem/WorklistItemCreatedNotificationProjection.cs`
+- [x] `Application/WorklistItems/RecordAnalysisResult/AnalysisResultRecordedNotificationProjection.cs`
+- [x] `Application/WorklistItems/GenerateReport/ReportGeneratedNotificationProjection.cs`
+- [x] `Application/WorklistItems/CompleteWorklistItem/WorklistItemCompletedNotificationProjection.cs`
 
 ---
 
@@ -258,15 +251,15 @@ Pattern: command → `GetEventually(probe, 15000)` on `WorklistItemDetails` read
 
 ### Test Infrastructure
 
-- [ ] `Tests/IntegrationTests/WorklistItems/GetWorklistItemDetailsFromLabAnalysisProbe.cs` — `IProbe<WorklistItemDetailsDto>`
-- [ ] `Tests/IntegrationTests/TestBase.cs`
+- [x] `Tests/IntegrationTests/WorklistItems/GetWorklistItemDetailsFromLabAnalysisProbe.cs` — `IProbe<WorklistItemDetailsDto>`
+- [x] `Tests/IntegrationTests/TestBase.cs`
   - `ClearDatabase()` truncates `lab_analysis.worklist_item_details`
   - Add `GetEventually()` static method (identical pattern to SampleCollection/TestOrders)
   - `IDisposable` calls `LabAnalysisStartup.Stop()`
 
 ### Test Methods
 
-- [ ] `Tests/IntegrationTests/WorklistItems/WorklistItemTests.cs`
+- [x] `Tests/IntegrationTests/WorklistItems/WorklistItemTests.cs`
 
 | Test Method | Command Sent | Assertion |
 |---|---|---|
@@ -277,13 +270,207 @@ Pattern: command → `GetEventually(probe, 15000)` on `WorklistItemDetails` read
 
 ---
 
+## Code Review Findings (2026-03-28)
+
+Items surfaced during post-implementation code review against the PRD and clinical workflow analysis.
+
+---
+
+### Bug Fix 1 — `CreateWorklistItemCommand` not registered in `internalCommandsMap` (critical)
+
+`LabAnalysisStartup.cs` initializes an empty `internalCommandsMap`. The Quartz job that processes internal commands uses this map to deserialize queued command types from JSON. Since `CreateWorklistItemCommand` is not registered, it is silently dropped after being enqueued — the entire `SampleCollected` → `CreateWorklistItem` runtime flow is broken. Integration tests don't catch this because they call `ExecuteCommandAsync` directly.
+
+- [ ] `Infrastructure/Configurations/LabAnalysisStartup.cs`
+  - Add to `internalCommandsMap`:
+    ```csharp
+    internalCommandsMap.Add("CreateWorklistItemCommand", typeof(CreateWorklistItemCommand));
+    ```
+  - Reference: `TestOrdersStartup.cs:75` shows the same pattern
+
+---
+
+### Bug Fix 2 — `HC.COre` namespace typo in integration events
+
+Namespace casing bug: `HC.COre` (capital O) instead of `HC.Core`. Works on Windows (case-insensitive FS) but breaks on Linux CI.
+
+- [ ] `IntegrationEvents/WorklistItemCreatedIntegrationEvent.cs:2` — fix `HC.COre` → `HC.Core`
+- [ ] `IntegrationEvents/WorklistItemCompletedIntegrationEvent.cs:2` — fix `HC.COre` → `HC.Core`
+- [ ] `SampleCollection/IntegrationEvents/SampleCollectedIntegrationEvent.cs:2` — same typo (predates this module)
+- [ ] `Infrastructure/Configurations/EventsBus/EventsBusStartup.cs:4` — same typo (`using HC.COre.Infrastructure.EventBus`)
+
+---
+
+### Feature — Structured Result Value
+
+`resultValue` is currently a plain `string` (e.g., `"7.4 mmol/L"`). Clinical results require three separate fields to be meaningful for report generation, reference range evaluation, and downstream consumers.
+
+New fields: `ResultValue (string)`, `ResultUnit (string)`, `ReferenceRange (string)`.
+
+#### Domain
+
+- [ ] `Domain/WorklistItems/Events/AnalysisResultRecordedDomainEvent.cs`
+  - Replace `ResultValue (string)` with three properties: `ResultValue (string)`, `ResultUnit (string)`, `ReferenceRange (string)`
+- [ ] `Domain/WorklistItems/WorklistItem.cs`
+  - Update `RecordResult(string resultValue, string resultUnit, string referenceRange, Guid analystId, DateTime recordedAt)`
+
+#### Unit Tests
+
+- [ ] `Tests/UnitTests/WorklistItems/WorklistItemTests.cs`
+  - Update `RecordAnalysisResultIsSuccessful` to assert all three result fields on the domain event
+- [ ] `Tests/UnitTests/WorklistItems/WorklistItemFactory.cs`
+  - Update `CreateWithResult()` helper with the new signature
+
+#### Application
+
+- [ ] `Application/WorklistItems/RecordAnalysisResult/RecordAnalysisResultCommand.cs`
+  - Add `ResultUnit (string)` and `ReferenceRange (string)` properties
+- [ ] `Application/WorklistItems/RecordAnalysisResult/RecordAnalysisResultCommandHandler.cs`
+  - Pass new fields to `RecordResult(...)`
+
+#### Database Migration
+
+- [ ] `src/HC.LIS/HC.LIS.Database/LabAnalysis/` — new migration
+  ```sql
+  ALTER TABLE lab_analysis.worklist_item_details
+    ADD COLUMN result_unit VARCHAR(50) NULL,
+    ADD COLUMN reference_range VARCHAR(100) NULL;
+  ```
+
+#### Read Model
+
+- [ ] `Application/WorklistItems/GetWorklistItemDetails/WorklistItemDetailsDto.cs`
+  - Add `ResultUnit (string?)` and `ReferenceRange (string?)` properties
+- [ ] `Application/WorklistItems/GetWorklistItemDetails/WorklistItemDetailsProjector.cs`
+  - Update `When(AnalysisResultRecordedDomainEvent)` to also SET `result_unit`, `reference_range`
+
+#### Integration Tests
+
+- [ ] `Tests/IntegrationTests/WorklistItems/WorklistItemTests.cs`
+  - Update `RecordAnalysisResultIsSuccessful` to assert `ResultUnit` and `ReferenceRange` on the DTO
+
+---
+
+### Feature — Inbound Analyzer Result Integration Event
+
+FR3 requires results to come from clinical analyzers via events (not a manually-triggered command). Define the inbound event contract and wire it into LabAnalysis so the analyzer integration layer has a defined interface to publish to.
+
+> The `AnalystId` field on `RecordResult` is retained for future use (analyst validation step). For now, it is set from the integration event payload (instrument ID or a system sentinel value).
+
+#### Integration Event Contract
+
+- [ ] Define `AnalyzerResultReceivedIntegrationEvent`
+  - **Location:** Decide whether this lives in LabAnalysis `IntegrationEvents/` (LabAnalysis owns the contract) or in a future `Analyzer` module — recommend LabAnalysis owns it for now
+  - Properties: `WorklistItemId (Guid)`, `InstrumentId (Guid)`, `ResultValue (string)`, `ResultUnit (string)`, `ReferenceRange (string)`, `RecordedAt (DateTime)`
+
+#### EventsBus Subscription
+
+- [ ] `Infrastructure/Configurations/EventsBus/EventsBusStartup.cs`
+  - Register subscription to `AnalyzerResultReceivedIntegrationEvent`
+- [ ] `Application/WorklistItems/RecordAnalysisResult/AnalyzerResultReceivedIntegrationEventNotificationHandler.cs`
+  - Implements `INotificationHandler<AnalyzerResultReceivedIntegrationEvent>`
+  - Enqueues `RecordAnalysisResultCommand` via `ICommandsScheduler`
+  - Maps `InstrumentId` → `AnalystId` (placeholder until analyst validation step is built)
+
+#### Infrastructure Wiring
+
+- [ ] `Infrastructure/Configurations/LabAnalysisStartup.cs`
+  - Add `RecordAnalysisResultCommand` to `internalCommandsMap`:
+    ```csharp
+    internalCommandsMap.Add("RecordAnalysisResultCommand", typeof(RecordAnalysisResultCommand));
+    ```
+
+#### Integration Test
+
+- [ ] `Tests/IntegrationTests/WorklistItems/WorklistItemTests.cs`
+  - Add `RecordAnalysisResultViaAnalyzerEventIsSuccessful`
+  - Insert `AnalyzerResultReceivedIntegrationEvent` directly into `lab_analysis.InboxMessages` (same pattern as `PlaceExamInProgressViaSampleCollectedTests.cs`)
+  - Poll read model for `Status == "ResultReceived"` and assert `ResultValue`, `ResultUnit`, `ReferenceRange`
+
+---
+
+### Design Issue — No idempotency guard on `SampleCollected` → `CreateWorklistItem`
+
+`SampleCollectedIntegrationEventNotificationHandler` generates a fresh `Guid.CreateVersion7()` for each `WorklistItemId` on every invocation. Under at-least-once inbox delivery the same message could be processed twice, silently creating duplicate `WorklistItem` streams for the same `(sampleId, examCode)` pair. Marten would not reject these since each gets a unique stream ID.
+
+- [ ] Evaluate using a deterministic `WorklistItemId` derived from `(sampleId, examCode)` — e.g., a v5 UUID — so reprocessing the same inbox message is idempotent
+  - File: `Application/WorklistItems/HandleSampleCollected/SampleCollectedIntegrationEventNotificationHandler.cs:25`
+
+---
+
+### Design Issue — `CompletionType` unconstrained at the domain level
+
+`Complete(string completionType, ...)` accepts any string. The TechSpec states `WorklistItem` always completes as `"Complete"` (PartialComplete is TestOrders' responsibility). Nothing in the aggregate enforces this — a caller can pass `"PartialComplete"` and it will silently be stored, contradicting the spec.
+
+- [ ] Enforce `completionType == "Complete"` inside the aggregate (throw or hardcode), or introduce a `CompletionType` value object / enum
+  - File: `Domain/WorklistItems/WorklistItem.cs:67`
+
+---
+
+### Design Issue — `GenerateReport` must be automated as an internal command
+
+In a clinical lab, report generation fires automatically after a result is validated — it is never a separate manual external call. Currently nothing triggers `GenerateReportCommand` after `RecordAnalysisResult`; the caller is expected to fire it separately.
+
+- [ ] Promote `GenerateReportCommand` to an internal command (`InternalCommandBase`) and have `AnalysisResultRecordedNotification` enqueue it automatically
+  - Enqueue in: `Application/WorklistItems/RecordAnalysisResult/AnalysisResultRecordedNotificationProjection.cs` (or a dedicated handler)
+  - Register in `internalCommandsMap`:
+    ```csharp
+    internalCommandsMap.Add("GenerateReportCommand", typeof(GenerateReportCommand));
+    ```
+  - File: `Infrastructure/Configurations/LabAnalysisStartup.cs`
+
+---
+
+### Design Issue — `AnalystId` semantically maps to an instrument
+
+`RecordResult` takes `analystId (Guid)`. Per the TechSpec, when the analyzer event integration is built, `InstrumentId` from the event is mapped to this field. An instrument is not an analyst; the naming will mislead future readers.
+
+- [ ] Rename `AnalystId` → `PerformedById` across domain event, aggregate, command, and handler — or explicitly split into `AnalystId` (human) and `InstrumentId` (machine) once the analyzer event is wired
+  - Files: `Domain/WorklistItems/Events/AnalysisResultRecordedDomainEvent.cs`, `WorklistItem.cs:42`, `RecordAnalysisResultCommand.cs`, `RecordAnalysisResultCommandHandler.cs`
+
+---
+
+### Design Issue — No `Reject()` path on the aggregate
+
+In clinical labs, samples are rejected before analysis (haemolysis, insufficient volume, wrong tube type, sample mix-up). Currently the state machine has no rejection transition — rejected items would remain `Pending` indefinitely with no way to close them out.
+
+> Out of scope for v1 — document in PRD open questions.
+
+- [ ] Add open question to `docs/prd/LabAnalysis.md`: how are pre-analysis sample rejections handled? What state does a rejected `WorklistItem` transition to, and who (biomedical scientist, LIS Admin) performs the rejection?
+- [ ] (future) Add `Reject(string rejectionReason, Guid rejectedById, DateTime rejectedAt)` method and `WorklistItemRejectedDomainEvent` to the aggregate
+  - State machine: `Pending → Rejected` (terminal)
+
+---
+
+### Design Issue — No pathologist review / sign-off step
+
+The PRD lists Pathologist as a primary persona, but the current state machine jumps `ReportGenerated → Completed` with no validation gate. In practice, out-of-range or flagged results are held for pathologist review before the report is released.
+
+> Out of scope for v1 — document in PRD open questions.
+
+- [ ] Add open question to `docs/prd/LabAnalysis.md`: which result categories require pathologist sign-off before report release? Should a `PendingValidation` state be added to the state machine?
+- [ ] (future) Add `Validate(Guid pathologistId, DateTime validatedAt)` method and `PendingValidation` state to the aggregate
+
+---
+
+### Design Issue — `DateTime` vs `DateTimeOffset` for clinical timestamps
+
+Commands and events use `DateTime` throughout. Clinical lab systems require timezone-correct timestamps for HIPAA-compliant audit trails (CAP/CLIA). `DateTime` without explicit `DateTimeKind.Utc` can produce ambiguous records.
+
+- [ ] Verify `SystemClock.Now` returns UTC-kind `DateTime` across the project
+  - If it does, annotate the convention so future contributors don't introduce `DateTime.Now` (local-time)
+  - If it does not, plan a migration of command/event timestamps to `DateTimeOffset`
+
+---
+
 ## Verification Checklist
 
-- [ ] `dotnet build` — zero warnings (`TreatWarningsAsErrors=true`)
-- [ ] `dotnet test` UnitTests — all tests pass
-- [ ] `dotnet test` IntegrationTests — all 4 tests pass
-- [ ] SampleCollection `dotnet test` UnitTests — still 14 passed (after prerequisite change)
-- [ ] SampleCollection `dotnet test` IntegrationTests — still 6 passed (after prerequisite change)
+- [x] `dotnet build` — zero warnings (`TreatWarningsAsErrors=true`)
+- [x] `dotnet test` UnitTests — 7/7 passed
+- [x] `dotnet test` IntegrationTests — 4/4 passed
+- [x] SampleCollection `dotnet test` UnitTests — 14/14 passed (after prerequisite change)
+- [x] SampleCollection `dotnet test` IntegrationTests — 7/7 passed (after prerequisite change)
+
+> **Session note (2026-03-27):** Migration runner uses `ASPNETCORE_HCLIS_DATABASE_CONNECTION_STRING`; integration tests use `ASPNETCORE_HCLIS_IntegrationTests_ConnectionString`. Must set the former explicitly when running migrations (the default shell env doesn't have it set). Run: `ASPNETCORE_HCLIS_DATABASE_CONNECTION_STRING="Host=localhost;Port=5432;Database=Healthcore.Dev;Username=dev;Password=dev" dotnet run --project src/HC.LIS/HC.LIS.Database/HC.LIS.Database.csproj`
 
 ### Analyzer Rules to Watch
 
