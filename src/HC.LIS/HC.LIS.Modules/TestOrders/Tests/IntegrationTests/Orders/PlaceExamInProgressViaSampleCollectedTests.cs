@@ -48,7 +48,9 @@ public class PlaceExamInProgressViaSampleCollectedTests : TestBase
             SystemClock.Now,
             OrderSampleData.OrderId,
             Guid.CreateVersion7(),
-            [OrderSampleData.OrderItemId]
+            OrderSampleData.PatientId,
+            "SC-TEST-001",
+            [OrderSampleData.OrderItemId.ToString()]
         );
 
         using (var connection = new NpgsqlConnection(ConnectionString))

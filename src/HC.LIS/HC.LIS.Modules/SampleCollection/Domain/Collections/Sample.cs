@@ -13,6 +13,8 @@ public class Sample : Entity
     private readonly List<Guid> _examIds = [];
     internal IReadOnlyCollection<Guid> ExamIds => _examIds.AsReadOnly();
     internal bool HasBarcode => !_status.IsPending;
+    private string? _barcodeValue;
+    internal string? Barcode => _barcodeValue;
     private SampleStatus _status = null!;
 
     private Sample() { }
@@ -49,8 +51,11 @@ public class Sample : Entity
     private void When(ExamAddedToExistingSampleDomainEvent domainEvent)
         => _examIds.Add(domainEvent.ExamId);
 
-    private void When(BarcodeCreatedDomainEvent _)
-        => _status = SampleStatus.BarcodeCreated;
+    private void When(BarcodeCreatedDomainEvent domainEvent)
+    {
+        _barcodeValue = domainEvent.BarcodeValue;
+        _status = SampleStatus.BarcodeCreated;
+    }
 
     private void When(SampleCollectedDomainEvent _)
         => _status = SampleStatus.Collected;

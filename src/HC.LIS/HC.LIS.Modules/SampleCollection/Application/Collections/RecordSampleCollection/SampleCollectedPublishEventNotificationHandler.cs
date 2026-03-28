@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -21,7 +22,9 @@ public class SampleCollectedPublishEventNotificationHandler(IEventsBus eventsBus
             notification.DomainEvent.OcurredAt,
             notification.DomainEvent.CollectionRequestId,
             notification.DomainEvent.SampleId,
-            notification.DomainEvent.ExamIds
+            notification.DomainEvent.PatientId,
+            notification.DomainEvent.SampleBarcode,
+            notification.DomainEvent.ExamIds.Select(id => id.ToString()).ToList().AsReadOnly()
         )).ConfigureAwait(false);
     }
 }

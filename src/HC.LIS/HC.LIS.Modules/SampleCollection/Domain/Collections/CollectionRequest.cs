@@ -128,6 +128,7 @@ public class CollectionRequest : AggregateRoot
             _patientId.Value,
             technicianId,
             sample.ExamIds,
+            sample.Barcode!,
             collectedAt
         );
         Apply(sampleCollectedDomainEvent);
