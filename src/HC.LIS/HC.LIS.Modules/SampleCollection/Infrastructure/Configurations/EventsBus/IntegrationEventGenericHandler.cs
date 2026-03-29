@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 using HC.Core.Infrastructure.Data;
 using HC.Core.Infrastructure.EventBus;
 using HC.Core.Infrastructure.Serialization;
-using HC.COre.Infrastructure.EventBus;
 
 namespace HC.LIS.Modules.SampleCollection.Infrastructure.Configurations.EventBus;
 

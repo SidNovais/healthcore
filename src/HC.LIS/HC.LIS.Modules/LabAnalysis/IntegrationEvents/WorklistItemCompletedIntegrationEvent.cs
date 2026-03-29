@@ -1,5 +1,5 @@
 using System;
-using HC.COre.Infrastructure.EventBus;
+using HC.Core.Infrastructure.EventBus;
 
 namespace HC.LIS.Modules.LabAnalysis.IntegrationEvents;
 

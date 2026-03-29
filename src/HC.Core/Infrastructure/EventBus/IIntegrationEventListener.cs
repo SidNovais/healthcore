@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using HC.COre.Infrastructure.EventBus;
+using HC.Core.Infrastructure.EventBus;
 
 namespace HC.Core.Infrastructure.EventBus;
 

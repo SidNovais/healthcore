@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using HC.COre.Infrastructure.EventBus;
+using HC.Core.Infrastructure.EventBus;
 using Serilog;
 
 namespace HC.Core.Infrastructure.EventBus;

@@ -1,7 +1,6 @@
 using Autofac;
 using Serilog;
 using HC.Core.Infrastructure.EventBus;
-using HC.COre.Infrastructure.EventBus;
 using HC.LIS.Modules.TestOrders.IntegrationEvents;
 
 namespace HC.LIS.Modules.SampleCollection.Infrastructure.Configurations.EventBus;

@@ -1,7 +1,7 @@
 using System;
 using MediatR;
 
-namespace HC.COre.Infrastructure.EventBus;
+namespace HC.Core.Infrastructure.EventBus;
 
 public abstract class IntegrationEvent(
     Guid id,
