@@ -121,6 +121,8 @@ Biomedical scientists and pathologists currently record test exam results manual
 | 3 | Which report PDF template/format is required for released results? | Lab Director / Pathologist | TBD |
 | 4 | How should partial results be handled — emit PartialComplete per item or batch? | IT / LIS Admin + TestOrders team | TBD |
 | 5 | Are there specific HIPAA controls (encryption at rest, field-level masking) already standardized in HC.LIS? | IT / LIS Admin | TBD |
+| 6 | **Sample rejection path:** How are pre-analysis sample rejections handled (e.g. haemolysis, insufficient volume, wrong tube type)? What state does a rejected `WorklistItem` transition to (`Pending → Rejected`), and which persona (Biomedical Scientist, LIS Admin) performs the rejection? Should a `Reject()` method and `WorklistItemRejectedDomainEvent` be added to v1? | Biomedical Scientist / LIS Admin | TBD |
+| 7 | **Pathologist sign-off:** Which result categories (out-of-range, critical values) require pathologist review before report release? Should a `PendingValidation` state be added between `ReportGenerated` and `Completed`? The current state machine jumps directly to `Completed` with no validation gate. | Pathologist / Lab Director | TBD |
 
 ---
 

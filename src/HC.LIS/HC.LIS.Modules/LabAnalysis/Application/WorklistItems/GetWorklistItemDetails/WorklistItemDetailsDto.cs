@@ -11,6 +11,8 @@ public class WorklistItemDetailsDto
     public Guid PatientId { get; set; }
     public string Status { get; set; } = string.Empty;
     public string? ResultValue { get; set; }
+    public string? ResultUnit { get; set; }
+    public string? ReferenceRange { get; set; }
     public string? ReportPath { get; set; }
     public string? CompletionType { get; set; }
     public DateTime CreatedAt { get; set; }

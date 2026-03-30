@@ -5,11 +5,9 @@ namespace HC.LIS.Modules.LabAnalysis.Application.WorklistItems.CompleteWorklistI
 
 public class CompleteWorklistItemCommand(
     Guid worklistItemId,
-    string completionType,
     DateTime completedAt
 ) : CommandBase
 {
     public Guid WorklistItemId { get; } = worklistItemId;
-    public string CompletionType { get; } = completionType;
     public DateTime CompletedAt { get; } = completedAt;
 }

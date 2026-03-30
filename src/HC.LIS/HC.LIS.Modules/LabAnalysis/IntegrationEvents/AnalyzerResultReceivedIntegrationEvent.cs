@@ -1,21 +1,23 @@
 using System;
-using HC.Core.Domain;
+using HC.Core.Infrastructure.EventBus;
 
-namespace HC.LIS.Modules.LabAnalysis.Domain.WorklistItems.Events;
+namespace HC.LIS.Modules.LabAnalysis.IntegrationEvents;
 
-public class AnalysisResultRecordedDomainEvent(
+public class AnalyzerResultReceivedIntegrationEvent(
+    Guid id,
+    DateTime occurredAt,
     Guid worklistItemId,
+    Guid instrumentId,
     string resultValue,
     string resultUnit,
     string referenceRange,
-    Guid performedById,
     DateTime recordedAt
-) : DomainEvent
+) : IntegrationEvent(id, occurredAt)
 {
     public Guid WorklistItemId { get; } = worklistItemId;
+    public Guid InstrumentId { get; } = instrumentId;
     public string ResultValue { get; } = resultValue;
     public string ResultUnit { get; } = resultUnit;
     public string ReferenceRange { get; } = referenceRange;
-    public Guid PerformedById { get; } = performedById;
     public DateTime RecordedAt { get; } = recordedAt;
 }

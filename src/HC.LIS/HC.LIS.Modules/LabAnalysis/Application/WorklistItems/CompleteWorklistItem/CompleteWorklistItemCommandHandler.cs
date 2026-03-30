@@ -20,7 +20,7 @@ internal class CompleteWorklistItemCommandHandler(
         WorklistItem? worklistItem = await _aggregateStore
             .Load<WorklistItem>(new WorklistItemId(command.WorklistItemId))
             .ConfigureAwait(false);
-        worklistItem!.Complete(command.CompletionType, command.CompletedAt);
+        worklistItem!.Complete(command.CompletedAt);
         _aggregateStore.AppendChanges(worklistItem);
     }
 }

@@ -39,13 +39,15 @@ public class WorklistItem : AggregateRoot
         return worklistItem;
     }
 
-    public void RecordResult(string resultValue, Guid analystId, DateTime recordedAt)
+    public void RecordResult(string resultValue, string resultUnit, string referenceRange, Guid performedById, DateTime recordedAt)
     {
         CheckRule(new CannotRecordResultForNonPendingWorklistItemRule(_status));
         AnalysisResultRecordedDomainEvent domainEvent = new(
             Id,
             resultValue,
-            analystId,
+            resultUnit,
+            referenceRange,
+            performedById,
             recordedAt
         );
         Apply(domainEvent);
@@ -64,14 +66,14 @@ public class WorklistItem : AggregateRoot
         AddDomainEvent(domainEvent);
     }
 
-    public void Complete(string completionType, DateTime completedAt)
+    public void Complete(DateTime completedAt)
     {
         CheckRule(new CannotCompleteWorklistItemWithoutReportRule(_status));
         WorklistItemCompletedDomainEvent domainEvent = new(
             Id,
             _sampleId,
             _examCode,
-            completionType,
+            "Complete",
             completedAt
         );
         Apply(domainEvent);

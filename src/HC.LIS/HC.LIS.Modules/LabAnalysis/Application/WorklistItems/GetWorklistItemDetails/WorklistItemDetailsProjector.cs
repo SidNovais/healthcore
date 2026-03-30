@@ -43,11 +43,13 @@ internal class WorklistItemDetailsProjector(
         using var connection = _sqlConnectionFactory.CreateConnection();
         await connection.ExecuteScalarAsync(
             @"UPDATE lab_analysis.worklist_item_details
-              SET result_value = @ResultValue, status = @Status
+              SET result_value = @ResultValue, result_unit = @ResultUnit, reference_range = @ReferenceRange, status = @Status
               WHERE id = @WorklistItemId",
             new
             {
                 e.ResultValue,
+                e.ResultUnit,
+                e.ReferenceRange,
                 Status = "ResultReceived",
                 e.WorklistItemId
             }

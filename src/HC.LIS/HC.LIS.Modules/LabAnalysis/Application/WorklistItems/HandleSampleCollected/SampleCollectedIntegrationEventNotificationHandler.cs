@@ -1,4 +1,6 @@
 using System;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -22,7 +24,7 @@ public class SampleCollectedIntegrationEventNotificationHandler(
         foreach (var examCode in notification.ExamCodes)
         {
             await _commandsScheduler.EnqueueAsync(new CreateWorklistItemCommand(
-                Guid.CreateVersion7(),
+                DeriveWorklistItemId(notification.SampleId, examCode),
                 notification.SampleId,
                 notification.SampleBarcode,
                 examCode,
@@ -30,5 +32,15 @@ public class SampleCollectedIntegrationEventNotificationHandler(
                 notification.OccurredAt
             )).ConfigureAwait(false);
         }
+    }
+
+    private static Guid DeriveWorklistItemId(Guid sampleId, string examCode)
+    {
+        byte[] inputBytes = Encoding.UTF8.GetBytes($"{sampleId}:{examCode}");
+        byte[] hash = SHA256.HashData(inputBytes);
+        // Use first 16 bytes and fix version/variant bits for RFC 4122 compatibility
+        hash[6] = (byte)((hash[6] & 0x0F) | 0x50); // version 5
+        hash[8] = (byte)((hash[8] & 0x3F) | 0x80); // RFC 4122 variant
+        return new Guid(hash[..16]);
     }
 }

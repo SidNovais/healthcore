@@ -21,7 +21,9 @@ internal static class WorklistItemFactory
         WorklistItem item = CreatePending();
         item.RecordResult(
             WorklistItemSampleData.ResultValue,
-            WorklistItemSampleData.AnalystId,
+            WorklistItemSampleData.ResultUnit,
+            WorklistItemSampleData.ReferenceRange,
+            WorklistItemSampleData.PerformedById,
             WorklistItemSampleData.RecordedAt
         );
         return item;
@@ -46,11 +48,12 @@ internal readonly struct WorklistItemSampleData
     public const string ExamCode = "019b6c5d-fbf9-7e35-aa12-c38922ec5030";
     public static readonly Guid PatientId = Guid.Parse("019b664c-52a4-7f37-a794-6da2481550c1");
     public static readonly DateTime CreatedAt = SystemClock.Now;
-    public const string ResultValue = "7.4 mmol/L";
-    public static readonly Guid AnalystId = Guid.Parse("019b6c5d-fbf9-7e35-aa12-c38922ec5031");
+    public const string ResultValue = "7.4";
+    public const string ResultUnit = "mmol/L";
+    public const string ReferenceRange = "3.5-5.5 mmol/L";
+    public static readonly Guid PerformedById = Guid.Parse("019b6c5d-fbf9-7e35-aa12-c38922ec5031");
     public static readonly DateTime RecordedAt = SystemClock.Now;
     public const string ReportPath = "/reports/worklist/SC-001.pdf";
     public static readonly DateTime GeneratedAt = SystemClock.Now;
-    public const string CompletionType = "Complete";
     public static readonly DateTime CompletedAt = SystemClock.Now;
 }

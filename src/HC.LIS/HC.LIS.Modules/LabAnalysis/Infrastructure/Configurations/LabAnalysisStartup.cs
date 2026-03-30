@@ -63,6 +63,9 @@ public class LabAnalysisStartup
         domainNotificationsMap.Add("WorklistItemCompletedNotification",    typeof(WorklistItemCompletedNotification));
         containerBuilder.RegisterModule(new OutboxModule(domainNotificationsMap));
         BiMap internalCommandsMap = new();
+        internalCommandsMap.Add("CreateWorklistItemCommand",    typeof(CreateWorklistItemCommand));
+        internalCommandsMap.Add("RecordAnalysisResultCommand", typeof(RecordAnalysisResultCommand));
+        internalCommandsMap.Add("GenerateReportCommand",       typeof(GenerateReportCommand));
         containerBuilder.RegisterModule(new InternalCommandsModule(internalCommandsMap));
         containerBuilder.RegisterModule(new QuartzModule());
         containerBuilder.RegisterInstance(executionContextAccessor);

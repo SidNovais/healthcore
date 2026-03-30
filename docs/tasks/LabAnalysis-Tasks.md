@@ -280,7 +280,7 @@ Items surfaced during post-implementation code review against the PRD and clinic
 
 `LabAnalysisStartup.cs` initializes an empty `internalCommandsMap`. The Quartz job that processes internal commands uses this map to deserialize queued command types from JSON. Since `CreateWorklistItemCommand` is not registered, it is silently dropped after being enqueued — the entire `SampleCollected` → `CreateWorklistItem` runtime flow is broken. Integration tests don't catch this because they call `ExecuteCommandAsync` directly.
 
-- [ ] `Infrastructure/Configurations/LabAnalysisStartup.cs`
+- [x] `Infrastructure/Configurations/LabAnalysisStartup.cs`
   - Add to `internalCommandsMap`:
     ```csharp
     internalCommandsMap.Add("CreateWorklistItemCommand", typeof(CreateWorklistItemCommand));
@@ -293,10 +293,12 @@ Items surfaced during post-implementation code review against the PRD and clinic
 
 Namespace casing bug: `HC.COre` (capital O) instead of `HC.Core`. Works on Windows (case-insensitive FS) but breaks on Linux CI.
 
-- [ ] `IntegrationEvents/WorklistItemCreatedIntegrationEvent.cs:2` — fix `HC.COre` → `HC.Core`
-- [ ] `IntegrationEvents/WorklistItemCompletedIntegrationEvent.cs:2` — fix `HC.COre` → `HC.Core`
-- [ ] `SampleCollection/IntegrationEvents/SampleCollectedIntegrationEvent.cs:2` — same typo (predates this module)
-- [ ] `Infrastructure/Configurations/EventsBus/EventsBusStartup.cs:4` — same typo (`using HC.COre.Infrastructure.EventBus`)
+- [x] `IntegrationEvents/WorklistItemCreatedIntegrationEvent.cs:2` — fix `HC.COre` → `HC.Core`
+- [x] `IntegrationEvents/WorklistItemCompletedIntegrationEvent.cs:2` — fix `HC.COre` → `HC.Core`
+- [x] `SampleCollection/IntegrationEvents/SampleCollectedIntegrationEvent.cs:2` — same typo (predates this module)
+- [x] `Infrastructure/Configurations/EventsBus/EventsBusStartup.cs:4` — same typo (`using HC.COre.Infrastructure.EventBus`)
+
+> **Session note (2026-03-29):** The typo originated in `HC.Core/Infrastructure/EventBus/IntegrationEvent.cs` — the class itself declared `namespace HC.COre.Infrastructure.EventBus`. All consumers were correct (matching the declared namespace). Fix was to rename the namespace in the base class and do a project-wide `HC.COre` → `HC.Core` replacement (15 files total). Some files had duplicate usings after the replacement and were cleaned up.
 
 ---
 
@@ -308,44 +310,40 @@ New fields: `ResultValue (string)`, `ResultUnit (string)`, `ReferenceRange (stri
 
 #### Domain
 
-- [ ] `Domain/WorklistItems/Events/AnalysisResultRecordedDomainEvent.cs`
+- [x] `Domain/WorklistItems/Events/AnalysisResultRecordedDomainEvent.cs`
   - Replace `ResultValue (string)` with three properties: `ResultValue (string)`, `ResultUnit (string)`, `ReferenceRange (string)`
-- [ ] `Domain/WorklistItems/WorklistItem.cs`
-  - Update `RecordResult(string resultValue, string resultUnit, string referenceRange, Guid analystId, DateTime recordedAt)`
+- [x] `Domain/WorklistItems/WorklistItem.cs`
+  - Update `RecordResult(string resultValue, string resultUnit, string referenceRange, Guid performedById, DateTime recordedAt)`
 
 #### Unit Tests
 
-- [ ] `Tests/UnitTests/WorklistItems/WorklistItemTests.cs`
+- [x] `Tests/UnitTests/WorklistItems/WorklistItemTests.cs`
   - Update `RecordAnalysisResultIsSuccessful` to assert all three result fields on the domain event
-- [ ] `Tests/UnitTests/WorklistItems/WorklistItemFactory.cs`
+- [x] `Tests/UnitTests/WorklistItems/WorklistItemFactory.cs`
   - Update `CreateWithResult()` helper with the new signature
 
 #### Application
 
-- [ ] `Application/WorklistItems/RecordAnalysisResult/RecordAnalysisResultCommand.cs`
+- [x] `Application/WorklistItems/RecordAnalysisResult/RecordAnalysisResultCommand.cs`
   - Add `ResultUnit (string)` and `ReferenceRange (string)` properties
-- [ ] `Application/WorklistItems/RecordAnalysisResult/RecordAnalysisResultCommandHandler.cs`
+- [x] `Application/WorklistItems/RecordAnalysisResult/RecordAnalysisResultCommandHandler.cs`
   - Pass new fields to `RecordResult(...)`
 
 #### Database Migration
 
-- [ ] `src/HC.LIS/HC.LIS.Database/LabAnalysis/` — new migration
-  ```sql
-  ALTER TABLE lab_analysis.worklist_item_details
-    ADD COLUMN result_unit VARCHAR(50) NULL,
-    ADD COLUMN reference_range VARCHAR(100) NULL;
-  ```
+- [x] `src/HC.LIS/HC.LIS.Database/LabAnalysis/20260326120400_LabAnalysisModule_AddTableWorklistItemDetails.cs`
+  - Added `result_unit VARCHAR(50) NULL` and `reference_range VARCHAR(100) NULL` columns directly to `CREATE TABLE` (migration not yet deployed)
 
 #### Read Model
 
-- [ ] `Application/WorklistItems/GetWorklistItemDetails/WorklistItemDetailsDto.cs`
+- [x] `Application/WorklistItems/GetWorklistItemDetails/WorklistItemDetailsDto.cs`
   - Add `ResultUnit (string?)` and `ReferenceRange (string?)` properties
-- [ ] `Application/WorklistItems/GetWorklistItemDetails/WorklistItemDetailsProjector.cs`
+- [x] `Application/WorklistItems/GetWorklistItemDetails/WorklistItemDetailsProjector.cs`
   - Update `When(AnalysisResultRecordedDomainEvent)` to also SET `result_unit`, `reference_range`
 
 #### Integration Tests
 
-- [ ] `Tests/IntegrationTests/WorklistItems/WorklistItemTests.cs`
+- [x] `Tests/IntegrationTests/WorklistItems/WorklistItemTests.cs`
   - Update `RecordAnalysisResultIsSuccessful` to assert `ResultUnit` and `ReferenceRange` on the DTO
 
 ---
@@ -358,33 +356,30 @@ FR3 requires results to come from clinical analyzers via events (not a manually-
 
 #### Integration Event Contract
 
-- [ ] Define `AnalyzerResultReceivedIntegrationEvent`
-  - **Location:** Decide whether this lives in LabAnalysis `IntegrationEvents/` (LabAnalysis owns the contract) or in a future `Analyzer` module — recommend LabAnalysis owns it for now
+- [x] `IntegrationEvents/AnalyzerResultReceivedIntegrationEvent.cs`
+  - Owned by LabAnalysis module
   - Properties: `WorklistItemId (Guid)`, `InstrumentId (Guid)`, `ResultValue (string)`, `ResultUnit (string)`, `ReferenceRange (string)`, `RecordedAt (DateTime)`
 
 #### EventsBus Subscription
 
-- [ ] `Infrastructure/Configurations/EventsBus/EventsBusStartup.cs`
+- [x] `Infrastructure/Configurations/EventsBus/EventsBusStartup.cs`
   - Register subscription to `AnalyzerResultReceivedIntegrationEvent`
-- [ ] `Application/WorklistItems/RecordAnalysisResult/AnalyzerResultReceivedIntegrationEventNotificationHandler.cs`
+- [x] `Application/WorklistItems/RecordAnalysisResult/AnalyzerResultReceivedIntegrationEventNotificationHandler.cs`
   - Implements `INotificationHandler<AnalyzerResultReceivedIntegrationEvent>`
   - Enqueues `RecordAnalysisResultCommand` via `ICommandsScheduler`
-  - Maps `InstrumentId` → `AnalystId` (placeholder until analyst validation step is built)
+  - Maps `InstrumentId` → `PerformedById`
 
 #### Infrastructure Wiring
 
-- [ ] `Infrastructure/Configurations/LabAnalysisStartup.cs`
-  - Add `RecordAnalysisResultCommand` to `internalCommandsMap`:
-    ```csharp
-    internalCommandsMap.Add("RecordAnalysisResultCommand", typeof(RecordAnalysisResultCommand));
-    ```
+- [x] `Infrastructure/Configurations/LabAnalysisStartup.cs`
+  - Add `RecordAnalysisResultCommand` to `internalCommandsMap`
 
 #### Integration Test
 
-- [ ] `Tests/IntegrationTests/WorklistItems/WorklistItemTests.cs`
-  - Add `RecordAnalysisResultViaAnalyzerEventIsSuccessful`
-  - Insert `AnalyzerResultReceivedIntegrationEvent` directly into `lab_analysis.InboxMessages` (same pattern as `PlaceExamInProgressViaSampleCollectedTests.cs`)
-  - Poll read model for `Status == "ResultReceived"` and assert `ResultValue`, `ResultUnit`, `ReferenceRange`
+- [x] `Tests/IntegrationTests/WorklistItems/WorklistItemTests.cs`
+  - Added `RecordAnalysisResultViaAnalyzerEventIsSuccessful`
+  - Inserts `AnalyzerResultReceivedIntegrationEvent` directly into `lab_analysis.InboxMessages`
+  - Polls read model for `Status == "ResultReceived"` and asserts `ResultValue`, `ResultUnit`, `ReferenceRange`
 
 ---
 
@@ -392,8 +387,8 @@ FR3 requires results to come from clinical analyzers via events (not a manually-
 
 `SampleCollectedIntegrationEventNotificationHandler` generates a fresh `Guid.CreateVersion7()` for each `WorklistItemId` on every invocation. Under at-least-once inbox delivery the same message could be processed twice, silently creating duplicate `WorklistItem` streams for the same `(sampleId, examCode)` pair. Marten would not reject these since each gets a unique stream ID.
 
-- [ ] Evaluate using a deterministic `WorklistItemId` derived from `(sampleId, examCode)` — e.g., a v5 UUID — so reprocessing the same inbox message is idempotent
-  - File: `Application/WorklistItems/HandleSampleCollected/SampleCollectedIntegrationEventNotificationHandler.cs:25`
+- [x] Replaced `Guid.CreateVersion7()` with a deterministic ID derived from `(sampleId, examCode)` using SHA256 (v5-style UUID)
+  - File: `Application/WorklistItems/HandleSampleCollected/SampleCollectedIntegrationEventNotificationHandler.cs`
 
 ---
 
@@ -401,8 +396,8 @@ FR3 requires results to come from clinical analyzers via events (not a manually-
 
 `Complete(string completionType, ...)` accepts any string. The TechSpec states `WorklistItem` always completes as `"Complete"` (PartialComplete is TestOrders' responsibility). Nothing in the aggregate enforces this — a caller can pass `"PartialComplete"` and it will silently be stored, contradicting the spec.
 
-- [ ] Enforce `completionType == "Complete"` inside the aggregate (throw or hardcode), or introduce a `CompletionType` value object / enum
-  - File: `Domain/WorklistItems/WorklistItem.cs:67`
+- [x] Removed `completionType` parameter from `Complete()` — hardcoded `"Complete"` in the domain event per TechSpec
+  - Files: `Domain/WorklistItems/WorklistItem.cs`, `CompleteWorklistItemCommand.cs`, `CompleteWorklistItemCommandHandler.cs`
 
 ---
 
@@ -410,8 +405,9 @@ FR3 requires results to come from clinical analyzers via events (not a manually-
 
 In a clinical lab, report generation fires automatically after a result is validated — it is never a separate manual external call. Currently nothing triggers `GenerateReportCommand` after `RecordAnalysisResult`; the caller is expected to fire it separately.
 
-- [ ] Promote `GenerateReportCommand` to an internal command (`InternalCommandBase`) and have `AnalysisResultRecordedNotification` enqueue it automatically
-  - Enqueue in: `Application/WorklistItems/RecordAnalysisResult/AnalysisResultRecordedNotificationProjection.cs` (or a dedicated handler)
+- [x] Promote `GenerateReportCommand` to an internal command (`InternalCommandBase`) and have `AnalysisResultRecordedNotification` enqueue it automatically
+  - New handler: `Application/WorklistItems/RecordAnalysisResult/AnalysisResultRecordedScheduleReportNotificationHandler.cs`
+  - Report path derived as `/reports/worklist/{worklistItemId}.pdf`
   - Register in `internalCommandsMap`:
     ```csharp
     internalCommandsMap.Add("GenerateReportCommand", typeof(GenerateReportCommand));
@@ -424,7 +420,7 @@ In a clinical lab, report generation fires automatically after a result is valid
 
 `RecordResult` takes `analystId (Guid)`. Per the TechSpec, when the analyzer event integration is built, `InstrumentId` from the event is mapped to this field. An instrument is not an analyst; the naming will mislead future readers.
 
-- [ ] Rename `AnalystId` → `PerformedById` across domain event, aggregate, command, and handler — or explicitly split into `AnalystId` (human) and `InstrumentId` (machine) once the analyzer event is wired
+- [x] Rename `AnalystId` → `PerformedById` across domain event, aggregate, command, and handler — or explicitly split into `AnalystId` (human) and `InstrumentId` (machine) once the analyzer event is wired
   - Files: `Domain/WorklistItems/Events/AnalysisResultRecordedDomainEvent.cs`, `WorklistItem.cs:42`, `RecordAnalysisResultCommand.cs`, `RecordAnalysisResultCommandHandler.cs`
 
 ---
@@ -435,7 +431,7 @@ In clinical labs, samples are rejected before analysis (haemolysis, insufficient
 
 > Out of scope for v1 — document in PRD open questions.
 
-- [ ] Add open question to `docs/prd/LabAnalysis.md`: how are pre-analysis sample rejections handled? What state does a rejected `WorklistItem` transition to, and who (biomedical scientist, LIS Admin) performs the rejection?
+- [x] Added open question #6 to `docs/prd/LabAnalysis.md` (sample rejection path)
 - [ ] (future) Add `Reject(string rejectionReason, Guid rejectedById, DateTime rejectedAt)` method and `WorklistItemRejectedDomainEvent` to the aggregate
   - State machine: `Pending → Rejected` (terminal)
 
@@ -447,7 +443,7 @@ The PRD lists Pathologist as a primary persona, but the current state machine ju
 
 > Out of scope for v1 — document in PRD open questions.
 
-- [ ] Add open question to `docs/prd/LabAnalysis.md`: which result categories require pathologist sign-off before report release? Should a `PendingValidation` state be added to the state machine?
+- [x] Added open question #7 to `docs/prd/LabAnalysis.md` (pathologist sign-off)
 - [ ] (future) Add `Validate(Guid pathologistId, DateTime validatedAt)` method and `PendingValidation` state to the aggregate
 
 ---
@@ -456,9 +452,7 @@ The PRD lists Pathologist as a primary persona, but the current state machine ju
 
 Commands and events use `DateTime` throughout. Clinical lab systems require timezone-correct timestamps for HIPAA-compliant audit trails (CAP/CLIA). `DateTime` without explicit `DateTimeKind.Utc` can produce ambiguous records.
 
-- [ ] Verify `SystemClock.Now` returns UTC-kind `DateTime` across the project
-  - If it does, annotate the convention so future contributors don't introduce `DateTime.Now` (local-time)
-  - If it does not, plan a migration of command/event timestamps to `DateTimeOffset`
+- [x] Verified: `SystemClock.Now` returns `DateTime.UtcNow` — annotated with UTC convention comment in `HC.Core/Domain/SystemClock.cs`
 
 ---
 

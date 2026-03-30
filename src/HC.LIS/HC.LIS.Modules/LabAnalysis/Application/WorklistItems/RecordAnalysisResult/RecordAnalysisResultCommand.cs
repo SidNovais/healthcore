@@ -6,12 +6,16 @@ namespace HC.LIS.Modules.LabAnalysis.Application.WorklistItems.RecordAnalysisRes
 public class RecordAnalysisResultCommand(
     Guid worklistItemId,
     string resultValue,
-    Guid analystId,
+    string resultUnit,
+    string referenceRange,
+    Guid performedById,
     DateTime recordedAt
 ) : CommandBase
 {
     public Guid WorklistItemId { get; } = worklistItemId;
     public string ResultValue { get; } = resultValue;
-    public Guid AnalystId { get; } = analystId;
+    public string ResultUnit { get; } = resultUnit;
+    public string ReferenceRange { get; } = referenceRange;
+    public Guid PerformedById { get; } = performedById;
     public DateTime RecordedAt { get; } = recordedAt;
 }

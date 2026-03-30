@@ -15,6 +15,8 @@ public class LabAnalysisModuleAddTableWorklistItemDetails : Migration
           .WithColumn("patient_id").AsGuid().NotNullable()
           .WithColumn("status").AsString(50).NotNullable()
           .WithColumn("result_value").AsString(int.MaxValue).Nullable()
+          .WithColumn("result_unit").AsString(50).Nullable()
+          .WithColumn("reference_range").AsString(100).Nullable()
           .WithColumn("report_path").AsString(500).Nullable()
           .WithColumn("completion_type").AsString(50).Nullable()
           .WithColumn("created_at").AsCustom("TIMESTAMPTZ").NotNullable()

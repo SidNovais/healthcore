@@ -1,13 +1,14 @@
 using System;
-using HC.LIS.Modules.LabAnalysis.Application.Contracts;
+using HC.LIS.Modules.LabAnalysis.Application.Configuration.Commands;
 
 namespace HC.LIS.Modules.LabAnalysis.Application.WorklistItems.GenerateReport;
 
 public class GenerateReportCommand(
+    Guid id,
     Guid worklistItemId,
     string reportPath,
     DateTime generatedAt
-) : CommandBase
+) : InternalCommandBase(id)
 {
     public Guid WorklistItemId { get; } = worklistItemId;
     public string ReportPath { get; } = reportPath;

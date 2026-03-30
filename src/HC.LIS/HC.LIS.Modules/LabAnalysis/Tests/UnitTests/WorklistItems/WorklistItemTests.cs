@@ -30,7 +30,9 @@ public class WorklistItemTests : TestBase
         AnalysisResultRecordedDomainEvent evt = AssertPublishedDomainEvent<AnalysisResultRecordedDomainEvent>(item);
         evt.WorklistItemId.Should().Be(WorklistItemSampleData.WorklistItemId);
         evt.ResultValue.Should().Be(WorklistItemSampleData.ResultValue);
-        evt.AnalystId.Should().Be(WorklistItemSampleData.AnalystId);
+        evt.ResultUnit.Should().Be(WorklistItemSampleData.ResultUnit);
+        evt.ReferenceRange.Should().Be(WorklistItemSampleData.ReferenceRange);
+        evt.PerformedById.Should().Be(WorklistItemSampleData.PerformedById);
         evt.RecordedAt.Should().Be(WorklistItemSampleData.RecordedAt);
     }
 
@@ -49,13 +51,13 @@ public class WorklistItemTests : TestBase
     public void CompleteWorklistItemIsSuccessful()
     {
         WorklistItem item = WorklistItemFactory.CreateWithReport();
-        item.Complete(WorklistItemSampleData.CompletionType, WorklistItemSampleData.CompletedAt);
+        item.Complete(WorklistItemSampleData.CompletedAt);
 
         WorklistItemCompletedDomainEvent evt = AssertPublishedDomainEvent<WorklistItemCompletedDomainEvent>(item);
         evt.WorklistItemId.Should().Be(WorklistItemSampleData.WorklistItemId);
         evt.SampleId.Should().Be(WorklistItemSampleData.SampleId);
         evt.ExamCode.Should().Be(WorklistItemSampleData.ExamCode);
-        evt.CompletionType.Should().Be(WorklistItemSampleData.CompletionType);
+        evt.CompletionType.Should().Be("Complete");
         evt.CompletedAt.Should().Be(WorklistItemSampleData.CompletedAt);
     }
 
@@ -65,7 +67,7 @@ public class WorklistItemTests : TestBase
         WorklistItem item = WorklistItemFactory.CreateWithResult();
 
         AssertBrokenRule<CannotRecordResultForNonPendingWorklistItemRule>(() =>
-            item.RecordResult(WorklistItemSampleData.ResultValue, WorklistItemSampleData.AnalystId, WorklistItemSampleData.RecordedAt));
+            item.RecordResult(WorklistItemSampleData.ResultValue, WorklistItemSampleData.ResultUnit, WorklistItemSampleData.ReferenceRange, WorklistItemSampleData.PerformedById, WorklistItemSampleData.RecordedAt));
     }
 
     [Fact]
@@ -83,6 +85,6 @@ public class WorklistItemTests : TestBase
         WorklistItem item = WorklistItemFactory.CreateWithResult();
 
         AssertBrokenRule<CannotCompleteWorklistItemWithoutReportRule>(() =>
-            item.Complete(WorklistItemSampleData.CompletionType, WorklistItemSampleData.CompletedAt));
+            item.Complete(WorklistItemSampleData.CompletedAt));
     }
 }
