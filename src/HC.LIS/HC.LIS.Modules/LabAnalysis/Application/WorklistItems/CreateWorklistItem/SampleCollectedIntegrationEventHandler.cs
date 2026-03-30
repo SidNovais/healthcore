@@ -5,10 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using HC.LIS.Modules.LabAnalysis.Application.Configuration.Commands;
-using HC.LIS.Modules.LabAnalysis.Application.WorklistItems.CreateWorklistItem;
 using HC.LIS.Modules.SampleCollection.IntegrationEvents;
 
-namespace HC.LIS.Modules.LabAnalysis.Application.WorklistItems.HandleSampleCollected;
+namespace HC.LIS.Modules.LabAnalysis.Application.WorklistItems.CreateWorklistItem;
 
 public class SampleCollectedIntegrationEventNotificationHandler(
     ICommandsScheduler commandsScheduler
