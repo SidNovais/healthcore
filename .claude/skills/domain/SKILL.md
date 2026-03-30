@@ -138,7 +138,18 @@ public class Cannot{X}Rule(
 
 ---
 
-### 4c. Aggregate root — add command method and When() handler
+### 4c. Status ValueObject (when introducing or extending a status type)
+
+> **Never** use a plain `string` for status on an aggregate or entity.
+> See full pattern and template: `.claude/skills/domain/templates/status-value-object.md`
+
+**File:** `Domain/{Aggregate}/{Aggregate}Status.cs`
+**Inherits:** `ValueObject` (HC.Core.Domain)
+**Shape:** private ctor · static properties per state · `Of(string)` factory · `internal bool Is{State}` per state
+
+---
+
+### 4d. Aggregate root — add command method and When() handler
 
 **Edit** the aggregate root file. Add:
 
@@ -165,9 +176,11 @@ private void When({Aggregate}{Action}DomainEvent domainEvent)
     => _items.Single(i => i.OrderItemId.Value == domainEvent.OrderItemId).{Action}(domainEvent);
 ```
 
+> **ValueObject unwrap:** if the command method reads `_status` (or any ValueObject field) to pass into the event, call `.Value` — events carry primitives only.
+
 ---
 
-### 4d. Entity — add the behavior method
+### 4e. Entity — add the behavior method
 
 **Edit** the entity file. Add a method that:
 1. Calls `CheckRule(new Cannot{X}Rule(...))` for each guard (use current entity state fields)
@@ -186,14 +199,14 @@ internal void {Action}({EventType} domainEvent)
 
 private void When({EventType} domainEvent)
 {
-    _status = {EntityStatus}.{NewStatus};
+    _status = {EntityStatus}.Of(domainEvent.Status); // reconstruct ValueObject from primitive
     _{actionedAt} = domainEvent.{ActionedAt};
 }
 ```
 
 ---
 
-### 4e. Unit tests
+### 4f. Unit tests
 
 **Edit** the existing unit test file (e.g., `Tests/UnitTests/Orders/OrderTests.cs`). Add:
 
@@ -291,3 +304,4 @@ When in doubt, read these:
 | `src/HC.Core/Domain/IBusinessRule.cs` | Rule interface |
 | `src/HC.Core/Domain/BaseBusinessRuleException.cs` | Exception base |
 | `src/HC.Core/Tests/UnitTests/TestBase.cs` | `AssertPublishedDomainEvent<T>()`, `AssertBrokenRule<TRule>()` |
+| `src/HC.LIS/HC.LIS.Modules/TestOrders/Domain/Orders/OrderItemStatus.cs` | Status ValueObject — canonical example |
