@@ -8,7 +8,7 @@ namespace HC.LIS.Modules.LabAnalysis.Domain.WorklistItems;
 
 public class WorklistItem : AggregateRoot
 {
-    private string _status = string.Empty;
+    private WorklistItemStatus _status = WorklistItemStatus.Pending;
     private Guid _sampleId;
     private string _examCode = string.Empty;
 
@@ -85,15 +85,15 @@ public class WorklistItem : AggregateRoot
         Id = domainEvent.WorklistItemId;
         _sampleId = domainEvent.SampleId;
         _examCode = domainEvent.ExamCode;
-        _status = "Pending";
+        _status = WorklistItemStatus.Pending;
     }
 
     private void When(AnalysisResultRecordedDomainEvent _)
-        => _status = "ResultReceived";
+        => _status = WorklistItemStatus.ResultReceived;
 
     private void When(ReportGeneratedDomainEvent _)
-        => _status = "ReportGenerated";
+        => _status = WorklistItemStatus.ReportGenerated;
 
     private void When(WorklistItemCompletedDomainEvent _)
-        => _status = "Completed";
+        => _status = WorklistItemStatus.Completed;
 }

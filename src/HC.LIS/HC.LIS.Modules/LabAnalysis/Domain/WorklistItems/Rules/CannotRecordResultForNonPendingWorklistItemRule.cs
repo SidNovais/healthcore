@@ -11,11 +11,11 @@ public class RecordResultForNonPendingWorklistItemException : BaseBusinessRuleEx
 }
 
 public class CannotRecordResultForNonPendingWorklistItemRule(
-    string actualStatus
+    WorklistItemStatus actualStatus
 ) : IBusinessRule
 {
-    private readonly string _actualStatus = actualStatus;
-    public bool IsBroken() => _actualStatus != "Pending";
+    private readonly WorklistItemStatus _actualStatus = actualStatus;
+    public bool IsBroken() => !_actualStatus.IsPending;
     public void ThrowException() => throw new RecordResultForNonPendingWorklistItemException(this);
     public string Message => "Cannot record result for a worklist item that is not Pending";
 }

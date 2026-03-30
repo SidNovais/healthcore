@@ -11,11 +11,11 @@ public class CompleteWorklistItemWithoutReportException : BaseBusinessRuleExcept
 }
 
 public class CannotCompleteWorklistItemWithoutReportRule(
-    string actualStatus
+    WorklistItemStatus actualStatus
 ) : IBusinessRule
 {
-    private readonly string _actualStatus = actualStatus;
-    public bool IsBroken() => _actualStatus != "ReportGenerated";
+    private readonly WorklistItemStatus _actualStatus = actualStatus;
+    public bool IsBroken() => !_actualStatus.IsReportGenerated;
     public void ThrowException() => throw new CompleteWorklistItemWithoutReportException(this);
     public string Message => "Cannot complete a worklist item without a generated report";
 }
