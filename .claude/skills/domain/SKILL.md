@@ -62,6 +62,8 @@ If uncertain, ask the user one focused question. Do not generate speculative cod
 
 Implement all of the following in one pass. Do not stop at one file.
 
+> **Integration event handler placement and naming:** when a handler reacts to an external integration event by scheduling a command, it lives in the **same folder as that command** — not in a separate `Handle{Event}/` folder. File name: `{Event}IntegrationEventHandler.cs`. Class name: `{Event}IntegrationEventNotificationHandler` (CA1711 forbids the `EventHandler` suffix on type names). Example: `Application/WorklistItems/CreateWorklistItem/SampleCollectedIntegrationEventHandler.cs` containing `class SampleCollectedIntegrationEventNotificationHandler`.
+
 ### 4a. Domain event
 
 **File:** `src/HC.LIS/HC.LIS.Modules/{ModuleName}/Domain/{Aggregate}/Events/{Aggregate}{Action}DomainEvent.cs`
