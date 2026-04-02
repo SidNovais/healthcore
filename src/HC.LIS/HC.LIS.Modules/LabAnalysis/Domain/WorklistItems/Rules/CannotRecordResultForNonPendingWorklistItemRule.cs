@@ -15,7 +15,7 @@ public class CannotRecordResultForNonPendingWorklistItemRule(
 ) : IBusinessRule
 {
     private readonly WorklistItemStatus _actualStatus = actualStatus;
-    public bool IsBroken() => !_actualStatus.IsPending;
+    public bool IsBroken() => !(_actualStatus.IsPending || _actualStatus.IsResultReceived);
     public void ThrowException() => throw new RecordResultForNonPendingWorklistItemException(this);
-    public string Message => "Cannot record result for a worklist item that is not Pending";
+    public string Message => "Cannot record result for a worklist item that is not Pending or ResultReceived";
 }

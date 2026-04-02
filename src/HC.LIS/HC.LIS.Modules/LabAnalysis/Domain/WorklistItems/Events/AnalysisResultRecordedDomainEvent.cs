@@ -5,6 +5,7 @@ namespace HC.LIS.Modules.LabAnalysis.Domain.WorklistItems.Events;
 
 public class AnalysisResultRecordedDomainEvent(
     Guid worklistItemId,
+    string analyteCode,
     string resultValue,
     string resultUnit,
     string referenceRange,
@@ -13,6 +14,7 @@ public class AnalysisResultRecordedDomainEvent(
 ) : DomainEvent
 {
     public Guid WorklistItemId { get; } = worklistItemId;
+    public string AnalyteCode { get; } = analyteCode;
     public string ResultValue { get; } = resultValue;
     public string ResultUnit { get; } = resultUnit;
     public string ReferenceRange { get; } = referenceRange;

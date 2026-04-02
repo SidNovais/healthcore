@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using HC.Core.Domain;
 using HC.Core.Domain.EventSourcing;
 using HC.LIS.Modules.LabAnalysis.Domain.WorklistItems.Events;
@@ -11,6 +12,7 @@ public class WorklistItem : AggregateRoot
     private WorklistItemStatus _status = WorklistItemStatus.Pending;
     private Guid _sampleId;
     private string _examCode = string.Empty;
+    private readonly List<AnalysisResult> _results = [];
 
     private WorklistItem() { }
 
@@ -39,11 +41,20 @@ public class WorklistItem : AggregateRoot
         return worklistItem;
     }
 
-    public void RecordResult(string resultValue, string resultUnit, string referenceRange, Guid performedById, DateTime recordedAt)
+    public void RecordResult(
+        string analyteCode,
+        string resultValue,
+        string resultUnit,
+        string referenceRange,
+        Guid performedById,
+        DateTime recordedAt)
     {
         CheckRule(new CannotRecordResultForNonPendingWorklistItemRule(_status));
+        AnalysisResult result = AnalysisResult.Create(analyteCode, resultValue, resultUnit, referenceRange);
+        CheckRule(new CannotRecordDuplicateAnalyteResultRule(_results.AsReadOnly(), result.AnalyteCode));
         AnalysisResultRecordedDomainEvent domainEvent = new(
             Id,
+            analyteCode,
             resultValue,
             resultUnit,
             referenceRange,
@@ -88,8 +99,16 @@ public class WorklistItem : AggregateRoot
         _status = WorklistItemStatus.Pending;
     }
 
-    private void When(AnalysisResultRecordedDomainEvent _)
-        => _status = WorklistItemStatus.ResultReceived;
+    private void When(AnalysisResultRecordedDomainEvent domainEvent)
+    {
+        _results.Add(AnalysisResult.Create(
+            domainEvent.AnalyteCode,
+            domainEvent.ResultValue,
+            domainEvent.ResultUnit,
+            domainEvent.ReferenceRange));
+        if (_status.IsPending)
+            _status = WorklistItemStatus.ResultReceived;
+    }
 
     private void When(ReportGeneratedDomainEvent _)
         => _status = WorklistItemStatus.ReportGenerated;

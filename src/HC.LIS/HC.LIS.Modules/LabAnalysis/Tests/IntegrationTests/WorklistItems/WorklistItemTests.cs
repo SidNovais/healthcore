@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using FluentAssertions;
@@ -8,7 +9,6 @@ using HC.Core.Domain;
 using HC.Core.Infrastructure.Serialization;
 using HC.LIS.Modules.LabAnalysis.Application.WorklistItems.CompleteWorklistItem;
 using HC.LIS.Modules.LabAnalysis.Application.WorklistItems.CreateWorklistItem;
-using HC.LIS.Modules.LabAnalysis.Application.WorklistItems.GenerateReport;
 using HC.LIS.Modules.LabAnalysis.Application.WorklistItems.GetWorklistItemDetails;
 using HC.LIS.Modules.LabAnalysis.Application.WorklistItems.RecordAnalysisResult;
 using HC.LIS.Modules.LabAnalysis.IntegrationEvents;
@@ -23,6 +23,10 @@ public class WorklistItemTests : TestBase
     private const string ExamCode = "019b6c5d-fbf9-7e35-aa12-c38922ec5040";
     private static readonly Guid PatientId = Guid.Parse("019b664c-52a4-7f37-a794-6da2481550f0");
     private static readonly Guid PerformedById = Guid.Parse("019b6c5d-fbf9-7e35-aa12-c38922ec5041");
+    private const string AnalyteCode = "GLU";
+    private const string ResultValue = "7.4";
+    private const string ResultUnit = "mmol/L";
+    private const string ReferenceRange = "3.5-5.5 mmol/L";
 
     public WorklistItemTests() : base(Guid.CreateVersion7()) { }
 
@@ -66,9 +70,10 @@ public class WorklistItemTests : TestBase
 
         await LabAnalysisModule.ExecuteCommandAsync(new RecordAnalysisResultCommand(
             WorklistItemId,
-            "7.4",
-            "mmol/L",
-            "3.5-5.5 mmol/L",
+            AnalyteCode,
+            ResultValue,
+            ResultUnit,
+            ReferenceRange,
             PerformedById,
             SystemClock.Now
         )).ConfigureAwait(true);
@@ -83,9 +88,11 @@ public class WorklistItemTests : TestBase
 
         details.Should().NotBeNull();
         details!.Status.Should().Be("ResultReceived");
-        details.ResultValue.Should().Be("7.4");
-        details.ResultUnit.Should().Be("mmol/L");
-        details.ReferenceRange.Should().Be("3.5-5.5 mmol/L");
+        AnalyteResultDto result = details.AnalyteResults.Should().ContainSingle().Subject;
+        result.AnalyteCode.Should().Be(AnalyteCode);
+        result.ResultValue.Should().Be(ResultValue);
+        result.ResultUnit.Should().Be(ResultUnit);
+        result.ReferenceRange.Should().Be(ReferenceRange);
     }
 
     [Fact]
@@ -101,7 +108,7 @@ public class WorklistItemTests : TestBase
         ).ConfigureAwait(true);
 
         await LabAnalysisModule.ExecuteCommandAsync(new RecordAnalysisResultCommand(
-            WorklistItemId, "7.4", "mmol/L", "3.5-5.5 mmol/L", PerformedById, SystemClock.Now
+            WorklistItemId, AnalyteCode, ResultValue, ResultUnit, ReferenceRange, PerformedById, SystemClock.Now
         )).ConfigureAwait(true);
 
         await GetEventually(
@@ -109,13 +116,6 @@ public class WorklistItemTests : TestBase
                 WorklistItemId, LabAnalysisModule, dto => dto?.Status == "ResultReceived"),
             15000
         ).ConfigureAwait(true);
-
-        await LabAnalysisModule.ExecuteCommandAsync(new GenerateReportCommand(
-            Guid.CreateVersion7(),
-            WorklistItemId,
-            "/reports/worklist/SC-INT-001.pdf",
-            SystemClock.Now
-        )).ConfigureAwait(true);
 
         WorklistItemDetailsDto? details = await GetEventually(
             new GetWorklistItemDetailsFromLabAnalysisProbe(
@@ -127,7 +127,7 @@ public class WorklistItemTests : TestBase
 
         details.Should().NotBeNull();
         details!.Status.Should().Be("ReportGenerated");
-        details.ReportPath.Should().Be("/reports/worklist/SC-INT-001.pdf");
+        details.ReportPath.Should().Be($"/reports/worklist/{WorklistItemId}.pdf");
     }
 
     [Fact]
@@ -143,7 +143,7 @@ public class WorklistItemTests : TestBase
         ).ConfigureAwait(true);
 
         await LabAnalysisModule.ExecuteCommandAsync(new RecordAnalysisResultCommand(
-            WorklistItemId, "7.4", "mmol/L", "3.5-5.5 mmol/L", PerformedById, SystemClock.Now
+            WorklistItemId, AnalyteCode, ResultValue, ResultUnit, ReferenceRange, PerformedById, SystemClock.Now
         )).ConfigureAwait(true);
 
         await GetEventually(
@@ -151,10 +151,6 @@ public class WorklistItemTests : TestBase
                 WorklistItemId, LabAnalysisModule, dto => dto?.Status == "ResultReceived"),
             15000
         ).ConfigureAwait(true);
-
-        await LabAnalysisModule.ExecuteCommandAsync(new GenerateReportCommand(
-            Guid.CreateVersion7(), WorklistItemId, "/reports/worklist/SC-INT-001.pdf", SystemClock.Now
-        )).ConfigureAwait(true);
 
         await GetEventually(
             new GetWorklistItemDetailsFromLabAnalysisProbe(
@@ -198,9 +194,10 @@ public class WorklistItemTests : TestBase
             SystemClock.Now,
             WorklistItemId,
             PerformedById,
-            "7.4",
-            "mmol/L",
-            "3.5-5.5 mmol/L",
+            AnalyteCode,
+            ResultValue,
+            ResultUnit,
+            ReferenceRange,
             SystemClock.Now
         );
 
@@ -227,8 +224,10 @@ public class WorklistItemTests : TestBase
 
         details.Should().NotBeNull();
         details!.Status.Should().Be("ResultReceived");
-        details.ResultValue.Should().Be("7.4");
-        details.ResultUnit.Should().Be("mmol/L");
-        details.ReferenceRange.Should().Be("3.5-5.5 mmol/L");
+        AnalyteResultDto result = details.AnalyteResults.Should().ContainSingle().Subject;
+        result.AnalyteCode.Should().Be(AnalyteCode);
+        result.ResultValue.Should().Be(ResultValue);
+        result.ResultUnit.Should().Be(ResultUnit);
+        result.ReferenceRange.Should().Be(ReferenceRange);
     }
 }

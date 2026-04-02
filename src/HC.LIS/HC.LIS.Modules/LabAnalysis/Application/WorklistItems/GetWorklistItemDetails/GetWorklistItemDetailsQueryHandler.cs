@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
@@ -18,27 +21,52 @@ internal class GetWorklistItemDetailsQueryHandler(
         CancellationToken cancellationToken
     )
     {
-        string sql = @$"SELECT
-            wid.id AS ""{nameof(WorklistItemDetailsDto.Id)}"",
-            wid.sample_id AS ""{nameof(WorklistItemDetailsDto.SampleId)}"",
-            wid.sample_barcode AS ""{nameof(WorklistItemDetailsDto.SampleBarcode)}"",
-            wid.exam_code AS ""{nameof(WorklistItemDetailsDto.ExamCode)}"",
-            wid.patient_id AS ""{nameof(WorklistItemDetailsDto.PatientId)}"",
-            wid.status AS ""{nameof(WorklistItemDetailsDto.Status)}"",
-            wid.result_value AS ""{nameof(WorklistItemDetailsDto.ResultValue)}"",
-            wid.report_path AS ""{nameof(WorklistItemDetailsDto.ReportPath)}"",
-            wid.completion_type AS ""{nameof(WorklistItemDetailsDto.CompletionType)}"",
-            wid.created_at AS ""{nameof(WorklistItemDetailsDto.CreatedAt)}"",
-            wid.completed_at AS ""{nameof(WorklistItemDetailsDto.CompletedAt)}""
+        const string sql = @"
+            SELECT
+                wid.id               AS ""Id"",
+                wid.sample_id        AS ""SampleId"",
+                wid.sample_barcode   AS ""SampleBarcode"",
+                wid.exam_code        AS ""ExamCode"",
+                wid.patient_id       AS ""PatientId"",
+                wid.status           AS ""Status"",
+                wid.report_path      AS ""ReportPath"",
+                wid.completion_type  AS ""CompletionType"",
+                wid.created_at       AS ""CreatedAt"",
+                wid.completed_at     AS ""CompletedAt""
             FROM lab_analysis.worklist_item_details AS wid
-            WHERE wid.id = @WorklistItemId";
+            WHERE wid.id = @WorklistItemId;
+
+            SELECT
+                r.id              AS ""Id"",
+                r.analyte_code    AS ""AnalyteCode"",
+                r.result_value    AS ""ResultValue"",
+                r.result_unit     AS ""ResultUnit"",
+                r.reference_range AS ""ReferenceRange"",
+                r.performed_by_id AS ""PerformedById"",
+                r.recorded_at     AS ""RecordedAt""
+            FROM lab_analysis.worklist_item_analyte_results AS r
+            WHERE r.worklist_item_id = @WorklistItemId
+            ORDER BY r.recorded_at;";
 
         IDbConnection? connection = _sqlConnectionFactory.GetConnection()
             ?? throw new InvalidOperationException("Must exist connection to get worklist item details");
 
-        return await connection.QueryFirstOrDefaultAsync<WorklistItemDetailsDto>(
-            sql,
-            new { query.WorklistItemId }
-        ).ConfigureAwait(false);
+        using SqlMapper.GridReader multi = await connection
+            .QueryMultipleAsync(sql, new { query.WorklistItemId })
+            .ConfigureAwait(false);
+
+        WorklistItemDetailsDto? dto = await multi
+            .ReadFirstOrDefaultAsync<WorklistItemDetailsDto>()
+            .ConfigureAwait(false);
+
+        if (dto is null)
+            return null;
+
+        IEnumerable<AnalyteResultDto> analyteResults = await multi
+            .ReadAsync<AnalyteResultDto>()
+            .ConfigureAwait(false);
+
+        dto.AnalyteResults = analyteResults.ToList().AsReadOnly();
+        return dto;
     }
 }

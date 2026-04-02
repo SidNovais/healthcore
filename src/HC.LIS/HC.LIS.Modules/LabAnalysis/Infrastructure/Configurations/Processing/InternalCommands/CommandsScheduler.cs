@@ -21,8 +21,7 @@ public class CommandsScheduler(
 
     public async Task EnqueueAsync(ICommand command)
     {
-        IDbConnection? connection = _sqlConnectionFactory.GetConnection()
-        ?? throw new InvalidOperationException("Must exist connection to insert internal commands");
+        using IDbConnection connection = _sqlConnectionFactory.CreateConnection();
 
         const string sqlInsert = @$"INSERT INTO ""lab_analysis"".""InternalCommands"" (""Id"", ""EnqueueDate"" , ""Type"", ""Data"") VALUES " +
                                  "(@Id, @EnqueueDate, @Type, @Data)";
@@ -41,8 +40,7 @@ public class CommandsScheduler(
 
     public async Task EnqueueAsync<T>(ICommand<T> command)
     {
-        IDbConnection? connection = _sqlConnectionFactory.GetConnection()
-        ?? throw new InvalidOperationException("Must exist connection to insert internal commands");
+        using IDbConnection connection = _sqlConnectionFactory.CreateConnection();
 
         const string sqlInsert = @$"INSERT INTO ""lab_analysis"".""InternalCommands"" (""Id"", ""EnqueueDate"" , ""Type"", ""Data"") VALUES " +
                                  "(@Id, @EnqueueDate, @Type, @Data)";

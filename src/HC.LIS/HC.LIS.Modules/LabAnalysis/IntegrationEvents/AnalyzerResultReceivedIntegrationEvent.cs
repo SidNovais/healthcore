@@ -8,6 +8,7 @@ public class AnalyzerResultReceivedIntegrationEvent(
     DateTime occurredAt,
     Guid worklistItemId,
     Guid instrumentId,
+    string analyteCode,
     string resultValue,
     string resultUnit,
     string referenceRange,
@@ -16,6 +17,7 @@ public class AnalyzerResultReceivedIntegrationEvent(
 {
     public Guid WorklistItemId { get; } = worklistItemId;
     public Guid InstrumentId { get; } = instrumentId;
+    public string AnalyteCode { get; } = analyteCode;
     public string ResultValue { get; } = resultValue;
     public string ResultUnit { get; } = resultUnit;
     public string ReferenceRange { get; } = referenceRange;

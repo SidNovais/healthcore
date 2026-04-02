@@ -88,6 +88,7 @@ public class TestBase : IDisposable
         const string sql = @"DELETE FROM ""lab_analysis"".""InboxMessages"";
                              DELETE FROM ""lab_analysis"".""InternalCommands"";
                              DELETE FROM ""lab_analysis"".""OutboxMessages"";
+                             DELETE FROM lab_analysis.worklist_item_analyte_results;
                              DELETE FROM lab_analysis.worklist_item_details;
                              DELETE FROM ""lab_analysis"".""mt_doc_deadletterevent"";
                              DELETE FROM ""lab_analysis"".""mt_event_progression"";

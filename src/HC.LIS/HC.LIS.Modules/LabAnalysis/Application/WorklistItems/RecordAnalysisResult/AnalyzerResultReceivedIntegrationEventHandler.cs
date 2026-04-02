@@ -19,6 +19,7 @@ public class AnalyzerResultReceivedIntegrationEventNotificationHandler(
     {
         await _commandsScheduler.EnqueueAsync(new RecordAnalysisResultCommand(
             notification.WorklistItemId,
+            notification.AnalyteCode,
             notification.ResultValue,
             notification.ResultUnit,
             notification.ReferenceRange,

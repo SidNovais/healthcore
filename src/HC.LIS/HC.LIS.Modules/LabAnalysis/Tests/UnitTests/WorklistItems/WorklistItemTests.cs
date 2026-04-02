@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Xunit;
 using FluentAssertions;
 using HC.LIS.Modules.LabAnalysis.Domain.WorklistItems;
@@ -29,11 +30,25 @@ public class WorklistItemTests : TestBase
 
         AnalysisResultRecordedDomainEvent evt = AssertPublishedDomainEvent<AnalysisResultRecordedDomainEvent>(item);
         evt.WorklistItemId.Should().Be(WorklistItemSampleData.WorklistItemId);
+        evt.AnalyteCode.Should().Be(WorklistItemSampleData.AnalyteCode);
         evt.ResultValue.Should().Be(WorklistItemSampleData.ResultValue);
         evt.ResultUnit.Should().Be(WorklistItemSampleData.ResultUnit);
         evt.ReferenceRange.Should().Be(WorklistItemSampleData.ReferenceRange);
         evt.PerformedById.Should().Be(WorklistItemSampleData.PerformedById);
         evt.RecordedAt.Should().Be(WorklistItemSampleData.RecordedAt);
+    }
+
+    [Fact]
+    public void RecordMultipleAnalyteResultsIsSuccessful()
+    {
+        WorklistItem item = WorklistItemFactory.CreatePending();
+        item.RecordResult("WBC", "7.4", "10^9/L", "4.0-11.0 10^9/L", WorklistItemSampleData.PerformedById, WorklistItemSampleData.RecordedAt);
+        item.RecordResult("RBC", "5.1", "10^12/L", "4.5-5.5 10^12/L", WorklistItemSampleData.PerformedById, WorklistItemSampleData.RecordedAt);
+
+        IReadOnlyCollection<AnalysisResultRecordedDomainEvent> events = AssertPublishedDomainEvents<AnalysisResultRecordedDomainEvent>(item);
+        events.Should().HaveCount(2);
+        events.Should().Contain(e => e.AnalyteCode == "WBC");
+        events.Should().Contain(e => e.AnalyteCode == "RBC");
     }
 
     [Fact]
@@ -62,12 +77,21 @@ public class WorklistItemTests : TestBase
     }
 
     [Fact]
-    public void RecordResultThrowsWhenNotPending()
+    public void RecordResultThrowsWhenReportAlreadyGenerated()
+    {
+        WorklistItem item = WorklistItemFactory.CreateWithReport();
+
+        AssertBrokenRule<CannotRecordResultForNonPendingWorklistItemRule>(() =>
+            item.RecordResult(WorklistItemSampleData.AnalyteCode, WorklistItemSampleData.ResultValue, WorklistItemSampleData.ResultUnit, WorklistItemSampleData.ReferenceRange, WorklistItemSampleData.PerformedById, WorklistItemSampleData.RecordedAt));
+    }
+
+    [Fact]
+    public void RecordResultThrowsOnDuplicateAnalyteCode()
     {
         WorklistItem item = WorklistItemFactory.CreateWithResult();
 
-        AssertBrokenRule<CannotRecordResultForNonPendingWorklistItemRule>(() =>
-            item.RecordResult(WorklistItemSampleData.ResultValue, WorklistItemSampleData.ResultUnit, WorklistItemSampleData.ReferenceRange, WorklistItemSampleData.PerformedById, WorklistItemSampleData.RecordedAt));
+        AssertBrokenRule<CannotRecordDuplicateAnalyteResultRule>(() =>
+            item.RecordResult(WorklistItemSampleData.AnalyteCode, WorklistItemSampleData.ResultValue, WorklistItemSampleData.ResultUnit, WorklistItemSampleData.ReferenceRange, WorklistItemSampleData.PerformedById, WorklistItemSampleData.RecordedAt));
     }
 
     [Fact]

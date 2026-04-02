@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Dapper;
 using HC.Core.Application.Projections;
@@ -42,17 +43,27 @@ internal class WorklistItemDetailsProjector(
     {
         using var connection = _sqlConnectionFactory.CreateConnection();
         await connection.ExecuteScalarAsync(
-            @"UPDATE lab_analysis.worklist_item_details
-              SET result_value = @ResultValue, result_unit = @ResultUnit, reference_range = @ReferenceRange, status = @Status
-              WHERE id = @WorklistItemId",
+            @"INSERT INTO lab_analysis.worklist_item_analyte_results
+              (id, worklist_item_id, analyte_code, result_value, result_unit, reference_range, performed_by_id, recorded_at)
+              VALUES (@Id, @WorklistItemId, @AnalyteCode, @ResultValue, @ResultUnit, @ReferenceRange, @PerformedById, @RecordedAt)",
             new
             {
+                Id = Guid.CreateVersion7(),
+                e.WorklistItemId,
+                e.AnalyteCode,
                 e.ResultValue,
                 e.ResultUnit,
                 e.ReferenceRange,
-                Status = "ResultReceived",
-                e.WorklistItemId
+                e.PerformedById,
+                e.RecordedAt
             }
+        ).ConfigureAwait(false);
+
+        await connection.ExecuteScalarAsync(
+            @"UPDATE lab_analysis.worklist_item_details
+              SET status = 'ResultReceived'
+              WHERE id = @WorklistItemId AND status = 'Pending'",
+            new { e.WorklistItemId }
         ).ConfigureAwait(false);
     }
 

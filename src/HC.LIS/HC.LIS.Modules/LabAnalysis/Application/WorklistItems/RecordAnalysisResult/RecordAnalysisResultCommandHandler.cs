@@ -20,7 +20,7 @@ internal class RecordAnalysisResultCommandHandler(
         WorklistItem? worklistItem = await _aggregateStore
             .Load<WorklistItem>(new WorklistItemId(command.WorklistItemId))
             .ConfigureAwait(false);
-        worklistItem!.RecordResult(command.ResultValue, command.ResultUnit, command.ReferenceRange, command.PerformedById, command.RecordedAt);
+        worklistItem!.RecordResult(command.AnalyteCode, command.ResultValue, command.ResultUnit, command.ReferenceRange, command.PerformedById, command.RecordedAt);
         _aggregateStore.AppendChanges(worklistItem);
     }
 }

@@ -1,8 +1,10 @@
 using System;
+using Newtonsoft.Json;
 using HC.LIS.Modules.LabAnalysis.Application.Configuration.Commands;
 
 namespace HC.LIS.Modules.LabAnalysis.Application.WorklistItems.GenerateReport;
 
+[method: JsonConstructor]
 public class GenerateReportCommand(
     Guid id,
     Guid worklistItemId,

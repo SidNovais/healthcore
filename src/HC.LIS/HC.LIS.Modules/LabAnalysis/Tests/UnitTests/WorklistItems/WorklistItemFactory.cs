@@ -20,6 +20,7 @@ internal static class WorklistItemFactory
     {
         WorklistItem item = CreatePending();
         item.RecordResult(
+            WorklistItemSampleData.AnalyteCode,
             WorklistItemSampleData.ResultValue,
             WorklistItemSampleData.ResultUnit,
             WorklistItemSampleData.ReferenceRange,
@@ -48,6 +49,7 @@ internal readonly struct WorklistItemSampleData
     public const string ExamCode = "019b6c5d-fbf9-7e35-aa12-c38922ec5030";
     public static readonly Guid PatientId = Guid.Parse("019b664c-52a4-7f37-a794-6da2481550c1");
     public static readonly DateTime CreatedAt = SystemClock.Now;
+    public const string AnalyteCode = "WBC";
     public const string ResultValue = "7.4";
     public const string ResultUnit = "mmol/L";
     public const string ReferenceRange = "3.5-5.5 mmol/L";
