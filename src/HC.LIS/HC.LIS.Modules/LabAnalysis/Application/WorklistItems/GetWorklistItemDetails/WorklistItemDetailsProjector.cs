@@ -4,6 +4,7 @@ using Dapper;
 using HC.Core.Application.Projections;
 using HC.Core.Domain;
 using HC.Core.Infrastructure.Data;
+using HC.LIS.Modules.LabAnalysis.Domain.WorklistItems;
 using HC.LIS.Modules.LabAnalysis.Domain.WorklistItems.Events;
 
 namespace HC.LIS.Modules.LabAnalysis.Application.WorklistItems.GetWorklistItemDetails;
@@ -42,10 +43,11 @@ internal class WorklistItemDetailsProjector(
     private async Task When(AnalysisResultRecordedDomainEvent e)
     {
         using var connection = _sqlConnectionFactory.CreateConnection();
+        bool isOutOfRange = ReferenceRange.Of(e.ReferenceRange).IsOutOfRange(e.ResultValue);
         await connection.ExecuteScalarAsync(
             @"INSERT INTO lab_analysis.worklist_item_analyte_results
-              (id, worklist_item_id, analyte_code, result_value, result_unit, reference_range, performed_by_id, recorded_at)
-              VALUES (@Id, @WorklistItemId, @AnalyteCode, @ResultValue, @ResultUnit, @ReferenceRange, @PerformedById, @RecordedAt)",
+              (id, worklist_item_id, analyte_code, result_value, result_unit, reference_range, is_out_of_range, performed_by_id, recorded_at)
+              VALUES (@Id, @WorklistItemId, @AnalyteCode, @ResultValue, @ResultUnit, @ReferenceRange, @IsOutOfRange, @PerformedById, @RecordedAt)",
             new
             {
                 Id = Guid.CreateVersion7(),
@@ -54,6 +56,7 @@ internal class WorklistItemDetailsProjector(
                 e.ResultValue,
                 e.ResultUnit,
                 e.ReferenceRange,
+                IsOutOfRange = isOutOfRange,
                 e.PerformedById,
                 e.RecordedAt
             }

@@ -7,13 +7,13 @@ public class AnalysisResult : ValueObject
     public AnalyteCode AnalyteCode { get; }
     public string ResultValue { get; }
     public string ResultUnit { get; }
-    public string ReferenceRange { get; }
+    public ReferenceRange ReferenceRange { get; }
 
     private AnalysisResult(
         AnalyteCode analyteCode,
         string resultValue,
         string resultUnit,
-        string referenceRange)
+        ReferenceRange referenceRange)
     {
         AnalyteCode = analyteCode;
         ResultValue = resultValue;
@@ -26,5 +26,5 @@ public class AnalysisResult : ValueObject
         string resultValue,
         string resultUnit,
         string referenceRange)
-        => new(AnalyteCode.Of(analyteCode), resultValue, resultUnit, referenceRange);
+        => new(AnalyteCode.Of(analyteCode), resultValue, resultUnit, ReferenceRange.Of(referenceRange));
 }

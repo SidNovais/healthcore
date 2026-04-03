@@ -25,6 +25,7 @@ public class AnalyteResultDto
     public string ResultValue { get; set; } = string.Empty;
     public string ResultUnit { get; set; } = string.Empty;
     public string ReferenceRange { get; set; } = string.Empty;
+    public bool IsOutOfRange { get; set; }
     public Guid PerformedById { get; set; }
     public DateTime RecordedAt { get; set; }
 }

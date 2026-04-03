@@ -14,6 +14,7 @@ public class LabAnalysisModuleAddTableWorklistItemAnalyteResults : Migration
             .WithColumn("result_value").AsString(int.MaxValue).NotNullable()
             .WithColumn("result_unit").AsString(50).NotNullable()
             .WithColumn("reference_range").AsString(100).NotNullable()
+            .WithColumn("is_out_of_range").AsBoolean().NotNullable()
             .WithColumn("performed_by_id").AsGuid().NotNullable()
             .WithColumn("recorded_at").AsCustom("TIMESTAMPTZ").NotNullable()
         ;

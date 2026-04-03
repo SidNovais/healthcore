@@ -41,8 +41,9 @@ internal class GetWorklistItemDetailsQueryHandler(
                 r.analyte_code    AS ""AnalyteCode"",
                 r.result_value    AS ""ResultValue"",
                 r.result_unit     AS ""ResultUnit"",
-                r.reference_range AS ""ReferenceRange"",
-                r.performed_by_id AS ""PerformedById"",
+                r.reference_range  AS ""ReferenceRange"",
+                r.is_out_of_range  AS ""IsOutOfRange"",
+                r.performed_by_id  AS ""PerformedById"",
                 r.recorded_at     AS ""RecordedAt""
             FROM lab_analysis.worklist_item_analyte_results AS r
             WHERE r.worklist_item_id = @WorklistItemId
