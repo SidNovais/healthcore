@@ -8,6 +8,8 @@ public class WorklistItemCompletedDomainEvent(
     Guid sampleId,
     string examCode,
     string completionType,
+    Guid orderId,
+    Guid orderItemId,
     DateTime completedAt
 ) : DomainEvent
 {
@@ -15,5 +17,7 @@ public class WorklistItemCompletedDomainEvent(
     public Guid SampleId { get; } = sampleId;
     public string ExamCode { get; } = examCode;
     public string CompletionType { get; } = completionType;
+    public Guid OrderId { get; } = orderId;
+    public Guid OrderItemId { get; } = orderItemId;
     public DateTime CompletedAt { get; } = completedAt;
 }

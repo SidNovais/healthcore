@@ -10,6 +10,8 @@ internal readonly struct WorklistItemSampleData
     public const string SampleBarcode = "SC-001";
     public const string ExamCode = "CBC";
     public static readonly Guid PatientId = Guid.Parse("019b664c-52a4-7f37-a794-6da2481550c1");
+    public static readonly Guid OrderId = Guid.Parse("019b664c-52a4-7f37-a794-6da2481550e2");
+    public static readonly Guid OrderItemId = Guid.Parse("019b664c-52a4-7f37-a794-6da2481550f3");
     public static readonly DateTime CreatedAt = SystemClock.Now;
     public const string AnalyteCode = "WBC";
     public const string ResultValue = "4.5";

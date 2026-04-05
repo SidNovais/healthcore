@@ -20,6 +20,8 @@ public class WorklistItemTests : TestBase
         evt.SampleBarcode.Should().Be(WorklistItemSampleData.SampleBarcode);
         evt.ExamCode.Should().Be(WorklistItemSampleData.ExamCode);
         evt.PatientId.Should().Be(WorklistItemSampleData.PatientId);
+        evt.OrderId.Should().Be(WorklistItemSampleData.OrderId);
+        evt.OrderItemId.Should().Be(WorklistItemSampleData.OrderItemId);
         evt.CreatedAt.Should().Be(WorklistItemSampleData.CreatedAt);
     }
 
@@ -73,6 +75,8 @@ public class WorklistItemTests : TestBase
         evt.SampleId.Should().Be(WorklistItemSampleData.SampleId);
         evt.ExamCode.Should().Be(WorklistItemSampleData.ExamCode);
         evt.CompletionType.Should().Be("Complete");
+        evt.OrderId.Should().Be(WorklistItemSampleData.OrderId);
+        evt.OrderItemId.Should().Be(WorklistItemSampleData.OrderItemId);
         evt.CompletedAt.Should().Be(WorklistItemSampleData.CompletedAt);
     }
 

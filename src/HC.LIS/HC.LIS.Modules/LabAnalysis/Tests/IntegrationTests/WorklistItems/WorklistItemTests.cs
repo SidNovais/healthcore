@@ -22,6 +22,8 @@ public class WorklistItemTests : TestBase
     private const string SampleBarcode = "SC-INT-001";
     private const string ExamCode = "019b6c5d-fbf9-7e35-aa12-c38922ec5040";
     private static readonly Guid PatientId = Guid.Parse("019b664c-52a4-7f37-a794-6da2481550f0");
+    private static readonly Guid OrderId = Guid.Parse("019b664c-52a4-7f37-a794-6da2481551a0");
+    private static readonly Guid OrderItemId = Guid.Parse("019b664c-52a4-7f37-a794-6da2481551b0");
     private static readonly Guid PerformedById = Guid.Parse("019b6c5d-fbf9-7e35-aa12-c38922ec5041");
     private const string AnalyteCode = "GLU";
     private const string ResultValue = "7.4";
@@ -39,6 +41,8 @@ public class WorklistItemTests : TestBase
             SampleBarcode,
             ExamCode,
             PatientId,
+            OrderId,
+            OrderItemId,
             SystemClock.Now
         )).ConfigureAwait(true);
 
@@ -60,7 +64,7 @@ public class WorklistItemTests : TestBase
     public async Task RecordAnalysisResultIsSuccessful()
     {
         await LabAnalysisModule.ExecuteCommandAsync(new CreateWorklistItemCommand(
-            WorklistItemId, SampleId, SampleBarcode, ExamCode, PatientId, SystemClock.Now
+            WorklistItemId, SampleId, SampleBarcode, ExamCode, PatientId, OrderId, OrderItemId, SystemClock.Now
         )).ConfigureAwait(true);
 
         await GetEventually(
@@ -99,7 +103,7 @@ public class WorklistItemTests : TestBase
     public async Task GenerateReportIsSuccessful()
     {
         await LabAnalysisModule.ExecuteCommandAsync(new CreateWorklistItemCommand(
-            WorklistItemId, SampleId, SampleBarcode, ExamCode, PatientId, SystemClock.Now
+            WorklistItemId, SampleId, SampleBarcode, ExamCode, PatientId, OrderId, OrderItemId, SystemClock.Now
         )).ConfigureAwait(true);
 
         await GetEventually(
@@ -134,7 +138,7 @@ public class WorklistItemTests : TestBase
     public async Task CompleteWorklistItemIsSuccessful()
     {
         await LabAnalysisModule.ExecuteCommandAsync(new CreateWorklistItemCommand(
-            WorklistItemId, SampleId, SampleBarcode, ExamCode, PatientId, SystemClock.Now
+            WorklistItemId, SampleId, SampleBarcode, ExamCode, PatientId, OrderId, OrderItemId, SystemClock.Now
         )).ConfigureAwait(true);
 
         await GetEventually(
@@ -181,7 +185,7 @@ public class WorklistItemTests : TestBase
     public async Task RecordAnalysisResultViaAnalyzerEventIsSuccessful()
     {
         await LabAnalysisModule.ExecuteCommandAsync(new CreateWorklistItemCommand(
-            WorklistItemId, SampleId, SampleBarcode, ExamCode, PatientId, SystemClock.Now
+            WorklistItemId, SampleId, SampleBarcode, ExamCode, PatientId, OrderId, OrderItemId, SystemClock.Now
         )).ConfigureAwait(true);
 
         await GetEventually(

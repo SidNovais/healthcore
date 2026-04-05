@@ -12,6 +12,8 @@ public class WorklistItem : AggregateRoot
     private WorklistItemStatus _status = WorklistItemStatus.Pending;
     private Guid _sampleId;
     private string _examCode = string.Empty;
+    private Guid _orderId;
+    private Guid _orderItemId;
     private readonly List<AnalysisResult> _results = [];
 
     private WorklistItem() { }
@@ -24,6 +26,8 @@ public class WorklistItem : AggregateRoot
         string sampleBarcode,
         string examCode,
         Guid patientId,
+        Guid orderId,
+        Guid orderItemId,
         DateTime createdAt
     )
     {
@@ -34,6 +38,8 @@ public class WorklistItem : AggregateRoot
             sampleBarcode,
             examCode,
             patientId,
+            orderId,
+            orderItemId,
             createdAt
         );
         worklistItem.Apply(domainEvent);
@@ -85,6 +91,8 @@ public class WorklistItem : AggregateRoot
             _sampleId,
             _examCode,
             "Complete",
+            _orderId,
+            _orderItemId,
             completedAt
         );
         Apply(domainEvent);
@@ -96,6 +104,8 @@ public class WorklistItem : AggregateRoot
         Id = domainEvent.WorklistItemId;
         _sampleId = domainEvent.SampleId;
         _examCode = domainEvent.ExamCode;
+        _orderId = domainEvent.OrderId;
+        _orderItemId = domainEvent.OrderItemId;
         _status = WorklistItemStatus.Pending;
     }
 

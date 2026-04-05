@@ -9,6 +9,8 @@ public class CreateWorklistItemCommand(
     string sampleBarcode,
     string examCode,
     Guid patientId,
+    Guid orderId,
+    Guid orderItemId,
     DateTime createdAt
 ) : CommandBase<Guid>
 {
@@ -17,5 +19,7 @@ public class CreateWorklistItemCommand(
     public string SampleBarcode { get; } = sampleBarcode;
     public string ExamCode { get; } = examCode;
     public Guid PatientId { get; } = patientId;
+    public Guid OrderId { get; } = orderId;
+    public Guid OrderItemId { get; } = orderItemId;
     public DateTime CreatedAt { get; } = createdAt;
 }

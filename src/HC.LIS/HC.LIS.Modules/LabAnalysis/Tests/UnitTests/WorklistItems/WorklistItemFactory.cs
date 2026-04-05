@@ -11,6 +11,8 @@ internal static class WorklistItemFactory
             WorklistItemSampleData.SampleBarcode,
             WorklistItemSampleData.ExamCode,
             WorklistItemSampleData.PatientId,
+            WorklistItemSampleData.OrderId,
+            WorklistItemSampleData.OrderItemId,
             WorklistItemSampleData.CreatedAt
         );
 

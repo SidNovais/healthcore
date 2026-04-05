@@ -28,6 +28,8 @@ public class SampleCollectedIntegrationEventNotificationHandler(
                 notification.SampleBarcode,
                 exam.ExamMnemonic,
                 notification.PatientId,
+                notification.CollectionRequestId,
+                exam.ExamId,
                 notification.OccurredAt
             )).ConfigureAwait(false);
         }

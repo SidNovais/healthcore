@@ -23,7 +23,9 @@ public class WorklistItemCompletedPublishEventNotificationHandler(IEventsBus eve
             notification.DomainEvent.WorklistItemId,
             notification.DomainEvent.SampleId,
             notification.DomainEvent.ExamCode,
-            notification.DomainEvent.CompletionType
+            notification.DomainEvent.CompletionType,
+            notification.DomainEvent.OrderId,
+            notification.DomainEvent.OrderItemId
         )).ConfigureAwait(false);
     }
 }

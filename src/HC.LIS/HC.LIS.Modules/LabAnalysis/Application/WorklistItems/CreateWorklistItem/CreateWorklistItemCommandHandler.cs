@@ -24,6 +24,8 @@ internal class CreateWorklistItemCommandHandler(
             command.SampleBarcode,
             command.ExamCode,
             command.PatientId,
+            command.OrderId,
+            command.OrderItemId,
             command.CreatedAt
         );
         _aggregateStore.Start(worklistItem);
