@@ -8,6 +8,7 @@ namespace HC.LIS.Modules.TestOrders.Domain.Orders;
 public class OrderItem : Entity
 {
     internal OrderItemId OrderItemId { get; private set; }
+    internal string _examMnemonic = string.Empty;
     internal SpecimenRequirement _speciamentRequirement;
     internal OrderItemStatus _status;
     internal string _reasonForRejection;
@@ -99,6 +100,7 @@ public class OrderItem : Entity
     private void When(OrderItemRequestedDomainEvent domainEvent)
     {
         OrderItemId = new(domainEvent.OrderItemId);
+        _examMnemonic = domainEvent.ExamMnemonic;
         _speciamentRequirement = SpecimenRequirement.Of(
             domainEvent.SpecimenMnemonic,
             domainEvent.MaterialType,

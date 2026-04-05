@@ -8,6 +8,7 @@ public class OrderItemRequestedIntegrationEvent(
     DateTime occurredAt,
     Guid orderItemId,
     Guid orderId,
+    string examMnemonic,
     string specimenMnemonic,
     string materialType,
     string containerType,
@@ -19,6 +20,7 @@ public class OrderItemRequestedIntegrationEvent(
 {
     public Guid OrderItemId { get; } = orderItemId;
     public Guid OrderId { get; } = orderId;
+    public string ExamMnemonic { get; } = examMnemonic;
     public string SpecimenMnemonic { get; } = specimenMnemonic;
     public string MaterialType { get; } = materialType;
     public string ContainerType { get; } = containerType;

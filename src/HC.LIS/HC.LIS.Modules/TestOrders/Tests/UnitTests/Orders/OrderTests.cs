@@ -18,6 +18,7 @@ public class OrderTests : TestBase
         _sut = OrderFactory.Create();
         _sut.RequestExam(
             OrderSampleData.OrderItemId,
+            OrderSampleData.ExamMnemonic,
             SpecimenRequirement.Of(
                 OrderSampleData.SpecimenMnemonic,
                 OrderSampleData.MaterialType,
@@ -46,6 +47,7 @@ public class OrderTests : TestBase
     {
         OrderItemRequestedDomainEvent orderItemRequestedDomainEvent = AssertPublishedDomainEvent<OrderItemRequestedDomainEvent>(_sut);
         orderItemRequestedDomainEvent.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
+        orderItemRequestedDomainEvent.ExamMnemonic.Should().Be(OrderSampleData.ExamMnemonic);
         orderItemRequestedDomainEvent.SpecimenMnemonic.Should().Be(OrderSampleData.SpecimenMnemonic);
         orderItemRequestedDomainEvent.MaterialType.Should().Be(OrderSampleData.MaterialType);
         orderItemRequestedDomainEvent.ContainerType.Should().Be(OrderSampleData.ContainerType);
@@ -109,6 +111,7 @@ public class OrderTests : TestBase
         orderItemAcceptedDomainEvent.OrderItemId.Should().Be(OrderSampleData.OrderItemId);
         orderItemAcceptedDomainEvent.OrderId.Should().Be(OrderSampleData.OrderId);
         orderItemAcceptedDomainEvent.PatientId.Should().Be(OrderSampleData.PatientId);
+        orderItemAcceptedDomainEvent.ExamMnemonic.Should().Be(OrderSampleData.ExamMnemonic);
         orderItemAcceptedDomainEvent.ContainerType.Should().Be(OrderSampleData.ContainerType);
         orderItemAcceptedDomainEvent.AcceptedAt.Should().Be(acceptedAt);
     }

@@ -41,6 +41,7 @@ public class Order : AggregateRoot
 
     public void RequestExam(
         Guid orderItemId,
+        string examMnemonic,
         SpecimenRequirement specimenRequirement,
         DateTime requestedAt
     )
@@ -48,6 +49,7 @@ public class Order : AggregateRoot
         OrderItemRequestedDomainEvent orderItemRequestedDomainEvent = new(
             orderItemId,
             Id,
+            examMnemonic,
             specimenRequirement.SpecimenMnemonic,
             specimenRequirement.MaterialType,
             specimenRequirement.ContainerType,
@@ -95,6 +97,7 @@ public class Order : AggregateRoot
             orderItemId.Value,
             Id,
             _patientId.Value,
+            item._examMnemonic,
             item._speciamentRequirement.ContainerType,
             acceptedAt
         );

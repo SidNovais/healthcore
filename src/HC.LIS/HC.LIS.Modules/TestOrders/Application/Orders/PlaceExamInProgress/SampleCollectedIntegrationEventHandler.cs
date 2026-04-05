@@ -1,6 +1,4 @@
-using System.Linq;
 using MediatR;
-using HC.Core.Domain;
 using HC.LIS.Modules.TestOrders.Application.Configuration.Commands;
 using HC.LIS.Modules.SampleCollection.IntegrationEvents;
 
@@ -16,12 +14,12 @@ public class SampleCollectedIntegrationEventNotificationHandler(ICommandsSchedul
         CancellationToken cancellationToken
     )
     {
-        foreach (Guid examId in notification.ExamCodes.Select(Guid.Parse))
+        foreach (var exam in notification.Exams)
         {
             await _commandsScheduler.EnqueueAsync(new PlaceExamInProgressByExamIdCommand(
                 Guid.CreateVersion7(),
                 notification.CollectionRequestId,
-                examId,
+                exam.ExamId,
                 notification.OccurredAt
             )).ConfigureAwait(false);
         }

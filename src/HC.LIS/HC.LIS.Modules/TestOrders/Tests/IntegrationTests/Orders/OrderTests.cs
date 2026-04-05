@@ -31,6 +31,7 @@ public class OrderTests : TestBase
           new RequestExamCommand(
             OrderSampleData.OrderId,
             OrderSampleData.OrderItemId,
+            OrderSampleData.ExamMnemonic,
             OrderSampleData.SpecimenMnemonic,
             OrderSampleData.MaterialType,
             OrderSampleData.ContainerType,

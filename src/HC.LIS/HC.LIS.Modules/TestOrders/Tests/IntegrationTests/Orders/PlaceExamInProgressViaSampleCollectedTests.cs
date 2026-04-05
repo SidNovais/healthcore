@@ -25,6 +25,7 @@ public class PlaceExamInProgressViaSampleCollectedTests : TestBase
         TestOrdersModule.ExecuteCommandAsync(new RequestExamCommand(
             OrderSampleData.OrderId,
             OrderSampleData.OrderItemId,
+            OrderSampleData.ExamMnemonic,
             OrderSampleData.SpecimenMnemonic,
             OrderSampleData.MaterialType,
             OrderSampleData.ContainerType,
@@ -50,7 +51,7 @@ public class PlaceExamInProgressViaSampleCollectedTests : TestBase
             Guid.CreateVersion7(),
             OrderSampleData.PatientId,
             "SC-TEST-001",
-            [OrderSampleData.OrderItemId.ToString()]
+            [new ExamInfo(OrderSampleData.OrderItemId, OrderSampleData.ExamMnemonic)]
         );
 
         using (var connection = new NpgsqlConnection(ConnectionString))

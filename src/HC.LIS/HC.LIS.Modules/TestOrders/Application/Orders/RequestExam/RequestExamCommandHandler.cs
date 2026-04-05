@@ -19,6 +19,7 @@ internal class RequestExamCommandHandler(
         throw new InvalidCommandException("Order must exist to request an test");
         order.RequestExam(
             command.ItemId,
+            command.ExamMnemonic,
             SpecimenRequirement.Of(
                 command.SpecimenMnemonic,
                 command.MaterialType,

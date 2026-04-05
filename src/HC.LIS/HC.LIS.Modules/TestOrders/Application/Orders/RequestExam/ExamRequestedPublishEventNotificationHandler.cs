@@ -19,6 +19,7 @@ public class ExamRequestedPublishEventNotificationHandler(IEventsBus eventsBus)
             notification.DomainEvent.OcurredAt,
             notification.DomainEvent.OrderItemId,
             notification.DomainEvent.OrderId,
+            notification.DomainEvent.ExamMnemonic,
             notification.DomainEvent.SpecimenMnemonic,
             notification.DomainEvent.MaterialType,
             notification.DomainEvent.ContainerType,
