@@ -30,6 +30,7 @@ public class OrderItemAcceptedIntegrationEventNotificationHandler(
                 notification.OrderId,
                 notification.PatientId,
                 notification.OrderItemId,
+                notification.ExamMnemonic,
                 notification.ContainerType,
                 notification.OccurredAt
             )).ConfigureAwait(false);
@@ -40,6 +41,7 @@ public class OrderItemAcceptedIntegrationEventNotificationHandler(
                 Guid.CreateVersion7(),
                 notification.OrderId,
                 notification.OrderItemId,
+                notification.ExamMnemonic,
                 notification.ContainerType
             )).ConfigureAwait(false);
         }

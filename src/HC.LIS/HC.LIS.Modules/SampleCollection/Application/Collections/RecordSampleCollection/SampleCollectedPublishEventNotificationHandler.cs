@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using HC.Core.Infrastructure.EventBus;
+using HC.LIS.Modules.SampleCollection.Domain.Collections;
 using HC.LIS.Modules.SampleCollection.IntegrationEvents;
 
 namespace HC.LIS.Modules.SampleCollection.Application.Collections.RecordSampleCollection;
@@ -24,7 +25,7 @@ public class SampleCollectedPublishEventNotificationHandler(IEventsBus eventsBus
             notification.DomainEvent.SampleId,
             notification.DomainEvent.PatientId,
             notification.DomainEvent.SampleBarcode,
-            notification.DomainEvent.ExamIds.Select(id => id.ToString()).ToList().AsReadOnly()
+            notification.DomainEvent.Exams.Select(e => new ExamInfo(e.ExamId, e.ExamMnemonic)).ToList().AsReadOnly()
         )).ConfigureAwait(false);
     }
 }

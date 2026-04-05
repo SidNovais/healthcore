@@ -47,6 +47,7 @@ public class CollectionRequestTests : TestBase
             new AddExamToCollectionCommand(
                 CollectionRequestSampleData.CollectionRequestId,
                 CollectionRequestSampleData.ExamId,
+                CollectionRequestSampleData.ExamMnemonic,
                 CollectionRequestSampleData.TubeType)).ConfigureAwait(true);
 
         var sampleNotification = await GetLastOutboxMessage<SampleCreatedForExamNotification>().ConfigureAwait(true);
@@ -116,6 +117,7 @@ public class CollectionRequestTests : TestBase
             new AddExamToCollectionCommand(
                 CollectionRequestSampleData.CollectionRequestId,
                 CollectionRequestSampleData.ExamId,
+                CollectionRequestSampleData.ExamMnemonic,
                 CollectionRequestSampleData.TubeType)).ConfigureAwait(true);
 
         var sampleNotification = await GetLastOutboxMessage<SampleCreatedForExamNotification>().ConfigureAwait(true);
@@ -134,7 +136,7 @@ public class CollectionRequestTests : TestBase
                 CollectionRequestSampleData.BarcodeCreatedAt)).ConfigureAwait(true);
 
         var details = await GetEventually(
-            new GetSampleDetailsFromSampleCollectionProbe(sampleId, SampleCollectionModule),
+            new GetSampleDetailsWithBarcodeProbe(sampleId, SampleCollectionModule),
             15000).ConfigureAwait(true);
 
         details.Should().NotBeNull();
@@ -150,6 +152,7 @@ public class CollectionRequestTests : TestBase
             new AddExamToCollectionCommand(
                 CollectionRequestSampleData.CollectionRequestId,
                 CollectionRequestSampleData.ExamId,
+                CollectionRequestSampleData.ExamMnemonic,
                 CollectionRequestSampleData.TubeType)).ConfigureAwait(true);
 
         var sampleNotification = await GetLastOutboxMessage<SampleCreatedForExamNotification>().ConfigureAwait(true);
@@ -196,6 +199,7 @@ public class CollectionRequestTests : TestBase
             CollectionRequestSampleData.ExamId,
             CollectionRequestSampleData.CollectionRequestId,
             CollectionRequestSampleData.PatientId,
+            CollectionRequestSampleData.ExamMnemonic,
             CollectionRequestSampleData.TubeType
         );
 

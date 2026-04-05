@@ -20,8 +20,8 @@ internal static class CollectionRequestFactory
     /// </summary>
     public static Guid AddExams(CollectionRequest request)
     {
-        request.AddExam(CollectionRequestSampleData.ExamId1, CollectionRequestSampleData.TubeType);
-        request.AddExam(CollectionRequestSampleData.ExamId2, CollectionRequestSampleData.TubeType);
+        request.AddExam(CollectionRequestSampleData.ExamId1, CollectionRequestSampleData.TubeType, CollectionRequestSampleData.ExamMnemonic1);
+        request.AddExam(CollectionRequestSampleData.ExamId2, CollectionRequestSampleData.TubeType, CollectionRequestSampleData.ExamMnemonic2);
         return request.GetDomainEvents()
             .OfType<SampleCreatedForExamDomainEvent>()
             .Single()

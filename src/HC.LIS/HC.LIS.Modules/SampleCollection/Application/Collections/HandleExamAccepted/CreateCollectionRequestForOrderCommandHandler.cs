@@ -21,7 +21,7 @@ internal class CreateCollectionRequestForOrderCommandHandler(
             false,
             command.AcceptedAt
         );
-        collectionRequest.AddExam(command.ExamId, command.ContainerType);
+        collectionRequest.AddExam(command.ExamId, command.ContainerType, command.ExamMnemonic);
         _aggregateStore.Start(collectionRequest);
         return Task.CompletedTask;
     }

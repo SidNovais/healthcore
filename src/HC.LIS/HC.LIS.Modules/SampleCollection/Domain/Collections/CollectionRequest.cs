@@ -39,7 +39,7 @@ public class CollectionRequest : AggregateRoot
         return collectionRequest;
     }
 
-    public void AddExam(Guid examId, string tubeType)
+    public void AddExam(Guid examId, string tubeType, string examMnemonic)
     {
         Sample? pendingSample = _samples.FirstOrDefault(s => s.TubeType == tubeType && !s.HasBarcode);
 
@@ -49,7 +49,8 @@ public class CollectionRequest : AggregateRoot
                 Id,
                 Guid.NewGuid(),
                 examId,
-                tubeType
+                tubeType,
+                examMnemonic
             );
             Apply(sampleCreatedForExamDomainEvent);
             AddDomainEvent(sampleCreatedForExamDomainEvent);
@@ -59,7 +60,8 @@ public class CollectionRequest : AggregateRoot
             ExamAddedToExistingSampleDomainEvent examAddedToExistingSampleDomainEvent = new(
                 Id,
                 pendingSample.SampleId.Value,
-                examId
+                examId,
+                examMnemonic
             );
             Apply(examAddedToExistingSampleDomainEvent);
             AddDomainEvent(examAddedToExistingSampleDomainEvent);
@@ -111,7 +113,7 @@ public class CollectionRequest : AggregateRoot
             barcodeValue,
             tubeType,
             technicianId,
-            pendingSample!.ExamIds,
+            pendingSample!.Exams,
             createdAt
         );
         Apply(barcodeCreatedDomainEvent);
@@ -127,7 +129,7 @@ public class CollectionRequest : AggregateRoot
             sampleId,
             _patientId.Value,
             technicianId,
-            sample.ExamIds,
+            sample.Exams,
             sample.Barcode!,
             collectedAt
         );

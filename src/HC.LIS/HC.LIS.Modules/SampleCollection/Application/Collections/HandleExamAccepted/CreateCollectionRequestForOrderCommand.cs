@@ -9,6 +9,7 @@ public class CreateCollectionRequestForOrderCommand(
     Guid collectionRequestId,
     Guid patientId,
     Guid examId,
+    string examMnemonic,
     string containerType,
     DateTime acceptedAt
 ) : InternalCommandBase(id)
@@ -16,6 +17,7 @@ public class CreateCollectionRequestForOrderCommand(
     public Guid CollectionRequestId { get; } = collectionRequestId;
     public Guid PatientId { get; } = patientId;
     public Guid ExamId { get; } = examId;
+    public string ExamMnemonic { get; } = examMnemonic;
     public string ContainerType { get; } = containerType;
     public DateTime AcceptedAt { get; } = acceptedAt;
 }

@@ -30,30 +30,32 @@ public class CollectionRequestTests : TestBase
     [Fact]
     public void AddExamCreatesNewSampleWhenNoSampleExistsForTubeType()
     {
-        _sut.AddExam(CollectionRequestSampleData.ExamId1, CollectionRequestSampleData.TubeType);
+        _sut.AddExam(CollectionRequestSampleData.ExamId1, CollectionRequestSampleData.TubeType, CollectionRequestSampleData.ExamMnemonic1);
 
         SampleCreatedForExamDomainEvent evt = AssertPublishedDomainEvent<SampleCreatedForExamDomainEvent>(_sut);
         evt.CollectionRequestId.Should().Be(CollectionRequestSampleData.CollectionRequestId);
         evt.SampleId.Should().NotBeEmpty();
         evt.ExamId.Should().Be(CollectionRequestSampleData.ExamId1);
+        evt.ExamMnemonic.Should().Be(CollectionRequestSampleData.ExamMnemonic1);
         evt.TubeType.Should().Be(CollectionRequestSampleData.TubeType);
     }
 
     [Fact]
     public void AddExamGroupsIntoExistingSampleWhenSampleAlreadyExistsForTubeType()
     {
-        _sut.AddExam(CollectionRequestSampleData.ExamId1, CollectionRequestSampleData.TubeType);
+        _sut.AddExam(CollectionRequestSampleData.ExamId1, CollectionRequestSampleData.TubeType, CollectionRequestSampleData.ExamMnemonic1);
         Guid sampleId = _sut.GetDomainEvents()
             .OfType<SampleCreatedForExamDomainEvent>()
             .Single()
             .SampleId;
 
-        _sut.AddExam(CollectionRequestSampleData.ExamId2, CollectionRequestSampleData.TubeType);
+        _sut.AddExam(CollectionRequestSampleData.ExamId2, CollectionRequestSampleData.TubeType, CollectionRequestSampleData.ExamMnemonic2);
 
         ExamAddedToExistingSampleDomainEvent evt = AssertPublishedDomainEvent<ExamAddedToExistingSampleDomainEvent>(_sut);
         evt.CollectionRequestId.Should().Be(CollectionRequestSampleData.CollectionRequestId);
         evt.SampleId.Should().Be(sampleId);
         evt.ExamId.Should().Be(CollectionRequestSampleData.ExamId2);
+        evt.ExamMnemonic.Should().Be(CollectionRequestSampleData.ExamMnemonic2);
     }
 
     [Fact]
@@ -92,8 +94,6 @@ public class CollectionRequestTests : TestBase
             CollectionRequestSampleData.CreatedAt
         );
 
-        IReadOnlyCollection<Guid> expectedExamIds = [CollectionRequestSampleData.ExamId1, CollectionRequestSampleData.ExamId2];
-
         BarcodeCreatedDomainEvent evt = AssertPublishedDomainEvent<BarcodeCreatedDomainEvent>(_sut);
         evt.CollectionRequestId.Should().Be(CollectionRequestSampleData.CollectionRequestId);
         evt.SampleId.Should().Be(sampleId);
@@ -101,7 +101,8 @@ public class CollectionRequestTests : TestBase
         evt.BarcodeValue.Should().Be(CollectionRequestSampleData.BarcodeValue);
         evt.TubeType.Should().Be(CollectionRequestSampleData.TubeType);
         evt.TechnicianId.Should().Be(CollectionRequestSampleData.TechnicianId);
-        evt.ExamIds.Should().BeEquivalentTo(expectedExamIds);
+        evt.Exams.Select(e => e.ExamId).Should().BeEquivalentTo([CollectionRequestSampleData.ExamId1, CollectionRequestSampleData.ExamId2]);
+        evt.Exams.Select(e => e.ExamMnemonic).Should().BeEquivalentTo([CollectionRequestSampleData.ExamMnemonic1, CollectionRequestSampleData.ExamMnemonic2]);
         evt.CreatedAt.Should().Be(CollectionRequestSampleData.CreatedAt);
     }
 

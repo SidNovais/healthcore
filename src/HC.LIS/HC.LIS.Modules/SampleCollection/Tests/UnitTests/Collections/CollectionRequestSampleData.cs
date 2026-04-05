@@ -10,6 +10,8 @@ public readonly struct CollectionRequestSampleData
     public static readonly Guid TechnicianId = Guid.Parse("019b6c5d-fbf9-7e35-aa12-c38922ec5027");
     public static readonly Guid ExamId1 = Guid.Parse("019b6c5d-fbf9-7e35-aa12-c38922ec5028");
     public static readonly Guid ExamId2 = Guid.Parse("019b6c5d-fbf9-7e35-aa12-c38922ec5029");
+    public const string ExamMnemonic1 = "CBC";
+    public const string ExamMnemonic2 = "HGB";
     public static readonly string TubeType = "EDTA";
     public static readonly string BarcodeValue = "BC-001";
     public static readonly bool ExamPreparationVerified = true;

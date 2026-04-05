@@ -7,6 +7,7 @@ public readonly struct CollectionRequestSampleData
     public static readonly Guid CollectionRequestId = Guid.Parse("019b6642-6c05-7678-919a-2bd510a95e40");
     public static readonly Guid PatientId = Guid.Parse("019b664c-52a4-7f37-a794-6da2481550c0");
     public static readonly Guid ExamId = Guid.Parse("019b6c5d-fbf9-7e35-aa12-c38922ec5026");
+    public const string ExamMnemonic = "CBC";
     public static readonly Guid TechnicianId = Guid.Parse("019b6c5d-fbf9-7e35-aa12-c38922ec5027");
     public static readonly string TubeType = "EDTA";
     public static readonly string BarcodeValue = "BC-001";

@@ -10,12 +10,12 @@ public class SampleCollectedIntegrationEvent(
     Guid sampleId,
     Guid patientId,
     string sampleBarcode,
-    IReadOnlyCollection<string> examCodes
+    IReadOnlyCollection<ExamInfo> exams
 ) : IntegrationEvent(id, occurredAt)
 {
     public Guid CollectionRequestId { get; } = collectionRequestId;
     public Guid SampleId { get; } = sampleId;
     public Guid PatientId { get; } = patientId;
     public string SampleBarcode { get; } = sampleBarcode;
-    public IReadOnlyCollection<string> ExamCodes { get; } = examCodes;
+    public IReadOnlyCollection<ExamInfo> Exams { get; } = exams;
 }

@@ -18,7 +18,7 @@ internal class AddExamToCollectionForOrderCommandHandler(
         CollectionRequest? collectionRequest = await _aggregateStore
             .Load<CollectionRequest>(new CollectionRequestId(command.CollectionRequestId))
             .ConfigureAwait(false);
-        collectionRequest!.AddExam(command.ExamId, command.ContainerType);
+        collectionRequest!.AddExam(command.ExamId, command.ContainerType, command.ExamMnemonic);
         _aggregateStore.AppendChanges(collectionRequest);
     }
 }

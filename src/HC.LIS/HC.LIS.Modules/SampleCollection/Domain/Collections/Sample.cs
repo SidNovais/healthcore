@@ -10,8 +10,8 @@ public class Sample : Entity
 {
     internal SampleId SampleId { get; private set; } = null!;
     internal string TubeType { get; private set; } = null!;
-    private readonly List<Guid> _examIds = [];
-    internal IReadOnlyCollection<Guid> ExamIds => _examIds.AsReadOnly();
+    private readonly List<CollectionExam> _exams = [];
+    internal IReadOnlyCollection<CollectionExam> Exams => _exams.AsReadOnly();
     internal bool HasBarcode => !_status.IsPending;
     private string? _barcodeValue;
     internal string? Barcode => _barcodeValue;
@@ -44,12 +44,12 @@ public class Sample : Entity
     {
         SampleId = new(domainEvent.SampleId);
         TubeType = domainEvent.TubeType;
-        _examIds.Add(domainEvent.ExamId);
+        _exams.Add(CollectionExam.Of(domainEvent.ExamId, domainEvent.TubeType, domainEvent.ExamMnemonic));
         _status = SampleStatus.Pending;
     }
 
     private void When(ExamAddedToExistingSampleDomainEvent domainEvent)
-        => _examIds.Add(domainEvent.ExamId);
+        => _exams.Add(CollectionExam.Of(domainEvent.ExamId, TubeType, domainEvent.ExamMnemonic));
 
     private void When(BarcodeCreatedDomainEvent domainEvent)
     {
