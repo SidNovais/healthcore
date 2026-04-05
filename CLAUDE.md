@@ -117,7 +117,7 @@ The public API of each module is a single facade class (e.g., `TestOrdersModule`
 
 Tests follow **Arrange–Act–Assert** with FluentAssertions. `TestBase` provides `AssertPublishedDomainEvent<T>()` to verify events raised on aggregates. `OrderSampleData` holds shared test data; `OrderFactory` builds test aggregates.
 
-TDD is practiced: test commits (`test:`) precede or accompany feature commits (`feat:`).
+**TDD is required.** Always write the failing test first, then implement only enough code to make it pass. Test commits (`test:`) must precede the corresponding feature commits (`feat:`). Never write production code without a failing test driving it.
 
 ---
 
@@ -125,7 +125,7 @@ TDD is practiced: test commits (`test:`) precede or accompany feature commits (`
 
 Typical flow for a new exam lifecycle command:
 
-1. **Domain** — add business rule(s) in `Rules/`, domain event in `Events/`, method on the aggregate
-2. **Application** — add `*Command`, `*CommandHandler`, `*Notification` in a subfolder under `Application/Orders/`
-3. **IntegrationEvents** — add `*IntegrationEvent` if external systems need notification
-4. **Tests** — add unit test in `OrderTests.cs` verifying the domain event with `AssertPublishedDomainEvent<T>()`
+1. **Tests** — write a failing unit test in `OrderTests.cs` asserting the expected domain event via `AssertPublishedDomainEvent<T>()`
+2. **Domain** — add business rule(s) in `Rules/`, domain event in `Events/`, method on the aggregate
+3. **Application** — add `*Command`, `*CommandHandler`, `*Notification` in a subfolder under `Application/Orders/`
+4. **IntegrationEvents** — add `*IntegrationEvent` if external systems need notification
