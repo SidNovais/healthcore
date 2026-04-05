@@ -1,5 +1,6 @@
 using HC.Core.Domain;
 using HC.Core.Domain.EventSourcing;
+using HC.LIS.Modules.SampleCollection.Infrastructure.Configurations.DataAccess;
 using JasperFx.Events;
 using Marten;
 using Newtonsoft.Json;
@@ -35,7 +36,7 @@ public class MartenAggregateStore(
         {
             Type type = DomainEventTypeMappings.Dictionary[@event.EventType.Name];
             string json = JsonConvert.SerializeObject(@event.Data);
-            var domainEvent = JsonConvert.DeserializeObject(json, type) as IDomainEvent;
+            var domainEvent = JsonConvert.DeserializeObject(json, type, new CollectionExamNewtonsoftConverter()) as IDomainEvent;
             domainEvents.Add(domainEvent!);
         }
         if (!domainEvents.Any()) return null;
