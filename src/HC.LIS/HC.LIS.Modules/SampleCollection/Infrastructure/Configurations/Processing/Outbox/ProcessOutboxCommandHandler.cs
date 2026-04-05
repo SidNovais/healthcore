@@ -11,6 +11,7 @@ using HC.Core.Infrastructure.Data;
 using HC.Core.Infrastructure.DomainEventsDispatching;
 using HC.LIS.Modules.SampleCollection.Application.Configuration.Commands;
 using HC.Core.Application.Events;
+using HC.LIS.Modules.SampleCollection.Infrastructure.Configurations.DataAccess;
 
 namespace HC.LIS.Modules.SampleCollection.Infrastructure.Configurations.Processing.Outbox;
 
@@ -54,7 +55,7 @@ internal class ProcessOutboxCommandHandler(
                 Type? type = _domainNotificationsMapper.GetTypeByName(message.Type);
                 if (type is not null)
                 {
-                    var @event = JsonConvert.DeserializeObject(message.Data, type) as IDomainEventNotification;
+                    var @event = JsonConvert.DeserializeObject(message.Data, type, new CollectionExamNewtonsoftConverter()) as IDomainEventNotification;
 
                     if (@event is not null)
                         using (LogContext.Push(new OutboxMessageContextEnricher(@event)))

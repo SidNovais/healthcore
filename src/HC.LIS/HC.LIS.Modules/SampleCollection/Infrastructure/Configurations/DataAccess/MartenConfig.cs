@@ -22,6 +22,10 @@ public static class MartenConfig
             options.Events.AddEventType<PatientCalledDomainEvent>();
             options.Events.AddEventType<BarcodeCreatedDomainEvent>();
             options.Events.AddEventType<SampleCollectedDomainEvent>();
+            options.UseSystemTextJsonForSerialization(configure: serializerOptions =>
+            {
+                serializerOptions.Converters.Add(new CollectionExamJsonConverter());
+            });
         });
         return store;
     }
