@@ -73,6 +73,7 @@ public class TestOrdersStartup
         containerBuilder.RegisterModule(new OutboxModule(domainNotificationsMap));
         BiMap internalCommandsMap = new();
         internalCommandsMap.Add("PlaceExamInProgressByExamIdCommand", typeof(PlaceExamInProgressByExamIdCommand));
+        internalCommandsMap.Add("CompleteExamByExamIdCommand", typeof(CompleteExamByExamIdCommand));
         containerBuilder.RegisterModule(new InternalCommandsModule(internalCommandsMap));
         containerBuilder.RegisterModule(new QuartzModule());
         containerBuilder.RegisterInstance(executionContextAccessor);
