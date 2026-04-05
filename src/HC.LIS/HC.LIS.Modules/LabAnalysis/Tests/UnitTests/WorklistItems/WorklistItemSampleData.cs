@@ -8,7 +8,7 @@ internal readonly struct WorklistItemSampleData
     public static readonly Guid WorklistItemId = Guid.Parse("019b6642-6c05-7678-919a-2bd510a95e50");
     public static readonly Guid SampleId = Guid.Parse("019b664c-52a4-7f37-a794-6da2481550d0");
     public const string SampleBarcode = "SC-001";
-    public const string ExamCode = "019b6c5d-fbf9-7e35-aa12-c38922ec5030";
+    public const string ExamCode = "CBC";
     public static readonly Guid PatientId = Guid.Parse("019b664c-52a4-7f37-a794-6da2481550c1");
     public static readonly DateTime CreatedAt = SystemClock.Now;
     public const string AnalyteCode = "WBC";

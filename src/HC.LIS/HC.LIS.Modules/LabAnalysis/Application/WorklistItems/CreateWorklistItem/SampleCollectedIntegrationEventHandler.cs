@@ -20,13 +20,13 @@ public class SampleCollectedIntegrationEventNotificationHandler(
         CancellationToken cancellationToken
     )
     {
-        foreach (var examCode in notification.ExamCodes)
+        foreach (var exam in notification.Exams)
         {
             await _commandsScheduler.EnqueueAsync(new CreateWorklistItemCommand(
-                DeriveWorklistItemId(notification.SampleId, examCode),
+                DeriveWorklistItemId(notification.SampleId, exam.ExamMnemonic),
                 notification.SampleId,
                 notification.SampleBarcode,
-                examCode,
+                exam.ExamMnemonic,
                 notification.PatientId,
                 notification.OccurredAt
             )).ConfigureAwait(false);
