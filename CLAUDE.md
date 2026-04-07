@@ -79,6 +79,20 @@ src/
 - `Application` → depends only on `Domain`
 - `Infrastructure` → depends on `Application` and `Domain`
 
+**Never violate layer boundaries in code:**
+
+- SQL queries belong in **query handlers** (`IQueryHandler<,>`) or **domain-defined provider interfaces** implemented in Infrastructure — never inline inside command handlers.
+- AWS SDK, EF Core, Dapper, and all third-party infrastructure clients belong in **Infrastructure** — never in Application or Domain.
+- Command handlers must not contain `ISqlConnectionFactory`, `IDbConnection`, or any raw SQL. If a handler needs read-model data, it should either inject the relevant `IQueryHandler<,>` directly (same DI scope) or resolve a domain-defined provider interface (e.g., `IWorklistItemForSigningProvider`).
+- Do not create `CLAUDE.md` files inside individual modules or layers — all architecture guidance belongs in the root `CLAUDE.md`.
+
+**Domain-defined provider interfaces** — when a domain factory or aggregate method needs data that only Infrastructure can supply (e.g., a DB query required to enforce a business rule):
+
+1. Define a value object in `Domain` carrying exactly what the domain needs.
+2. Define the provider interface in `Domain` (e.g., `IWorklistItemForSigningProvider`).
+3. Implement the interface in `Infrastructure` using Dapper.
+4. Inject the interface into the Application command handler; pass the result into the aggregate method.
+
 ### Key Architectural Patterns
 
 - **Event Sourcing** — aggregates state is rebuilt by replaying domain events (via Marten)
