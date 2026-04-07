@@ -28,6 +28,8 @@ internal class GetWorklistItemDetailsQueryHandler(
                 wid.sample_barcode   AS ""SampleBarcode"",
                 wid.exam_code        AS ""ExamCode"",
                 wid.patient_id       AS ""PatientId"",
+                wid.order_id         AS ""OrderId"",
+                wid.order_item_id    AS ""OrderItemId"",
                 wid.status           AS ""Status"",
                 wid.report_path      AS ""ReportPath"",
                 wid.completion_type  AS ""CompletionType"",

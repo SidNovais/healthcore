@@ -13,6 +13,8 @@ public class LabAnalysisModuleAddTableWorklistItemDetails : Migration
           .WithColumn("sample_barcode").AsString(255).NotNullable()
           .WithColumn("exam_code").AsString(255).NotNullable()
           .WithColumn("patient_id").AsGuid().NotNullable()
+          .WithColumn("order_id").AsGuid().NotNullable()
+          .WithColumn("order_item_id").AsGuid().NotNullable()
           .WithColumn("status").AsString(50).NotNullable()
           .WithColumn("report_path").AsString(500).Nullable()
           .WithColumn("completion_type").AsString(50).Nullable()

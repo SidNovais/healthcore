@@ -10,6 +10,8 @@ public class WorklistItemDetailsDto
     public string SampleBarcode { get; set; } = string.Empty;
     public string ExamCode { get; set; } = string.Empty;
     public Guid PatientId { get; set; }
+    public Guid OrderId { get; set; }
+    public Guid OrderItemId { get; set; }
     public string Status { get; set; } = string.Empty;
     public IReadOnlyCollection<AnalyteResultDto> AnalyteResults { get; set; } = Array.Empty<AnalyteResultDto>();
     public string? ReportPath { get; set; }

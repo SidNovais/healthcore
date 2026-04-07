@@ -25,8 +25,8 @@ internal class WorklistItemDetailsProjector(
         using var connection = _sqlConnectionFactory.CreateConnection();
         await connection.ExecuteScalarAsync(
             @"INSERT INTO lab_analysis.worklist_item_details
-              (id, sample_id, sample_barcode, exam_code, patient_id, status, created_at)
-              VALUES (@WorklistItemId, @SampleId, @SampleBarcode, @ExamCode, @PatientId, @Status, @CreatedAt)",
+              (id, sample_id, sample_barcode, exam_code, patient_id, order_id, order_item_id, status, created_at)
+              VALUES (@WorklistItemId, @SampleId, @SampleBarcode, @ExamCode, @PatientId, @OrderId, @OrderItemId, @Status, @CreatedAt)",
             new
             {
                 e.WorklistItemId,
@@ -34,6 +34,8 @@ internal class WorklistItemDetailsProjector(
                 e.SampleBarcode,
                 e.ExamCode,
                 e.PatientId,
+                e.OrderId,
+                e.OrderItemId,
                 Status = "Pending",
                 CreatedAt = e.CreatedAt
             }
