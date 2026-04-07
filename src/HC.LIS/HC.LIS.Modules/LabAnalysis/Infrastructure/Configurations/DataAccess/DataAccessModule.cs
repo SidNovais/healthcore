@@ -62,6 +62,7 @@ internal class DataAccessModule(
         .As<IAggregateStore>()
         .InstancePerLifetimeScope()
         ;
+
     }
 
 }

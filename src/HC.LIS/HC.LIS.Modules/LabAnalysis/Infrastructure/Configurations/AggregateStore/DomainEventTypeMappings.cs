@@ -1,3 +1,4 @@
+using HC.LIS.Modules.LabAnalysis.Domain.SignedReports.Events;
 using HC.LIS.Modules.LabAnalysis.Domain.WorklistItems.Events;
 
 namespace HC.LIS.Modules.LabAnalysis.Infrastructure.Configurations.AggregateStore;
@@ -14,6 +15,9 @@ internal static class DomainEventTypeMappings
             { "AnalysisResultRecordedDomainEvent",   typeof(AnalysisResultRecordedDomainEvent) },
             { "ReportGeneratedDomainEvent",          typeof(ReportGeneratedDomainEvent) },
             { "WorklistItemCompletedDomainEvent",    typeof(WorklistItemCompletedDomainEvent) },
+            { "SignedReportCreatedDomainEvent",      typeof(SignedReportCreatedDomainEvent) },
+            { "HtmlReportUploadedDomainEvent",       typeof(HtmlReportUploadedDomainEvent) },
+            { "PdfReportUploadedDomainEvent",        typeof(PdfReportUploadedDomainEvent) },
         };
     }
 }
