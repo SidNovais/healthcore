@@ -22,7 +22,7 @@ public class LabAnalysisModuleAddTableSignedReportDetails : Migration
         Create.Index("ix_signed_report_details_worklist_item_id")
             .OnTable("signed_report_details").InSchema("lab_analysis")
             .OnColumn("worklist_item_id").Ascending()
-            .WithOptions().UniqueIndex();
+            .WithOptions().Unique();
     }
 
     public override void Down()
