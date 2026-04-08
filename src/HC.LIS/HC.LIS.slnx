@@ -24,4 +24,11 @@
   <Project Path="../HC.LIS/HC.LIS.Modules/SampleCollection/Tests/IntegrationTests/HC.LIS.Modules.SampleCollection.IntegrationTests.csproj" />
   <Project Path="../HC.LIS/HC.LIS.Modules/SampleCollection/Tests/ArchTests/HC.LIS.Modules.SampleCollection.ArchTests.csproj" />
   <Project Path="HC.LIS.Database/HC.LIS.Database.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/Analyzer/Domain/HC.LIS.Modules.Analyzer.Domain.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/Analyzer/Application/HC.LIS.Modules.Analyzer.Application.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/Analyzer/Infrastructure/HC.LIS.Modules.Analyzer.Infrastructure.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/Analyzer/IntegrationEvents/HC.LIS.Modules.Analyzer.IntegrationEvents.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/Analyzer/Tests/UnitTests/HC.LIS.Modules.Analyzer.UnitTests.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/Analyzer/Tests/IntegrationTests/HC.LIS.Modules.Analyzer.IntegrationTests.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/Analyzer/Tests/ArchTests/HC.LIS.Modules.Analyzer.ArchTests.csproj" />
 </Solution>
