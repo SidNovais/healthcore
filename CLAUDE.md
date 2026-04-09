@@ -93,6 +93,16 @@ src/
 3. Implement the interface in `Infrastructure` using Dapper.
 4. Inject the interface into the Application command handler; pass the result into the aggregate method.
 
+**Inbound integration events must use internal commands** — when a module receives an integration event from another module, the handler must never execute the command directly. Instead:
+
+1. The integration event handler (`{Event}IntegrationEventNotificationHandler`) injects `ICommandsScheduler`.
+2. It schedules an **internal command** (extending `InternalCommandBase`) via `ICommandsScheduler.EnqueueAsync()`.
+3. The internal command is persisted in the `InternalCommands` table and executed asynchronously by the `ProcessInternalCommandsJob` (Quartz).
+4. The internal command must use `[method: JsonConstructor]` for deserialization and be registered in the `InternalCommandsModule` BiMap in the module's Startup class.
+5. Internal command naming: describe *what* it does and *by what identifier* (e.g., `CreateAnalyzerSampleBySampleCollectedCommand`, `PlaceExamInProgressByExamIdCommand`).
+
+This pattern ensures transactional safety — the Inbox processes the event, the internal command is enqueued atomically, and the command handler runs in its own unit of work.
+
 ### Key Architectural Patterns
 
 - **Event Sourcing** — aggregates state is rebuilt by replaying domain events (via Marten)
