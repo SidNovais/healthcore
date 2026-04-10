@@ -1,3 +1,4 @@
+using HC.LIS.Modules.Analyzer.Domain.AnalyzerSamples.Events;
 using JasperFx;
 using JasperFx.Events;
 using Marten;
@@ -14,8 +15,10 @@ public static class MartenConfig
             options.DatabaseSchemaName = "analyzer";
             options.AutoCreateSchemaObjects = AutoCreate.None;
             options.Events.StreamIdentity = StreamIdentity.AsString;
-            // Register domain event types here, e.g.:
-            // options.Events.AddEventType<MyDomainEvent>();
+            options.Events.AddEventType<AnalyzerSampleCreatedDomainEvent>();
+            options.Events.AddEventType<WorklistItemAssignedDomainEvent>();
+            options.Events.AddEventType<SampleInfoDispatchedDomainEvent>();
+            options.Events.AddEventType<ExamResultReceivedDomainEvent>();
         });
         return store;
     }
