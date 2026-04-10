@@ -122,26 +122,26 @@
 
 ### Phase 5: Integration Events
 
-- [ ] **Task 5.1** — Define outbound integration event `ExamResultReceivedIntegrationEvent`
+- [x] **Task 5.1** — Define outbound integration event `ExamResultReceivedIntegrationEvent`
   - **Creates:** `IntegrationEvents/ExamResultReceivedIntegrationEvent.cs`
 
-- [ ] **Task 5.2** — Implement `ExamResultReceivedPublishEventNotificationHandler`
+- [x] **Task 5.2** — Implement `ExamResultReceivedPublishEventNotificationHandler`
   - **Creates:** `Application/AnalyzerSamples/ReceiveExamResult/ExamResultReceivedPublishEventNotificationHandler.cs`
 
-- [ ] **Task 5.3** — Implement internal command `CreateAnalyzerSampleBySampleCollectedCommand` and handler
+- [x] **Task 5.3** — Implement internal command `CreateAnalyzerSampleBySampleCollectedCommand` and handler
   - **Creates:** `Application/AnalyzerSamples/CreateAnalyzerSample/CreateAnalyzerSampleBySampleCollectedCommand.cs`, `CreateAnalyzerSampleBySampleCollectedCommandHandler.cs`
   - **Pattern:** Extends `InternalCommandBase`; uses `[method: JsonConstructor]`; handler calls `AnalyzerSample.Create()` via `IAggregateStore.Start()`
 
-- [ ] **Task 5.4** — Implement inbound handler for `SampleCollectedIntegrationEvent`
+- [x] **Task 5.4** — Implement inbound handler for `SampleCollectedIntegrationEvent`
   - **Creates:** `Application/AnalyzerSamples/CreateAnalyzerSample/SampleCollectedIntegrationEventHandler.cs` (class: `SampleCollectedIntegrationEventNotificationHandler`)
   - **Pattern:** Schedules `CreateAnalyzerSampleBySampleCollectedCommand` via `ICommandsScheduler.EnqueueAsync()`
   - **Dependencies:** `SampleCollectedIntegrationEvent` must be enriched (Task 9.1)
 
-- [ ] **Task 5.5** — Implement internal command `AssignWorklistItemByBarcodeAndExamCodeCommand` and handler
+- [x] **Task 5.5** — Implement internal command `AssignWorklistItemByBarcodeAndExamCodeCommand` and handler
   - **Creates:** `Application/AnalyzerSamples/AssignWorklistItem/AssignWorklistItemByBarcodeAndExamCodeCommand.cs`, `AssignWorklistItemByBarcodeAndExamCodeCommandHandler.cs`
   - **Pattern:** Extends `InternalCommandBase`; handler resolves `AnalyzerSampleId` by injecting `IQueryHandler<GetSampleInfoByBarcodeQuery, SampleInfoDto?>` directly, then calls `AssignWorklistItem()` via `AppendChanges`
 
-- [ ] **Task 5.6** — Implement inbound handler for `WorklistItemCreatedIntegrationEvent`
+- [x] **Task 5.6** — Implement inbound handler for `WorklistItemCreatedIntegrationEvent`
   - **Creates:** `Application/AnalyzerSamples/AssignWorklistItem/WorklistItemCreatedIntegrationEventHandler.cs` (class: `WorklistItemCreatedIntegrationEventNotificationHandler`)
   - **Pattern:** Schedules `AssignWorklistItemByBarcodeAndExamCodeCommand` via `ICommandsScheduler.EnqueueAsync()`
   - **Dependencies:** `GetSampleInfoByBarcodeQuery` (Task 4.3)
@@ -156,11 +156,11 @@
 - [x] **Task 6.2** — Register notifications in OutboxModule BiMap
   - **Modifies:** `Infrastructure/Configurations/AnalyzerStartup.cs`
 
-- [ ] **Task 6.3** — Register internal commands in InternalCommandsModule BiMap
+- [x] **Task 6.3** — Register internal commands in InternalCommandsModule BiMap
   - **Modifies:** `Infrastructure/Configurations/AnalyzerStartup.cs`
   - **Registers:** `CreateAnalyzerSampleBySampleCollectedCommand`, `AssignWorklistItemByBarcodeAndExamCodeCommand`
 
-- [ ] **Task 6.4** — Register EventsBus subscriptions
+- [x] **Task 6.4** — Register EventsBus subscriptions
   - **Modifies:** `Infrastructure/Configurations/EventsBus/EventsBusStartup.cs`
 
 - [ ] **Task 6.5** — Register HL7 infrastructure services
@@ -201,14 +201,14 @@
   - **Creates:** `Tests/IntegrationTests/AnalyzerSamples/ReceiveExamResultTests.cs`
   - **Tests:** `ReceiveExamResultIsSuccessful`, `ReceiveAllExamResultsCompletesAnalyzerSample`
 
-- [ ] **Task 8.5** — Verify all integration tests pass
+- [x] **Task 8.5** — Verify all integration tests pass
   - **Verify:** `dotnet test src/HC.LIS/HC.LIS.Modules/Analyzer/Tests/IntegrationTests/HC.LIS.Modules.Analyzer.IntegrationTests.csproj`
 
 ---
 
 ### Phase 9: Cross-Module Changes
 
-- [ ] **Task 9.1** — Enrich `SampleCollectedIntegrationEvent` in SampleCollection
+- [x] **Task 9.1** — Enrich `SampleCollectedIntegrationEvent` in SampleCollection
   - **Modifies:** `src/HC.LIS/HC.LIS.Modules/SampleCollection/IntegrationEvents/SampleCollectedIntegrationEvent.cs`
   - **New fields:** `PatientName (string)`, `PatientBirthdate (DateTime)`, `PatientGender (string)`
   - **Also update:** The domain event and publish notification handler in SampleCollection that populates these fields
