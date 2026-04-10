@@ -118,7 +118,13 @@ public class CollectionRequestTests : TestBase
             CollectionRequestSampleData.CreatedAt
         );
         _sut.CallPatient(CollectionRequestSampleData.TechnicianId, CollectionRequestSampleData.CalledAt);
-        _sut.RecordCollection(sampleId, CollectionRequestSampleData.TechnicianId, CollectionRequestSampleData.CollectedAt);
+        _sut.RecordCollection(
+            sampleId,
+            CollectionRequestSampleData.TechnicianId,
+            CollectionRequestSampleData.PatientName,
+            CollectionRequestSampleData.PatientBirthdate,
+            CollectionRequestSampleData.PatientGender,
+            CollectionRequestSampleData.CollectedAt);
 
         SampleCollectedDomainEvent evt = AssertPublishedDomainEvent<SampleCollectedDomainEvent>(_sut);
         evt.CollectionRequestId.Should().Be(CollectionRequestSampleData.CollectionRequestId);
@@ -206,6 +212,9 @@ public class CollectionRequestTests : TestBase
         void action() => _sut.RecordCollection(
             sampleId,
             CollectionRequestSampleData.TechnicianId,
+            CollectionRequestSampleData.PatientName,
+            CollectionRequestSampleData.PatientBirthdate,
+            CollectionRequestSampleData.PatientGender,
             CollectionRequestSampleData.CollectedAt
         );
 
@@ -224,11 +233,20 @@ public class CollectionRequestTests : TestBase
             CollectionRequestSampleData.CreatedAt
         );
         _sut.CallPatient(CollectionRequestSampleData.TechnicianId, CollectionRequestSampleData.CalledAt);
-        _sut.RecordCollection(sampleId, CollectionRequestSampleData.TechnicianId, CollectionRequestSampleData.CollectedAt);
+        _sut.RecordCollection(
+            sampleId,
+            CollectionRequestSampleData.TechnicianId,
+            CollectionRequestSampleData.PatientName,
+            CollectionRequestSampleData.PatientBirthdate,
+            CollectionRequestSampleData.PatientGender,
+            CollectionRequestSampleData.CollectedAt);
 
         void action() => _sut.RecordCollection(
             sampleId,
             CollectionRequestSampleData.TechnicianId,
+            CollectionRequestSampleData.PatientName,
+            CollectionRequestSampleData.PatientBirthdate,
+            CollectionRequestSampleData.PatientGender,
             CollectionRequestSampleData.CollectedAt
         );
 

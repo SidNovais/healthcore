@@ -20,4 +20,7 @@ public readonly struct CollectionRequestSampleData
     public static readonly DateTime CalledAt = SystemClock.Now;
     public static readonly DateTime CreatedAt = SystemClock.Now;
     public static readonly DateTime CollectedAt = SystemClock.Now;
+    public const string PatientName = "John Doe";
+    public static readonly DateTime PatientBirthdate = new(1990, 5, 15, 0, 0, 0, DateTimeKind.Utc);
+    public const string PatientGender = "M";
 }

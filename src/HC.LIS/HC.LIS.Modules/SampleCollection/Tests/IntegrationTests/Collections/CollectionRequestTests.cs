@@ -179,6 +179,9 @@ public class CollectionRequestTests : TestBase
                 CollectionRequestSampleData.CollectionRequestId,
                 sampleId,
                 CollectionRequestSampleData.TechnicianId,
+                CollectionRequestSampleData.PatientName,
+                CollectionRequestSampleData.PatientBirthdate,
+                CollectionRequestSampleData.PatientGender,
                 CollectionRequestSampleData.CollectedAt)).ConfigureAwait(true);
 
         var details = await GetEventually(

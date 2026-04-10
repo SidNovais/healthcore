@@ -16,4 +16,7 @@ public readonly struct CollectionRequestSampleData
     public static readonly DateTime CalledAt = new(2026, 1, 1, 8, 10, 0, DateTimeKind.Utc);
     public static readonly DateTime BarcodeCreatedAt = new(2026, 1, 1, 8, 15, 0, DateTimeKind.Utc);
     public static readonly DateTime CollectedAt = new(2026, 1, 1, 8, 20, 0, DateTimeKind.Utc);
+    public const string PatientName = "John Doe";
+    public static readonly DateTime PatientBirthdate = new(1990, 5, 15, 0, 0, 0, DateTimeKind.Utc);
+    public const string PatientGender = "M";
 }
