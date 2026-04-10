@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using HC.Core.Domain;
+using HC.Core.Domain.EventSourcing;
 
 namespace HC.LIS.Modules.Analyzer.UnitTests;
 
@@ -22,10 +23,25 @@ public abstract class TestBase
         return domainEvent;
     }
 
+    public static T AssertPublishedDomainEvent<T>(AggregateRoot aggregate)
+        where T : IDomainEvent
+    {
+        T domainEvent = aggregate.GetDomainEvents().OfType<T>().SingleOrDefault()
+            ?? throw new InvalidOperationException($"{typeof(T).Name} event not published");
+        return domainEvent;
+    }
+
     public static void AssertDomainEventNotPublished<T>(Entity aggregate)
         where T : IDomainEvent
     {
         var domainEvent = DomainEventsTestHelper.GetAllDomainEvents(aggregate).OfType<T>().SingleOrDefault();
+        domainEvent.Should().BeNull();
+    }
+
+    public static void AssertDomainEventNotPublished<T>(AggregateRoot aggregate)
+        where T : IDomainEvent
+    {
+        T? domainEvent = aggregate.GetDomainEvents().OfType<T>().SingleOrDefault();
         domainEvent.Should().BeNull();
     }
 
@@ -40,6 +56,15 @@ public abstract class TestBase
         }
 
         return domainEvents.AsReadOnly();
+    }
+
+    public static IList<T> AssertPublishedDomainEvents<T>(AggregateRoot aggregate)
+        where T : IDomainEvent
+    {
+        var domainEvents = aggregate.GetDomainEvents().OfType<T>().ToList();
+        if (domainEvents.Count == 0)
+            throw new InvalidOperationException($"{typeof(T).Name} event not published");
+        return domainEvents;
     }
 
     public static void AssertBrokenRule<TRule>(Action testDelegate)
