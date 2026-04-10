@@ -18,7 +18,13 @@ internal class RecordSampleCollectionCommandHandler(
         CollectionRequest? request = await _aggregateStore
             .Load<CollectionRequest>(new CollectionRequestId(command.CollectionRequestId))
             .ConfigureAwait(false);
-        request!.RecordCollection(command.SampleId, command.TechnicianId, command.CollectedAt);
+        request!.RecordCollection(
+            command.SampleId,
+            command.TechnicianId,
+            command.PatientName,
+            command.PatientBirthdate,
+            command.PatientGender,
+            command.CollectedAt);
         _aggregateStore.AppendChanges(request);
     }
 }

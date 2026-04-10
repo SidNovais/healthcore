@@ -8,6 +8,9 @@ public class SampleCollectedDomainEvent(
     Guid sampleId,
     Guid patientId,
     Guid technicianId,
+    string patientName,
+    DateTime patientBirthdate,
+    string patientGender,
     IReadOnlyCollection<CollectionExam> exams,
     string sampleBarcode,
     DateTime collectedAt
@@ -17,6 +20,9 @@ public class SampleCollectedDomainEvent(
     public Guid SampleId { get; } = sampleId;
     public Guid PatientId { get; } = patientId;
     public Guid TechnicianId { get; } = technicianId;
+    public string PatientName { get; } = patientName;
+    public DateTime PatientBirthdate { get; } = patientBirthdate;
+    public string PatientGender { get; } = patientGender;
     public IReadOnlyCollection<CollectionExam> Exams { get; } = exams;
     public string SampleBarcode { get; } = sampleBarcode;
     public DateTime CollectedAt { get; } = collectedAt;

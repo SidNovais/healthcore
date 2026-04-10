@@ -25,6 +25,9 @@ public class SampleCollectedPublishEventNotificationHandler(IEventsBus eventsBus
             notification.DomainEvent.SampleId,
             notification.DomainEvent.PatientId,
             notification.DomainEvent.SampleBarcode,
+            notification.DomainEvent.PatientName,
+            notification.DomainEvent.PatientBirthdate,
+            notification.DomainEvent.PatientGender,
             notification.DomainEvent.Exams.Select(e => new ExamInfo(e.ExamId, e.ExamMnemonic)).ToList().AsReadOnly()
         )).ConfigureAwait(false);
     }

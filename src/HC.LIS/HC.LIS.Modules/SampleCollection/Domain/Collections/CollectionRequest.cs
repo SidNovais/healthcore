@@ -120,7 +120,13 @@ public class CollectionRequest : AggregateRoot
         AddDomainEvent(barcodeCreatedDomainEvent);
     }
 
-    public void RecordCollection(Guid sampleId, Guid technicianId, DateTime collectedAt)
+    public void RecordCollection(
+        Guid sampleId,
+        Guid technicianId,
+        string patientName,
+        DateTime patientBirthdate,
+        string patientGender,
+        DateTime collectedAt)
     {
         CheckRule(new CannotCollectSampleBeforePatientIsCalledRule(_status));
         Sample sample = _samples.Single(s => s.SampleId.Value == sampleId);
@@ -129,6 +135,9 @@ public class CollectionRequest : AggregateRoot
             sampleId,
             _patientId.Value,
             technicianId,
+            patientName,
+            patientBirthdate,
+            patientGender,
             sample.Exams,
             sample.Barcode!,
             collectedAt

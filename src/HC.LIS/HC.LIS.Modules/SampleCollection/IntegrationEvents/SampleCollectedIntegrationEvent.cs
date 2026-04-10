@@ -10,6 +10,9 @@ public class SampleCollectedIntegrationEvent(
     Guid sampleId,
     Guid patientId,
     string sampleBarcode,
+    string patientName,
+    DateTime patientBirthdate,
+    string patientGender,
     IReadOnlyCollection<ExamInfo> exams
 ) : IntegrationEvent(id, occurredAt)
 {
@@ -17,5 +20,8 @@ public class SampleCollectedIntegrationEvent(
     public Guid SampleId { get; } = sampleId;
     public Guid PatientId { get; } = patientId;
     public string SampleBarcode { get; } = sampleBarcode;
+    public string PatientName { get; } = patientName;
+    public DateTime PatientBirthdate { get; } = patientBirthdate;
+    public string PatientGender { get; } = patientGender;
     public IReadOnlyCollection<ExamInfo> Exams { get; } = exams;
 }
