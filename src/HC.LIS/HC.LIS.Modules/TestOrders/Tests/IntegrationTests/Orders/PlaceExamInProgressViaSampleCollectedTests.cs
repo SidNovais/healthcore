@@ -51,6 +51,9 @@ public class PlaceExamInProgressViaSampleCollectedTests : TestBase
             Guid.CreateVersion7(),
             OrderSampleData.PatientId,
             "SC-TEST-001",
+            "John Doe",
+            new DateTime(1990, 5, 15, 0, 0, 0, DateTimeKind.Utc),
+            "M",
             [new ExamInfo(OrderSampleData.OrderItemId, OrderSampleData.ExamMnemonic)]
         );
 
