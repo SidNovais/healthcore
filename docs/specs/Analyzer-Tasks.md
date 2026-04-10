@@ -113,12 +113,10 @@
 - [x] **Task 4.2** — Implement `AnalyzerSampleExamDetails` read model (DTO, query, handler, projector)
   - **Creates:** `Application/AnalyzerSamples/GetAnalyzerSampleExamDetails/AnalyzerSampleExamDetailsDto.cs`, `GetAnalyzerSampleExamDetailsQuery.cs`, `GetAnalyzerSampleExamDetailsQueryHandler.cs`, `AnalyzerSampleExamDetailsProjector.cs`
 
-- [ ] **Task 4.3** — Implement `GetSampleInfoByBarcode` query (JOIN of both read models)
+- [x] **Task 4.3** — Implement `GetSampleInfoByBarcode` query (JOIN of both read models)
   - **Creates:** `Application/AnalyzerSamples/GetSampleInfoByBarcode/SampleInfoDto.cs`, `GetSampleInfoByBarcodeQuery.cs`, `GetSampleInfoByBarcodeQueryHandler.cs`
 
-- [ ] **Task 4.4** — Implement domain provider `IAnalyzerSampleByBarcodeProvider`
-  - **Creates:** `Domain/AnalyzerSamples/IAnalyzerSampleByBarcodeProvider.cs`
-  - **Creates:** `Infrastructure/DataAccess/AnalyzerSampleByBarcodeProvider.cs`
+- ~~**Task 4.4** — Implement domain provider `IAnalyzerSampleByBarcodeProvider`~~ **REMOVED** — lookup happens at command handler level (Application), not inside the aggregate; inject `IQueryHandler<GetSampleInfoByBarcodeQuery, SampleInfoDto?>` directly in Task 5.5 instead.
 
 ---
 
@@ -141,12 +139,12 @@
 
 - [ ] **Task 5.5** — Implement internal command `AssignWorklistItemByBarcodeAndExamCodeCommand` and handler
   - **Creates:** `Application/AnalyzerSamples/AssignWorklistItem/AssignWorklistItemByBarcodeAndExamCodeCommand.cs`, `AssignWorklistItemByBarcodeAndExamCodeCommandHandler.cs`
-  - **Pattern:** Extends `InternalCommandBase`; handler resolves `AnalyzerSampleId` via `IAnalyzerSampleByBarcodeProvider`, then calls `AssignWorklistItem()` via `AppendChanges`
+  - **Pattern:** Extends `InternalCommandBase`; handler resolves `AnalyzerSampleId` by injecting `IQueryHandler<GetSampleInfoByBarcodeQuery, SampleInfoDto?>` directly, then calls `AssignWorklistItem()` via `AppendChanges`
 
 - [ ] **Task 5.6** — Implement inbound handler for `WorklistItemCreatedIntegrationEvent`
   - **Creates:** `Application/AnalyzerSamples/AssignWorklistItem/WorklistItemCreatedIntegrationEventHandler.cs` (class: `WorklistItemCreatedIntegrationEventNotificationHandler`)
   - **Pattern:** Schedules `AssignWorklistItemByBarcodeAndExamCodeCommand` via `ICommandsScheduler.EnqueueAsync()`
-  - **Dependencies:** `IAnalyzerSampleByBarcodeProvider` (Task 4.4)
+  - **Dependencies:** `GetSampleInfoByBarcodeQuery` (Task 4.3)
 
 ---
 
@@ -169,8 +167,7 @@
   - **Creates:** `Infrastructure/HL7/HL7SampleInfoPresenter.cs`, `Infrastructure/HL7/HL7ResultParser.cs`
   - **Modifies:** `Infrastructure/Configurations/AnalyzerStartup.cs` (or new `HL7Module.cs`)
 
-- [ ] **Task 6.6** — Register domain provider in DataAccessModule
-  - **Modifies:** `Infrastructure/Configurations/DataAccess/DataAccessModule.cs`
+- ~~**Task 6.6** — Register domain provider in DataAccessModule~~ **REMOVED** — domain provider was eliminated; no registration needed.
 
 ---
 
