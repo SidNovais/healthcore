@@ -14,6 +14,7 @@ using HC.LIS.Modules.Analyzer.Infrastructure.Configurations.Mediation;
 using HC.LIS.Modules.Analyzer.Infrastructure.Configurations.Processing;
 using HC.LIS.Modules.Analyzer.Infrastructure.Configurations.Processing.InternalCommands;
 using HC.LIS.Modules.Analyzer.Infrastructure.Configurations.Processing.Outbox;
+using HC.LIS.Modules.Analyzer.Infrastructure.Configurations.HL7;
 using HC.LIS.Modules.Analyzer.Infrastructure.Configurations.Quartz;
 using Serilog;
 
@@ -67,6 +68,7 @@ public class AnalyzerStartup
         internalCommandsMap.Add("AssignWorklistItemByBarcodeAndExamCodeCommand", typeof(AssignWorklistItemByBarcodeAndExamCodeCommand));
         containerBuilder.RegisterModule(new InternalCommandsModule(internalCommandsMap));
         containerBuilder.RegisterModule(new QuartzModule());
+        containerBuilder.RegisterModule(new HL7Module());
         containerBuilder.RegisterInstance(executionContextAccessor);
         _container = containerBuilder.Build();
         AnalyzerCompositionRoot.SetContainer(_container);
