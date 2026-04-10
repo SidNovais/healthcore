@@ -3,6 +3,8 @@
 **Tech Spec:** [docs/specs/Analyzer-TechSpec.md](./Analyzer-TechSpec.md)
 **Date:** 2026-04-09
 
+> **Workflow rule:** After implementing each task, mark it as done (`- [x]`) in this file before moving on.
+
 ---
 
 ## Prerequisites
@@ -22,48 +24,48 @@
 
 ### Phase 2: Domain Layer (TDD)
 
-- [ ] **Task 2.1** — Write failing unit tests for `AnalyzerSample` creation
+- [x] **Task 2.1** — Write failing unit tests for `AnalyzerSample` creation
   - **Skill:** `/unit-test Analyzer create an AnalyzerSample`
   - **Creates:** `Tests/UnitTests/AnalyzerSamples/AnalyzerSampleTests.cs`, `AnalyzerSampleFactory.cs`, `AnalyzerSampleSampleData.cs`
   - **Tests:** `CreateAnalyzerSampleIsSuccessful`
   - **Expected:** Tests fail — `AnalyzerSampleCreatedDomainEvent` and `AnalyzerSample.Create()` do not exist yet
 
-- [ ] **Task 2.2** — Implement `AnalyzerSample` aggregate with `Create` method
+- [x] **Task 2.2** — Implement `AnalyzerSample` aggregate with `Create` method
   - **Skill:** `/domain Analyzer create an AnalyzerSample`
   - **Creates:** `Domain/AnalyzerSamples/AnalyzerSample.cs`, `AnalyzerSampleId.cs`, `AnalyzerSampleStatus.cs`, `AnalyzerSampleExam.cs`, `Events/AnalyzerSampleCreatedDomainEvent.cs`
   - **Verify:** Unit tests from Task 2.1 pass
 
-- [ ] **Task 2.3** — Write failing unit tests for `AssignWorklistItem`
+- [x] **Task 2.3** — Write failing unit tests for `AssignWorklistItem`
   - **Skill:** `/unit-test Analyzer assign a worklist item to an AnalyzerSample exam`
   - **Modifies:** `Tests/UnitTests/AnalyzerSamples/AnalyzerSampleTests.cs`
   - **Tests:** `AssignWorklistItemIsSuccessful`, `AssignWorklistItemShouldBrokeExamMustExistInSampleRuleWhenExamDoesNotExist`
   - **Expected:** Tests fail — `WorklistItemAssignedDomainEvent`, `ExamMustExistInSampleRule`, and `AnalyzerSample.AssignWorklistItem()` do not exist yet
 
-- [ ] **Task 2.4** — Implement `AssignWorklistItem` on `AnalyzerSample`
+- [x] **Task 2.4** — Implement `AssignWorklistItem` on `AnalyzerSample`
   - **Skill:** `/domain Analyzer assign a worklist item to an AnalyzerSample exam`
   - **Creates:** `Domain/AnalyzerSamples/Events/WorklistItemAssignedDomainEvent.cs`, `Domain/AnalyzerSamples/Rules/ExamMustExistInSampleRule.cs`
   - **Modifies:** `Domain/AnalyzerSamples/AnalyzerSample.cs`
   - **Verify:** Unit tests from Task 2.3 pass
 
-- [ ] **Task 2.5** — Write failing unit tests for `DispatchInfo`
+- [x] **Task 2.5** — Write failing unit tests for `DispatchInfo`
   - **Skill:** `/unit-test Analyzer dispatch sample info for an AnalyzerSample`
   - **Modifies:** `Tests/UnitTests/AnalyzerSamples/AnalyzerSampleTests.cs`
   - **Tests:** `DispatchInfoIsSuccessful`, `DispatchInfoShouldBrokeCannotDispatchInfoForNonAwaitingQuerySampleRuleWhenNotAwaitingQuery`
   - **Expected:** Tests fail — `SampleInfoDispatchedDomainEvent`, `CannotDispatchInfoForNonAwaitingQuerySampleRule`, and `AnalyzerSample.DispatchInfo()` do not exist yet
 
-- [ ] **Task 2.6** — Implement `DispatchInfo` on `AnalyzerSample`
+- [x] **Task 2.6** — Implement `DispatchInfo` on `AnalyzerSample`
   - **Skill:** `/domain Analyzer dispatch sample info for an AnalyzerSample`
   - **Creates:** `Domain/AnalyzerSamples/Events/SampleInfoDispatchedDomainEvent.cs`, `Domain/AnalyzerSamples/Rules/CannotDispatchInfoForNonAwaitingQuerySampleRule.cs`
   - **Modifies:** `Domain/AnalyzerSamples/AnalyzerSample.cs`
   - **Verify:** Unit tests from Task 2.5 pass
 
-- [ ] **Task 2.7** — Write failing unit tests for `ReceiveResult`
+- [x] **Task 2.7** — Write failing unit tests for `ReceiveResult`
   - **Skill:** `/unit-test Analyzer receive an exam result for an AnalyzerSample`
   - **Modifies:** `Tests/UnitTests/AnalyzerSamples/AnalyzerSampleTests.cs`
   - **Tests:** `ReceiveExamResultIsSuccessful`, `ReceiveExamResultShouldBrokeCannotReceiveResultForNonDispatchedSampleRuleWhenNotDispatched`, `ReceiveExamResultShouldBrokeExamMustExistInSampleRuleWhenExamDoesNotExist`, `ReceiveLastExamResultSetsAllResultsReceivedTrue`
   - **Expected:** Tests fail — `ExamResultReceivedDomainEvent`, `CannotReceiveResultForNonDispatchedSampleRule`, and `AnalyzerSample.ReceiveResult()` do not exist yet
 
-- [ ] **Task 2.8** — Implement `ReceiveResult` on `AnalyzerSample`
+- [x] **Task 2.8** — Implement `ReceiveResult` on `AnalyzerSample`
   - **Skill:** `/domain Analyzer receive an exam result for an AnalyzerSample`
   - **Creates:** `Domain/AnalyzerSamples/Events/ExamResultReceivedDomainEvent.cs`, `Domain/AnalyzerSamples/Rules/CannotReceiveResultForNonDispatchedSampleRule.cs`
   - **Modifies:** `Domain/AnalyzerSamples/AnalyzerSample.cs`
