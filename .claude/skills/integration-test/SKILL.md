@@ -45,7 +45,6 @@ Read in order — do not skip:
 6. If an existing `{Aggregate}Tests.cs` exists in IntegrationTests — read it and determine:
    - Constructor style (shared setup vs. empty constructor)?
    - Test method signature (`async void` or `async Task`)?
-   - SampleData style: inline `private static readonly` constants vs. separate `{Aggregate}SampleData` struct?
    - Which tests already exist? (No duplicates.)
 7. If `{Aggregate}SampleData.cs` exists in IntegrationTests — read it: note all constants, GUIDs, and DateTime style (`SystemClock.Now` vs. `new DateTime(...)`).
 8. If `{Aggregate}Factory.cs` exists in IntegrationTests — read it: note which command it dispatches and what `SampleData` it references.
@@ -93,7 +92,7 @@ Check for ambiguity before writing:
 - Does the module facade expose a `Get{Aggregate}Details` query already, or will it be new?
 - What is the expected final `Status` value after the action?
 - Does the test need a probe with the optional predicate (`satisfiedWhen`) or a separate named probe per status?
-- Does `SampleData` need new GUIDs or scalar constants?
+- Does `{Aggregate}SampleData.cs` exist? If not, which new GUIDs and scalar constants are needed?
 - If inbox injection: which source module and `IntegrationEvent` type? What SQL schema is used for InboxMessages?
 - Does `{Aggregate}Factory.cs` need to be created or does it already exist?
 
@@ -111,9 +110,9 @@ Write only test files. Do not touch domain, application, or infrastructure code.
 |---|---|
 | `{Aggregate}Tests.cs` exists in IntegrationTests | Edit — append new `[Fact]` methods inside existing class |
 | `{Aggregate}Tests.cs` absent | Create — full class with empty constructor |
-| Separate `{Aggregate}SampleData.cs` used by module | Edit — append new `static readonly` GUIDs and `const string` scalars |
-| Inline constants in test class | Add new `private static readonly` fields inside the test class |
-| `{Aggregate}Factory.cs` absent in IntegrationTests | Create — single `CreateAsync()` dispatching the root create command |
+| `{Aggregate}SampleData.cs` exists in IntegrationTests | Edit — append new `static readonly` GUIDs and `const string` scalars |
+| `{Aggregate}SampleData.cs` absent | **Always create** — `public readonly struct {Aggregate}SampleData` with all GUIDs and string constants; never use inline constants inside a test class |
+| `{Aggregate}Factory.cs` absent in IntegrationTests | **Always create** — single `CreateAsync()` dispatching the root create command, referencing `{Aggregate}SampleData.*` |
 | `{Aggregate}Factory.cs` exists and new precondition needed | Edit — append `CreateWith{State}Async()` chaining prior state |
 | Probe for this aggregate/DTO absent | Create — new probe class (see template choice below) |
 | Probe with predicate already exists for this DTO | Reuse existing probe with a `satisfiedWhen` lambda |

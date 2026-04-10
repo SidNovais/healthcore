@@ -75,42 +75,42 @@
 
 ### Phase 3: Application Layer — Commands & Handlers
 
-- [ ] **Task 3.1** — Implement `CreateAnalyzerSampleCommand` and handler
+- [x] **Task 3.1** — Implement `CreateAnalyzerSampleCommand` and handler
   - **Creates:** `Application/AnalyzerSamples/CreateAnalyzerSample/CreateAnalyzerSampleCommand.cs`, `CreateAnalyzerSampleCommandHandler.cs`, `ExamInfoDto.cs`
   - **Pattern:** Handler uses `IAggregateStore.Start()` for creation
 
-- [ ] **Task 3.2** — Implement `AnalyzerSampleCreatedNotification` and projection
+- [x] **Task 3.2** — Implement `AnalyzerSampleCreatedNotification` and projection
   - **Creates:** `Application/AnalyzerSamples/CreateAnalyzerSample/AnalyzerSampleCreatedNotification.cs`, `AnalyzerSampleCreatedNotificationProjection.cs`
 
-- [ ] **Task 3.3** — Implement `AssignWorklistItemCommand` and handler
+- [x] **Task 3.3** — Implement `AssignWorklistItemCommand` and handler
   - **Creates:** `Application/AnalyzerSamples/AssignWorklistItem/AssignWorklistItemCommand.cs`, `AssignWorklistItemCommandHandler.cs`
   - **Pattern:** Handler uses `IAggregateStore.Load()` + `AppendChanges`
 
-- [ ] **Task 3.4** — Implement `WorklistItemAssignedNotification` and projection
+- [x] **Task 3.4** — Implement `WorklistItemAssignedNotification` and projection
   - **Creates:** `Application/AnalyzerSamples/AssignWorklistItem/WorklistItemAssignedNotification.cs`, `WorklistItemAssignedNotificationProjection.cs`
 
-- [ ] **Task 3.5** — Implement `DispatchSampleInfoCommand` and handler
+- [x] **Task 3.5** — Implement `DispatchSampleInfoCommand` and handler
   - **Creates:** `Application/AnalyzerSamples/DispatchSampleInfo/DispatchSampleInfoCommand.cs`, `DispatchSampleInfoCommandHandler.cs`
   - **Pattern:** Handler uses `IAggregateStore.Load()` + `AppendChanges`
 
-- [ ] **Task 3.6** — Implement `SampleInfoDispatchedNotification` and projection
+- [x] **Task 3.6** — Implement `SampleInfoDispatchedNotification` and projection
   - **Creates:** `Application/AnalyzerSamples/DispatchSampleInfo/SampleInfoDispatchedNotification.cs`, `SampleInfoDispatchedNotificationProjection.cs`
 
-- [ ] **Task 3.7** — Implement `ReceiveExamResultCommand` and handler
+- [x] **Task 3.7** — Implement `ReceiveExamResultCommand` and handler
   - **Creates:** `Application/AnalyzerSamples/ReceiveExamResult/ReceiveExamResultCommand.cs`, `ReceiveExamResultCommandHandler.cs`
   - **Pattern:** Handler uses `IAggregateStore.Load()` + `AppendChanges`
 
-- [ ] **Task 3.8** — Implement `ExamResultReceivedNotification` and projection
+- [x] **Task 3.8** — Implement `ExamResultReceivedNotification` and projection
   - **Creates:** `Application/AnalyzerSamples/ReceiveExamResult/ExamResultReceivedNotification.cs`, `ExamResultReceivedNotificationProjection.cs`
 
 ---
 
 ### Phase 4: Application Layer — Read Model
 
-- [ ] **Task 4.1** — Implement `AnalyzerSampleDetails` read model (DTO, query, handler, projector)
+- [x] **Task 4.1** — Implement `AnalyzerSampleDetails` read model (DTO, query, handler, projector)
   - **Creates:** `Application/AnalyzerSamples/GetAnalyzerSampleDetails/AnalyzerSampleDetailsDto.cs`, `GetAnalyzerSampleDetailsQuery.cs`, `GetAnalyzerSampleDetailsQueryHandler.cs`, `AnalyzerSampleDetailsProjector.cs`
 
-- [ ] **Task 4.2** — Implement `AnalyzerSampleExamDetails` read model (DTO, query, handler, projector)
+- [x] **Task 4.2** — Implement `AnalyzerSampleExamDetails` read model (DTO, query, handler, projector)
   - **Creates:** `Application/AnalyzerSamples/GetAnalyzerSampleExamDetails/AnalyzerSampleExamDetailsDto.cs`, `GetAnalyzerSampleExamDetailsQuery.cs`, `GetAnalyzerSampleExamDetailsQueryHandler.cs`, `AnalyzerSampleExamDetailsProjector.cs`
 
 - [ ] **Task 4.3** — Implement `GetSampleInfoByBarcode` query (JOIN of both read models)
@@ -152,10 +152,10 @@
 
 ### Phase 6: Infrastructure Wiring
 
-- [ ] **Task 6.1** — Register domain events in `DomainEventTypeMappings`
+- [x] **Task 6.1** — Register domain events in `DomainEventTypeMappings`
   - **Modifies:** `Infrastructure/Configurations/AggregateStore/DomainEventTypeMappings.cs`
 
-- [ ] **Task 6.2** — Register notifications in OutboxModule BiMap
+- [x] **Task 6.2** — Register notifications in OutboxModule BiMap
   - **Modifies:** `Infrastructure/Configurations/AnalyzerStartup.cs`
 
 - [ ] **Task 6.3** — Register internal commands in InternalCommandsModule BiMap
@@ -176,11 +176,11 @@
 
 ### Phase 7: Database Migrations
 
-- [ ] **Task 7.1** — Create `AnalyzerSampleDetails` table migration
+- [x] **Task 7.1** — Create `AnalyzerSampleDetails` table migration
   - **Creates:** `src/HC.LIS/HC.LIS.Database/Analyzer/20260409120400_AnalyzerModule_AddTableAnalyzerSampleDetails.cs`
   - **Verify:** `dotnet run --project src/HC.LIS/HC.LIS.Database/HC.LIS.Database.csproj` succeeds
 
-- [ ] **Task 7.2** — Create `AnalyzerSampleExamDetails` table migration
+- [x] **Task 7.2** — Create `AnalyzerSampleExamDetails` table migration
   - **Creates:** `src/HC.LIS/HC.LIS.Database/Analyzer/20260409120500_AnalyzerModule_AddTableAnalyzerSampleExamDetails.cs`
   - **Verify:** `dotnet run --project src/HC.LIS/HC.LIS.Database/HC.LIS.Database.csproj` succeeds
 
@@ -188,24 +188,20 @@
 
 ### Phase 8: Integration Tests (TDD)
 
-- [ ] **Task 8.1** — Write integration tests for `CreateAnalyzerSample`
-  - **Skill:** `/integration-test Analyzer create an AnalyzerSample`
-  - **Creates:** `Tests/IntegrationTests/AnalyzerSamples/AnalyzerSampleTests.cs`, `GetAnalyzerSampleDetailsFromAnalyzerProbe.cs`, `GetAnalyzerSampleExamDetailsFromAnalyzerProbe.cs`, `AnalyzerSampleFactory.cs`, `AnalyzerSampleSampleData.cs`
+- [x] **Task 8.1** — Write integration tests for `CreateAnalyzerSample`
+  - **Creates:** `Tests/IntegrationTests/AnalyzerSamples/CreateAnalyzerSampleTests.cs`, `GetAnalyzerSampleDetailsProbe.cs`, `GetAnalyzerSampleExamDetailsProbe.cs`
   - **Tests:** `CreateAnalyzerSampleIsSuccessful`
 
-- [ ] **Task 8.2** — Write integration tests for `AssignWorklistItem`
-  - **Skill:** `/integration-test Analyzer assign a worklist item to an AnalyzerSample exam`
-  - **Modifies:** `Tests/IntegrationTests/AnalyzerSamples/AnalyzerSampleTests.cs`
+- [x] **Task 8.2** — Write integration tests for `AssignWorklistItem`
+  - **Creates:** `Tests/IntegrationTests/AnalyzerSamples/AssignWorklistItemTests.cs`
   - **Tests:** `AssignWorklistItemIsSuccessful`
 
-- [ ] **Task 8.3** — Write integration tests for `DispatchSampleInfo`
-  - **Skill:** `/integration-test Analyzer dispatch sample info for an AnalyzerSample`
-  - **Modifies:** `Tests/IntegrationTests/AnalyzerSamples/AnalyzerSampleTests.cs`
+- [x] **Task 8.3** — Write integration tests for `DispatchSampleInfo`
+  - **Creates:** `Tests/IntegrationTests/AnalyzerSamples/DispatchSampleInfoTests.cs`
   - **Tests:** `DispatchSampleInfoIsSuccessful`
 
-- [ ] **Task 8.4** — Write integration tests for `ReceiveExamResult`
-  - **Skill:** `/integration-test Analyzer receive an exam result for an AnalyzerSample`
-  - **Modifies:** `Tests/IntegrationTests/AnalyzerSamples/AnalyzerSampleTests.cs`
+- [x] **Task 8.4** — Write integration tests for `ReceiveExamResult`
+  - **Creates:** `Tests/IntegrationTests/AnalyzerSamples/ReceiveExamResultTests.cs`
   - **Tests:** `ReceiveExamResultIsSuccessful`, `ReceiveAllExamResultsCompletesAnalyzerSample`
 
 - [ ] **Task 8.5** — Verify all integration tests pass
