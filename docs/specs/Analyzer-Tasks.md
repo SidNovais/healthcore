@@ -163,7 +163,7 @@
 - [x] **Task 6.4** — Register EventsBus subscriptions
   - **Modifies:** `Infrastructure/Configurations/EventsBus/EventsBusStartup.cs`
 
-- [ ] **Task 6.5** — Register HL7 infrastructure services
+- [x] **Task 6.5** — Register HL7 infrastructure services
   - **Creates:** `Infrastructure/HL7/HL7SampleInfoPresenter.cs`, `Infrastructure/HL7/HL7ResultParser.cs`
   - **Modifies:** `Infrastructure/Configurations/AnalyzerStartup.cs` (or new `HL7Module.cs`)
 
