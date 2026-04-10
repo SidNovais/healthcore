@@ -6,6 +6,7 @@ using Serilog;
 using TestOrdersMartenConfig = HC.LIS.Modules.TestOrders.Infrastructure.Configurations.DataAccess.MartenConfig;
 using SampleCollectionMartenConfig = HC.LIS.Modules.SampleCollection.Infrastructure.Configurations.DataAccess.MartenConfig;
 using LabAnalysisMartenConfig = HC.LIS.Modules.LabAnalysis.Infrastructure.Configurations.DataAccess.MartenConfig;
+using AnalyzerMartenConfig = HC.LIS.Modules.Analyzer.Infrastructure.Configurations.DataAccess.MartenConfig;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console(
@@ -29,6 +30,9 @@ sampleCollectionStore.Storage.ApplyAllConfiguredChangesToDatabaseAsync().Wait();
 
 IDocumentStore labAnalysisStore = LabAnalysisMartenConfig.BuildDocumentStore(connectionString);
 labAnalysisStore.Storage.ApplyAllConfiguredChangesToDatabaseAsync().Wait();
+
+IDocumentStore analyzerStore = AnalyzerMartenConfig.BuildDocumentStore(connectionString);
+analyzerStore.Storage.ApplyAllConfiguredChangesToDatabaseAsync().Wait();
 
 Log.Logger.Information("Migration executed!");
 Log.CloseAndFlush();
