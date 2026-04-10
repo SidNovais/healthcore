@@ -63,6 +63,8 @@ public class AnalyzerStartup
         domainNotificationsMap.Add("ExamResultReceivedNotification",      typeof(ExamResultReceivedNotification));
         containerBuilder.RegisterModule(new OutboxModule(domainNotificationsMap));
         BiMap internalCommandsMap = new();
+        internalCommandsMap.Add("CreateAnalyzerSampleBySampleCollectedCommand", typeof(CreateAnalyzerSampleBySampleCollectedCommand));
+        internalCommandsMap.Add("AssignWorklistItemByBarcodeAndExamCodeCommand", typeof(AssignWorklistItemByBarcodeAndExamCodeCommand));
         containerBuilder.RegisterModule(new InternalCommandsModule(internalCommandsMap));
         containerBuilder.RegisterModule(new QuartzModule());
         containerBuilder.RegisterInstance(executionContextAccessor);

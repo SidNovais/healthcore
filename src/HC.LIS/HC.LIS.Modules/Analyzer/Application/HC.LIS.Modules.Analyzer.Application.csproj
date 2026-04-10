@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\SampleCollection\IntegrationEvents\HC.LIS.Modules.SampleCollection.IntegrationEvents.csproj" />
+    <ProjectReference Include="..\..\LabAnalysis\IntegrationEvents\HC.LIS.Modules.LabAnalysis.IntegrationEvents.csproj" />
+  </ItemGroup>
+
 </Project>
