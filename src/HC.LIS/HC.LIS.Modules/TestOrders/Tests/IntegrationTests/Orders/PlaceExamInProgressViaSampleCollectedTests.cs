@@ -54,6 +54,7 @@ public class PlaceExamInProgressViaSampleCollectedTests : TestBase
             "John Doe",
             new DateTime(1990, 5, 15, 0, 0, 0, DateTimeKind.Utc),
             "M",
+            isUrgent: false,
             [new ExamInfo(OrderSampleData.OrderItemId, OrderSampleData.ExamMnemonic)]
         );
 

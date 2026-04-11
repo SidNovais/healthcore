@@ -21,7 +21,8 @@ public class ExamAcceptedPublishEventNotificationHandler(IEventsBus eventsBus)
             notification.DomainEvent.OrderId,
             notification.DomainEvent.PatientId,
             notification.DomainEvent.ExamMnemonic,
-            notification.DomainEvent.ContainerType
+            notification.DomainEvent.ContainerType,
+            notification.DomainEvent.IsUrgent
         )).ConfigureAwait(false);
     }
 }

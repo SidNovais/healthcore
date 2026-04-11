@@ -99,6 +99,7 @@ public class Order : AggregateRoot
             _patientId.Value,
             item._examMnemonic,
             item._speciamentRequirement.ContainerType,
+            _orderPriority.IsUrgent,
             acceptedAt
         );
         Apply(orderItemAcceptedDomainEvent);
