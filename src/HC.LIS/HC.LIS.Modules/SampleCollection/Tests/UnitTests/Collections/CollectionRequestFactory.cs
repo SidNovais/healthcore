@@ -12,6 +12,7 @@ internal static class CollectionRequestFactory
             CollectionRequestSampleData.CollectionRequestId,
             CollectionRequestSampleData.PatientId,
             CollectionRequestSampleData.ExamPreparationVerified,
+            isUrgent: false,
             CollectionRequestSampleData.ArrivedAt
         );
 

@@ -18,7 +18,8 @@ internal class CreateCollectionRequestForOrderCommandHandler(
         CollectionRequest collectionRequest = CollectionRequest.Create(
             command.CollectionRequestId,
             command.PatientId,
-            false,
+            examPreparationVerified: false,
+            command.IsUrgent,
             command.AcceptedAt
         );
         collectionRequest.AddExam(command.ExamId, command.ContainerType, command.ExamMnemonic);

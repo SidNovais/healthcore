@@ -32,6 +32,7 @@ public class OrderItemAcceptedIntegrationEventNotificationHandler(
                 notification.OrderItemId,
                 notification.ExamMnemonic,
                 notification.ContainerType,
+                notification.IsUrgent,
                 notification.OccurredAt
             )).ConfigureAwait(false);
         }

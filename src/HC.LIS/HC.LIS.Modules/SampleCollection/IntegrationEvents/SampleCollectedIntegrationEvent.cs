@@ -13,6 +13,7 @@ public class SampleCollectedIntegrationEvent(
     string patientName,
     DateTime patientBirthdate,
     string patientGender,
+    bool isUrgent,
     IReadOnlyCollection<ExamInfo> exams
 ) : IntegrationEvent(id, occurredAt)
 {
@@ -23,5 +24,6 @@ public class SampleCollectedIntegrationEvent(
     public string PatientName { get; } = patientName;
     public DateTime PatientBirthdate { get; } = patientBirthdate;
     public string PatientGender { get; } = patientGender;
+    public bool IsUrgent { get; } = isUrgent;
     public IReadOnlyCollection<ExamInfo> Exams { get; } = exams;
 }

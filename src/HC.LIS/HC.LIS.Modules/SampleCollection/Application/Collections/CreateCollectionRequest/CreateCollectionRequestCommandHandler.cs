@@ -19,6 +19,7 @@ internal class CreateCollectionRequestCommandHandler(
             command.CollectionRequestId,
             command.PatientId,
             command.ExamPreparationVerified,
+            isUrgent: false,
             command.ArrivedAt
         );
         _aggregateStore.Start(request);

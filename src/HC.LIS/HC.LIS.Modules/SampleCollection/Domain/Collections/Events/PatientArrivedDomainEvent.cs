@@ -7,11 +7,13 @@ public class PatientArrivedDomainEvent(
     Guid collectionRequestId,
     Guid patientId,
     bool examPreparationVerified,
+    bool isUrgent,
     DateTime arrivedAt
 ) : DomainEvent
 {
     public Guid CollectionRequestId { get; } = collectionRequestId;
     public Guid PatientId { get; } = patientId;
     public bool ExamPreparationVerified { get; } = examPreparationVerified;
+    public bool IsUrgent { get; } = isUrgent;
     public DateTime ArrivedAt { get; } = arrivedAt;
 }

@@ -11,6 +11,7 @@ public class SampleCollectedDomainEvent(
     string patientName,
     DateTime patientBirthdate,
     string patientGender,
+    bool isUrgent,
     IReadOnlyCollection<CollectionExam> exams,
     string sampleBarcode,
     DateTime collectedAt
@@ -23,6 +24,7 @@ public class SampleCollectedDomainEvent(
     public string PatientName { get; } = patientName;
     public DateTime PatientBirthdate { get; } = patientBirthdate;
     public string PatientGender { get; } = patientGender;
+    public bool IsUrgent { get; } = isUrgent;
     public IReadOnlyCollection<CollectionExam> Exams { get; } = exams;
     public string SampleBarcode { get; } = sampleBarcode;
     public DateTime CollectedAt { get; } = collectedAt;

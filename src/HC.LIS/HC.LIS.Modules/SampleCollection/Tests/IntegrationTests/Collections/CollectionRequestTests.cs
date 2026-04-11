@@ -203,7 +203,8 @@ public class CollectionRequestTests : TestBase
             CollectionRequestSampleData.CollectionRequestId,
             CollectionRequestSampleData.PatientId,
             CollectionRequestSampleData.ExamMnemonic,
-            CollectionRequestSampleData.TubeType
+            CollectionRequestSampleData.TubeType,
+            isUrgent: false
         );
 
         using (var connection = new NpgsqlConnection(ConnectionString))

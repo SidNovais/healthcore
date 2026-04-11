@@ -13,6 +13,7 @@ public class CollectionRequest : AggregateRoot
 {
     private PatientId _patientId = null!;
     private bool _examPreparationVerified;
+    private bool _isUrgent;
     private CollectionStatus _status = null!;
     private IList<Sample> _samples = [];
 
@@ -24,6 +25,7 @@ public class CollectionRequest : AggregateRoot
         Guid id,
         Guid patientId,
         bool examPreparationVerified,
+        bool isUrgent,
         DateTime arrivedAt
     )
     {
@@ -32,6 +34,7 @@ public class CollectionRequest : AggregateRoot
             id,
             patientId,
             examPreparationVerified,
+            isUrgent,
             arrivedAt
         );
         collectionRequest.Apply(patientArrivedDomainEvent);
@@ -138,6 +141,7 @@ public class CollectionRequest : AggregateRoot
             patientName,
             patientBirthdate,
             patientGender,
+            _isUrgent,
             sample.Exams,
             sample.Barcode!,
             collectedAt
@@ -151,6 +155,7 @@ public class CollectionRequest : AggregateRoot
         Id = domainEvent.CollectionRequestId;
         _patientId = new(domainEvent.PatientId);
         _examPreparationVerified = domainEvent.ExamPreparationVerified;
+        _isUrgent = domainEvent.IsUrgent;
         _status = CollectionStatus.Arrived;
     }
 
