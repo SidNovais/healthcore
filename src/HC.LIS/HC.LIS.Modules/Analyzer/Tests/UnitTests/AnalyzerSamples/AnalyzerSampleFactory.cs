@@ -15,6 +15,7 @@ internal static class AnalyzerSampleFactory
                 new ExamInfo(AnalyzerSampleSampleData.ExamId, AnalyzerSampleSampleData.ExamMnemonic),
                 new ExamInfo(AnalyzerSampleSampleData.ExamId2, AnalyzerSampleSampleData.ExamMnemonic2)
             ],
+            isUrgent: false,
             AnalyzerSampleSampleData.CreatedAt
         );
     }

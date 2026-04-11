@@ -10,7 +10,8 @@ internal static class AnalyzerSampleFactory
 {
     public static async Task CreateAsync(
         IAnalyzerModule analyzerModule,
-        IReadOnlyCollection<ExamInfoDto>? exams = null
+        IReadOnlyCollection<ExamInfoDto>? exams = null,
+        bool isUrgent = false
     )
     {
         await analyzerModule.ExecuteCommandAsync(new CreateAnalyzerSampleCommand(
@@ -21,6 +22,7 @@ internal static class AnalyzerSampleFactory
             AnalyzerSampleSampleData.PatientName,
             AnalyzerSampleSampleData.PatientBirthdate,
             AnalyzerSampleSampleData.PatientGender,
+            isUrgent,
             exams ?? new List<ExamInfoDto>
             {
                 new(AnalyzerSampleSampleData.ExamId1, AnalyzerSampleSampleData.ExamMnemonic1)

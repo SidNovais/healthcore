@@ -15,6 +15,7 @@ public class AnalyzerModuleAddTableAnalyzerSampleDetails : Migration
           .WithColumn("patient_name").AsString(255).NotNullable()
           .WithColumn("patient_birthdate").AsCustom("TIMESTAMPTZ").NotNullable()
           .WithColumn("patient_gender").AsString(10).NotNullable()
+          .WithColumn("is_urgent").AsBoolean().NotNullable().WithDefaultValue(false)
           .WithColumn("status").AsString(50).NotNullable()
           .WithColumn("dispatched_at").AsCustom("TIMESTAMPTZ").Nullable()
           .WithColumn("created_at").AsCustom("TIMESTAMPTZ").NotNullable()

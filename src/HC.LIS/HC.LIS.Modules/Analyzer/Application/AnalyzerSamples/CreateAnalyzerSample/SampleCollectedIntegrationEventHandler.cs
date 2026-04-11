@@ -27,6 +27,7 @@ public class SampleCollectedIntegrationEventNotificationHandler(
             notification.PatientName,
             notification.PatientBirthdate,
             notification.PatientGender,
+            notification.IsUrgent,
             notification.Exams.Select(e => new ExamInfoDto(e.ExamId, e.ExamMnemonic)).ToList().AsReadOnly(),
             notification.OccurredAt
         )).ConfigureAwait(false);

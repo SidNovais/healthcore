@@ -13,6 +13,7 @@ public class AnalyzerSample : AggregateRoot
     private Guid _sampleId;
     private string _sampleBarcode = string.Empty;
     private PatientInfo _patientInfo = null!;
+    private bool _isUrgent;
     private AnalyzerSampleStatus _status = null!;
     private IList<AnalyzerSampleExam> _exams = [];
     private DateTime _createdAt;
@@ -27,6 +28,7 @@ public class AnalyzerSample : AggregateRoot
         string sampleBarcode,
         PatientInfo patientInfo,
         IReadOnlyCollection<ExamInfo> exams,
+        bool isUrgent,
         DateTime createdAt)
     {
         AnalyzerSample sample = new();
@@ -38,6 +40,7 @@ public class AnalyzerSample : AggregateRoot
             patientInfo.PatientName,
             patientInfo.PatientBirthdate,
             patientInfo.PatientGender,
+            isUrgent,
             exams.Select(e => e.ExamMnemonic).ToList().AsReadOnly(),
             createdAt);
         sample.Apply(domainEvent);
@@ -99,6 +102,7 @@ public class AnalyzerSample : AggregateRoot
             domainEvent.PatientName,
             domainEvent.PatientBirthdate,
             domainEvent.PatientGender);
+        _isUrgent = domainEvent.IsUrgent;
         _status = AnalyzerSampleStatus.AwaitingQuery;
         _exams = domainEvent.ExamMnemonics.Select(m => AnalyzerSampleExam.Create(m)).ToList();
         _createdAt = domainEvent.CreatedAt;

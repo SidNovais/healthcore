@@ -32,6 +32,7 @@ internal class CreateAnalyzerSampleCommandHandler(
             command.SampleBarcode,
             patientInfo,
             exams,
+            command.IsUrgent,
             command.CreatedAt);
 
         _aggregateStore.Start(sample);

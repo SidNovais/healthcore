@@ -12,6 +12,7 @@ public class AnalyzerSampleCreatedDomainEvent(
     string patientName,
     DateTime patientBirthdate,
     string patientGender,
+    bool isUrgent,
     IReadOnlyCollection<string> examMnemonics,
     DateTime createdAt
 ) : DomainEvent
@@ -23,6 +24,7 @@ public class AnalyzerSampleCreatedDomainEvent(
     public string PatientName { get; } = patientName;
     public DateTime PatientBirthdate { get; } = patientBirthdate;
     public string PatientGender { get; } = patientGender;
+    public bool IsUrgent { get; } = isUrgent;
     public IReadOnlyCollection<string> ExamMnemonics { get; } = examMnemonics;
     public DateTime CreatedAt { get; } = createdAt;
 }

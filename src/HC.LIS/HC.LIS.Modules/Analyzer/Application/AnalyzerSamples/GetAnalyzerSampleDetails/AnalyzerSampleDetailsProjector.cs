@@ -22,8 +22,8 @@ internal class AnalyzerSampleDetailsProjector(
         using var connection = _sqlConnectionFactory.CreateConnection();
         await connection.ExecuteScalarAsync(
             @"INSERT INTO analyzer.analyzer_sample_details
-              (id, sample_id, patient_id, sample_barcode, patient_name, patient_birthdate, patient_gender, status, created_at)
-              VALUES (@AnalyzerSampleId, @SampleId, @PatientId, @SampleBarcode, @PatientName, @PatientBirthdate, @PatientGender, @Status, @CreatedAt)",
+              (id, sample_id, patient_id, sample_barcode, patient_name, patient_birthdate, patient_gender, is_urgent, status, created_at)
+              VALUES (@AnalyzerSampleId, @SampleId, @PatientId, @SampleBarcode, @PatientName, @PatientBirthdate, @PatientGender, @IsUrgent, @Status, @CreatedAt)",
             new
             {
                 e.AnalyzerSampleId,
@@ -33,6 +33,7 @@ internal class AnalyzerSampleDetailsProjector(
                 e.PatientName,
                 e.PatientBirthdate,
                 e.PatientGender,
+                e.IsUrgent,
                 Status = "AwaitingQuery",
                 e.CreatedAt
             }

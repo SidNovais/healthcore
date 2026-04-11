@@ -14,6 +14,7 @@ public class CreateAnalyzerSampleBySampleCollectedCommand(
     string patientName,
     DateTime patientBirthdate,
     string patientGender,
+    bool isUrgent,
     IReadOnlyCollection<ExamInfoDto> exams,
     DateTime createdAt
 ) : InternalCommandBase(id)
@@ -24,6 +25,7 @@ public class CreateAnalyzerSampleBySampleCollectedCommand(
     public string PatientName { get; } = patientName;
     public DateTime PatientBirthdate { get; } = patientBirthdate;
     public string PatientGender { get; } = patientGender;
+    public bool IsUrgent { get; } = isUrgent;
     public IReadOnlyCollection<ExamInfoDto> Exams { get; } = exams;
     public DateTime CreatedAt { get; } = createdAt;
 }

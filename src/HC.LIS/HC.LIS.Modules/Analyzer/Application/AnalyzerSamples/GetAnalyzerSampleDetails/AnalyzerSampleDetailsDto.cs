@@ -10,6 +10,7 @@ public class AnalyzerSampleDetailsDto
     public DateTime PatientBirthdate { get; set; }
     public string PatientGender { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
+    public bool IsUrgent { get; set; }
     public DateTime? DispatchedAt { get; set; }
     public DateTime CreatedAt { get; set; }
 }

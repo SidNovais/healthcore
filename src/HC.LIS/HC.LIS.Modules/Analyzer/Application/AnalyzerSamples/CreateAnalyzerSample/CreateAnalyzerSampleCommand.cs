@@ -10,6 +10,7 @@ public class CreateAnalyzerSampleCommand(
     string patientName,
     DateTime patientBirthdate,
     string patientGender,
+    bool isUrgent,
     IReadOnlyCollection<ExamInfoDto> exams,
     DateTime createdAt
 ) : CommandBase<Guid>
@@ -21,6 +22,7 @@ public class CreateAnalyzerSampleCommand(
     public string PatientName { get; } = patientName;
     public DateTime PatientBirthdate { get; } = patientBirthdate;
     public string PatientGender { get; } = patientGender;
+    public bool IsUrgent { get; } = isUrgent;
     public IReadOnlyCollection<ExamInfoDto> Exams { get; } = exams;
     public DateTime CreatedAt { get; } = createdAt;
 }
