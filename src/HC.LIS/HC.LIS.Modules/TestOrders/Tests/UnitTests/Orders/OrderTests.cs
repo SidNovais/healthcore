@@ -5,6 +5,8 @@ using HC.Core.UnitTests;
 using HC.LIS.Modules.TestOrders.Domain.Orders;
 using HC.LIS.Modules.TestOrders.Domain.Orders.Events;
 using HC.LIS.Modules.TestOrders.Domain.Orders.Rules;
+using HC.LIS.Modules.TestOrders.Domain.Patients;
+using HC.LIS.Modules.TestOrders.Domain.Physicians;
 using HC.LIS.Modules.TestOrders.UnitTests.Orders;
 
 namespace HC.Lis.Modules.TestOrders.UnitTests.Orders;
@@ -231,6 +233,42 @@ public class OrderTests : TestBase
             );
         }
         AssertBrokenRule<CannotPlaceInProgressOrderItemMoreThanOnceRule>(action);
+    }
+
+    [Fact]
+    public void AcceptExamOnUrgentOrderRaisesIsUrgentEvent()
+    {
+        Order urgentOrder = Order.Create(
+            OrderSampleData.OrderId,
+            new PatientId(OrderSampleData.PatientId),
+            new PhysicianId(OrderSampleData.RequestedBy),
+            OrderPriority.Of("Urgent"),
+            OrderSampleData.RequestedAt
+        );
+        urgentOrder.RequestExam(
+            OrderSampleData.OrderItemId,
+            OrderSampleData.ExamMnemonic,
+            SpecimenRequirement.Of(
+                OrderSampleData.SpecimenMnemonic,
+                OrderSampleData.MaterialType,
+                OrderSampleData.ContainerType,
+                OrderSampleData.Additive,
+                OrderSampleData.ProcessingType,
+                OrderSampleData.StorageCondition
+            ),
+            OrderSampleData.RequestedAt
+        );
+        urgentOrder.AcceptExam(new OrderItemId(OrderSampleData.OrderItemId), SystemClock.Now);
+        OrderItemAcceptedDomainEvent domainEvent = AssertPublishedDomainEvent<OrderItemAcceptedDomainEvent>(urgentOrder);
+        domainEvent.IsUrgent.Should().BeTrue();
+    }
+
+    [Fact]
+    public void AcceptExamOnRoutineOrderRaisesNotUrgentEvent()
+    {
+        _sut.AcceptExam(new OrderItemId(OrderSampleData.OrderItemId), SystemClock.Now);
+        OrderItemAcceptedDomainEvent domainEvent = AssertPublishedDomainEvent<OrderItemAcceptedDomainEvent>(_sut);
+        domainEvent.IsUrgent.Should().BeFalse();
     }
 
     [Fact]
