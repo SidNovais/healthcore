@@ -135,12 +135,45 @@ public class CollectionRequestTests : TestBase
     }
 
     [Fact]
+    public void RecordCollectionOnUrgentRequestRaisesIsUrgentEvent()
+    {
+        CollectionRequest urgentRequest = CollectionRequest.Create(
+            CollectionRequestSampleData.CollectionRequestId,
+            CollectionRequestSampleData.PatientId,
+            examPreparationVerified: true,
+            isUrgent: true,
+            CollectionRequestSampleData.ArrivedAt
+        );
+        Guid sampleId = CollectionRequestFactory.AddExams(urgentRequest);
+        urgentRequest.MoveToWaiting(CollectionRequestSampleData.WaitingAt);
+        urgentRequest.CreateBarcode(
+            CollectionRequestSampleData.TubeType,
+            CollectionRequestSampleData.BarcodeValue,
+            CollectionRequestSampleData.TechnicianId,
+            CollectionRequestSampleData.CreatedAt
+        );
+        urgentRequest.CallPatient(CollectionRequestSampleData.TechnicianId, CollectionRequestSampleData.CalledAt);
+        urgentRequest.RecordCollection(
+            sampleId,
+            CollectionRequestSampleData.TechnicianId,
+            CollectionRequestSampleData.PatientName,
+            CollectionRequestSampleData.PatientBirthdate,
+            CollectionRequestSampleData.PatientGender,
+            CollectionRequestSampleData.CollectedAt
+        );
+
+        SampleCollectedDomainEvent evt = AssertPublishedDomainEvent<SampleCollectedDomainEvent>(urgentRequest);
+        evt.IsUrgent.Should().BeTrue();
+    }
+
+    [Fact]
     public void MoveToWaitingShouldBreakExamPreparationMustBeVerifiedToAdvanceRuleWhenExamPrepNotVerified()
     {
         CollectionRequest sut = CollectionRequest.Create(
             CollectionRequestSampleData.CollectionRequestId,
             CollectionRequestSampleData.PatientId,
             examPreparationVerified: false,
+            isUrgent: false,
             CollectionRequestSampleData.ArrivedAt
         );
 
