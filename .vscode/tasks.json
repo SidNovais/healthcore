@@ -25,6 +25,18 @@
       "label": "prepare:dev:docker",
       "dependsOn": ["docker:dev:up", "build:database:migration"],
       "problemMatcher": []
+    },
+    {
+      "label": "build: HC.LIS.API",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/src/HC.LIS/HC.LIS.API/HC.LIS.API.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
     }
   ]
 }
