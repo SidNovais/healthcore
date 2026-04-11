@@ -38,6 +38,7 @@ public class CreateAnalyzerSampleTests : TestBase
         details.PatientName.Should().Be(AnalyzerSampleSampleData.PatientName);
         details.PatientGender.Should().Be(AnalyzerSampleSampleData.PatientGender);
         details.Status.Should().Be("AwaitingQuery");
+        details.IsUrgent.Should().BeFalse();
         details.DispatchedAt.Should().BeNull();
 
         IReadOnlyCollection<AnalyzerSampleExamDetailsDto>? exams = await GetEventually(

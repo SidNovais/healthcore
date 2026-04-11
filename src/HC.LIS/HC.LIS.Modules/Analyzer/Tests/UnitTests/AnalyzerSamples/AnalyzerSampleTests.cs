@@ -29,6 +29,30 @@ public class AnalyzerSampleTests : TestBase
     }
 
     [Fact]
+    public void CreateAnalyzerSampleWithIsUrgentFlagIsSuccessful()
+    {
+        AnalyzerSample sut = AnalyzerSample.Create(
+            AnalyzerSampleSampleData.AnalyzerSampleId,
+            AnalyzerSampleSampleData.SampleId,
+            AnalyzerSampleSampleData.SampleBarcode,
+            AnalyzerSampleSampleData.PatientInfo,
+            [new ExamInfo(AnalyzerSampleSampleData.ExamId, AnalyzerSampleSampleData.ExamMnemonic)],
+            isUrgent: true,
+            AnalyzerSampleSampleData.CreatedAt
+        );
+        AnalyzerSampleCreatedDomainEvent domainEvent = AssertPublishedDomainEvent<AnalyzerSampleCreatedDomainEvent>(sut);
+        domainEvent.IsUrgent.Should().BeTrue();
+    }
+
+    [Fact]
+    public void CreateAnalyzerSampleWithoutIsUrgentFlagIsSuccessful()
+    {
+        AnalyzerSample sut = AnalyzerSampleFactory.Create();
+        AnalyzerSampleCreatedDomainEvent domainEvent = AssertPublishedDomainEvent<AnalyzerSampleCreatedDomainEvent>(sut);
+        domainEvent.IsUrgent.Should().BeFalse();
+    }
+
+    [Fact]
     public void AssignWorklistItemIsSuccessful()
     {
         AnalyzerSample sut = AnalyzerSampleFactory.Create();
