@@ -1,3 +1,6 @@
+using HC.LIS.API.Modules.SampleCollection.Samples.GetSampleDetails;
+using HC.LIS.Modules.SampleCollection.Application.Collections.GetSampleDetails;
+
 namespace HC.LIS.API.Modules.SampleCollection.Samples;
 
 internal static class SamplesEndpoints
@@ -7,14 +10,11 @@ internal static class SamplesEndpoints
     {
         group.WithTags("Samples");
 
-        // TODO: add endpoint registrations using /create-api add
-        // Example:
-        // group.MapGet("{id:guid}", GetSampleEndpoint.Handle)
-        //     .WithName("GetSample")
-        //     .WithSummary("Get a sample by ID.")
-        //     .Produces<SampleDto>()
-        //     .ProducesProblem(401)
-        //     .ProducesProblem(404);
+        group.MapGet("{id:guid}", GetSampleDetailsEndpoint.Handle)
+            .WithName("GetSampleDetails")
+            .WithSummary("Get sample details by ID.")
+            .Produces<SampleDetailsDto>()
+            .ProducesProblem(StatusCodes.Status404NotFound);
 
         return group;
     }

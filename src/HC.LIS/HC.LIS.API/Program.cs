@@ -12,6 +12,7 @@ using HC.LIS.API.Modules.Analyzer.AnalyzerSamples;
 using HC.LIS.API.Modules.LabAnalysis;
 using HC.LIS.API.Modules.LabAnalysis.WorklistItems;
 using HC.LIS.API.Modules.SampleCollection;
+using HC.LIS.API.Modules.SampleCollection.CollectionRequests;
 using HC.LIS.API.Modules.SampleCollection.Samples;
 using HC.LIS.API.Modules.TestOrders;
 using HC.LIS.API.Modules.TestOrders.Orders;
@@ -130,6 +131,7 @@ try
 
     v1.MapGroup("orders").MapOrdersEndpoints();
     v1.MapGroup("samples").MapSamplesEndpoints();
+    v1.MapGroup("collection-requests").MapCollectionRequestsEndpoints();
     v1.MapGroup("analyzer-samples").MapAnalyzerSamplesEndpoints();
     v1.MapGroup("worklist-items").MapWorklistItemsEndpoints();
 
