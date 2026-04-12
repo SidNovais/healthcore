@@ -64,6 +64,8 @@ Use `AskUserQuestion` with:
 2. **API version** — which version? (default: v1; ask if v2+ groups already exist)
 3. **Description** — what should this endpoint do? (free text)
 
+**Before proceeding to Phase 3:** grep the target module's `Application` folder for `*IntegrationEventNotificationHandler` files. If the described operation is enqueued by one of those handlers (i.e., the same command appears in an `EnqueueAsync` call), stop and tell the user the operation is internal and must not have an HTTP endpoint. Do not generate any files.
+
 The skill proposes a RESTful design after receiving the description (see Phase 4 add-mode).
 
 ---
@@ -249,3 +251,24 @@ Report:
 - No raw SQL, EF Core, or Dapper in the API project
 - `ExecutionContextAccessor` reads identity from claims; never read `HttpContext` directly outside `Configuration/ExecutionContext/`
 - Layer boundary: the API project references only module `Infrastructure` projects and `HC.Core.Application` / `HC.Core.Domain`
+
+### No endpoints for integration-event-driven operations
+
+**Never scaffold an HTTP endpoint for an operation that is triggered by an integration event or an internal domain event.**
+
+Before generating any endpoint, check whether the corresponding command is enqueued by an `*IntegrationEventNotificationHandler` or scheduled in response to a domain event notification handler. If it is, the operation is internal — reject the request and explain why.
+
+Examples of operations that must **not** have HTTP endpoints:
+
+| Operation | Reason |
+|---|---|
+| Create worklist item | Triggered by `SampleCollectedIntegrationEvent` |
+| Create analyzer sample | Triggered by `SampleCollectedIntegrationEvent` |
+| Assign worklist item to analyzer sample | Triggered by `WorklistItemCreatedIntegrationEvent` |
+| Record analysis result on worklist item | Triggered by `AnalyzerResultReceivedIntegrationEvent` |
+| Complete worklist item | Triggered by domain event (SignedReport created) |
+| Add exam to collection request | Triggered by `OrderItemAcceptedIntegrationEvent` |
+| Complete exam on order | Triggered by `WorklistItemCompletedIntegrationEvent` |
+| Place exam in progress | Triggered by `SampleCollectedIntegrationEvent` |
+
+**How to check:** grep for `*IntegrationEventNotificationHandler` files in the relevant module's `Application` folder. If the handler enqueues the same command via `ICommandsScheduler`, the operation is internal — do not expose it as an HTTP endpoint.
