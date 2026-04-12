@@ -137,6 +137,10 @@ The public API of each module is a single facade class (e.g., `TestOrdersModule`
 - 4 spaces indentation
 - Private fields: `_camelCase`, static fields: `s_camelCase`, constants: `PascalCase`
 
+### Clock
+
+Always use `SystemClock.Now` (from `HC.Core.Domain`) instead of `DateTime.UtcNow` or `DateTime.Now` throughout all application and API code. Tests use `SystemClock.Set(DateTime)` to freeze time and `SystemClock.Clear()` to reset it.
+
 ### Testing Pattern
 
 Tests follow **Arrange–Act–Assert** with FluentAssertions. `TestBase` provides `AssertPublishedDomainEvent<T>()` to verify events raised on aggregates. `OrderSampleData` holds shared test data; `OrderFactory` builds test aggregates.
