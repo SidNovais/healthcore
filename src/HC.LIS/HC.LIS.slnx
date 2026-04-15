@@ -31,4 +31,11 @@
   <Project Path="../HC.LIS/HC.LIS.Modules/Analyzer/Tests/UnitTests/HC.LIS.Modules.Analyzer.UnitTests.csproj" />
   <Project Path="../HC.LIS/HC.LIS.Modules/Analyzer/Tests/IntegrationTests/HC.LIS.Modules.Analyzer.IntegrationTests.csproj" />
   <Project Path="../HC.LIS/HC.LIS.Modules/Analyzer/Tests/ArchTests/HC.LIS.Modules.Analyzer.ArchTests.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/UserAccess/Domain/HC.LIS.Modules.UserAccess.Domain.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/UserAccess/Application/HC.LIS.Modules.UserAccess.Application.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/UserAccess/Infrastructure/HC.LIS.Modules.UserAccess.Infrastructure.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/UserAccess/IntegrationEvents/HC.LIS.Modules.UserAccess.IntegrationEvents.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/UserAccess/Tests/UnitTests/HC.LIS.Modules.UserAccess.UnitTests.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/UserAccess/Tests/IntegrationTests/HC.LIS.Modules.UserAccess.IntegrationTests.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/UserAccess/Tests/ArchTests/HC.LIS.Modules.UserAccess.ArchTests.csproj" />
 </Solution>
