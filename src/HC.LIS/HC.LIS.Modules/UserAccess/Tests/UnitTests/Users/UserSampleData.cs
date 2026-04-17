@@ -14,4 +14,9 @@ public readonly struct UserSampleData
     public const string Role = "LabTechnician";
     public const string InvitationToken = "tok-test-abc123";
     public static readonly DateTime CreatedAt = SystemClock.Now;
+    public const string PasswordHash = "hashed-password-abc";
+    public static readonly DateTime ActivatedAt = SystemClock.Now;
+    public const string NewRole = "Physician";
+    public static readonly Guid ChangedById = Guid.Parse("019e1a2b-3c4d-7e5f-a6b7-c8d9e0f1a2b5");
+    public static readonly DateTime ChangedAt = SystemClock.Now;
 }
