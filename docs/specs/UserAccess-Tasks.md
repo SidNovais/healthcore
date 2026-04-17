@@ -13,23 +13,23 @@ None — module is self-contained. No cross-module enrichment or integration eve
 
 ## Task List
 
-### Phase 1: Module Skeleton
+### Phase 1: Module Skeleton ✓
 
-> **Skip** — `src/HC.LIS/HC.LIS.Modules/UserAccess/` already exists with full infrastructure scaffolding.
+> **Done** — `src/HC.LIS/HC.LIS.Modules/UserAccess/` already exists with full infrastructure scaffolding.
 
 ---
 
-### Phase 2: Domain Layer (TDD)
+### Phase 2: Domain Layer (TDD) ✓
 
 #### User creation
 
-- [ ] **Task 2.1** — Write failing unit tests for `User.Create`
+- [x] **Task 2.1** — Write failing unit tests for `User.Create`
   - **Skill:** `/unit-test UserAccess create a user`
   - **Creates:** `Tests/UnitTests/Users/UserTests.cs`, `UserFactory.cs`, `UserSampleData.cs`
   - **Tests:** `CreateUserIsSuccessful`
   - **Expected:** Tests fail — `UserCreatedDomainEvent`, `User.Create()`, `UserId`, `UserStatus`, `UserRole`, and `UserEmail` do not exist yet
 
-- [ ] **Task 2.2** — Implement `User` aggregate with `Create` method
+- [x] **Task 2.2** — Implement `User` aggregate with `Create` method
   - **Skill:** `/domain UserAccess create a user`
   - **Creates:** `Domain/Users/User.cs`, `UserId.cs`, `UserEmail.cs`, `UserRole.cs`, `UserStatus.cs`, `Events/UserCreatedDomainEvent.cs`
   - **Note:** No `Apply()`/`When()` — direct field assignments. Extends `AggregateRoot` for domain event infrastructure.
@@ -37,13 +37,13 @@ None — module is self-contained. No cross-module enrichment or integration eve
 
 #### User activation
 
-- [ ] **Task 2.3** — Write failing unit tests for `User.Activate`
+- [x] **Task 2.3** — Write failing unit tests for `User.Activate`
   - **Skill:** `/unit-test UserAccess activate a user`
   - **Modifies:** `Tests/UnitTests/Users/UserTests.cs`
   - **Tests:** `ActivateUserIsSuccessful`, `ActivateThrowsWhenTokenIsInvalid`, `ActivateThrowsWhenUserIsAlreadyActive`
   - **Expected:** Tests fail — `UserActivatedDomainEvent`, `CannotActivateWithInvalidTokenRule`, `CannotActivateAlreadyActiveUserRule` do not exist yet
 
-- [ ] **Task 2.4** — Implement `User.Activate` method
+- [x] **Task 2.4** — Implement `User.Activate` method
   - **Skill:** `/domain UserAccess activate a user`
   - **Creates:** `Events/UserActivatedDomainEvent.cs`, `Rules/CannotActivateWithInvalidTokenRule.cs`, `Rules/CannotActivateAlreadyActiveUserRule.cs`
   - **Modifies:** `Domain/Users/User.cs`
@@ -51,13 +51,13 @@ None — module is self-contained. No cross-module enrichment or integration eve
 
 #### Role change
 
-- [ ] **Task 2.5** — Write failing unit tests for `User.ChangeRole`
+- [x] **Task 2.5** — Write failing unit tests for `User.ChangeRole`
   - **Skill:** `/unit-test UserAccess change a user's role`
   - **Modifies:** `Tests/UnitTests/Users/UserTests.cs`
   - **Tests:** `ChangeRoleIsSuccessful`, `ChangeRoleThrowsWhenUserIsPending`
   - **Expected:** Tests fail — `UserRoleChangedDomainEvent`, `CannotChangeRoleOfPendingUserRule` do not exist yet
 
-- [ ] **Task 2.6** — Implement `User.ChangeRole` method
+- [x] **Task 2.6** — Implement `User.ChangeRole` method
   - **Skill:** `/domain UserAccess change a user's role`
   - **Creates:** `Events/UserRoleChangedDomainEvent.cs`, `Rules/CannotChangeRoleOfPendingUserRule.cs`
   - **Modifies:** `Domain/Users/User.cs`
