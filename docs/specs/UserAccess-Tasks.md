@@ -118,19 +118,19 @@ None — module is self-contained. No cross-module enrichment or integration eve
 
 ### Phase 4: Application Layer — Read Models
 
-- [ ] **Task 4.1** — Implement `GetUserDetails` query + handler + DTO
+- [x] **Task 4.1** — Implement `GetUserDetails` query + handler + DTO
   - **Manual**
   - **Creates:** `Application/Users/GetUserDetails/UserDetailsDto.cs`, `Application/Users/GetUserDetails/GetUserDetailsQuery.cs`, `Application/Users/GetUserDetails/GetUserDetailsQueryHandler.cs`
   - **Note:** Dapper `QueryFirstOrDefaultAsync` — SELECT by `id` or `email`; no projector needed
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 4.2** — Implement `GetUserList` query + handler + DTO
+- [x] **Task 4.2** — Implement `GetUserList` query + handler + DTO
   - **Manual**
   - **Creates:** `Application/Users/GetUserList/UserListItemDto.cs`, `Application/Users/GetUserList/GetUserListQuery.cs`, `Application/Users/GetUserList/GetUserListQueryHandler.cs`
   - **Note:** Dapper `QueryAsync` — SELECT `id, email, full_name, role, status, created_at` ordered by `created_at DESC`
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 4.3** — Implement `GetAuditLog` query + handler + DTO
+- [x] **Task 4.3** — Implement `GetAuditLog` query + handler + DTO
   - **Manual**
   - **Creates:** `Application/Users/GetAuditLog/AuditLogEntryDto.cs`, `Application/Users/GetAuditLog/GetAuditLogQuery.cs`, `Application/Users/GetAuditLog/GetAuditLogQueryHandler.cs`
   - **Note:** Dapper `QueryAsync` with optional `UserId` / date range filters; ordered by `occurred_at DESC`
