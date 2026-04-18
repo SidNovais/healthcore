@@ -9,6 +9,7 @@
     <BaseDirectory Condition="'$(BaseDirectory)' == ''">$(MSBuildThisFileDirectory)src\</BaseDirectory>
     <!-- Caminho absoluto para o projeto HC.Core -->
     <CoreDomainPath>$(BaseDirectory)HC.Core\Domain\HC.Core.Domain.csproj</CoreDomainPath>
+    <CoreApplicationPath>$(BaseDirectory)HC.Core\Application\HC.Core.Application.csproj</CoreApplicationPath>
     <CoreInfrastructure>$(BaseDirectory)HC.Core\Infrastructure\HC.Core.Infrastructure.csproj</CoreInfrastructure>
     <CoreUnitTests>$(BaseDirectory)HC.Core\Tests\UnitTests\HC.Core.UnitTests.csproj</CoreUnitTests>
     <CoreIntegrationTests>$(BaseDirectory)HC.Core\Tests\IntegrationTests\HC.Core.IntegrationTests.csproj</CoreIntegrationTests>
@@ -24,6 +25,9 @@
   </ItemGroup>
   <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Application'))">
     <ProjectReference Include="..\Domain\*.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Application')) and !$(MSBuildProjectName.Contains('Core'))">
+    <ProjectReference Include="$(CoreApplicationPath)" />
   </ItemGroup>
   <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.IntegrationTests')) and !$(MSBuildProjectName.Contains('Core'))">
     <ProjectReference Include="..\..\Infrastructure\*.csproj" />
