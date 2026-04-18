@@ -4,7 +4,6 @@ using HC.Core.Application.Events;
 using HC.Core.Infrastructure;
 using HC.Core.Infrastructure.DomainEventsDispatching;
 using HC.LIS.Modules.UserAccess.Application.Configuration.Commands;
-using HC.LIS.Modules.UserAccess.Infrastructure.Configurations.AggregateStore;
 using HC.LIS.Modules.UserAccess.Infrastructure.Configurations.Processing.InternalCommands;
 
 namespace HC.LIS.Modules.UserAccess.Infrastructure.Configurations.Processing;
@@ -17,7 +16,7 @@ internal class ProcessingModule : Autofac.Module
             .As<IDomainEventsDispatcher>()
             .InstancePerLifetimeScope();
 
-        builder.RegisterType<AggregateStoreDomainEventsAccessor>()
+        builder.RegisterType<DomainEventsAccessor>()
             .As<IDomainEventsAccessor>()
             .InstancePerLifetimeScope();
 

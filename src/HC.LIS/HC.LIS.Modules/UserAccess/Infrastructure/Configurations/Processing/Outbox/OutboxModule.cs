@@ -4,7 +4,7 @@ using HC.Core.Application.Events;
 using HC.Core.Infrastructure;
 using HC.Core.Infrastructure.DomainEventsDispatching;
 using HC.Core.Infrastructure.Outbox;
-using HC.LIS.Modules.UserAccess.Infrastructure.Configurations.AggregateStore;
+using HC.LIS.Modules.UserAccess.Infrastructure.Outbox;
 
 namespace HC.LIS.Modules.UserAccess.Infrastructure.Configurations.Processing.Outbox;
 
@@ -14,7 +14,7 @@ internal class OutboxModule(BiMap domainNotificationsMap) : Autofac.Module
 
     protected override void Load(ContainerBuilder builder)
     {
-        builder.RegisterType<SqlOutboxAccessor>()
+        builder.RegisterType<OutboxAccessor>()
             .As<IOutbox>()
             .FindConstructorsWith(new AllConstructorFinder())
             .InstancePerLifetimeScope();

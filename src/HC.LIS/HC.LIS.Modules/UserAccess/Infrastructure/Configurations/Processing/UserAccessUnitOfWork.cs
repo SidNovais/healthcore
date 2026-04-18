@@ -1,37 +1,21 @@
 using HC.Core.Infrastructure;
 using HC.Core.Infrastructure.DomainEventsDispatching;
-using HC.Core.Infrastructure.Outbox;
-using Marten;
 
 namespace HC.LIS.Modules.UserAccess.Infrastructure.Configurations.Processing;
 
 public class UserAccessUnitOfWork(
-  IDomainEventsDispatcher domainEventsDispatcher,
-  IDocumentSession documentSession,
-  IOutbox outbox
+    IDomainEventsDispatcher domainEventsDispatcher,
+    UserAccessContext context
 ) : IUnitOfWork
 {
     private readonly IDomainEventsDispatcher _domainEventsDispatcher = domainEventsDispatcher;
-    private readonly IDocumentSession _documentSession = documentSession;
-    private readonly IOutbox _outbox = outbox;
+    private readonly UserAccessContext _context = context;
+
     public async Task<int> CommitAsync(
-    Guid? internalCommandId = null,
-    CancellationToken cancellationToken = default
-  )
+        Guid? internalCommandId = null,
+        CancellationToken cancellationToken = default)
     {
         await _domainEventsDispatcher.DispatchEventsAsync().ConfigureAwait(false);
-        await _outbox.Save().ConfigureAwait(false);
-        if (internalCommandId.HasValue)
-        {
-            _documentSession.QueueSqlCommand(
-              @$"UPDATE ""user_access"".""InternalCommands""
-                SET ""ProcessedDate"" = ?
-                WHERE ""Id"" = ?",
-              DateTimeOffset.UtcNow,
-              internalCommandId.Value
-            );
-        }
-        await _documentSession.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        return 0;
+        return await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 }
