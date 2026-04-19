@@ -17,6 +17,8 @@ public class User : Entity, IAggregateRoot
     private string? _invitationToken;
     private string? _passwordHash;
     private DateTime? _activatedAt;
+    private DateTime _createdAt;
+    private Guid? _createdById;
 
     private User() { }
 
@@ -40,6 +42,8 @@ public class User : Entity, IAggregateRoot
         user._role = UserRole.Of(role);
         user._status = UserStatus.PendingActivation;
         user._invitationToken = invitationToken;
+        user._createdAt = createdAt;
+        user._createdById = createdById;
 
         UserCreatedDomainEvent ev = new(
             userId, email, fullName, birthdate, gender, role,

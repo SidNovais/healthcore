@@ -23,9 +23,9 @@ internal class GetAuditLogQueryHandler(
                 a.event_type  AS "{nameof(AuditLogEntryDto.EventType)}",
                 a.details     AS "{nameof(AuditLogEntryDto.Details)}"
             FROM user_access.audit_log a
-            WHERE (@UserId IS NULL OR a.user_id = @UserId)
-              AND (@FromDate IS NULL OR a.occurred_at >= @FromDate)
-              AND (@ToDate IS NULL OR a.occurred_at <= @ToDate)
+            WHERE (@UserId::uuid IS NULL OR a.user_id = @UserId)
+              AND (@FromDate::timestamptz IS NULL OR a.occurred_at >= @FromDate)
+              AND (@ToDate::timestamptz IS NULL OR a.occurred_at <= @ToDate)
             ORDER BY a.occurred_at DESC
             """;
 
