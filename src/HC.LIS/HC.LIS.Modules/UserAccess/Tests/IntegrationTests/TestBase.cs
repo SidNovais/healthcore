@@ -10,6 +10,7 @@ using Serilog;
 using HC.Core.Application;
 using HC.Core.Domain;
 using HC.Core.IntegrationTests;
+using HC.Core.IntegrationTests.Probing;
 using HC.LIS.Modules.UserAccess.Application;
 using HC.LIS.Modules.UserAccess.Application.Contracts;
 using HC.LIS.Modules.UserAccess.Infrastructure;
@@ -18,8 +19,12 @@ using HC.LIS.Modules.UserAccess.Infrastructure.Configurations;
 namespace HC.LIS.Modules.UserAccess.IntegrationTests;
 
 [Collection("IntegrationTests")]
-public class TestBase
+public class TestBase : IDisposable
 {
+#pragma warning disable CA1805
+    private bool _disposed = false;
+#pragma warning restore CA1805
+
     protected string? ConnectionString { get; private set; }
     protected ILogger Logger { get; private set; }
     protected IUserAccessModule UserAccessModule { get; private set; }
@@ -71,12 +76,42 @@ public class TestBase
         }
     }
 
+    public static async Task<T?> GetEventually<T>(IProbe<T> probe, int timeout)
+        where T : class
+    {
+        Poller poller = new(timeout);
+        return await poller.GetAsync(probe).ConfigureAwait(false);
+    }
+
     private static async Task ClearDatabase(IDbConnection connection)
     {
-        const string sql = @"DELETE FROM ""user_access"".""InboxMessages"";
+        const string sql = @"DELETE FROM user_access.audit_log;
+                             DELETE FROM user_access.users;
+                             DELETE FROM ""user_access"".""InboxMessages"";
                              DELETE FROM ""user_access"".""InternalCommands"";
                              DELETE FROM ""user_access"".""OutboxMessages"";";
 
         await connection.ExecuteScalarAsync(sql).ConfigureAwait(false);
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed) return;
+        if (disposing)
+        {
+            UserAccessStartup.Stop();
+        }
+        _disposed = true;
+    }
+
+    ~TestBase()
+    {
+        Dispose(false);
     }
 }
