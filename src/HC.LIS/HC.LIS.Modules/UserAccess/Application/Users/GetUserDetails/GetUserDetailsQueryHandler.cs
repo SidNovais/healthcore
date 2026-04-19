@@ -26,7 +26,7 @@ internal class GetUserDetailsQueryHandler(
                 u.created_by_id AS "{nameof(UserDetailsDto.CreatedById)}",
                 u.activated_at  AS "{nameof(UserDetailsDto.ActivatedAt)}"
             FROM user_access.users u
-            WHERE (@UserId IS NULL OR u.id = @UserId)
+            WHERE (@UserId::uuid IS NULL OR u.id = @UserId::uuid)
               AND (@Email IS NULL OR u.email = @Email)
             """;
 
