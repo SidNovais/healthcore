@@ -67,48 +67,48 @@ None — module is self-contained. No cross-module enrichment or integration eve
 
 ### Phase 3: Application Layer — Commands & Notifications
 
-- [ ] **Task 3.1** — Implement application service interfaces
+- [x] **Task 3.1** — Implement application service interfaces
   - **Manual**
   - **Creates:** `Application/Users/IPasswordHasher.cs`, `Application/Users/IJwtTokenService.cs`, `Application/Users/IEmailService.cs`, `Application/Users/IAuditLogWriter.cs`
   - **Note:** Interfaces only — implementations in Phase 6
 
-- [ ] **Task 3.2** — Implement `CreateUserCommand` + handler
+- [x] **Task 3.2** — Implement `CreateUserCommand` + handler
   - **Manual**
   - **Creates:** `Application/Users/CreateUser/CreateUserCommand.cs`, `Application/Users/CreateUser/CreateUserCommandHandler.cs`
   - **Pattern:** `User.Create(...)` → `_context.Users.Add(user)` → `SaveChangesAsync()`; returns `UserId`
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 3.3** — Implement `UserCreatedNotification` + invitation email handler
+- [x] **Task 3.3** — Implement `UserCreatedNotification` + invitation email handler
   - **Manual**
   - **Creates:** `Application/Users/CreateUser/UserCreatedNotification.cs`, `Application/Users/CreateUser/UserCreatedNotificationHandler.cs`
   - **Note:** Handler calls `IEmailService.SendInvitationEmailAsync(notification.DomainEvent.Email, notification.DomainEvent.InvitationToken)`
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 3.4** — Implement `ActivateUserCommand` + handler
+- [x] **Task 3.4** — Implement `ActivateUserCommand` + handler
   - **Manual**
   - **Creates:** `Application/Users/ActivateUser/ActivateUserCommand.cs`, `Application/Users/ActivateUser/ActivateUserCommandHandler.cs`
   - **Pattern:** Load `User` by Id via EF Core; `User.Activate(invitationToken, passwordHash, activatedAt)`; `SaveChangesAsync()`
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 3.5** — Implement `UserActivatedNotification` handler
+- [x] **Task 3.5** — Implement `UserActivatedNotification` handler
   - **Manual**
   - **Creates:** `Application/Users/ActivateUser/UserActivatedNotification.cs`, `Application/Users/ActivateUser/UserActivatedNotificationHandler.cs`
   - **Note:** No-op handler; notification required for OutboxModule BiMap completeness
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 3.6** — Implement `ChangeRoleCommand` + handler
+- [x] **Task 3.6** — Implement `ChangeRoleCommand` + handler
   - **Manual**
   - **Creates:** `Application/Users/ChangeRole/ChangeRoleCommand.cs`, `Application/Users/ChangeRole/ChangeRoleCommandHandler.cs`
   - **Pattern:** Load `User` by Id; `User.ChangeRole(newRole, changedById, changedAt)`; `SaveChangesAsync()`
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 3.7** — Implement `UserRoleChangedNotification` + audit handler
+- [x] **Task 3.7** — Implement `UserRoleChangedNotification` + audit handler
   - **Manual**
   - **Creates:** `Application/Users/ChangeRole/UserRoleChangedNotification.cs`, `Application/Users/ChangeRole/UserRoleChangedNotificationHandler.cs`
   - **Note:** Handler calls `IAuditLogWriter.WriteAsync(userId, changedById, "RoleChanged", details)` where details includes old and new role
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 3.8** — Implement `LoginCommand` + handler + `LoginResultDto`
+- [x] **Task 3.8** — Implement `LoginCommand` + handler + `LoginResultDto`
   - **Manual**
   - **Creates:** `Application/Users/Login/LoginCommand.cs`, `Application/Users/Login/LoginCommandHandler.cs`, `Application/Users/Login/LoginResultDto.cs`
   - **Pattern:** Dapper SELECT user by email from `user_access.users`; verify password via `IPasswordHasher`; on success: issue JWT via `IJwtTokenService`, write audit `LoginSuccess`; on failure: write audit `LoginFailed`, throw
@@ -146,7 +146,7 @@ None — module is self-contained. No cross-module enrichment or integration eve
 
 ### Phase 6: Infrastructure Wiring
 
-- [ ] **Task 6.1** — Register OutboxModule BiMap in `UserAccessStartup`
+- [x] **Task 6.1** — Register OutboxModule BiMap in `UserAccessStartup`
   - **Manual**
   - **Modifies:** `Infrastructure/Configurations/UserAccessStartup.cs`
   - **Adds:**
@@ -157,26 +157,26 @@ None — module is self-contained. No cross-module enrichment or integration eve
     ```
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 6.2** — Add `DbSet<User>` + `UserEntityTypeConfiguration` to `UserAccessContext`
+- [x] **Task 6.2** — Add `DbSet<User>` + `UserEntityTypeConfiguration` to `UserAccessContext`
   - **Manual**
   - **Modifies:** `Infrastructure/UserAccessContext.cs`
   - **Creates:** `Infrastructure/Users/UserEntityTypeConfiguration.cs`
   - **Note:** Table `user_access.users`, all 12 columns; EF Core value conversions for `UserId`, `UserEmail`, `UserRole`, `UserStatus`
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 6.3** — Implement `PasswordHasher` + `JwtTokenService`
+- [x] **Task 6.3** — Implement `PasswordHasher` + `JwtTokenService`
   - **Manual**
   - **Creates:** `Infrastructure/Authentication/PasswordHasher.cs`, `Infrastructure/Authentication/JwtTokenService.cs`
   - **Note:** `PasswordHasher` uses `Microsoft.AspNetCore.Identity.PasswordHasher<object>`; `JwtTokenService` uses `System.IdentityModel.Tokens.Jwt` with issuer/audience/key from `IConfiguration`
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 6.4** — Implement `EmailService` stub
+- [x] **Task 6.4** — Implement `EmailService` stub
   - **Manual**
   - **Creates:** `Infrastructure/Email/EmailService.cs`
   - **Note:** Stub implementation — logs invitation token to Serilog (`ILogger`) in dev; real SMTP provider wired when PRD open question #2 is resolved
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 6.5** — Implement `AuditLogWriter`
+- [x] **Task 6.5** — Implement `AuditLogWriter`
   - **Manual**
   - **Creates:** `Infrastructure/AuditLog/AuditLogWriter.cs`
   - **Note:** Dapper INSERT into `user_access.audit_log`; inject `ISqlConnectionFactory`; `.ConfigureAwait(false)` on all awaited calls
@@ -186,7 +186,7 @@ None — module is self-contained. No cross-module enrichment or integration eve
 
 ### Phase 7: Database Migrations
 
-- [ ] **Task 7.1** — Create schema + infrastructure table migrations
+- [x] **Task 7.1** — Create schema + infrastructure table migrations
   - **Manual**
   - **Creates:**
     - `src/HC.LIS/HC.LIS.Database/UserAccess/20260415120000_UserAccessModule_AddSchemaUserAccess.cs`
@@ -196,19 +196,19 @@ None — module is self-contained. No cross-module enrichment or integration eve
   - **Pattern:** Copy from `LabAnalysis/` migrations, substitute `lab_analysis` → `user_access`
   - **Verify:** `dotnet run --project src/HC.LIS/HC.LIS.Database/HC.LIS.Database.csproj` succeeds
 
-- [ ] **Task 7.2** — Create `users` table migration
+- [x] **Task 7.2** — Create `users` table migration
   - **Manual**
   - **Creates:** `src/HC.LIS/HC.LIS.Database/UserAccess/20260415120400_UserAccessModule_AddTableUsers.cs`
   - **Columns:** `id UUID PK`, `email VARCHAR(255) UNIQUE NOT NULL`, `full_name VARCHAR(255) NOT NULL`, `birthdate DATE NOT NULL`, `gender VARCHAR(20) NOT NULL`, `role VARCHAR(50) NOT NULL`, `status VARCHAR(50) NOT NULL`, `password_hash VARCHAR(500) NULL`, `invitation_token VARCHAR(100) NULL`, `created_at TIMESTAMPTZ NOT NULL`, `created_by_id UUID NULL`, `activated_at TIMESTAMPTZ NULL`
   - **Verify:** `dotnet run --project src/HC.LIS/HC.LIS.Database/HC.LIS.Database.csproj` succeeds
 
-- [ ] **Task 7.3** — Create `audit_log` table migration
+- [x] **Task 7.3** — Create `audit_log` table migration
   - **Manual**
   - **Creates:** `src/HC.LIS/HC.LIS.Database/UserAccess/20260415120500_UserAccessModule_AddTableAuditLog.cs`
   - **Columns:** `id UUID PK`, `occurred_at TIMESTAMPTZ NOT NULL`, `user_id UUID NULL`, `actor_id UUID NULL`, `event_type VARCHAR(50) NOT NULL`, `details TEXT NULL`
   - **Verify:** `dotnet run --project src/HC.LIS/HC.LIS.Database/HC.LIS.Database.csproj` succeeds
 
-- [ ] **Task 7.4** — Create root user seed migration
+- [x] **Task 7.4** — Create root user seed migration
   - **Manual**
   - **Creates:** `src/HC.LIS/HC.LIS.Database/UserAccess/20260415120600_UserAccessModule_SeedRootUser.cs`
   - **Note:** INSERT with id = well-known Guid, email = `root@hclis.local`, role = `ITAdmin`, status = `Active`, bcrypt hash of known dev password; production override via `ASPNETCORE_HCLIS_ROOT_PASSWORD_HASH`
@@ -218,27 +218,27 @@ None — module is self-contained. No cross-module enrichment or integration eve
 
 ### Phase 8: Integration Tests (TDD)
 
-- [ ] **Task 8.1** — Write integration tests for `CreateUser`
+- [x] **Task 8.1** — Write integration tests for `CreateUser`
   - **Skill:** `/integration-test UserAccess create a user`
   - **Creates:** `Tests/IntegrationTests/Users/UserTests.cs`, `GetUserFromUserAccessProbe.cs`, `UserFactory.cs`, `UserSampleData.cs`
   - **Tests:** `CreateUserIsSuccessful` — asserts row in `user_access.users` with Status = `"PendingActivation"`
 
-- [ ] **Task 8.2** — Write integration tests for `ActivateUser`
+- [x] **Task 8.2** — Write integration tests for `ActivateUser`
   - **Skill:** `/integration-test UserAccess activate a user`
   - **Modifies:** `Tests/IntegrationTests/Users/UserTests.cs`
   - **Tests:** `ActivateUserIsSuccessful` — asserts Status = `"Active"`, `activated_at` set, `invitation_token` = null
 
-- [ ] **Task 8.3** — Write integration tests for `ChangeRole`
+- [x] **Task 8.3** — Write integration tests for `ChangeRole`
   - **Skill:** `/integration-test UserAccess change a user's role`
   - **Modifies:** `Tests/IntegrationTests/Users/UserTests.cs`
   - **Tests:** `ChangeRoleIsSuccessful` — asserts `role` column updated
 
-- [ ] **Task 8.4** — Write integration tests for `Login`
+- [x] **Task 8.4** — Write integration tests for `Login`
   - **Skill:** `/integration-test UserAccess login a user`
   - **Modifies:** `Tests/IntegrationTests/Users/UserTests.cs`
   - **Tests:** `LoginIsSuccessful` — asserts `LoginResultDto.Token` non-empty; `LoginFailedWritesAuditEntry` — asserts `audit_log` row with EventType = `"LoginFailed"`
 
-- [ ] **Task 8.5** — Verify all integration tests pass
+- [x] **Task 8.5** — Verify all integration tests pass
   - **Manual**
   - **Verify:** `dotnet test src/HC.LIS/HC.LIS.Modules/UserAccess/Tests/IntegrationTests/HC.LIS.Modules.UserAccess.IntegrationTests.csproj` — all tests green
 
