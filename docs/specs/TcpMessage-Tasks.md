@@ -31,7 +31,7 @@ src/HC.LIS/
 
 ### Phase 1: Project Scaffold
 
-- [ ] **Task 1.1** — Create `HC.LIS.TcpMessage` Worker project
+- [x] **Task 1.1** — Create `HC.LIS.TcpMessage` Worker project
   - **Manual**
   - **Creates:**
     - `src/HC.LIS/HC.LIS.TcpMessage/HC.LIS.TcpMessage.csproj` — `Sdk="Microsoft.NET.Sdk.Worker"`, `net10.0`
@@ -40,14 +40,14 @@ src/HC.LIS/
   - **Package references:** `Autofac.Extensions.DependencyInjection`, `Serilog.Extensions.Hosting`, `Serilog.Sinks.Console`
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 1.2** — Create `HC.LIS.TcpMessage.Tests` unit test project
+- [x] **Task 1.2** — Create `HC.LIS.TcpMessage.Tests` unit test project
   - **Manual**
   - **Creates:** `src/HC.LIS/HC.LIS.TcpMessage.Tests/HC.LIS.TcpMessage.Tests.csproj`
   - **Project references:** `HC.LIS.TcpMessage`
   - **Package references:** `xunit`, `FluentAssertions`, `NSubstitute`
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 1.3** — Create `HC.LIS.TcpMessage.IntegrationTests` project
+- [x] **Task 1.3** — Create `HC.LIS.TcpMessage.IntegrationTests` project
   - **Manual**
   - **Creates:** `src/HC.LIS/HC.LIS.TcpMessage.IntegrationTests/HC.LIS.TcpMessage.IntegrationTests.csproj`
   - **Project references:** `HC.LIS.TcpMessage`, `HC.LIS.Modules.Analyzer.Infrastructure`
