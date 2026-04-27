@@ -11,4 +11,10 @@
     <ProjectReference Include="..\HC.LIS.Modules\Analyzer\Infrastructure\HC.LIS.Modules.Analyzer.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>HC.LIS.TcpMessage.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
 </Project>

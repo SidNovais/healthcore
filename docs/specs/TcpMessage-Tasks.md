@@ -59,7 +59,7 @@ src/HC.LIS/
 
 ### Phase 2: MLLP Framer (TDD)
 
-- [ ] **Task 2.1** — Write failing unit tests for `MllpFramer`
+- [x] **Task 2.1** — Write failing unit tests for `MllpFramer`
   - **Manual**
   - **Creates:** `src/HC.LIS/HC.LIS.TcpMessage.Tests/Mllp/MllpFramerTests.cs`
   - **Tests:**
@@ -71,7 +71,7 @@ src/HC.LIS/
     - `UnwrapAsyncThrowsOnTruncatedFrame`
   - **Expected:** Tests fail — `MllpFramer` does not exist yet
 
-- [ ] **Task 2.2** — Implement `MllpFramer`
+- [x] **Task 2.2** — Implement `MllpFramer`
   - **Manual**
   - **Creates:** `src/HC.LIS/HC.LIS.TcpMessage/Mllp/MllpFramer.cs`
   - **API:**
