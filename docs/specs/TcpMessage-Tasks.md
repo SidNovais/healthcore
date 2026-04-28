@@ -116,7 +116,7 @@ src/HC.LIS/
 
 ### Phase 4: TCP Listener
 
-- [ ] **Task 4.1** — Implement `TcpListenerService`
+- [x] **Task 4.1** — Implement `TcpListenerService`
   - **Manual**
   - **Creates:** `src/HC.LIS/HC.LIS.TcpMessage/Tcp/TcpListenerService.cs`
   - **Responsibilities:**
