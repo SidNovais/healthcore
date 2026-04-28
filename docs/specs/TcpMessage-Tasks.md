@@ -134,30 +134,32 @@ src/HC.LIS/
 
 ### Phase 5: Connection Handler & State Machine (TDD)
 
-- [ ] **Task 5.1** — Write failing unit tests for `ConnectionHandler`
+- [x] **Task 5.1** — Write failing unit tests for `ConnectionHandler`
   - **Manual**
   - **Creates:** `src/HC.LIS/HC.LIS.TcpMessage.Tests/Tcp/ConnectionHandlerTests.cs`
   - **Tests:**
-    - `FullExchange_QueryPhase_CallsHandleBarcodeQueryCommand`
-    - `FullExchange_ResultPhase_SendsImmediateAckBeforeDomainProcessing`
-    - `FullExchange_ResultPhase_CallsForwardRawResultCommandAfterAck`
-    - `ReadTimeout_SemaphoreIsReleased`
-  - **Pattern:** Mock `IAnalyzerModule` (NSubstitute), fake `Stream` backed by `MemoryStream`
-  - **Expected:** Tests fail — `ConnectionHandler` does not exist yet
+    - `FullExchangeQueryPhaseCallsHandleBarcodeQueryCommand`
+    - `FullExchangeResultPhaseSendsImmediateAckBeforeDomainProcessing`
+    - `FullExchangeResultPhaseCallsForwardRawResultCommandAfterAck`
+    - `ReadTimeoutSemaphoreIsReleased`
+  - **Pattern:** Mock `IAnalyzerModule` (NSubstitute), `DuplexStream` helper backed by two `MemoryStream`s
+  - **Note:** Semaphore passed into `HandleAsync`; `TcpListenerService` updated accordingly (no longer releases semaphore itself)
+  - **Note:** Command stub classes created in `Analyzer.Application` as prerequisite (no handlers yet)
+  - **Note:** `NullLogger<ConnectionHandler>.Instance` used instead of `Substitute.For<ILogger<>>()` to avoid Castle DynamicProxy visibility issues with `internal` types
 
-- [ ] **Task 5.2** — Implement `ConnectionState` enum
+- [x] **Task 5.2** — Implement `ConnectionState` enum
   - **Manual**
   - **Creates:** `src/HC.LIS/HC.LIS.TcpMessage/Tcp/ConnectionState.cs`
   - **Values:** `ReceivingQuery`, `QueryAnswered`, `ReceivingResult`, `Done`
 
-- [ ] **Task 5.3** — Implement `ConnectionHandler`
+- [x] **Task 5.3** — Implement `ConnectionHandler`
   - **Manual**
   - **Creates:** `src/HC.LIS/HC.LIS.TcpMessage/Tcp/ConnectionHandler.cs`
   - **State machine:**
     1. `ReceivingQuery` → `MllpFramer.UnwrapAsync` → `HandleBarcodeQueryCommand` → `MllpFramer.Wrap` → write → `QueryAnswered`
     2. `ReceivingResult` → `MllpFramer.UnwrapAsync` → `BuildMessageAckCommand` → write ACK immediately → `ForwardRawResultCommand` → `Done`
-  - **Error handling:** If `IAnalyzerModule` throws (including `HL7ChecksumException`) → log metadata, close stream, release semaphore — do not write ACK
-  - **Verify:** Unit tests from Task 5.1 pass
+  - **Error handling:** Catches non-cancellation exceptions → logs metadata, closes stream, releases semaphore in `finally`
+  - **Verify:** All 10 unit tests pass (6 MllpFramer + 4 ConnectionHandler)
 
 ---
 

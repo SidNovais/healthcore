@@ -69,7 +69,6 @@ internal sealed partial class TcpListenerService : BackgroundService
     {
         string remoteIp = (client.Client.RemoteEndPoint as IPEndPoint)?.Address.ToString() ?? "unknown";
         Stream stream = client.GetStream();
-        bool semaphoreAcquired = false;
 
         try
         {
@@ -89,9 +88,9 @@ internal sealed partial class TcpListenerService : BackgroundService
             }
 
             await _semaphore.WaitAsync(ct).ConfigureAwait(false);
-            semaphoreAcquired = true;
 
-            await _handler.HandleAsync(stream, remoteIp, ct).ConfigureAwait(false);
+            // Semaphore is released by ConnectionHandler in its own finally block.
+            await _handler.HandleAsync(stream, remoteIp, _semaphore, ct).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
@@ -107,9 +106,6 @@ internal sealed partial class TcpListenerService : BackgroundService
         }
         finally
         {
-            if (semaphoreAcquired)
-                _semaphore.Release();
-
             await stream.DisposeAsync().ConfigureAwait(false);
             client.Dispose();
         }
