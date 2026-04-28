@@ -1,11 +1,16 @@
+using System.Text;
 using HC.LIS.Modules.Analyzer.Application.Contracts;
 
 namespace HC.LIS.Modules.Analyzer.Infrastructure.HL7;
 
-internal class HL7ResultParser : IHL7ResultParser
+internal class HL7ResultParser(bool enableHl7Checksum) : IHL7ResultParser
 {
+    private readonly bool _enableHl7Checksum = enableHl7Checksum;
+
     public AnalyzerResultDto Parse(string hl7Message)
     {
+        if (_enableHl7Checksum)
+            ValidateChecksum(hl7Message);
         // Simulated HL7 v2.x ORU^R01 parser — expects pipe-delimited lines
         // OBX: OBX|1|NM|<ExamMnemonic>^<Desc>||<Value>|<Unit>|<RefRange>||...
         // SPM: SPM|||<Barcode>
@@ -34,5 +39,30 @@ internal class HL7ResultParser : IHL7ResultParser
         if (line is null) return string.Empty;
         string[] fields = line.Split('|');
         return fieldIndex < fields.Length ? fields[fieldIndex] : string.Empty;
+    }
+
+    private static void ValidateChecksum(string hl7Message)
+    {
+        int zcsIndex = hl7Message.LastIndexOf("\rZCS|", StringComparison.Ordinal);
+        if (zcsIndex < 0)
+            throw new HL7ChecksumException(0, 0);
+
+        string zcsLine = hl7Message[(zcsIndex + 1)..].TrimEnd('\r');
+        string[] zcsFields = zcsLine.Split('|');
+        if (zcsFields.Length < 2 || !byte.TryParse(zcsFields[1], out byte expected))
+            throw new HL7ChecksumException(0, 0);
+
+        byte[] payloadBytes = Encoding.UTF8.GetBytes(hl7Message[..(zcsIndex + 1)]);
+        byte actual = ComputeBcc(payloadBytes);
+        if (actual != expected)
+            throw new HL7ChecksumException(expected, actual);
+    }
+
+    private static byte ComputeBcc(byte[] bytes)
+    {
+        int sum = 0;
+        foreach (byte b in bytes)
+            sum += b;
+        return (byte)(sum % 256);
     }
 }

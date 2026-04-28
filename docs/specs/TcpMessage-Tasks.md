@@ -179,7 +179,7 @@ src/HC.LIS/
 
 These tasks extend the Analyzer module Application layer with three new commands. They live in `HC.LIS.Modules.Analyzer`, not in TcpMessage.
 
-- [ ] **Task 7.1** — Implement `BuildMessageAckCommand` and handler
+- [x] **Task 7.1** — Implement `BuildMessageAckCommand` and handler
   - **Manual**
   - **Creates:**
     - `src/HC.LIS/HC.LIS.Modules/Analyzer/Application/AnalyzerSamples/BuildMessageAck/BuildMessageAckCommand.cs` — `CommandBase<byte[]>`, property: `RawPayload (byte[])`
@@ -193,12 +193,12 @@ These tasks extend the Analyzer module Application layer with three new commands
   - **Note:** No aggregate access, no DB calls
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 7.2** — Define `IHL7QueryParser` interface
+- [x] **Task 7.2** — Define `IHL7QueryParser` interface
   - **Manual**
   - **Creates:** `src/HC.LIS/HC.LIS.Modules/Analyzer/Application/AnalyzerSamples/HandleBarcodeQuery/IHL7QueryParser.cs`
   - **Interface:** `string ParseBarcode(byte[] rawQueryPayload)`
 
-- [ ] **Task 7.3** — Implement `HandleBarcodeQueryCommand` and handler
+- [x] **Task 7.3** — Implement `HandleBarcodeQueryCommand` and handler
   - **Manual**
   - **Creates:**
     - `src/HC.LIS/HC.LIS.Modules/Analyzer/Application/AnalyzerSamples/HandleBarcodeQuery/HandleBarcodeQueryCommand.cs` — `CommandBase<byte[]>`, property: `RawQueryPayload (byte[])`
@@ -210,7 +210,7 @@ These tasks extend the Analyzer module Application layer with three new commands
     4. `ISampleInfoPresenter.Format(dto)` → response bytes
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 7.4** — Implement `ForwardRawResultCommand` and handler
+- [x] **Task 7.4** — Implement `ForwardRawResultCommand` and handler
   - **Manual**
   - **Creates:**
     - `src/HC.LIS/HC.LIS.Modules/Analyzer/Application/AnalyzerSamples/ForwardRawResult/ForwardRawResultCommand.cs` — `CommandBase`, property: `RawResultPayload (byte[])`
@@ -221,7 +221,7 @@ These tasks extend the Analyzer module Application layer with three new commands
     3. Load aggregate → `AnalyzerSample.ReceiveResult(...)` → `AppendChanges`
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 7.5** — Implement `HL7QueryParser` + register in `HL7Module`
+- [x] **Task 7.5** — Implement `HL7QueryParser` + register in `HL7Module`
   - **Manual**
   - **Creates:** `src/HC.LIS/HC.LIS.Modules/Analyzer/Infrastructure/HL7/HL7QueryParser.cs`
   - **Implements:** `IHL7QueryParser.ParseBarcode` — minimal QBP^Q11 field parser; validates HL7 content checksum when `EnableHl7Checksum = true`; throws `HL7ChecksumException` on mismatch

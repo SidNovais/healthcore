@@ -28,7 +28,8 @@ public class AnalyzerStartup
       IExecutionContextAccessor executionContextAccessor,
       ILogger logger,
       IEventsBus? eventBus,
-      long? internalProcessingPoolingInterval = null
+      long? internalProcessingPoolingInterval = null,
+      bool enableHl7Checksum = false
     )
     {
         ILogger moduleLogger = logger.ForContext("Module", "Analyzer");
@@ -36,7 +37,8 @@ public class AnalyzerStartup
           databaseConnectionString,
           executionContextAccessor,
           moduleLogger,
-          eventBus
+          eventBus,
+          enableHl7Checksum
         );
         QuartzStartup.Initialize(moduleLogger, internalProcessingPoolingInterval);
         EventsBusStartup.Initialize(moduleLogger);
@@ -46,7 +48,8 @@ public class AnalyzerStartup
       string databaseConnectionString,
       IExecutionContextAccessor executionContextAccessor,
       ILogger logger,
-      IEventsBus? eventsBus
+      IEventsBus? eventsBus,
+      bool enableHl7Checksum
     )
     {
         var containerBuilder = new ContainerBuilder();
@@ -68,7 +71,7 @@ public class AnalyzerStartup
         internalCommandsMap.Add("AssignWorklistItemByBarcodeAndExamCodeCommand", typeof(AssignWorklistItemByBarcodeAndExamCodeCommand));
         containerBuilder.RegisterModule(new InternalCommandsModule(internalCommandsMap));
         containerBuilder.RegisterModule(new QuartzModule());
-        containerBuilder.RegisterModule(new HL7Module());
+        containerBuilder.RegisterModule(new HL7Module(enableHl7Checksum));
         containerBuilder.RegisterInstance(executionContextAccessor);
         _container = containerBuilder.Build();
         AnalyzerCompositionRoot.SetContainer(_container);
