@@ -6,6 +6,7 @@ using HC.LIS.Modules.Analyzer.Application.AnalyzerSamples.BuildMessageAck;
 using HC.LIS.Modules.Analyzer.Application.AnalyzerSamples.ForwardRawResult;
 using HC.LIS.Modules.Analyzer.Application.AnalyzerSamples.HandleBarcodeQuery;
 using HC.LIS.Modules.Analyzer.Application.Contracts;
+using HC.LIS.TcpMessage.AuditLog;
 using HC.LIS.TcpMessage.Configuration;
 using HC.LIS.TcpMessage.Mllp;
 using Microsoft.Extensions.Logging;
@@ -14,6 +15,7 @@ namespace HC.LIS.TcpMessage.Tcp;
 
 internal sealed partial class ConnectionHandler(
     IAnalyzerModule analyzerModule,
+    TcpAuditLogger auditLogger,
     TcpOptions options,
     ILogger<ConnectionHandler> logger)
 {
@@ -23,6 +25,7 @@ internal sealed partial class ConnectionHandler(
         try
         {
             byte[] rawQuery = await MllpFramer.UnwrapAsync(stream, options.EnableMllpChecksum, ct).ConfigureAwait(false);
+            auditLogger.LogInbound(remoteIp, rawQuery.Length, state);
             state = ConnectionState.QueryAnswered;
 
             byte[] rspBytes = await analyzerModule
@@ -30,16 +33,18 @@ internal sealed partial class ConnectionHandler(
                 .ConfigureAwait(false);
 
             await stream.WriteAsync(MllpFramer.Wrap(rspBytes, options.EnableMllpChecksum), ct).ConfigureAwait(false);
-
+            auditLogger.LogOutbound(remoteIp, rspBytes.Length, state);
             state = ConnectionState.ReceivingResult;
 
             byte[] rawResult = await MllpFramer.UnwrapAsync(stream, options.EnableMllpChecksum, ct).ConfigureAwait(false);
+            auditLogger.LogInbound(remoteIp, rawResult.Length, state);
 
             byte[] ackBytes = await analyzerModule
                 .ExecuteCommandAsync<byte[]>(new BuildMessageAckCommand(rawResult))
                 .ConfigureAwait(false);
 
             await stream.WriteAsync(MllpFramer.Wrap(ackBytes, options.EnableMllpChecksum), ct).ConfigureAwait(false);
+            auditLogger.LogOutbound(remoteIp, ackBytes.Length, state);
 
             await analyzerModule
                 .ExecuteCommandAsync(new ForwardRawResultCommand(rawResult))

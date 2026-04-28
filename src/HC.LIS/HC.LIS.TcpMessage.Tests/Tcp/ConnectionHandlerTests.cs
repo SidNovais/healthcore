@@ -8,6 +8,7 @@ using HC.LIS.Modules.Analyzer.Application.AnalyzerSamples.BuildMessageAck;
 using HC.LIS.Modules.Analyzer.Application.AnalyzerSamples.ForwardRawResult;
 using HC.LIS.Modules.Analyzer.Application.AnalyzerSamples.HandleBarcodeQuery;
 using HC.LIS.Modules.Analyzer.Application.Contracts;
+using HC.LIS.TcpMessage.AuditLog;
 using HC.LIS.TcpMessage.Configuration;
 using HC.LIS.TcpMessage.Mllp;
 using HC.LIS.TcpMessage.Tcp;
@@ -25,7 +26,11 @@ public class ConnectionHandlerTests
     private static readonly byte[] AckBytes = "ACK_RESPONSE"u8.ToArray();
 
     private static ConnectionHandler CreateHandler(IAnalyzerModule module)
-        => new(module, new TcpOptions(), NullLogger<ConnectionHandler>.Instance);
+        => new(
+            module,
+            new TcpAuditLogger(NullLogger<TcpAuditLogger>.Instance),
+            new TcpOptions(),
+            NullLogger<ConnectionHandler>.Instance);
 
     private static byte[] BuildFullExchangeData()
     {
