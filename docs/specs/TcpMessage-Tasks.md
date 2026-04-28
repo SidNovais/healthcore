@@ -94,7 +94,7 @@ src/HC.LIS/
 
 ### Phase 3: Configuration
 
-- [ ] **Task 3.1** — Implement `TcpOptions`
+- [x] **Task 3.1** — Implement `TcpOptions`
   - **Manual**
   - **Creates:** `src/HC.LIS/HC.LIS.TcpMessage/Configuration/TcpOptions.cs`
   - **Properties:**
@@ -106,7 +106,7 @@ src/HC.LIS/
     - `EnableMllpChecksum (bool = false)`
     - `EnableHl7Checksum (bool = false)`
 
-- [ ] **Task 3.2** — Implement `AnalyzerAutofacModule`
+- [x] **Task 3.2** — Implement `AnalyzerAutofacModule`
   - **Manual**
   - **Creates:** `src/HC.LIS/HC.LIS.TcpMessage/Configuration/AnalyzerAutofacModule.cs`
   - **Registers:** `AnalyzerModule` as `IAnalyzerModule` (instance-per-lifetime-scope)
