@@ -4,7 +4,7 @@ using System.Reflection;
 using MediatR;
 using NetArchTest.Rules;
 
-namespace HC.LIS.ArchTests.Modules;
+namespace HC.LIS.Tests.ArchTests.Modules;
 
 public class ModuleTests : TestBase
 {

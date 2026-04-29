@@ -18,7 +18,7 @@ using LabAnalysisDomainAssembly = HC.LIS.Modules.LabAnalysis.Domain.DomainAssemb
 using SampleCollectionDomainAssembly = HC.LIS.Modules.SampleCollection.Domain.DomainAssemblyInfo;
 using TestOrdersDomainAssembly = HC.LIS.Modules.TestOrders.Domain.DomainAssemblyInfo;
 
-namespace HC.LIS.ArchTests;
+namespace HC.LIS.Tests.ArchTests;
 
 public abstract class TestBase
 {

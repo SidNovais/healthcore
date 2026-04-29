@@ -17,7 +17,7 @@
     <!-- The Directory.Build.targets auto-link for .ArchTests resolves to a nonexistent path
          for this project location. HC.LIS.API already references all module Infrastructure
          projects transitively, so one explicit reference is sufficient. -->
-    <ProjectReference Include="..\HC.LIS.API\HC.LIS.API.csproj" />
+    <ProjectReference Include="..\..\HC.LIS.API\HC.LIS.API.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Using Include="Xunit" />

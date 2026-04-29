@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using NetArchTest.Rules;
 
-namespace HC.LIS.ArchTests.Api;
+namespace HC.LIS.Tests.ArchTests.Api;
 
 public class ApiTests : TestBase
 {
