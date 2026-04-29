@@ -290,7 +290,7 @@ These tasks extend the Analyzer module Application layer with three new commands
   - **Modifies:** `TcpExchangeTests.cs`
   - **Test:** `SecondConnection_WaitsForFirstExchangeToComplete`
 
-- [ ] **Task 9.6** — Verify all integration tests pass
+- [x] **Task 9.6** — Verify all integration tests pass
   - **Manual**
   - **Verify:** `dotnet test src/HC.LIS/HC.LIS.TcpMessage.IntegrationTests/HC.LIS.TcpMessage.IntegrationTests.csproj` — all tests green
 
@@ -298,13 +298,13 @@ These tasks extend the Analyzer module Application layer with three new commands
 
 ### Phase 10: Docker
 
-- [ ] **Task 10.1** — Add `Dockerfile.tcpmessage`
+- [x] **Task 10.1** — Add `Dockerfile.tcpmessage`
   - **Manual**
   - **Creates:** `Dockerfile.tcpmessage`
   - **Pattern:** Multi-stage — `sdk` build stage, `aspnet` runtime stage
   - **Key lines:** `EXPOSE 8890`, `ENTRYPOINT ["dotnet", "HC.LIS.TcpMessage.dll"]`
 
-- [ ] **Task 10.2** — Add TcpMessage service to `development-compose.yaml`
+- [x] **Task 10.2** — Add TcpMessage service to `development-compose.yaml`
   - **Manual**
   - **Modifies:** `development-compose.yaml`
   - **Adds:** service `tcpmessage`, `Dockerfile.tcpmessage`, port `8890:8890`, env vars for DB connection string and optional TLS cert

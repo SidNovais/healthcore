@@ -10,3 +10,17 @@ services:
       POSTGRES_PASSWORD: dev
     ports:
       - "5432:5432"
+
+  tcpmessage-healthcore:
+    build:
+      context: .
+      dockerfile: Dockerfile.tcpmessage
+    container_name: tcpmessage-healthcore
+    depends_on:
+      - postgres-healthcore
+    ports:
+      - "8890:8890"
+    environment:
+      ASPNETCORE_HCLIS_DATABASE_CONNECTION_STRING: "Host=postgres-healthcore;Port=5432;Database=Healthcore.Dev;Username=dev;Password=dev"
+      ASPNETCORE_HCLIS_Tcp__UseTls: "false"
+      ASPNETCORE_HCLIS_Tcp__Port: "8890"
