@@ -165,7 +165,7 @@ src/HC.LIS/
 
 ### Phase 6: Audit Logger
 
-- [ ] **Task 6.1** — Implement `TcpAuditLogger`
+- [x] **Task 6.1** — Implement `TcpAuditLogger`
   - **Manual**
   - **Creates:** `src/HC.LIS/HC.LIS.TcpMessage/AuditLog/TcpAuditLogger.cs`
   - **Methods:** `LogInbound(string connectionIp, int messageSizeBytes, ConnectionState state)`, `LogOutbound(string connectionIp, int messageSizeBytes, ConnectionState state)`
@@ -233,12 +233,12 @@ These tasks extend the Analyzer module Application layer with three new commands
 
 ### Phase 8: `Program.cs` + `SystemExecutionContextAccessor`
 
-- [ ] **Task 8.1** — Implement `SystemExecutionContextAccessor`
+- [x] **Task 8.1** — Implement `SystemExecutionContextAccessor`
   - **Manual**
   - **Creates:** `src/HC.LIS/HC.LIS.TcpMessage/SystemExecutionContextAccessor.cs`
   - **Implements:** `IExecutionContextAccessor` with `UserId = Guid.Empty`, `UserName = "tcpmessage-system"`, `IsAvailable = true`, `CorrelationId = Guid.Empty`
 
-- [ ] **Task 8.2** — Implement `Program.cs`
+- [x] **Task 8.2** — Implement `Program.cs`
   - **Manual**
   - **Modifies:** `src/HC.LIS/HC.LIS.TcpMessage/Program.cs`
   - **Bootstrap sequence:**
@@ -255,7 +255,7 @@ These tasks extend the Analyzer module Application layer with three new commands
 
 ### Phase 9: Integration Tests
 
-- [ ] **Task 9.1** — Write integration test: full barcode-query exchange
+- [x] **Task 9.1** — Write integration test: full barcode-query exchange
   - **Manual**
   - **Creates:** `src/HC.LIS/HC.LIS.TcpMessage.IntegrationTests/TcpExchangeTests.cs`
   - **Setup:** `AnalyzerStartup.Initialize(connectionString, ...)` in test constructor; start `TcpListenerService` on random port; connect `TcpClient` (plain TCP — no TLS in tests)
@@ -263,7 +263,7 @@ These tasks extend the Analyzer module Application layer with three new commands
     - Seed `AnalyzerSample` (AwaitingQuery); send MLLP-wrapped QBP^Q11 bytes
     - Assert: MLLP RSP received; contains `MSA|AA`; `AnalyzerSampleDetails.Status == "InfoDispatched"`
 
-- [ ] **Task 9.2** — Write integration test: result forward with immediate ACK
+- [x] **Task 9.2** — Write integration test: result forward with immediate ACK
   - **Manual**
   - **Modifies:** `TcpExchangeTests.cs`
   - **Test:** `ResultForwardExchange_SendsImmediateAckThenProcessesDomain`
@@ -271,21 +271,21 @@ These tasks extend the Analyzer module Application layer with three new commands
     - Send MLLP-wrapped ORU^R01 bytes
     - Assert: `ACK^R01 AA` received; `MSA-2` echoes original `MSH-10`; `AnalyzerSampleExamDetails.ResultValue` set
 
-- [ ] **Task 9.3** — Write integration tests: MLLP BCC checksum
+- [x] **Task 9.3** — Write integration tests: MLLP BCC checksum
   - **Manual**
   - **Modifies:** `TcpExchangeTests.cs`
   - **Tests:**
     - `MllpChecksum_CorrectBccByte_AckReceived`
     - `MllpChecksum_WrongBccByte_ConnectionClosed`
 
-- [ ] **Task 9.4** — Write integration tests: HL7 message content checksum
+- [x] **Task 9.4** — Write integration tests: HL7 message content checksum
   - **Manual**
   - **Modifies:** `TcpExchangeTests.cs`
   - **Tests:**
     - `Hl7Checksum_ValidContentChecksum_AckReceived`
     - `Hl7Checksum_InvalidContentChecksum_ConnectionClosedWithoutAck`
 
-- [ ] **Task 9.5** — Write integration test: semaphore enforcement
+- [x] **Task 9.5** — Write integration test: semaphore enforcement
   - **Manual**
   - **Modifies:** `TcpExchangeTests.cs`
   - **Test:** `SecondConnection_WaitsForFirstExchangeToComplete`

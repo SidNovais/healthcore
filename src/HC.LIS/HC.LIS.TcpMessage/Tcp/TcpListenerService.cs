@@ -20,7 +20,12 @@ internal sealed partial class TcpListenerService : BackgroundService
     private readonly ConnectionHandler _handler;
     private readonly ILogger<TcpListenerService> _logger;
     private readonly SemaphoreSlim _semaphore = new(1, 1);
+    private readonly TaskCompletionSource _listenerStarted = new();
+    private TcpListener? _listener;
     private X509Certificate2? _tlsCert;
+
+    internal Task ListenerStarted => _listenerStarted.Task;
+    internal int BoundPort => ((IPEndPoint)_listener!.LocalEndpoint).Port;
 
     public TcpListenerService(
         IOptions<TcpOptions> options,
@@ -45,23 +50,31 @@ internal sealed partial class TcpListenerService : BackgroundService
                 _options.TlsCertificatePassword);
         }
 
-        using var listener = new TcpListener(IPAddress.Any, _options.Port);
-        listener.Start();
+        _listener = new TcpListener(IPAddress.Any, _options.Port);
+        _listener.Start();
+        _listenerStarted.TrySetResult();
         Log.ListeningOnPort(_logger, _options.Port);
 
-        while (!stoppingToken.IsCancellationRequested)
+        try
         {
-            TcpClient client;
-            try
+            while (!stoppingToken.IsCancellationRequested)
             {
-                client = await listener.AcceptTcpClientAsync(stoppingToken).ConfigureAwait(false);
-            }
-            catch (OperationCanceledException)
-            {
-                break;
-            }
+                TcpClient client;
+                try
+                {
+                    client = await _listener.AcceptTcpClientAsync(stoppingToken).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
 
-            _ = HandleConnectionAsync(client, stoppingToken);
+                _ = HandleConnectionAsync(client, stoppingToken);
+            }
+        }
+        finally
+        {
+            _listener.Dispose();
         }
     }
 
@@ -115,6 +128,7 @@ internal sealed partial class TcpListenerService : BackgroundService
     {
         _semaphore.Dispose();
         _tlsCert?.Dispose();
+        _listener?.Dispose();
         base.Dispose();
         GC.SuppressFinalize(this);
     }
