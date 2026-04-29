@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HC.LIS.TcpMessage\HC.LIS.TcpMessage.csproj" />
+    <ProjectReference Include="..\..\TcpMessage\HC.LIS.TcpMessage.csproj" />
   </ItemGroup>
 
   <ItemGroup>

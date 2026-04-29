@@ -7,8 +7,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\HC.Core\Application\HC.Core.Application.csproj" />
-    <ProjectReference Include="..\HC.LIS.Modules\Analyzer\Infrastructure\HC.LIS.Modules.Analyzer.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\HC.Core\Application\HC.Core.Application.csproj" />
+    <ProjectReference Include="..\..\HC.LIS.Modules\Analyzer\Infrastructure\HC.LIS.Modules.Analyzer.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
