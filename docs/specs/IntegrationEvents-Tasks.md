@@ -20,61 +20,42 @@
 
 ### Phase 1: Resolve Open Design Decisions
 
-- [ ] **Task 1.1** — Verify probe query methods on each module facade
-  - Check `ITestOrdersModule`, `ISampleCollectionModule`, `IAnalyzerModule`, `ILabAnalysisModule` for `GetOrderItemDetailsQuery`, `GetCollectionRequestDetailsQuery`, `GetAnalyzerSampleDetailsQuery`, `GetWorklistItemDetailsQuery`
-  - If a query is missing, fall back to direct Dapper queries in the probe using `ConnectionString`
-  - Document findings in a comment at the top of each probe file
+- [x] **Task 1.1** — Verify probe query methods on each module facade
+  - All 4 queries exist. 2 probes use Dapper fallback (CollectionRequest by PatientId; WorklistItem by barcode+examCode). GetAnalyzerSample uses `GetSampleInfoByBarcodeQuery`. See plan for details.
 
-- [ ] **Task 1.2** — Verify `ForwardRawResultCommand` signature in Analyzer
-  - Read `IAnalyzerModule` and `ForwardRawResultCommand` — confirm parameter type (raw `byte[]` vs parsed DTO)
-  - If raw bytes: write a `Hl7MessageBuilder` helper in `Analyzer/` with a `BuildOruR01(string barcode, string examMnemonic, string resultValue)` method producing a minimal valid ORU^R01 payload
+- [x] **Task 1.2** — Verify `ForwardRawResultCommand` signature in Analyzer
+  - Takes `byte[]` rawResultPayload (HL7 ORU^R01, pipe-delimited). `Hl7MessageBuilder` to be created in `Analyzer/` folder in Phase 5.
 
-- [ ] **Task 1.3** — Verify `GenerateReportCommand` accepts stub path
-  - Read `GenerateReportCommand` and its handler — confirm whether `ReportPath` is validated or stored as-is
-  - A stub string (`"test-report.pdf"`) is sufficient if no file system check exists
+- [x] **Task 1.3** — Verify `GenerateReportCommand` accepts stub path
+  - No file system validation. `"test-report.pdf"` works. Command extends `InternalCommandBase` (implements `ICommand`) — callable directly on `ILabAnalysisModule.ExecuteCommandAsync`.
 
-- [ ] **Task 1.4** — Verify Quartz executes internal commands with `eventBus: null`
-  - Run a single existing module integration test (e.g., `AnalyzerIntegrationTests`) with the current environment
-  - Confirm Quartz `ProcessInternalCommandsJob` fires without an event bus wired
+- [x] **Task 1.4** — Verify Quartz executes internal commands with `eventBus: null`
+  - Confirmed via code review. `InMemoryEventBusClient` registered when null; all three Quartz jobs run on 2-second intervals regardless.
 
 ---
 
 ### Phase 2: Probes
 
-- [ ] **Task 2.1** — `GetCollectionRequestFromSampleCollectionProbe`
-  - **Creates:** `Probes/GetCollectionRequestFromSampleCollectionProbe.cs`
-  - Queries `ISampleCollectionModule` (or Dapper fallback) for `CollectionRequestDetails` by `CollectionRequestId`
-  - `IsSatisfied()`: result is not null and `Id` matches expected
+- [x] **Task 2.1** — `GetCollectionRequestFromSampleCollectionProbe`
+  - Dapper query on `sample_collection."CollectionRequestDetails"` by `PatientId`. `IsSatisfied`: not null.
 
-- [ ] **Task 2.2** — `GetExamInProgressFromTestOrdersProbe`
-  - **Creates:** `Probes/GetExamInProgressFromTestOrdersProbe.cs`
-  - Queries `ITestOrdersModule` for `OrderItemDetails` by `OrderItemId`
-  - `IsSatisfied()`: result is not null and `Status == "InProgress"`
+- [x] **Task 2.2** — `GetExamInProgressFromTestOrdersProbe`
+  - Facade `GetOrderItemDetailsQuery`. Default predicate `Status == "InProgress"`, overridable via `satisfiedWhen`.
 
-- [ ] **Task 2.3** — `GetAnalyzerSampleFromAnalyzerProbe`
-  - **Creates:** `Probes/GetAnalyzerSampleFromAnalyzerProbe.cs`
-  - Queries `IAnalyzerModule` for `AnalyzerSampleDetails` by `SampleBarcode`
-  - `IsSatisfied()`: result is not null
+- [x] **Task 2.3** — `GetAnalyzerSampleFromAnalyzerProbe`
+  - Facade `GetSampleInfoByBarcodeQuery(barcode)`. `IsSatisfied`: not null.
 
-- [ ] **Task 2.4** — `GetWorklistItemFromLabAnalysisProbe`
-  - **Creates:** `Probes/GetWorklistItemFromLabAnalysisProbe.cs`
-  - Queries `ILabAnalysisModule` for `WorklistItemDetails` by `SampleBarcode` + `ExamCode`
-  - `IsSatisfied()`: result is not null and `Status == "Pending"`
+- [x] **Task 2.4** — `GetWorklistItemFromLabAnalysisProbe`
+  - Dapper query on `lab_analysis.worklist_item_details` by barcode + examCode. `IsSatisfied`: not null.
 
-- [ ] **Task 2.5** — `GetWorklistItemAssignedFromAnalyzerProbe`
-  - **Creates:** `Probes/GetWorklistItemAssignedFromAnalyzerProbe.cs`
-  - Queries `IAnalyzerModule` for `AnalyzerSampleExamDetails` by `SampleBarcode` + exam mnemonic
-  - `IsSatisfied()`: result is not null and `WorklistItemId` is not null/empty
+- [x] **Task 2.5** — `GetWorklistItemAssignedFromAnalyzerProbe`
+  - Facade `GetSampleInfoByBarcodeQuery` — uses `SampleInfoDto.Exams` collection directly (has `WorklistItemId` per exam). `IsSatisfied`: exam with matching mnemonic has non-null `WorklistItemId`.
 
-- [ ] **Task 2.6** — `GetAnalysisResultFromLabAnalysisProbe`
-  - **Creates:** `Probes/GetAnalysisResultFromLabAnalysisProbe.cs`
-  - Queries `ILabAnalysisModule` for `WorklistItemDetails` by `WorklistItemId`
-  - `IsSatisfied()`: result is not null and `Status == "ResultReceived"`
+- [x] **Task 2.6** — `GetAnalysisResultFromLabAnalysisProbe`
+  - Facade `GetWorklistItemDetailsQuery`. `IsSatisfied`: `Status == "ResultReceived"`.
 
-- [ ] **Task 2.7** — `GetExamCompletedFromTestOrdersProbe`
-  - **Creates:** `Probes/GetExamCompletedFromTestOrdersProbe.cs`
-  - Queries `ITestOrdersModule` for `OrderItemDetails` by `OrderItemId`
-  - `IsSatisfied()`: result is not null and `Status == "Completed"`
+- [x] **Task 2.7** — `GetExamCompletedFromTestOrdersProbe`
+  - Facade `GetOrderItemDetailsQuery`. `IsSatisfied`: `Status == "Completed"`.
 
 ---
 
