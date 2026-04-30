@@ -11,6 +11,10 @@ internal static class IntegrationTestAssert
     internal static async Task AssertEventually(IProbe probe, int timeoutMs)
         => await new Poller(timeoutMs).CheckAsync(probe);
 
+    internal static async Task AssertEventually<T>(IProbe<T> probe, int timeoutMs)
+        where T : class
+        => await new Poller(timeoutMs).GetAsync(probe);
+
     internal static void AssertBrokenRule<TRule>(Action testDelegate)
         where TRule : class, IBusinessRule
         => testDelegate.Should()

@@ -16,7 +16,7 @@ public abstract class TestBase : IAsyncLifetime
     protected string ConnectionString { get; private set; } = null!;
     protected ExecutionContextMock ExecutionContext { get; private set; } = null!;
 
-    public async Task InitializeAsync()
+    public virtual async Task InitializeAsync()
     {
         const string envVar = "ASPNETCORE_HCLIS_IntegrationTests_ConnectionString";
         ConnectionString = EnvironmentVariablesProvider.GetVariable(envVar)
@@ -36,7 +36,7 @@ public abstract class TestBase : IAsyncLifetime
         LabAnalysisStartup.Initialize(ConnectionString, ExecutionContext, logger, eventBus: null);
     }
 
-    public Task DisposeAsync()
+    public virtual Task DisposeAsync()
     {
         TestOrdersStartup.Stop();
         SampleCollectionStartup.Stop();
