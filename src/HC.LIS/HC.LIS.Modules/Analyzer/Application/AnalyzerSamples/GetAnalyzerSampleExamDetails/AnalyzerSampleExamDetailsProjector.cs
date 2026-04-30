@@ -25,7 +25,8 @@ internal class AnalyzerSampleExamDetailsProjector(
             await connection.ExecuteScalarAsync(
                 @"INSERT INTO analyzer.analyzer_sample_exam_details
                   (id, analyzer_sample_id, exam_mnemonic)
-                  VALUES (@Id, @AnalyzerSampleId, @ExamMnemonic)",
+                  VALUES (@Id, @AnalyzerSampleId, @ExamMnemonic)
+                  ON CONFLICT (analyzer_sample_id, exam_mnemonic) DO NOTHING",
                 new
                 {
                     Id = Guid.CreateVersion7(),
