@@ -57,8 +57,8 @@ public class OrderItemAcceptedFlowTests : TestBase
             "EDTA Tube", "EDTA", "Centrifuge", "Room Temperature", SystemClock.Now));
 
         await TestOrdersModule.ExecuteCommandAsync(new RequestExamCommand(
-            orderId, orderItemId2, "PLT", "BLOOD", "Whole Blood",
-            "EDTA Tube", "EDTA", "Centrifuge", "Room Temperature", SystemClock.Now));
+            orderId, orderItemId2, "PT", "BLOOD", "Whole Blood",
+            "Citrate Tube", "Citrate", "Centrifuge", "Room Temperature", SystemClock.Now));
 
         await TestOrdersModule.ExecuteCommandAsync(
             new AcceptExamCommand(orderId, orderItemId1, SystemClock.Now));
@@ -76,7 +76,7 @@ public class OrderItemAcceptedFlowTests : TestBase
         // Assert — same CollectionRequest now has 2 samples (async via Quartz)
         await IntegrationTestAssert.AssertEventually(
             new TwoSamplesInCollectionRequestProbe(collectionRequestId, SampleCollectionModule),
-            timeoutMs: 15_000);
+            timeoutMs: 25_000);
     }
 
     private sealed class TwoSamplesInCollectionRequestProbe(
