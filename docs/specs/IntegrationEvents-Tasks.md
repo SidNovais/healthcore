@@ -61,13 +61,13 @@
 
 ### Phase 3: Group A — TestOrders → SampleCollection
 
-- [ ] **Task 3.1** — `TestOrders/TestBase.cs`
+- [x] **Task 3.1** — `TestOrders/TestBase.cs`
   - **Creates:** `TestOrders/TestBase.cs`
   - Extends shared `TestBase`; adds `protected ITestOrdersModule TestOrdersModule` and `protected ISampleCollectionModule SampleCollectionModule`
   - `InitializeAsync`: calls `base.InitializeAsync()`, then instantiates both module facades
   - `DisposeAsync`: calls `base.DisposeAsync()`
 
-- [ ] **Task 3.2** — `OrderItemAcceptedFlowTests` — single exam
+- [x] **Task 3.2** — `OrderItemAcceptedFlowTests` — single exam
   - **Creates:** `TestOrders/OrderItemAcceptedFlowTests.cs`
   - **Test:** `SingleExamAccepted_CreatesCollectionRequest`
     1. Place order in TestOrders (`CreateOrderCommand`)
@@ -76,7 +76,7 @@
     4. `AssertEventually(new GetCollectionRequestFromSampleCollectionProbe(OrderId, SampleCollectionModule), 15_000)`
   - **Verify:** Test fails (no handler wired) → then verify it passes with DB running
 
-- [ ] **Task 3.3** — `OrderItemAcceptedFlowTests` — multiple exams
+- [x] **Task 3.3** — `OrderItemAcceptedFlowTests` — multiple exams
   - **Modifies:** `TestOrders/OrderItemAcceptedFlowTests.cs`
   - **Test:** `MultipleExamsAccepted_AddsExamsToSameCollectionRequest`
     1. Place order, request two exams, accept first → CollectionRequest created
