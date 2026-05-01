@@ -64,7 +64,7 @@ public abstract class TestBase : HC.LIS.Tests.IntegrationEvents.TestBase
         var cr = await crProbe.GetSampleAsync();
         var collectionRequestId = cr!.CollectionRequestId;
 
-        using var connection = new NpgsqlConnection(ConnectionString);
+        await using var connection = new NpgsqlConnection(ConnectionString);
         var sampleId = await connection.ExecuteScalarAsync<Guid>(
             @"SELECT ""Id"" FROM sample_collection.""SampleDetails"" WHERE ""CollectionRequestId"" = @CollectionRequestId LIMIT 1",
             new { CollectionRequestId = collectionRequestId });
