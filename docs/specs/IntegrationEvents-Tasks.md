@@ -87,30 +87,30 @@
 
 ### Phase 4: Group B — SampleCollection fan-out
 
-- [ ] **Task 4.1** — `SampleCollection/TestBase.cs`
+- [x] **Task 4.1** — `SampleCollection/TestBase.cs`
   - **Creates:** `SampleCollection/TestBase.cs`
   - Extends shared `TestBase`; exposes all four module facades
   - Includes protected helper `SetupCollectedSampleAsync(string barcode, string examMnemonic)` that runs the full Group A chain + `MarkPatientArrived` + `CreateBarcode` + `RecordSampleCollection`, returning `(OrderId, OrderItemId, SampleId, Barcode)`
 
-- [ ] **Task 4.2** — `SampleCollectedFlowTests` — TestOrders receives InProgress
+- [x] **Task 4.2** — `SampleCollectedFlowTests` — TestOrders receives InProgress
   - **Creates:** `SampleCollection/SampleCollectedFlowTests.cs`
   - **Test:** `SampleCollected_PlacesExamInProgressInTestOrders`
     1. `SetupCollectedSampleAsync(...)`
     2. `AssertEventually(new GetExamInProgressFromTestOrdersProbe(OrderItemId, TestOrdersModule), 15_000)`
 
-- [ ] **Task 4.3** — `SampleCollectedFlowTests` — Analyzer receives AnalyzerSample
+- [x] **Task 4.3** — `SampleCollectedFlowTests` — Analyzer receives AnalyzerSample
   - **Modifies:** `SampleCollection/SampleCollectedFlowTests.cs`
   - **Test:** `SampleCollected_CreatesAnalyzerSample`
     1. `SetupCollectedSampleAsync(...)`
     2. `AssertEventually(new GetAnalyzerSampleFromAnalyzerProbe(Barcode, AnalyzerModule), 15_000)`
 
-- [ ] **Task 4.4** — `SampleCollectedFlowTests` — LabAnalysis receives WorklistItem
+- [x] **Task 4.4** — `SampleCollectedFlowTests` — LabAnalysis receives WorklistItem
   - **Modifies:** `SampleCollection/SampleCollectedFlowTests.cs`
   - **Test:** `SampleCollected_CreatesWorklistItemInLabAnalysis`
     1. `SetupCollectedSampleAsync(...)`
     2. `AssertEventually(new GetWorklistItemFromLabAnalysisProbe(Barcode, ExamMnemonic, LabAnalysisModule), 15_000)`
 
-- [ ] **Task 4.5** — `SampleCollectedFlowTests` — Analyzer exam gets WorklistItemId assigned
+- [x] **Task 4.5** — `SampleCollectedFlowTests` — Analyzer exam gets WorklistItemId assigned
   - **Modifies:** `SampleCollection/SampleCollectedFlowTests.cs`
   - **Test:** `SampleCollected_AssignsWorklistItemToAnalyzerExam`
     1. `SetupCollectedSampleAsync(...)`
