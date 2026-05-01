@@ -1,6 +1,6 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
 using HC.Core.Domain;
 using HC.LIS.Modules.Analyzer.Application.Contracts;
 using HC.LIS.Modules.Analyzer.Infrastructure;
@@ -8,6 +8,7 @@ using HC.LIS.Modules.LabAnalysis.Application.Contracts;
 using HC.LIS.Modules.LabAnalysis.Infrastructure;
 using HC.LIS.Modules.SampleCollection.Application.Collections.CallPatient;
 using HC.LIS.Modules.SampleCollection.Application.Collections.CreateBarcode;
+using HC.LIS.Modules.SampleCollection.Application.Collections.GetSamplesByCollectionRequestId;
 using HC.LIS.Modules.SampleCollection.Application.Collections.MovePatientToWaiting;
 using HC.LIS.Modules.SampleCollection.Application.Collections.RecordSampleCollection;
 using HC.LIS.Modules.SampleCollection.Application.Contracts;
@@ -18,7 +19,6 @@ using HC.LIS.Modules.TestOrders.Application.Orders.CreateOrder;
 using HC.LIS.Modules.TestOrders.Application.Orders.RequestExam;
 using HC.LIS.Modules.TestOrders.Infrastructure;
 using HC.LIS.Tests.IntegrationEvents.Probes;
-using Npgsql;
 
 namespace HC.LIS.Tests.IntegrationEvents.SampleCollection;
 
@@ -64,10 +64,9 @@ public abstract class TestBase : HC.LIS.Tests.IntegrationEvents.TestBase
         var cr = await crProbe.GetSampleAsync();
         var collectionRequestId = cr!.CollectionRequestId;
 
-        await using var connection = new NpgsqlConnection(ConnectionString);
-        var sampleId = await connection.ExecuteScalarAsync<Guid>(
-            @"SELECT ""Id"" FROM sample_collection.""SampleDetails"" WHERE ""CollectionRequestId"" = @CollectionRequestId LIMIT 1",
-            new { CollectionRequestId = collectionRequestId });
+        var samples = await SampleCollectionModule.ExecuteQueryAsync(
+            new GetSamplesByCollectionRequestIdQuery(collectionRequestId));
+        var sampleId = samples!.Single().Id;
 
         await SampleCollectionModule.ExecuteCommandAsync(
             new MovePatientToWaitingCommand(collectionRequestId, SystemClock.Now));

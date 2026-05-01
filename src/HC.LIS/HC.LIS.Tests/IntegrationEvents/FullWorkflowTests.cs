@@ -1,7 +1,7 @@
 using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Dapper;
 using HC.Core.Domain;
 using HC.Core.IntegrationTests.Probing;
 using HC.LIS.Modules.Analyzer.Application.AnalyzerSamples.ForwardRawResult;
@@ -12,6 +12,7 @@ using HC.LIS.Modules.LabAnalysis.Application.WorklistItems.CompleteWorklistItem;
 using HC.LIS.Modules.LabAnalysis.Application.WorklistItems.GetWorklistItemDetails;
 using HC.LIS.Modules.LabAnalysis.Infrastructure;
 using HC.LIS.Modules.SampleCollection.Application.Collections.CallPatient;
+using HC.LIS.Modules.SampleCollection.Application.Collections.GetSamplesByCollectionRequestId;
 using HC.LIS.Modules.SampleCollection.Application.Collections.CreateBarcode;
 using HC.LIS.Modules.SampleCollection.Application.Collections.MovePatientToWaiting;
 using HC.LIS.Modules.SampleCollection.Application.Collections.RecordSampleCollection;
@@ -22,7 +23,6 @@ using HC.LIS.Modules.TestOrders.Application.Orders.CreateOrder;
 using HC.LIS.Modules.TestOrders.Application.Orders.RequestExam;
 using HC.LIS.Modules.TestOrders.Infrastructure;
 using HC.LIS.Tests.IntegrationEvents.Probes;
-using Npgsql;
 
 namespace HC.LIS.Tests.IntegrationEvents;
 
@@ -70,13 +70,9 @@ public class FullWorkflowTests : TestBase
         await _sampleCollection.ExecuteCommandAsync(new CreateBarcodeCommand(collectionRequestId, "EDTA Tube", barcode, ExecutionContext.UserId, SystemClock.Now));
         await _sampleCollection.ExecuteCommandAsync(new CallPatientCommand(collectionRequestId, ExecutionContext.UserId, SystemClock.Now));
 
-        Guid sampleId;
-        await using (var conn = new NpgsqlConnection(ConnectionString))
-        {
-            sampleId = await conn.ExecuteScalarAsync<Guid>(
-                @"SELECT ""Id"" FROM sample_collection.""SampleDetails"" WHERE ""CollectionRequestId"" = @CollectionRequestId LIMIT 1",
-                new { CollectionRequestId = collectionRequestId });
-        }
+        var samples = await _sampleCollection.ExecuteQueryAsync(
+            new GetSamplesByCollectionRequestIdQuery(collectionRequestId));
+        var sampleId = samples!.Single().Id;
 
         await _sampleCollection.ExecuteCommandAsync(new RecordSampleCollectionCommand(
             collectionRequestId, sampleId, ExecutionContext.UserId,
