@@ -17,7 +17,7 @@ public sealed class GetWorklistItemFromLabAnalysisProbe(
 
     public async Task<WorklistItemDetailsDto?> GetSampleAsync()
     {
-        using var connection = new NpgsqlConnection(connectionString);
+        await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QueryFirstOrDefaultAsync<WorklistItemDetailsDto>(
             @"SELECT id AS ""Id"", sample_barcode AS ""SampleBarcode"",
                      exam_code AS ""ExamCode"", status AS ""Status"",
