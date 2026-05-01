@@ -1,7 +1,9 @@
 using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HC.LIS.Modules.Analyzer.Application.AnalyzerSamples.ForwardRawResult;
+using HC.LIS.Modules.Analyzer.Application.AnalyzerSamples.GetSampleInfoByBarcode;
 using HC.LIS.Tests.IntegrationEvents.Probes;
 
 namespace HC.LIS.Tests.IntegrationEvents.Analyzer;
@@ -35,10 +37,9 @@ public abstract class TestBase : HC.LIS.Tests.IntegrationEvents.SampleCollection
             new GetWorklistItemAssignedFromAnalyzerProbe(barcode, examMnemonic, AnalyzerModule),
             timeoutMs: 25_000);
 
-        // Retrieve worklistItemId via probe
-        var wiProbe = new GetWorklistItemFromLabAnalysisProbe(barcode, examMnemonic, ConnectionString);
-        var wi = await wiProbe.GetSampleAsync();
-        var worklistItemId = wi!.Id;
+        // Retrieve worklistItemId from Analyzer facade (WorklistItemId is populated after assignment)
+        var sampleInfo = await AnalyzerModule.ExecuteQueryAsync(new GetSampleInfoByBarcodeQuery(barcode));
+        var worklistItemId = sampleInfo!.Exams.Single(e => e.ExamMnemonic == examMnemonic).WorklistItemId!.Value;
 
         return (orderId, orderItemId, sampleId, barcode, worklistItemId);
     }

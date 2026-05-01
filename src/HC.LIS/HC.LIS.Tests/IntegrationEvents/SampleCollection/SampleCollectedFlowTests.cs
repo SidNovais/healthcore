@@ -31,8 +31,8 @@ public class SampleCollectedFlowTests : TestBase
         var (_, _, _, barcode) = await SetupCollectedSampleAsync("BC-P4-003", "HGB");
 
         await IntegrationTestAssert.AssertEventually(
-            new GetWorklistItemFromLabAnalysisProbe(barcode, "HGB", ConnectionString),
-            timeoutMs: 15_000);
+            new GetWorklistItemFromLabAnalysisProbe(barcode, "HGB", AnalyzerModule, LabAnalysisModule),
+            timeoutMs: 25_000);
     }
 
     [Fact]
