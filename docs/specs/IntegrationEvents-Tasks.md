@@ -137,14 +137,15 @@
 
 ### Phase 6: Group D — LabAnalysis → TestOrders
 
-- [ ] **Task 6.1** — `LabAnalysis/TestBase.cs`
+- [x] **Task 6.1** — `LabAnalysis/TestBase.cs`
   - **Creates:** `LabAnalysis/TestBase.cs`
-  - Extends shared `TestBase`; exposes `ITestOrdersModule` and `ILabAnalysisModule`
-  - Includes protected helper `SetupWorklistItemWithResultAsync(...)` — runs Group C chain; also calls `GenerateReportCommand` on `LabAnalysisModule`; returns `(WorklistItemId, OrderItemId)`
+  - Extends `Analyzer.TestBase`; inherits all 4 module facades
+  - `SetupWorklistItemWithResultAsync`: runs `SetupExamResultReadyAsync` → `ForwardRawResultCommand` → polls `ResultReceived` → polls `ReportGenerated` (auto-scheduled); returns `(WorklistItemId, OrderItemId)`
+  - Private `WorklistItemInStatusProbe` for generic status polling
 
-- [ ] **Task 6.2** — `WorklistItemCompletedFlowTests`
+- [x] **Task 6.2** — `WorklistItemCompletedFlowTests`
   - **Creates:** `LabAnalysis/WorklistItemCompletedFlowTests.cs`
-  - **Test:** `WorklistItemCompleted_CompletesExamInTestOrders`
+  - **Test:** `WorklistItemCompletedCompletesExamInTestOrders`
     1. `SetupWorklistItemWithResultAsync(...)` → `(WorklistItemId, OrderItemId)`
     2. Execute `CompleteWorklistItemCommand` on `LabAnalysisModule`
     3. `AssertEventually(new GetExamCompletedFromTestOrdersProbe(OrderItemId, TestOrdersModule), 15_000)`
