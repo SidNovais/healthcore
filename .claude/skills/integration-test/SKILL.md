@@ -122,6 +122,8 @@ Write only test files. Do not touch domain, application, or infrastructure code.
 - **Variant B (fixed):** when the probe targets one specific final state (TestOrders style).
 - **Variant C (DB-direct):** when the `Get{Aggregate}DetailsQuery` does not yet exist — probe queries the read-model table directly via Dapper so the test file compiles.
 
+**Module facade rule (CRITICAL):** Test setup helpers and test methods must NEVER use raw Dapper or NpgsqlConnection to fetch data. Always use the module facade: `module.ExecuteQueryAsync(new Get{Aggregate}DetailsQuery(...))`. Raw Dapper is only acceptable inside probes (Variant C) when no suitable facade query exists for the required field combination.
+
 **Test constructor style:**
 - Match existing `{Aggregate}Tests.cs` if it exists.
 - When creating new: default to empty constructor `public {Aggregate}Tests() : base(Guid.CreateVersion7()) { }` with all setup inside each `[Fact]` method.
@@ -172,7 +174,8 @@ Always output at the end:
 
 - File-scoped namespaces
 - 4-space indentation
-- `using` blocks (`using (var connection = ...)`) around `NpgsqlConnection` in inbox injection tests
+- `await using` blocks (`await using var connection = new NpgsqlConnection(...)`) around `NpgsqlConnection` — only inside probes (Variant C), never in test methods or setup helpers
+- Test methods and setup helpers fetch data exclusively through the module facade (`module.ExecuteQueryAsync(...)`), never raw SQL
 - Explicit type for DTO results: `{DtoType}? details = await GetEventually(...)` — not `var`
 - `var` for local intermediate objects: `var integrationEvent = new ...`
 - `Guid.CreateVersion7()` for all new GUIDs
