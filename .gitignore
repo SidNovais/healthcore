@@ -2,3 +2,4 @@
 *bin
 launch.json
 **/settings.local.json
+.worktrees/
