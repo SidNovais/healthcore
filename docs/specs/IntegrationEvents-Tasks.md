@@ -120,13 +120,13 @@
 
 ### Phase 5: Group C — Analyzer → LabAnalysis
 
-- [ ] **Task 5.1** — `Analyzer/TestBase.cs`
+- [x] **Task 5.1** — `Analyzer/TestBase.cs`
   - **Creates:** `Analyzer/TestBase.cs`
   - Extends shared `TestBase`; exposes all four module facades
   - Includes protected helper `SetupExamResultReadyAsync(string barcode, string examMnemonic)` — runs full Group B chain (using `SetupCollectedSampleAsync`), then waits for `GetWorklistItemFromLabAnalysisProbe` before returning `WorklistItemId`
   - Includes optional `Hl7MessageBuilder.BuildOruR01(...)` helper if `ForwardRawResultCommand` takes raw bytes (from Task 1.2)
 
-- [ ] **Task 5.2** — `ExamResultReceivedFlowTests`
+- [x] **Task 5.2** — `ExamResultReceivedFlowTests`
   - **Creates:** `Analyzer/ExamResultReceivedFlowTests.cs`
   - **Test:** `ExamResultReceived_RecordsAnalysisResultInLabAnalysis`
     1. `SetupExamResultReadyAsync(barcode, examMnemonic)` → `WorklistItemId`
