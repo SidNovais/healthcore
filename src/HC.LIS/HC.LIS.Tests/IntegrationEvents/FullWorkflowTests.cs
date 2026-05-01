@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using HC.Core.Domain;
 using HC.Core.IntegrationTests.Probing;
 using HC.LIS.Modules.Analyzer.Application.AnalyzerSamples.ForwardRawResult;
+using HC.LIS.Modules.Analyzer.Application.AnalyzerSamples.GetSampleInfoByBarcode;
 using HC.LIS.Modules.Analyzer.Application.Contracts;
 using HC.LIS.Modules.Analyzer.Infrastructure;
 using HC.LIS.Modules.LabAnalysis.Application.Contracts;
@@ -83,15 +84,13 @@ public class FullWorkflowTests : TestBase
             new GetExamInProgressFromTestOrdersProbe(orderItemId, _testOrders), timeoutMs: 60_000);
         await IntegrationTestAssert.AssertEventually(
             new GetAnalyzerSampleFromAnalyzerProbe(barcode, _analyzer), timeoutMs: 60_000);
-        await IntegrationTestAssert.AssertEventually(
-            new GetWorklistItemFromLabAnalysisProbe(barcode, examMnemonic, ConnectionString), timeoutMs: 60_000);
+        // Two-hop: SampleCollected → WorklistItem created in LabAnalysis → assigned back to AnalyzerSample
         await IntegrationTestAssert.AssertEventually(
             new GetWorklistItemAssignedFromAnalyzerProbe(barcode, examMnemonic, _analyzer), timeoutMs: 60_000);
 
-        // Retrieve worklistItemId via probe after it is confirmed to exist
-        var wiProbe = new GetWorklistItemFromLabAnalysisProbe(barcode, examMnemonic, ConnectionString);
-        var wi = await wiProbe.GetSampleAsync();
-        var worklistItemId = wi!.Id;
+        // Retrieve worklistItemId from Analyzer facade (WorklistItemId is populated after assignment)
+        var sampleInfo = await _analyzer.ExecuteQueryAsync(new GetSampleInfoByBarcodeQuery(barcode));
+        var worklistItemId = sampleInfo!.Exams.Single(e => e.ExamMnemonic == examMnemonic).WorklistItemId!.Value;
 
         // Step 5: Analyzer — forward raw HL7 result
         await _analyzer.ExecuteCommandAsync(new ForwardRawResultCommand(BuildOruR01(barcode, examMnemonic)));
