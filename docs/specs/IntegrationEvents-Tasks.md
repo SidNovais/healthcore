@@ -154,7 +154,7 @@
 
 ### Phase 7: End-to-End
 
-- [ ] **Task 7.1** — Full workflow test
+- [x] **Task 7.1** — Full workflow test
   - **Creates:** `FullWorkflowTests.cs` (at root of `IntegrationEvents/`)
   - **Test:** `FullLaboratoryWorkflow_FromOrderAcceptanceToCompletion`
     1. Place order, request exam, accept exam (TestOrders)
