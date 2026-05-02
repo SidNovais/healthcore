@@ -20,6 +20,12 @@ using HC.LIS.Modules.Analyzer.Infrastructure.Configurations;
 using HC.LIS.Modules.LabAnalysis.Infrastructure.Configurations;
 using HC.LIS.Modules.SampleCollection.Infrastructure.Configurations;
 using HC.LIS.Modules.TestOrders.Infrastructure.Configurations;
+using HC.LIS.API.Modules.UserAccess;
+using HC.LIS.API.Modules.UserAccess.Auth;
+using HC.LIS.API.Modules.UserAccess.AuditLog;
+using HC.LIS.API.Modules.UserAccess.Users;
+using HC.LIS.API.Modules.UserAccess.Users.ActivateUser;
+using HC.LIS.Modules.UserAccess.Infrastructure.Configurations;
 using Serilog;
 using Serilog.Events;
 
@@ -61,6 +67,7 @@ try
         containerBuilder.RegisterModule(new SampleCollectionAutofacModule());
         containerBuilder.RegisterModule(new AnalyzerAutofacModule());
         containerBuilder.RegisterModule(new LabAnalysisAutofacModule());
+        containerBuilder.RegisterModule(new UserAccessAutofacModule());
     });
 
     // ─── Services ──────────────────────────────────────────────────────────
@@ -68,7 +75,10 @@ try
     builder.Services.AddSingleton<IExecutionContextAccessor, ExecutionContextAccessor>();
 
     builder.Services.AddHcLisJwtCookieAuthentication(builder.Configuration);
-    builder.Services.AddAuthorization();
+    builder.Services.AddAuthorization(options =>
+    {
+        options.AddPolicy("ITAdmin", policy => policy.RequireRole("ITAdmin"));
+    });
 
     if (builder.Environment.IsDevelopment())
     {
@@ -111,6 +121,7 @@ try
     SampleCollectionStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: null);
     AnalyzerStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: null);
     LabAnalysisStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: null);
+    UserAccessStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: null);
 
     // ─── Middleware pipeline ────────────────────────────────────────────────
     if (app.Environment.IsDevelopment())
@@ -134,11 +145,25 @@ try
         .MapToApiVersion(1)
         .RequireAuthorization();
 
+    var v1Anon = app.MapGroup("/api/v{version:apiVersion}")
+        .WithApiVersionSet(versionSet)
+        .MapToApiVersion(1);
+
+    v1Anon.MapGroup("auth").MapAuthEndpoints();
+    v1Anon.MapPost("users/{userId:guid}/activate", ActivateUserEndpoint.Handle)
+        .WithName("ActivateUser")
+        .WithTags("Users")
+        .WithSummary("Activate a user account using an invitation token.")
+        .Produces(StatusCodes.Status204NoContent)
+        .ProducesProblem(StatusCodes.Status400BadRequest);
+
     v1.MapGroup("orders").MapOrdersEndpoints();
     v1.MapGroup("samples").MapSamplesEndpoints();
     v1.MapGroup("collection-requests").MapCollectionRequestsEndpoints();
     v1.MapGroup("analyzer-samples").MapAnalyzerSamplesEndpoints();
     v1.MapGroup("worklist-items").MapWorklistItemsEndpoints();
+    v1.MapGroup("users").MapUsersEndpoints();
+    v1.MapGroup("audit-log").MapAuditLogEndpoints();
 
     app.Run();
 }
