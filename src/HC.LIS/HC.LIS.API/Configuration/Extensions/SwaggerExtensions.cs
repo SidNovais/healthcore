@@ -43,7 +43,7 @@ internal static class SwaggerExtensions
                 Scheme = "Bearer"
             });
 
-            // Apply Bearer requirement globally
+            // Apply Bearer requirement globally; the filter below overrides it for anonymous endpoints
             options.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
@@ -58,6 +58,9 @@ internal static class SwaggerExtensions
                     Array.Empty<string>()
                 }
             });
+
+            // Must be registered AFTER AddSecurityRequirement so operation.Security is already populated
+            options.OperationFilter<AuthorizedEndpointsSecurityFilter>();
         });
 
         return services;
