@@ -63,7 +63,7 @@ public class UserTests : TestBase
             new ActivateUserCommand(
                 UserSampleData.UserId,
                 UserSampleData.InvitationToken,
-                UserSampleData.PasswordHash,
+                UserSampleData.Password,
                 SystemClock.Now
         )).ConfigureAwait(true);
 

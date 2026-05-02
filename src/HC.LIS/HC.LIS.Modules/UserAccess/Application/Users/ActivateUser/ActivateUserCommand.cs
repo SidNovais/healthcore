@@ -5,12 +5,12 @@ namespace HC.LIS.Modules.UserAccess.Application.Users.ActivateUser;
 public class ActivateUserCommand(
     Guid userId,
     string invitationToken,
-    string passwordHash,
+    string password,
     DateTime activatedAt
 ) : CommandBase
 {
     public Guid UserId { get; } = userId;
     public string InvitationToken { get; } = invitationToken;
-    public string PasswordHash { get; } = passwordHash;
+    public string Password { get; } = password;
     public DateTime ActivatedAt { get; } = activatedAt;
 }
