@@ -1,0 +1,27 @@
+{
+  "name": "@hc-lis/api-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "generate": "openapi-ts",
+    "build": "vite build",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@hey-api/client-fetch": "^0.9.0"
+  },
+  "devDependencies": {
+    "@hey-api/openapi-ts": "^0.62.0",
+    "vite": "^6.0.0",
+    "vitest": "^3.0.0"
+  }
+}
