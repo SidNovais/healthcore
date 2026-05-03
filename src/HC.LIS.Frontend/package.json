@@ -1,0 +1,11 @@
+{
+  "name": "hc-lis-frontend",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "eslint": "^9.0.0"
+  }
+}
