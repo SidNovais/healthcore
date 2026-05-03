@@ -3,9 +3,11 @@ using HC.LIS.API.Modules.SampleCollection.CollectionRequests.CallPatient;
 using HC.LIS.API.Modules.SampleCollection.CollectionRequests.CreateBarcode;
 using HC.LIS.API.Modules.SampleCollection.CollectionRequests.CreateCollectionRequest;
 using HC.LIS.API.Modules.SampleCollection.CollectionRequests.GetCollectionRequestDetails;
+using HC.LIS.API.Modules.SampleCollection.CollectionRequests.GetCollectionRequestList;
 using HC.LIS.API.Modules.SampleCollection.CollectionRequests.MovePatientToWaiting;
 using HC.LIS.API.Modules.SampleCollection.CollectionRequests.RecordSampleCollection;
 using HC.LIS.Modules.SampleCollection.Application.Collections.GetCollectionRequestDetails;
+using HC.LIS.Modules.SampleCollection.Application.Collections.GetCollectionRequestList;
 
 namespace HC.LIS.API.Modules.SampleCollection.CollectionRequests;
 
@@ -15,6 +17,11 @@ internal static class CollectionRequestsEndpoints
         this RouteGroupBuilder group)
     {
         group.WithTags("CollectionRequests");
+
+        group.MapGet("", GetCollectionRequestListEndpoint.Handle)
+            .WithName("GetCollectionRequestList")
+            .WithSummary("List collection requests, optionally filtered by status.")
+            .Produces<IReadOnlyCollection<CollectionRequestSummaryDto>>();
 
         group.MapPost("", CreateCollectionRequestEndpoint.Handle)
             .WithName("CreateCollectionRequest")
