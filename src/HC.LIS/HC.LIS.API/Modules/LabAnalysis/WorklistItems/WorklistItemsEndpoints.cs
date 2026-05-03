@@ -1,9 +1,11 @@
 using HC.LIS.API.Common;
 using HC.LIS.API.Modules.LabAnalysis.WorklistItems.GetSignedReport;
 using HC.LIS.API.Modules.LabAnalysis.WorklistItems.GetWorklistItemDetails;
+using HC.LIS.API.Modules.LabAnalysis.WorklistItems.GetWorklistItemList;
 using HC.LIS.API.Modules.LabAnalysis.WorklistItems.SignReport;
 using HC.LIS.Modules.LabAnalysis.Application.SignedReports.GetSignedReportDetails;
 using HC.LIS.Modules.LabAnalysis.Application.WorklistItems.GetWorklistItemDetails;
+using HC.LIS.Modules.LabAnalysis.Application.WorklistItems.GetWorklistItemList;
 
 namespace HC.LIS.API.Modules.LabAnalysis.WorklistItems;
 
@@ -13,6 +15,11 @@ internal static class WorklistItemsEndpoints
         this RouteGroupBuilder group)
     {
         group.WithTags("WorklistItems");
+
+        group.MapGet("", GetWorklistItemListEndpoint.Handle)
+            .WithName("GetWorklistItemList")
+            .WithSummary("List worklist items, optionally filtered by status.")
+            .Produces<IReadOnlyCollection<WorklistItemSummaryDto>>();
 
         group.MapGet("{id:guid}", GetWorklistItemDetailsEndpoint.Handle)
             .WithName("GetWorklistItemDetails")
