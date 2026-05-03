@@ -11,14 +11,14 @@
 
 HealthcoreSPA is a browser-only Single Page Application that surfaces every HC.LIS workflow to non-technical lab staff through a role-scoped, HIPAA-compliant UI. It lives in a Yarn workspaces monorepo at `src/HC.LIS.Frontend/` alongside the existing .NET backend.
 
-**Technology:** Angular 17+ (standalone components), TypeScript, Yarn workspaces, Vite, Playwright
+**Technology:** Angular 21 (standalone components), TypeScript, Yarn workspaces, Vite, Playwright
 
 **Monorepo packages:**
 
 | Package | Path | Purpose |
 |---|---|---|
 | `hc-lis-api-client` | `packages/hc-lis-api-client/` | TypeScript SDK — auto-generated from HC.LIS.API OpenAPI spec; Vite library mode |
-| `hc-lis-spa` | `packages/hc-lis-spa/` | Angular 17+ SPA — consumes the SDK; provides all UI screens |
+| `hc-lis-spa` | `packages/hc-lis-spa/` | Angular 21 SPA — consumes the SDK; provides all UI screens |
 
 **Backend API:** `HC.LIS.API` at `/api/v1/` — Swagger spec at `/swagger/v1/swagger.json`
 
@@ -79,7 +79,7 @@ src/
 
 ### 2.3 `hc-lis-spa` — Angular SPA Package
 
-- Angular 17+ standalone components — no NgModules
+- Angular 21 standalone components — no NgModules
 - Imports `@hc-lis/api-client` as a Yarn workspace dependency
 - All domain API calls routed through SDK functions — no raw `HttpClient` usage for HC.LIS API calls
 - Dev server uses `proxy.conf.json` to proxy `/api` → `http://localhost:5000`
