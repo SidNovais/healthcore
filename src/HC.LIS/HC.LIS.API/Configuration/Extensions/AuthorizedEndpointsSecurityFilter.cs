@@ -8,11 +8,12 @@ internal sealed class AuthorizedEndpointsSecurityFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        var hasAuthorize = context.ApiDescription.ActionDescriptor.EndpointMetadata
-            .OfType<IAuthorizeData>()
-            .Any();
+        var metadata = context.ApiDescription.ActionDescriptor.EndpointMetadata;
 
-        if (!hasAuthorize)
+        var hasAuthorize = metadata.OfType<IAuthorizeData>().Any();
+        var hasAllowAnonymous = metadata.OfType<IAllowAnonymous>().Any();
+
+        if (!hasAuthorize || hasAllowAnonymous)
             operation.Security = [];
     }
 }

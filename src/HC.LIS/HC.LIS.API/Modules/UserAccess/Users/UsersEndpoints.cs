@@ -1,4 +1,5 @@
 using HC.LIS.API.Common;
+using HC.LIS.API.Modules.UserAccess.Users.ActivateUser;
 using HC.LIS.API.Modules.UserAccess.Users.ChangeRole;
 using HC.LIS.API.Modules.UserAccess.Users.CreateUser;
 using HC.LIS.API.Modules.UserAccess.Users.GetUserDetails;
@@ -40,6 +41,13 @@ internal static class UsersEndpoints
             .WithName("GetUserList")
             .WithSummary("Get paginated list of users.")
             .Produces<IReadOnlyCollection<UserListItemDto>>();
+
+        group.MapPost("{userId:guid}/activate", ActivateUserEndpoint.Handle)
+            .AllowAnonymous()
+            .WithName("ActivateUser")
+            .WithSummary("Activate a user account using an invitation token.")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status400BadRequest);
 
         return group;
     }

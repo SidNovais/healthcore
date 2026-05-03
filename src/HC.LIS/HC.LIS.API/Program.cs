@@ -24,7 +24,6 @@ using HC.LIS.API.Modules.UserAccess;
 using HC.LIS.API.Modules.UserAccess.Auth;
 using HC.LIS.API.Modules.UserAccess.AuditLog;
 using HC.LIS.API.Modules.UserAccess.Users;
-using HC.LIS.API.Modules.UserAccess.Users.ActivateUser;
 using HC.LIS.Modules.UserAccess.Infrastructure.Configurations;
 using Serilog;
 using Serilog.Events;
@@ -150,12 +149,6 @@ try
         .MapToApiVersion(1);
 
     v1Anon.MapGroup("auth").MapAuthEndpoints();
-    v1Anon.MapPost("users/{userId:guid}/activate", ActivateUserEndpoint.Handle)
-        .WithName("ActivateUser")
-        .WithTags("Users")
-        .WithSummary("Activate a user account using an invitation token.")
-        .Produces(StatusCodes.Status204NoContent)
-        .ProducesProblem(StatusCodes.Status400BadRequest);
 
     v1.MapGroup("orders").MapOrdersEndpoints();
     v1.MapGroup("samples").MapSamplesEndpoints();
