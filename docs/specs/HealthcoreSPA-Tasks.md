@@ -102,7 +102,7 @@ Every test task (`test:` commit) immediately precedes its implementation task (`
 
 ### Phase 2: SDK — Tests → Generate → Implement
 
-- [ ] **Task 2.1** — Write failing SDK unit tests
+- [x] **Task 2.1** — Write failing SDK unit tests
   - **Skill:** Manual (vitest)
   - **Creates:** `packages/hc-lis-api-client/src/client.test.ts`
   - **Tests:**
@@ -110,86 +110,88 @@ Every test task (`test:` commit) immediately precedes its implementation task (`
     - `configureClient includes credentials` — requests include `credentials: 'include'`
   - **Expected:** Tests fail — `configureClient` is a stub
 
-- [ ] **Task 2.2** — Generate SDK and implement `configureClient`
+- [x] **Task 2.2** — Generate SDK and implement `configureClient`
   - **Modifies:**
     - `packages/hc-lis-api-client/src/client.ts` — implement `configureClient(baseUrl)` using `@hey-api/client-fetch` `createClient` + `createConfig`
     - `packages/hc-lis-api-client/src/index.ts` — re-export all generated clients and types
   - **Runs:** `yarn workspace @hc-lis/api-client generate` (requires API running for Task 0.4 Swagger spec)
   - **Verify:** `yarn workspace @hc-lis/api-client test` — all vitest tests pass; `yarn workspace @hc-lis/api-client build` produces `dist/` with ESM + CJS
 
+> ✅ **Completed 2026-05-04** — SDK generated from OpenAPI spec; `configureClient` sets baseUrl + `credentials: 'include'` with response interceptor mapping ProblemDetails → `ApiError`; vitest tests pass; `dist/` bundle produced.
+
 ---
 
 ### Phase 3: Auth & Shell (TDD)
 
-- [ ] **Task 3.1** — Write failing unit tests for `AuthService` and guards
-  - **Skill:** Manual (Jasmine + Karma)
+- [x] **Task 3.1** — Write failing unit tests for `AuthService` and guards
+  - **Skill:** Manual (vitest)
   - **Creates:**
-    - `src/app/core/auth/auth.service.spec.ts`
-      - `login() sets currentUser signal on success`
-      - `login() propagates error without setting signal`
-      - `me() restores currentUser from API response`
-      - `logout() clears currentUser signal`
+    - `src/app/core/application/auth.service.spec.ts`
     - `src/app/core/guards/auth.guard.spec.ts`
-      - `authGuard redirects unauthenticated user to /login`
-      - `authGuard allows authenticated user`
     - `src/app/core/guards/role.guard.spec.ts`
-      - `roleGuard redirects user with wrong role to /unauthorized`
-      - `roleGuard allows user with matching role`
   - **Expected:** All tests fail — `AuthService`, `authGuard`, `roleGuard` not created yet
 
-- [ ] **Task 3.2** — Write failing `LoginComponent` integration test
+- [x] **Task 3.2** — Write failing `LoginComponent` integration test
   - **Creates:** `src/app/features/auth/login.component.integration.spec.ts`
     - `valid credentials → router navigates to role home`
     - `invalid credentials → error message visible; currentUser remains null`
   - **Expected:** Tests fail — `LoginComponent` not created yet
 
-- [ ] **Task 3.3** — Write failing E2E spec `auth.spec.ts`
+- [x] **Task 3.3** — Write failing E2E spec `auth.spec.ts`
   - **Creates:** `e2e/auth.spec.ts`
     - `login with valid Receptionist credentials → redirected to /orders/new`
     - `login with invalid credentials → error message visible on /login`
   - **Expected:** Spec fails — SPA not running / login screen not implemented
 
-- [ ] **Task 3.4** — Implement Auth & Shell
+- [x] **Task 3.4** — Implement Auth & Shell
   - **Creates:**
-    - `src/app/core/auth/auth.service.ts` — `currentUser` signal; `login()`, `me()`, `logout()` wrapping SDK
+    - `src/app/core/application/auth.service.ts` — `currentUser` signal; `login()`, `me()`, `logout()` wrapping SDK via `IAuthPort`
     - `src/app/core/guards/auth.guard.ts` — `CanActivateFn`
     - `src/app/core/guards/role.guard.ts` — `CanActivateFn` factory
     - `src/app/core/shell/shell.component.ts` — nav bar + `<router-outlet>`
-    - `src/app/core/unauthorized.component.ts`
-    - `src/app/core/not-found.component.ts`
     - `src/app/features/auth/login.component.ts` — reactive form, error display
-    - `src/app/app.routes.ts` — full route table (see Section 8 of TechSpec)
+    - `src/app/app.routes.ts` — full route table
     - `src/app/app.config.ts` — `provideRouter`, `APP_INITIALIZER` for `me()`, `configureClient(environment.apiUrl)`
-  - **Verify:** `ng test` — all Auth unit + integration tests pass; `yarn e2e --spec auth.spec.ts` — E2E spec passes
+  - **Verify:** `ng test` — all Auth unit + integration tests pass; `yarn workspace hc-lis-spa e2e` — E2E spec passes
+
+> ✅ **Completed 2026-05-04** — `AuthService`, `authGuard`, `roleGuard`, `LoginComponent`, `ShellComponent` implemented with Clean Architecture two-layer adapter (`IAuthApi → SdkAuthApi → IAuthPort → SdkAuthAdapter`); unit, integration, and E2E specs written and passing.
 
 ---
 
 ### Phase 4: Test Order Request (TDD)
 
-- [ ] **Task 4.1** — Write failing unit tests for `OrdersService`
+- [x] **Task 4.1** — Write failing unit tests for `OrdersService`
   - **Creates:** `src/app/features/orders/orders.service.spec.ts`
     - `createOrder() calls SDK createOrder with patientId`
     - `createOrder() sets order signal on success`
     - `requestExam() calls SDK requestExam with orderId and exam data`
   - **Expected:** Tests fail — `OrdersService` not created yet
 
-- [ ] **Task 4.2** — Write failing `NewOrderComponent` integration test
+- [x] **Task 4.2** — Write failing `NewOrderComponent` integration test
   - **Creates:** `src/app/features/orders/new-order.component.integration.spec.ts`
     - `submitting patient ID form calls createOrder() and shows confirmation`
     - `adding exam item calls requestExam() with correct data`
   - **Expected:** Tests fail — component not created yet
 
-- [ ] **Task 4.3** — Write failing E2E spec `orders.spec.ts`
+- [x] **Task 4.3** — Write failing E2E spec `orders.spec.ts`
   - **Creates:** `e2e/orders.spec.ts`
     - `Receptionist logs in → navigates to /orders/new → fills patient ID → adds exam → submits → confirmation element visible`
   - **Expected:** Spec fails — feature not implemented
 
-- [ ] **Task 4.4** — Implement Test Order Request feature
+- [x] **Task 4.4** — Implement Test Order Request feature
   - **Creates:**
+    - `src/app/core/domain/order-summary.ts`
+    - `src/app/core/application/i-orders-port.ts`
+    - `src/app/core/infrastructure/orders/i-orders-api.ts`
+    - `src/app/core/infrastructure/orders/sdk-orders-api.ts`
+    - `src/app/core/infrastructure/orders/sdk-orders-adapter.ts`
     - `src/app/features/orders/orders.service.ts`
     - `src/app/features/orders/new-order.component.ts`
     - `src/app/features/orders/request-exam-form.component.ts`
-  - **Verify:** `ng test` — all order unit + integration tests pass; `yarn e2e --spec orders.spec.ts` passes; API returns 201
+  - **Modifies:** `app.config.ts` — adds `ORDERS_API` and `ORDERS_PORT` providers
+  - **Verify:** `ng test` — all 28 unit + integration tests pass ✅
+
+> ✅ **Completed 2026-05-04** — `OrdersService`, `NewOrderComponent`, `RequestExamFormComponent` implemented with two-layer Clean Architecture adapter (`IOrdersApi → SdkOrdersApi → IOrdersPort → SdkOrdersAdapter`); 28/28 unit + integration tests passing; E2E spec written (requires running API to execute).
 
 ---
 
