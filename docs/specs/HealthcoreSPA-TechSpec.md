@@ -49,19 +49,24 @@ src/
           index.ts                   # re-exports all generated clients + DTOs
           generated/                 # codegen output — gitignored, regenerated in CI
       hc-lis-spa/
-        package.json                 # "@hc-lis/api-client": "workspace:*"
+        package.json                 # "@hc-lis/api-client": "file:../hc-lis-api-client"
         angular.json
         proxy.conf.json              # dev proxy: /api → http://localhost:5000
         playwright.config.ts
         src/
           app/
-            core/                    # auth service, guards, shell layout
+            core/
+              domain/                # Pure TS interfaces & value objects (no Angular imports)
+              application/           # Injectable services + port interfaces (no SDK imports)
+              infrastructure/        # SDK adapters implementing port interfaces
+              guards/                # authGuard, roleGuard (presentation-layer plumbing)
+              shell/                 # ShellComponent, UnauthorizedComponent, NotFoundComponent
             features/
-              auth/                  # login screen
-              orders/                # test order request
-              waiting-room/          # sample collection
-              worklist/              # doctor worklist
-              admin/                 # user management (ITAdmin)
+              auth/                  # LoginComponent
+              orders/                # NewOrderComponent, RequestExamFormComponent
+              waiting-room/          # WaitingRoomComponent, PatientCardComponent
+              worklist/              # WorklistComponent, WorklistItemDetailComponent
+              admin/                 # UserListComponent, CreateUserFormComponent
             shared/                  # pipes, UI primitives
           environments/
         e2e/                         # Playwright specs
@@ -80,9 +85,48 @@ src/
 ### 2.3 `hc-lis-spa` — Angular SPA Package
 
 - Angular 21 standalone components — no NgModules
-- Imports `@hc-lis/api-client` as a Yarn workspace dependency
-- All domain API calls routed through SDK functions — no raw `HttpClient` usage for HC.LIS API calls
+- Imports `@hc-lis/api-client` as a local file dependency (`file:../hc-lis-api-client`)
+- All domain API calls routed through service port interfaces — components never import the SDK directly
 - Dev server uses `proxy.conf.json` to proxy `/api` → `http://localhost:5000`
+- Unit tests use **vitest** (Angular 21 default — replaces Karma/Jasmine)
+
+### 2.4 Frontend Clean Architecture
+
+The SPA follows Clean Architecture with four concentric layers. Framework dependencies are confined to the outermost layer.
+
+#### Layers
+
+| Layer | Path | Allowed dependencies |
+|---|---|---|
+| **Domain** | `src/app/core/domain/` | None — pure TypeScript interfaces and value objects |
+| **Application** | `src/app/core/application/` | Domain only — injectable services + port interfaces |
+| **Infrastructure** | `src/app/core/infrastructure/` | Application + `@hc-lis/api-client` SDK — implements ports |
+| **Presentation** | `src/app/features/` + `src/app/core/shell/` + `src/app/core/guards/` | Application layer services + Angular framework |
+
+#### Rules
+
+- Domain models (`UserSession`, `OrderSummary`, etc.) live in `core/domain/` with **zero Angular imports**.
+- Services (`AuthService`, `OrdersService`, etc.) live in `core/application/`, are `@Injectable`, and depend only on port interfaces — never the SDK directly.
+- SDK adapter classes in `core/infrastructure/` implement port interfaces and call SDK functions — this is the **only layer that imports `@hc-lis/api-client`**.
+- Angular components in `features/` inject application-layer services; they never import SDK functions or HTTP clients.
+- Route guards and `APP_INITIALIZER` live in `core/guards/` and `app.config.ts` — considered presentation-layer plumbing.
+
+#### Example: Auth
+
+```
+core/domain/         UserSession.ts            interface { userId, userName, role } — no Angular
+core/application/    IAuthPort.ts              port interface
+                     AuthService.ts            @Injectable — login(), me(), logout(), currentUser signal
+core/infrastructure/ SdkAuthAdapter.ts         implements IAuthPort — calls SDK login/me functions
+features/auth/       LoginComponent            injects AuthService; zero SDK imports
+```
+
+#### Why
+
+- Components are **unit-testable with simple mock services** — no SDK spies required
+- Swapping the SDK or HTTP transport requires changing only `core/infrastructure/`
+- Domain interfaces are portable and reusable in non-Angular contexts (SSR, web workers)
+- Mirrors the HC.LIS backend's own Clean Architecture/CQRS layering for conceptual consistency
 
 ---
 

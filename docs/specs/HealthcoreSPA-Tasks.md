@@ -29,7 +29,7 @@ Every test task (`test:` commit) immediately precedes its implementation task (`
 
 > Changes to the HC.LIS .NET backend — must be completed before Phases 5, 6, and the session-restore part of Phase 3 can be fully wired.
 
-- [ ] **Task 0.1** — Add `GET /api/v1/collection-requests` list endpoint
+- [x] **Task 0.1** — Add `GET /api/v1/collection-requests` list endpoint
   - **Creates:**
     - `Application/Collections/GetCollectionRequestList/GetCollectionRequestListQuery.cs`
     - `Application/Collections/GetCollectionRequestList/GetCollectionRequestListQueryHandler.cs`
@@ -38,7 +38,7 @@ Every test task (`test:` commit) immediately precedes its implementation task (`
   - **Modifies:** `CollectionRequestsEndpoints.cs` — add `MapGet("")`
   - **Verify:** `GET /api/v1/collection-requests?status=Waiting` returns 200 with array response
 
-- [ ] **Task 0.2** — Add `GET /api/v1/worklist-items` list endpoint
+- [x] **Task 0.2** — Add `GET /api/v1/worklist-items` list endpoint
   - **Creates:**
     - `Application/WorklistItems/GetWorklistItemList/GetWorklistItemListQuery.cs`
     - `Application/WorklistItems/GetWorklistItemList/GetWorklistItemListQueryHandler.cs`
@@ -47,29 +47,29 @@ Every test task (`test:` commit) immediately precedes its implementation task (`
   - **Modifies:** `WorklistItemsEndpoints.cs` — add `MapGet("")`
   - **Verify:** `GET /api/v1/worklist-items` returns 200 with array response
 
-- [ ] **Task 0.3** — Add `GET /api/v1/auth/me` endpoint
+- [x] **Task 0.3** — Add `GET /api/v1/auth/me` endpoint
   - **Creates:**
     - `HC.LIS.API/Modules/UserAccess/Auth/Me/MeEndpoint.cs` — reads `IExecutionContextAccessor`, returns `{ userId, userName, role }` from JWT claims (no DB call)
   - **Modifies:** `AuthEndpoints.cs` — add `MapGet("me").RequireAuthorization()`
   - **Verify:** Authenticated `GET /api/v1/auth/me` returns `{ userId, userName, role }`; unauthenticated returns 401
 
-- [ ] **Task 0.4** — Verify Swagger spec
+- [x] **Task 0.4** — Verify Swagger spec
   - **Verify:** Start API, open `/swagger/v1/swagger.json` — all three new endpoints appear; download snapshot as `swagger.json` for CI use
 
 ---
 
 ### Phase 1: Monorepo + Test Infrastructure Scaffolding
 
-> Establishes the Yarn workspace, both package skeletons, and the full test toolchain (Karma + Playwright). Playwright is set up here so E2E specs can be written alongside features in Phases 3–8.
+> Establishes the Yarn workspace, both package skeletons, and the full test toolchain (vitest + Playwright). Angular 21 uses vitest (not Karma/Jasmine) by default. Playwright is set up here so E2E specs can be written alongside features in Phases 3–8.
 
-- [ ] **Task 1.1** — Create Yarn workspace root
+- [x] **Task 1.1** — Create Yarn workspace root
   - **Creates:**
     - `src/HC.LIS.Frontend/package.json` — `"workspaces": ["packages/*"]`; root devDependencies: `typescript`, `eslint`, `vitest`
     - `src/HC.LIS.Frontend/.yarnrc.yml` — `nodeLinker: node-modules`
     - `src/HC.LIS.Frontend/tsconfig.base.json` — `"strict": true`, `"target": "ES2022"`, `"module": "ESNext"`
   - **Verify:** `yarn install` completes with no errors
 
-- [ ] **Task 1.2** — Scaffold `hc-lis-api-client` SDK package
+- [x] **Task 1.2** — Scaffold `hc-lis-api-client` SDK package
   - **Creates:**
     - `packages/hc-lis-api-client/package.json` — name `@hc-lis/api-client`; deps: `@hey-api/openapi-ts`, `@hey-api/client-fetch`; scripts: `generate`, `build`, `test`
     - `packages/hc-lis-api-client/vite.config.ts` — `build.lib` with `entry: 'src/index.ts'`, `formats: ['es', 'cjs']`
@@ -80,21 +80,22 @@ Every test task (`test:` commit) immediately precedes its implementation task (`
     - `packages/hc-lis-api-client/.gitignore` — `src/generated/`
   - **Verify:** `yarn workspace @hc-lis/api-client build` succeeds (empty bundle)
 
-- [ ] **Task 1.3** — Scaffold `hc-lis-spa` Angular project
-  - **Creates:** `packages/hc-lis-spa/` via `ng new hc-lis-spa --standalone --routing --style=css --skip-git`
+- [x] **Task 1.3** — Scaffold `hc-lis-spa` Angular 21 project
+  - **Note:** Angular 21 uses **vitest** (not Karma/Jasmine) for unit tests. `--standalone` flag is no longer needed (default). Workspace dep uses `"file:../hc-lis-api-client"` (Yarn 1 classic, not `workspace:*`).
+  - **Creates:** `packages/hc-lis-spa/` via `ng new hc-lis-spa --routing --style=css --skip-git`
   - **Modifies:**
-    - `packages/hc-lis-spa/package.json` — add `"@hc-lis/api-client": "workspace:*"` to `dependencies`
+    - `packages/hc-lis-spa/package.json` — add `"@hc-lis/api-client": "file:../hc-lis-api-client"` to `dependencies`
     - `packages/hc-lis-spa/proxy.conf.json` — `{ "/api": { "target": "http://localhost:5000", "secure": false, "changeOrigin": true } }`
     - `packages/hc-lis-spa/angular.json` — add `"proxyConfig": "proxy.conf.json"` to serve options
     - `packages/hc-lis-spa/src/environments/environment.ts` — `{ apiUrl: 'http://localhost:5000', production: false }`
     - `packages/hc-lis-spa/src/environments/environment.prod.ts` — `{ apiUrl: '', production: true }`
   - **Verify:** `yarn workspace hc-lis-spa build` and `yarn workspace hc-lis-spa test` (zero tests) both succeed
 
-- [ ] **Task 1.4** — Install and configure Playwright
+- [x] **Task 1.4** — Install and configure Playwright
   - **Creates:**
     - `packages/hc-lis-spa/playwright.config.ts` — `baseURL: process.env['E2E_BASE_URL'] ?? 'http://localhost:4200'`; projects: Chromium, Firefox, WebKit; `screenshot: 'only-on-failure'`
     - `packages/hc-lis-spa/e2e/` directory with `.gitkeep`
-  - **Modifies:** `packages/hc-lis-spa/package.json` — add `"e2e": "playwright test"` script; add `@playwright/test` to devDependencies
+  - **Modifies:** `packages/hc-lis-spa/package.json` — add `"e2e": "playwright test --pass-with-no-tests"` script; add `@playwright/test` to devDependencies
   - **Verify:** `yarn workspace hc-lis-spa e2e` exits cleanly (zero specs = pass)
 
 ---
