@@ -12,6 +12,10 @@ import { ORDERS_PORT } from './core/application/i-orders-port';
 import { ORDERS_API } from './core/infrastructure/orders/i-orders-api';
 import { SdkOrdersApi } from './core/infrastructure/orders/sdk-orders-api';
 import { SdkOrdersAdapter } from './core/infrastructure/orders/sdk-orders-adapter';
+import { COLLECTION_REQUESTS_PORT } from './core/application/i-collection-requests-port';
+import { COLLECTION_REQUESTS_API } from './core/infrastructure/collection-requests/i-collection-requests-api';
+import { SdkCollectionRequestsApi } from './core/infrastructure/collection-requests/sdk-collection-requests-api';
+import { SdkCollectionRequestsAdapter } from './core/infrastructure/collection-requests/sdk-collection-requests-adapter';
 
 function initializeApp(authService: AuthService): () => Promise<void> {
   return () => {
@@ -28,6 +32,8 @@ export const appConfig: ApplicationConfig = {
     { provide: AUTH_PORT, useClass: SdkAuthAdapter },
     { provide: ORDERS_API, useClass: SdkOrdersApi },
     { provide: ORDERS_PORT, useClass: SdkOrdersAdapter },
+    { provide: COLLECTION_REQUESTS_API, useClass: SdkCollectionRequestsApi },
+    { provide: COLLECTION_REQUESTS_PORT, useClass: SdkCollectionRequestsAdapter },
     {
       provide: APP_INITIALIZER,
       useFactory: initializeApp,
