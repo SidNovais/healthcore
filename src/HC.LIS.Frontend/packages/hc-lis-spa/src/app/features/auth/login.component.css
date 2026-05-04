@@ -1,0 +1,157 @@
+.login-page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  padding: var(--space-8) var(--space-4);
+  gap: var(--space-6);
+}
+
+.login-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-10) var(--space-10);
+  width: 100%;
+  max-width: 440px;
+  box-shadow: var(--shadow-md);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
+
+.logo-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: var(--color-accent);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-4);
+}
+
+.product-name {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.product-tagline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+  margin: var(--space-1) 0 0;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+
+.field-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.field-input {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-text);
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 0.9375rem;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.field-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-light);
+}
+
+.field-input.field-input--invalid {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px var(--color-error-bg);
+}
+
+.field-input::placeholder {
+  color: var(--color-text-subtle);
+}
+
+.error-alert {
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-error);
+  font-size: 0.875rem;
+  margin-bottom: var(--space-5);
+}
+
+.submit-btn {
+  width: 100%;
+  background: var(--color-accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+  margin-top: var(--space-2);
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: #1e40af;
+  box-shadow: var(--shadow-sm);
+}
+
+.submit-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 600ms linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.login-footer {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--color-text-subtle);
+  text-align: center;
+  max-width: 440px;
+  line-height: 1.5;
+}

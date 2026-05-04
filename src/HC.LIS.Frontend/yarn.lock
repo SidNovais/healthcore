@@ -1011,12 +1011,12 @@
 "@hc-lis/api-client@file:packages/hc-lis-api-client":
   version "0.1.0"
   dependencies:
-    "@hey-api/client-fetch" "^0.9.0"
+    "@hey-api/client-fetch" "^0.13.1"
 
-"@hey-api/client-fetch@^0.9.0":
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/@hey-api/client-fetch/-/client-fetch-0.9.0.tgz#bccae975b25c32ba1bfc5cee4be0c48fbd8a8fff"
-  integrity sha512-64oAhGJZHSEEReOZjB12HgU27QsSRR+zcFGsGDE2+zZGgYh67L3lSZ6jEN37KKo6jNytdZ3oB5z5+It2NxZWEA==
+"@hey-api/client-fetch@^0.13.1":
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/@hey-api/client-fetch/-/client-fetch-0.13.1.tgz#d01cdeed5f5b5b5706d52ffe29387741d2a533e0"
+  integrity sha512-29jBRYNdxVGlx5oewFgOrkulZckpIpBIRHth3uHFn1PrL2ucMy52FvWOY3U3dVx2go1Z3kUmMi6lr07iOpUqqA==
 
 "@hey-api/json-schema-ref-parser@1.0.1":
   version "1.0.1"
