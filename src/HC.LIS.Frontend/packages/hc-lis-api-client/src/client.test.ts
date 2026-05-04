@@ -1,11 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('@hey-api/client-fetch', () => ({
-  createClient: vi.fn(() => ({ interceptors: { response: { use: vi.fn() } } })),
-  createConfig: vi.fn((cfg: unknown) => cfg),
+vi.mock('./generated/sdk.gen', () => ({
+  client: {
+    setConfig: vi.fn(),
+    interceptors: { response: { use: vi.fn() } },
+  },
 }));
 
-import { createClient, createConfig } from '@hey-api/client-fetch';
+import { client as sdkClient } from './generated/sdk.gen';
 import { configureClient } from './client';
 
 describe('configureClient', () => {
@@ -13,19 +15,18 @@ describe('configureClient', () => {
     vi.clearAllMocks();
   });
 
-  it('calls createClient with the provided baseUrl', () => {
+  it('configures the SDK client with the provided baseUrl', () => {
     configureClient('http://test');
 
-    expect(createConfig).toHaveBeenCalledWith(
+    expect(sdkClient.setConfig).toHaveBeenCalledWith(
       expect.objectContaining({ baseUrl: 'http://test' }),
     );
-    expect(createClient).toHaveBeenCalledOnce();
   });
 
   it('includes credentials: "include" in the config', () => {
     configureClient('http://test');
 
-    expect(createConfig).toHaveBeenCalledWith(
+    expect(sdkClient.setConfig).toHaveBeenCalledWith(
       expect.objectContaining({ credentials: 'include' }),
     );
   });
