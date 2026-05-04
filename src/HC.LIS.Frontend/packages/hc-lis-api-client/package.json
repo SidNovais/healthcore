@@ -5,19 +5,22 @@
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     }
   },
   "scripts": {
     "generate": "openapi-ts",
-    "build": "vite build",
+    "build": "vite build && tsc --project tsconfig.json",
+    "types": "tsc --project tsconfig.json",
     "test": "vitest run"
   },
   "dependencies": {
-    "@hey-api/client-fetch": "^0.9.0"
+    "@hey-api/client-fetch": "^0.13.1"
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "^0.62.0",
