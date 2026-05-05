@@ -271,24 +271,26 @@ Every test task (`test:` commit) immediately precedes its implementation task (`
 
 ### Phase 7: User Management (TDD)
 
-- [ ] **Task 7.1** — Write failing unit tests for `UsersService`
+- [x] **Task 7.1** — Write failing unit tests for `UsersService`
   - **Creates:** `src/app/features/admin/users.service.spec.ts`
     - `listUsers() calls SDK listUsers and sets users signal`
     - `createUser(data) calls SDK createUser`
     - `changeRole(userId, role) calls SDK changeRole`
   - **Expected:** Tests fail — service not created yet
 
-- [ ] **Task 7.2** — Write failing E2E spec `admin-users.spec.ts`
+- [x] **Task 7.2** — Write failing E2E spec `admin-users.spec.ts`
   - **Creates:** `e2e/admin-users.spec.ts`
     - `ITAdmin logs in → /admin/users loads → opens Create User form → fills fields → submits → new user appears in list`
   - **Expected:** Spec fails — feature not implemented
 
-- [ ] **Task 7.3** — Implement User Management feature
+- [x] **Task 7.3** — Implement User Management feature
   - **Creates:**
     - `src/app/features/admin/users.service.ts`
     - `src/app/features/admin/user-list.component.ts`
     - `src/app/features/admin/create-user-form.component.ts`
   - **Verify:** `ng test` — all admin unit tests pass; `yarn e2e --spec admin-users.spec.ts` passes
+
+> ✅ **Completed 2026-05-05** — `UsersService`, `UserListComponent`, `CreateUserFormComponent` implemented with two-layer Clean Architecture adapter (`IUsersApi → SdkUsersApi → IUsersPort → SdkUsersAdapter`); 54/54 unit tests passing (5 new); E2E spec written (requires running API + seed ITAdmin user).
 
 ---
 
