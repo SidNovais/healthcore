@@ -239,7 +239,7 @@ Every test task (`test:` commit) immediately precedes its implementation task (`
 
 > Depends on Task 0.2 (`GET /worklist-items` list endpoint).
 
-- [ ] **Task 6.1** — Write failing unit tests for `WorklistService`
+- [x] **Task 6.1** — Write failing unit tests for `WorklistService`
   - **Creates:** `src/app/features/worklist/worklist.service.spec.ts`
     - `loadItems() calls SDK listWorklistItems`
     - `loadItems() sets items signal`
@@ -247,23 +247,25 @@ Every test task (`test:` commit) immediately precedes its implementation task (`
     - `signReport(id, data) calls SDK signReport`
   - **Expected:** Tests fail — service not created yet
 
-- [ ] **Task 6.2** — Write failing `WorklistComponent` integration tests
+- [x] **Task 6.2** — Write failing `WorklistComponent` integration tests
   - **Creates:** `src/app/features/worklist/worklist.component.integration.spec.ts`
     - `renders table rows with status badge for each worklist item`
     - `clicking a row loads item details into detail panel`
   - **Expected:** Tests fail — component not created yet
 
-- [ ] **Task 6.3** — Write failing E2E spec `worklist.spec.ts`
+- [x] **Task 6.3** — Write failing E2E spec `worklist.spec.ts`
   - **Creates:** `e2e/worklist.spec.ts`
     - `Physician logs in → /worklist loads → clicks Refresh → rows visible → clicks row → detail panel opens → clicks Sign Report → confirmation visible`
   - **Expected:** Spec fails — feature not implemented
 
-- [ ] **Task 6.4** — Implement Doctor Worklist feature
+- [x] **Task 6.4** — Implement Doctor Worklist feature
   - **Creates:**
     - `src/app/features/worklist/worklist.service.ts`
     - `src/app/features/worklist/worklist.component.ts` — table + Refresh button
     - `src/app/features/worklist/worklist-item-detail.component.ts` — detail panel + Sign Report action
   - **Verify:** `ng test` — all worklist tests pass; `yarn e2e --spec worklist.spec.ts` passes
+
+> ✅ **Completed 2026-05-05** — `WorklistService`, `WorklistComponent`, `WorklistItemDetailComponent` implemented with two-layer Clean Architecture adapter (`IWorklistApi → SdkWorklistApi → IWorklistPort → SdkWorklistAdapter`); 49/49 unit + integration tests passing (11 new); E2E spec written (requires running API + seed data).
 
 ---
 

@@ -16,6 +16,10 @@ import { COLLECTION_REQUESTS_PORT } from './core/application/i-collection-reques
 import { COLLECTION_REQUESTS_API } from './core/infrastructure/collection-requests/i-collection-requests-api';
 import { SdkCollectionRequestsApi } from './core/infrastructure/collection-requests/sdk-collection-requests-api';
 import { SdkCollectionRequestsAdapter } from './core/infrastructure/collection-requests/sdk-collection-requests-adapter';
+import { WORKLIST_PORT } from './core/application/i-worklist-port';
+import { WORKLIST_API } from './core/infrastructure/worklist/i-worklist-api';
+import { SdkWorklistApi } from './core/infrastructure/worklist/sdk-worklist-api';
+import { SdkWorklistAdapter } from './core/infrastructure/worklist/sdk-worklist-adapter';
 
 function initializeApp(authService: AuthService): () => Promise<void> {
   return () => {
@@ -34,6 +38,8 @@ export const appConfig: ApplicationConfig = {
     { provide: ORDERS_PORT, useClass: SdkOrdersAdapter },
     { provide: COLLECTION_REQUESTS_API, useClass: SdkCollectionRequestsApi },
     { provide: COLLECTION_REQUESTS_PORT, useClass: SdkCollectionRequestsAdapter },
+    { provide: WORKLIST_API, useClass: SdkWorklistApi },
+    { provide: WORKLIST_PORT, useClass: SdkWorklistAdapter },
     {
       provide: APP_INITIALIZER,
       useFactory: initializeApp,
