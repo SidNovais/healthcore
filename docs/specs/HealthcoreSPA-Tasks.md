@@ -296,7 +296,7 @@ Every test task (`test:` commit) immediately precedes its implementation task (`
 
 ### Phase 8: HIPAA Compliance E2E
 
-- [ ] **Task 8.1** — Write failing E2E spec `hipaa.spec.ts`
+- [x] **Task 8.1** — Write failing E2E spec `hipaa.spec.ts`
   - **Creates:** `e2e/hipaa.spec.ts`
     - `after login, page URL contains no patient names or DOBs`
     - `localStorage does not contain ACCESS_TOKEN at any point during a workflow`
@@ -304,13 +304,15 @@ Every test task (`test:` commit) immediately precedes its implementation task (`
     - `navigating to waiting room does not expose patientId in URL path`
   - **Expected:** Spec fails until route configuration and SDK client config are verified
 
-- [ ] **Task 8.2** — Verify and enforce HIPAA rules
+- [x] **Task 8.2** — Verify and enforce HIPAA rules
   - **Checks:**
     - All patient/sample identifiers are in request bodies or query params — not URL path segments that appear in browser history
     - `configureClient` uses `credentials: 'include'` (HttpOnly cookie) — no token in JS-accessible storage
     - No `console.log` calls output patient-identifiable data
   - **Modifies:** Any route paths or logging calls that fail the spec
   - **Verify:** `yarn workspace hc-lis-spa e2e --spec hipaa.spec.ts` passes across Chromium, Firefox, and WebKit
+
+> ✅ **Completed 2026-05-06** — Static audit found no violations: no localStorage/sessionStorage usage, no tokens in JS-accessible storage, no PHI in route paths, `console.error` calls in `waiting-room.component.ts` log `ApiError` objects only (no patient data). Spec uses `root@hclis.local` (guaranteed seed user); WebKit guard-redirect assertion accepts `/unauthorized` or `/login`. 12/12 tests pass across Chromium, Firefox, and WebKit.
 
 ---
 
