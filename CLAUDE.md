@@ -44,6 +44,15 @@ dotnet run --project src/HC.LIS/HC.LIS.Database/HC.LIS.Database.csproj
 
 The database connection string is read from the environment variable `ASPNETCORE_HCLIS_DATABASE_CONNECTION_STRING`.
 
+### E2E
+
+```bash
+cd src/HC.LIS.Frontend/packages/hc-lis-spa
+yarn e2e
+```
+
+Requires the Angular dev server running (`ng serve`) and the API + database up. Base URL defaults to `http://localhost:4200`; override with `E2E_BASE_URL`.
+
 ---
 
 ## Architecture
@@ -147,6 +156,18 @@ Tests follow **Arrange–Act–Assert** with FluentAssertions. `TestBase` provid
 
 **TDD is required.** Always write the failing test first, then implement only enough code to make it pass. Test commits (`test:`) must precede the corresponding feature commits (`feat:`). Never write production code without a failing test driving it.
 
+**TDD is required for UI features.** Write the failing Playwright test before implementing any Angular component. The same commit ordering rule applies: `test:` commit precedes `feat:` commit.
+
+**E2E test location:** `src/HC.LIS.Frontend/packages/hc-lis-spa/e2e/*.spec.ts`
+
+**Playwright conventions:**
+- Selectors: `data-testid` attributes with kebab-case IDs (e.g., `create-user-btn`, `patient-id-input`). Never select by CSS class or element tag.
+- Role-based login helpers are defined inline in each spec file.
+- Seed users follow `role@hclis.local` / `Admin1234!` (e.g., `itadmin@hclis.local`, `receptionist@hclis.local`, `labtech@hclis.local`, `physician@hclis.local`).
+- Every feature spec includes: one "full workflow" test exercising the happy path end-to-end, plus at least one role-guard test verifying unauthorized roles are redirected to `/unauthorized`.
+- Use `waitForResponse()` before asserting state that depends on an API call completing.
+- Timeouts: 5 000 ms for element visibility, 10 000 ms for navigation.
+
 ---
 
 ## Adding a New Feature
@@ -157,3 +178,4 @@ Typical flow for a new exam lifecycle command:
 2. **Domain** — add business rule(s) in `Rules/`, domain event in `Events/`, method on the aggregate
 3. **Application** — add `*Command`, `*CommandHandler`, `*Notification` in a subfolder under `Application/Orders/`
 4. **IntegrationEvents** — add `*IntegrationEvent` if external systems need notification
+5. **E2E Test** — write a failing Playwright test in `e2e/*.spec.ts` covering the full user workflow before implementing the Angular component; add `data-testid` attributes to all interactive and verifiable template elements
