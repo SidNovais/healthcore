@@ -37,6 +37,47 @@
         "/consoleloggerparameters:NoSummary"
       ],
       "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "run:database:migration",
+      "type": "shell",
+      "command": "dotnet run --project ${workspaceFolder}/src/HC.LIS/HC.LIS.Database/HC.LIS.Database.csproj",
+      "options": {
+        "env": {
+          "ASPNETCORE_HCLIS_DATABASE_CONNECTION_STRING": "Host=localhost;Port=5432;Database=Healthcore.Dev;Username=dev;Password=dev"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "spa:serve",
+      "type": "shell",
+      "command": "yarn start",
+      "options": {
+        "cwd": "${workspaceFolder}/src/HC.LIS.Frontend/packages/hc-lis-spa"
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "angular",
+        "pattern": {
+          "regexp": "^(ERROR|error)"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Building|Generating|Watch mode",
+          "endsPattern": "Local:|compiled successfully|bundle generation complete"
+        }
+      }
+    },
+    {
+      "label": "prepare:fullstack",
+      "dependsOn": [
+        "docker:dev:up",
+        "run:database:migration",
+        "build: HC.LIS.API"
+      ],
+      "dependsOrder": "sequence",
+      "problemMatcher": []
     }
   ]
 }
