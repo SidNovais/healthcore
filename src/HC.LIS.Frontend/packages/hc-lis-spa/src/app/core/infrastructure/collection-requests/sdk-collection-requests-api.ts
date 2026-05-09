@@ -27,7 +27,7 @@ export class SdkCollectionRequestsApi implements ICollectionRequestsApi {
   }
 
   async callPatient(id: string): Promise<void> {
-    await sdkCallPatient({ path: { id } });
+    await sdkCallPatient({ path: { id }, body: {} });
   }
 
   async createBarcode(id: string, params: ApiCreateBarcodeParams): Promise<void> {
@@ -48,7 +48,7 @@ export class SdkCollectionRequestsApi implements ICollectionRequestsApi {
         sampleId: params.sampleId,
         technicianId: params.technicianId,
         patientName: params.patientName,
-        patientBirthdate: params.patientBirthdate as unknown as Date,
+        patientBirthdate: params.patientBirthdate,
         patientGender: params.patientGender,
       },
     });

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { createOrder as sdkCreateOrder, requestExam as sdkRequestExam } from '@hc-lis/api-client';
+import type { HcLisApiCommonCreatedIdResponse } from '@hc-lis/api-client';
 import type { IOrdersApi, OrdersCreateParams, OrdersCreateResult, OrdersRequestExamParams } from './i-orders-api';
 
 @Injectable()
@@ -13,7 +14,7 @@ export class SdkOrdersApi implements IOrdersApi {
         orderPriority: params.orderPriority,
       },
     });
-    const data = result.data as { id: string };
+    const data = result.data as HcLisApiCommonCreatedIdResponse;
     return { id: data?.id ?? '' };
   }
 

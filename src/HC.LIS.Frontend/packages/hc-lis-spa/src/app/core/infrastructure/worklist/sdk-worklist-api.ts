@@ -4,82 +4,61 @@ import {
   getWorklistItemDetails as sdkGetWorklistItemDetails,
   signReport as sdkSignReport,
 } from '@hc-lis/api-client';
+import type {
+  HcLisModulesLabAnalysisApplicationWorklistItemsGetWorklistItemListWorklistItemSummaryDto,
+  HcLisModulesLabAnalysisApplicationWorklistItemsGetWorklistItemDetailsWorklistItemDetailsDto,
+  HcLisModulesLabAnalysisApplicationWorklistItemsGetWorklistItemDetailsAnalyteResultDto,
+} from '@hc-lis/api-client';
 import type { IWorklistApi } from './i-worklist-api';
 import type { SignReportParams } from '../../application/i-worklist-port';
 import type { WorklistItemSummary } from '../../domain/worklist-item-summary';
 import type { WorklistItemDetails, AnalyteResult } from '../../domain/worklist-item-details';
 
+type SdkWorklistItemSummaryDto = HcLisModulesLabAnalysisApplicationWorklistItemsGetWorklistItemListWorklistItemSummaryDto;
+type SdkWorklistItemDetailsDto = HcLisModulesLabAnalysisApplicationWorklistItemsGetWorklistItemDetailsWorklistItemDetailsDto;
+type SdkAnalyteResultDto = HcLisModulesLabAnalysisApplicationWorklistItemsGetWorklistItemDetailsAnalyteResultDto;
+
 @Injectable()
 export class SdkWorklistApi implements IWorklistApi {
   async getItems(): Promise<WorklistItemSummary[]> {
     const result = await getWorklistItemList();
-    const data = (result.data ?? []) as Array<{
-      id: string;
-      sampleBarcode: string | null;
-      examCode: string | null;
-      patientId: string;
-      status: string | null;
-      createdAt: string;
-    }>;
+    const data: SdkWorklistItemSummaryDto[] = result.data ?? [];
     return data.map(item => ({
-      id: item.id,
+      id: item.id ?? '',
       sampleBarcode: item.sampleBarcode ?? '',
       examCode: item.examCode ?? '',
-      patientId: item.patientId,
+      patientId: item.patientId ?? '',
       status: item.status ?? '',
-      createdAt: item.createdAt,
+      createdAt: item.createdAt ?? '',
     }));
   }
 
   async getItemDetails(id: string): Promise<WorklistItemDetails> {
     const result = await sdkGetWorklistItemDetails({ path: { id } });
-    const d = result.data as {
-      id: string;
-      sampleId: string;
-      sampleBarcode: string | null;
-      examCode: string | null;
-      patientId: string;
-      orderId: string;
-      orderItemId: string;
-      status: string | null;
-      analyteResults: Array<{
-        id: string;
-        analyteCode: string | null;
-        resultValue: string | null;
-        resultUnit: string | null;
-        referenceRange: string | null;
-        isOutOfRange: boolean;
-        performedById: string;
-        recordedAt: string;
-      }> | null;
-      reportPath: string | null;
-      completionType: string | null;
-      createdAt: string;
-      completedAt: string | null;
-    };
-    const analyteResults: AnalyteResult[] = (d.analyteResults ?? []).map(r => ({
-      id: r.id,
+    const d = result.data as SdkWorklistItemDetailsDto;
+    const analyteResults: AnalyteResult[] = (d.analyteResults ?? []).map((r: SdkAnalyteResultDto) => ({
+      id: r.id ?? '',
       analyteCode: r.analyteCode ?? '',
       resultValue: r.resultValue ?? '',
       resultUnit: r.resultUnit ?? '',
       referenceRange: r.referenceRange ?? '',
-      isOutOfRange: r.isOutOfRange,
-      performedById: r.performedById,
-      recordedAt: r.recordedAt,
+      isOutOfRange: r.isOutOfRange ?? false,
+      performedById: r.performedById ?? '',
+      recordedAt: r.recordedAt ?? '',
     }));
     return {
-      id: d.id,
-      sampleId: d.sampleId,
+      id: d.id ?? '',
+      sampleId: d.sampleId ?? '',
       sampleBarcode: d.sampleBarcode ?? '',
       examCode: d.examCode ?? '',
-      patientId: d.patientId,
-      orderId: d.orderId,
-      orderItemId: d.orderItemId,
+      patientId: d.patientId ?? '',
+      orderId: d.orderId ?? '',
+      orderItemId: d.orderItemId ?? '',
       status: d.status ?? '',
       analyteResults,
       reportPath: d.reportPath ?? null,
       completionType: d.completionType ?? null,
-      createdAt: d.createdAt,
+      createdAt: d.createdAt ?? '',
       completedAt: d.completedAt ?? null,
     };
   }
