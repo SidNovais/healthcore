@@ -22,19 +22,19 @@ export const routes: Routes = [
     children: [
       {
         path: 'orders/new',
-        canActivate: [roleGuard('Receptionist')],
+        canActivate: [roleGuard('Receptionist', 'ITAdmin')],
         loadComponent: () =>
           import('./features/orders/new-order.component').then(m => m.NewOrderComponent),
       },
       {
         path: 'waiting-room',
-        canActivate: [roleGuard('LabTechnician')],
+        canActivate: [roleGuard('LabTechnician', 'ITAdmin')],
         loadComponent: () =>
           import('./features/waiting-room/waiting-room.component').then(m => m.WaitingRoomComponent),
       },
       {
         path: 'worklist',
-        canActivate: [roleGuard('Physician')],
+        canActivate: [roleGuard('Physician', 'ITAdmin')],
         loadComponent: () =>
           import('./features/worklist/worklist.component').then(m => m.WorklistComponent),
       },
