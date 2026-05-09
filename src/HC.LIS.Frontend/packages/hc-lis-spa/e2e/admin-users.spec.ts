@@ -18,10 +18,22 @@ test.describe('User Management', () => {
     await expect(page.getByTestId('users-title')).toBeVisible({ timeout: 5_000 });
   });
 
-  test('ITAdmin cannot access /worklist (role guard)', async ({ page }) => {
+  test('ITAdmin can access /orders/new', async ({ page }) => {
+    await loginAsITAdmin(page);
+    await page.goto('/orders/new');
+    await expect(page).toHaveURL('/orders/new', { timeout: 5_000 });
+  });
+
+  test('ITAdmin can access /waiting-room', async ({ page }) => {
+    await loginAsITAdmin(page);
+    await page.goto('/waiting-room');
+    await expect(page).toHaveURL('/waiting-room', { timeout: 5_000 });
+  });
+
+  test('ITAdmin can access /worklist', async ({ page }) => {
     await loginAsITAdmin(page);
     await page.goto('/worklist');
-    await expect(page).toHaveURL('/unauthorized', { timeout: 5_000 });
+    await expect(page).toHaveURL('/worklist', { timeout: 5_000 });
   });
 
   test('full create-user workflow: open form → fill fields → submit → new user appears in list', async ({ page }) => {
