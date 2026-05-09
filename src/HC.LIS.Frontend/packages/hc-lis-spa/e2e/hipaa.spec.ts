@@ -100,11 +100,10 @@ test.describe('HIPAA Compliance', () => {
 
     await loginAsITAdmin(page);
 
-    // Navigate to /waiting-room; guard redirects ITAdmin to /unauthorized (or /login
-    // when the session cookie is not carried — a WebKit-specific timing quirk).
-    // Either redirect is a static route with no UUID, satisfying the HIPAA assertion.
+    // Navigate to /waiting-room; ITAdmin is now allowed on this route, so the
+    // page loads directly with no redirect. The URL must not contain a UUID.
     await page.goto('/waiting-room');
-    await page.waitForURL(/\/(unauthorized|login|waiting-room)$/, { timeout: 5_000 });
+    await page.waitForURL(/\/waiting-room$/, { timeout: 5_000 });
 
     spaUrls.push(page.url());
 
