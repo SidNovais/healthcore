@@ -20,6 +20,9 @@ const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
     { label: 'Worklist', route: '/worklist', icon: 'worklist' },
   ],
   ITAdmin: [
+    { label: 'New Order', route: '/orders/new', icon: 'order' },
+    { label: 'Waiting Room', route: '/waiting-room', icon: 'queue' },
+    { label: 'Worklist', route: '/worklist', icon: 'worklist' },
     { label: 'Users', route: '/admin/users', icon: 'users' },
   ],
 };
