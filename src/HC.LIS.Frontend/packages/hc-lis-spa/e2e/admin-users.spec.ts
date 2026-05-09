@@ -1,7 +1,7 @@
 // e2e/admin-users.spec.ts
 import { test, expect } from '@playwright/test';
 
-const ITADMIN_EMAIL = 'itadmin@hclis.local';
+const ITADMIN_EMAIL = 'root@hclis.local';
 const ITADMIN_PASSWORD = 'Admin1234!';
 
 async function loginAsITAdmin(page: import('@playwright/test').Page) {
