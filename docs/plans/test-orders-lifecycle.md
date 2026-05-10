@@ -25,9 +25,9 @@ order lifecycle UX for receptionists and physicians.
 
 ## Phase 2 — Backend: Missing Application query
 
-- [ ] **B-2** Write failing integration test for `GetOrdersListQuery`
+- [x] **B-2** Write failing integration test for `GetOrdersListQuery`
   (`Tests/IntegrationTests/Orders/GetOrdersListTests.cs`)
-- [ ] **B-3** Implement `GetOrdersListQuery` + `GetOrdersListQueryHandler` + `OrderListItemDto`
+- [x] **B-3** Implement `GetOrdersListQuery` + `GetOrdersListQueryHandler` + `OrderListItemDto`
   under `Application/Orders/GetOrdersList/`
   — use `ISqlConnectionFactory` + Dapper; GROUP BY order, count items
   — fields: `OrderId`, `PatientId`, `RequestedBy`, `OrderPriority`, `RequestedAt`, `ItemCount`
