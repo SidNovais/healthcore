@@ -18,7 +18,7 @@ internal static class LoginEndpoint
         httpContext.Response.Cookies.Append("ACCESS_TOKEN", result.Token, new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
+            Secure = httpContext.Request.IsHttps,
             SameSite = SameSiteMode.Strict,
             Expires = DateTimeOffset.UtcNow.AddHours(1)
         });
