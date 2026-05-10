@@ -6,6 +6,7 @@ namespace HC.LIS.API.Modules.TestOrders.Orders.GetOrderItemDetails;
 internal static class GetOrderItemDetailsEndpoint
 {
     internal static async Task<IResult> Handle(
+        Guid orderId,
         Guid itemId,
         ITestOrdersModule module,
         CancellationToken ct)

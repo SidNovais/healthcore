@@ -40,7 +40,7 @@ internal static class OrdersEndpoints
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status409Conflict);
 
-        group.MapGet("exams/{itemId:guid}", GetOrderItemDetailsEndpoint.Handle)
+        group.MapGet("{orderId:guid}/exams/{itemId:guid}", GetOrderItemDetailsEndpoint.Handle)
             .WithName("GetOrderItemDetails")
             .WithSummary("Get order item details by ID.")
             .Produces<OrderItemDetailsDto>()
