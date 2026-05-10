@@ -23,8 +23,9 @@ test.describe('Test Order Request', () => {
     // Exam section appears after order creation
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
 
-    // Fill exam mnemonic and request exam
+    // Fill exam mnemonic + container type and request exam
     await page.getByTestId('exam-mnemonic-input').fill('GLU');
+    await page.getByTestId('container-type-input').fill('RedTop');
     await page.getByTestId('request-exam-btn').click();
 
     // Confirmation appears

@@ -5,6 +5,9 @@ const ROOT_EMAIL = 'root@hclis.local';
 const ROOT_PASSWORD = 'Admin1234!';
 
 test.describe('Authentication', () => {
+  test.beforeEach(async ({ context }) => {
+    await context.clearCookies();
+  });
   test('ITAdmin login redirects to /admin/users', async ({ page }) => {
     await page.goto('/login');
 
