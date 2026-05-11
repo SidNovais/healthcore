@@ -1,5 +1,7 @@
 # TestOrders Full Lifecycle — Implementation Tasks
 
+> **RULE: Mark every task `[x]` immediately when it is done. Do not batch. Do not wait until the end of the session.**
+
 ## Context
 
 The TestOrders module has a complete domain model and Application layer (9 commands, 2 queries)
