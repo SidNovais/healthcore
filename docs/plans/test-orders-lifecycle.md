@@ -36,13 +36,13 @@ order lifecycle UX for receptionists and physicians.
 
 ## Phase 3 — Backend: Missing API endpoints
 
-- [ ] **B-4** Add `GET /api/v1/orders` endpoint (`GetOrderList/GetOrderListEndpoint.cs`)
+- [x] **B-4** Add `GET /api/v1/orders` endpoint (`GetOrderList/GetOrderListEndpoint.cs`)
   — 200 OK with `IReadOnlyCollection<OrderListItemDto>`; wire into `OrdersEndpoints.cs`
-- [ ] **B-5** Add `POST /api/v1/orders/{orderId}/exams/{itemId}/place-in-progress` endpoint
+- [x] **B-5** Add `POST /api/v1/orders/{orderId}/exams/{itemId}/place-in-progress` endpoint
   (`PlaceExamInProgress/PlaceExamInProgressEndpoint.cs`)
   — no request body; 204 No Content; wire into `OrdersEndpoints.cs`
   — `PlaceExamInProgressCommand` already exists in Application
-- [ ] **B-6** Build + test verification
+- [x] **B-6** Build + test verification
   ```bash
   dotnet build src/HC.LIS/HC.LIS.API/HC.LIS.API.csproj
   dotnet test src/HC.LIS/HC.LIS.Modules/TestOrders/Tests/IntegrationTests/HC.LIS.Modules.TestOrders.IntegrationTests.csproj

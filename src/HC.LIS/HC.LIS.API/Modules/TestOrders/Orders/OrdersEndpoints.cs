@@ -4,12 +4,15 @@ using HC.LIS.API.Modules.TestOrders.Orders.CancelExam;
 using HC.LIS.API.Modules.TestOrders.Orders.CreateOrder;
 using HC.LIS.API.Modules.TestOrders.Orders.GetOrderDetails;
 using HC.LIS.API.Modules.TestOrders.Orders.GetOrderItemDetails;
+using HC.LIS.API.Modules.TestOrders.Orders.GetOrderList;
 using HC.LIS.API.Modules.TestOrders.Orders.PartiallyCompleteExam;
+using HC.LIS.API.Modules.TestOrders.Orders.PlaceExamInProgress;
 using HC.LIS.API.Modules.TestOrders.Orders.PlaceExamOnHold;
 using HC.LIS.API.Modules.TestOrders.Orders.RejectExam;
 using HC.LIS.API.Modules.TestOrders.Orders.RequestExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.GetOrderDetails;
 using HC.LIS.Modules.TestOrders.Application.Orders.GetOrderItemDetails;
+using HC.LIS.Modules.TestOrders.Application.Orders.GetOrdersList;
 
 namespace HC.LIS.API.Modules.TestOrders.Orders;
 
@@ -19,6 +22,11 @@ internal static class OrdersEndpoints
         this RouteGroupBuilder group)
     {
         group.WithTags("Orders");
+
+        group.MapGet("", GetOrderListEndpoint.Handle)
+            .WithName("GetOrderList")
+            .WithSummary("Get the list of test orders.")
+            .Produces<IReadOnlyCollection<OrderListItemDto>>();
 
         group.MapPost("", CreateOrderEndpoint.Handle)
             .WithName("CreateOrder")
@@ -63,6 +71,13 @@ internal static class OrdersEndpoints
         group.MapPost("{orderId:guid}/exams/{itemId:guid}/partially-complete", PartiallyCompleteExamEndpoint.Handle)
             .WithName("PartiallyCompleteExam")
             .WithSummary("Partially complete an exam on an order.")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status409Conflict);
+
+        group.MapPost("{orderId:guid}/exams/{itemId:guid}/place-in-progress", PlaceExamInProgressEndpoint.Handle)
+            .WithName("PlaceExamInProgress")
+            .WithSummary("Place an exam in progress.")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status409Conflict);
