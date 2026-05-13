@@ -11,10 +11,13 @@ import {
   placeExamInProgress as sdkPlaceExamInProgress,
   partiallyCompleteExam as sdkPartiallyCompleteExam,
 } from '@hc-lis/api-client';
-import type { HcLisApiCommonCreatedIdResponse } from '@hc-lis/api-client';
+import type {
+  HcLisApiCommonCreatedIdResponse,
+  HcLisModulesTestOrdersApplicationOrdersGetOrderDetailsOrderDetailsDto,
+} from '@hc-lis/api-client';
 import type { IOrdersApi, OrdersCreateParams, OrdersCreateResult, OrdersRequestExamParams } from './i-orders-api';
 import type { OrderListItem } from '../../domain/order-list-item';
-import type { OrderDetails } from '../../domain/order-details';
+import type { OrderDetails, ExamItemStatus } from '../../domain/order-details';
 
 @Injectable()
 export class SdkOrdersApi implements IOrdersApi {
@@ -62,14 +65,32 @@ export class SdkOrdersApi implements IOrdersApi {
 
   async getOrderDetails(orderId: string): Promise<OrderDetails> {
     const result = await sdkGetOrderDetails({ path: { orderId } });
-    const dto = result.data;
+    const dto = result.data as HcLisModulesTestOrdersApplicationOrdersGetOrderDetailsOrderDetailsDto | undefined;
     return {
       orderId: dto?.orderId ?? '',
       patientId: dto?.patientId ?? '',
       requestedBy: dto?.requestedBy ?? '',
       orderPriority: dto?.orderPriority ?? '',
       requestedAt: dto?.requestedAt ?? '',
-      items: [],
+      items: (dto?.items ?? []).map(item => ({
+        orderItemId: item.orderItemId ?? '',
+        specimenMnemonic: item.specimenMnemonic ?? '',
+        materialType: item.materialType ?? '',
+        containerType: item.containerType ?? '',
+        additive: item.additive ?? '',
+        processingType: item.processingType ?? '',
+        storageCondition: item.storageCondition ?? '',
+        reasonForRejection: item.reasonForRejection ?? null,
+        status: (item.status ?? 'Requested') as ExamItemStatus,
+        requestedAt: item.requestedAt ?? '',
+        canceledAt: item.canceledAt ?? null,
+        onHoldAt: item.onHoldAt ?? null,
+        acceptedAt: item.acceptedAt ?? null,
+        rejectedAt: item.rejectedAt ?? null,
+        inProgressAt: item.inProgressAt ?? null,
+        partiallyCompletedAt: item.partiallyCompletedAt ?? null,
+        completedAt: item.completedAt ?? null,
+      })),
     };
   }
 
