@@ -38,7 +38,7 @@ public class GetOrderDetailsWithItemsTests : TestBase
     }
 
     [Fact]
-    public async void GetOrderDetailsIncludesItems()
+    public async Task GetOrderDetailsIncludesItems()
     {
         OrderDetailsDto? result = await TestOrdersModule
             .ExecuteQueryAsync(new GetOrderDetailsQuery(OrderSampleData.OrderId))
