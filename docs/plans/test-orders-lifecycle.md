@@ -54,19 +54,19 @@ order lifecycle UX for receptionists and physicians.
 
 ## Phase 4 — Frontend: SDK + Infrastructure layer
 
-- [ ] **F-1** Regenerate `@hc-lis/api-client` SDK after all API changes are compiled
-- [ ] **F-2** Create domain types:
+- [x] **F-1** Regenerate `@hc-lis/api-client` SDK after all API changes are compiled
+- [x] **F-2** Create domain types:
   - `src/app/core/domain/order-list-item.ts` — `OrderListItem` interface
   - `src/app/core/domain/order-details.ts` — `OrderDetails`, `ExamItem`, `ExamItemStatus` union type
-- [ ] **F-3** Extend `IOrdersApi` (`core/infrastructure/orders/i-orders-api.ts`) with new methods:
+- [x] **F-3** Extend `IOrdersApi` (`core/infrastructure/orders/i-orders-api.ts`) with new methods:
   `getOrderList()`, `getOrderDetails(orderId)`,
   `acceptExam(orderId, itemId)`, `cancelExam(orderId, itemId)`,
   `rejectExam(orderId, itemId, reason)`, `placeExamOnHold(orderId, itemId, reason)`,
   `placeExamInProgress(orderId, itemId)`, `partiallyCompleteExam(orderId, itemId)`
-- [ ] **F-4** Implement all new methods in `SdkOrdersApi`
-- [ ] **F-5** Extend `IOrdersPort` (`core/application/i-orders-port.ts`) with the same methods
-- [ ] **F-6** Extend `OrdersService` (`features/orders/orders.service.ts`) with all new methods
-- [ ] **F-7** Add unit test cases to `orders.service.spec.ts` for each new method
+- [x] **F-4** Implement all new methods in `SdkOrdersApi`
+- [x] **F-5** Extend `IOrdersPort` (`core/application/i-orders-port.ts`) with the same methods
+- [x] **F-6** Extend `OrdersService` (`features/orders/orders.service.ts`) with all new methods
+- [x] **F-7** Add unit test cases to `orders.service.spec.ts` for each new method
 
 ---
 

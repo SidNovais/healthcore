@@ -41,7 +41,7 @@
 - Modify: `src/HC.LIS/HC.LIS.Modules/TestOrders/Application/Orders/GetOrderDetails/OrderDetailsDto.cs`
 - Modify: `src/HC.LIS/HC.LIS.Modules/TestOrders/Application/Orders/GetOrderDetails/GetOrderDetailsQueryHandler.cs`
 
-- [ ] **Step 1: Write the failing integration test**
+- [x] **Step 1: Write the failing integration test**
 
   Create `src/HC.LIS/HC.LIS.Modules/TestOrders/Tests/IntegrationTests/Orders/GetOrderDetailsWithItemsTests.cs`:
 
@@ -102,7 +102,7 @@
   }
   ```
 
-- [ ] **Step 2: Run test to verify it fails (compile error expected)**
+- [x] **Step 2: Run test to verify it fails (compile error expected)**
 
   ```bash
   dotnet build src/HC.LIS/HC.LIS.Modules/TestOrders/Tests/IntegrationTests/HC.LIS.Modules.TestOrders.IntegrationTests.csproj
@@ -110,14 +110,14 @@
 
   Expected: build error — `'OrderDetailsDto' does not contain a definition for 'Items'`
 
-- [ ] **Step 3: Commit the failing test**
+- [x] **Step 3: Commit the failing test**
 
   ```bash
   git add src/HC.LIS/HC.LIS.Modules/TestOrders/Tests/IntegrationTests/Orders/GetOrderDetailsWithItemsTests.cs
   git commit -m "test(test-orders): add GetOrderDetailsWithItems integration test"
   ```
 
-- [ ] **Step 4: Update OrderDetailsDto to add Items property**
+- [x] **Step 4: Update OrderDetailsDto to add Items property**
 
   Replace the full content of `src/HC.LIS/HC.LIS.Modules/TestOrders/Application/Orders/GetOrderDetails/OrderDetailsDto.cs`:
 
@@ -137,7 +137,7 @@
   }
   ```
 
-- [ ] **Step 5: Update GetOrderDetailsQueryHandler to fetch items**
+- [x] **Step 5: Update GetOrderDetailsQueryHandler to fetch items**
 
   Replace the full content of `src/HC.LIS/HC.LIS.Modules/TestOrders/Application/Orders/GetOrderDetails/GetOrderDetailsQueryHandler.cs`:
 
@@ -210,7 +210,7 @@
   }
   ```
 
-- [ ] **Step 6: Run the integration test to verify it passes**
+- [x] **Step 6: Run the integration test to verify it passes**
 
   ```bash
   dotnet test --filter "FullyQualifiedName~GetOrderDetailsIncludesItems" src/HC.LIS/HC.LIS.Modules/TestOrders/Tests/IntegrationTests/HC.LIS.Modules.TestOrders.IntegrationTests.csproj
@@ -218,7 +218,7 @@
 
   Expected: `Passed  GetOrderDetailsWithItemsTests.GetOrderDetailsIncludesItems`
 
-- [ ] **Step 7: Run all integration tests to check for regressions**
+- [x] **Step 7: Run all integration tests to check for regressions**
 
   ```bash
   dotnet test src/HC.LIS/HC.LIS.Modules/TestOrders/Tests/IntegrationTests/HC.LIS.Modules.TestOrders.IntegrationTests.csproj
@@ -226,7 +226,7 @@
 
   Expected: all tests pass.
 
-- [ ] **Step 8: Build the full API to confirm no compile errors**
+- [x] **Step 8: Build the full API to confirm no compile errors**
 
   ```bash
   dotnet build src/HC.LIS/HC.LIS.API/HC.LIS.API.csproj
@@ -234,7 +234,7 @@
 
   Expected: `Build succeeded. 0 Warning(s) 0 Error(s)`
 
-- [ ] **Step 9: Commit the backend fix**
+- [x] **Step 9: Commit the backend fix**
 
   ```bash
   git add src/HC.LIS/HC.LIS.Modules/TestOrders/Application/Orders/GetOrderDetails/OrderDetailsDto.cs
@@ -249,7 +249,7 @@
 **Files:**
 - Generated: `src/HC.LIS.Frontend/packages/hc-lis-api-client/src/generated/` (fully regenerated)
 
-- [ ] **Step 1: Start the API in the background**
+- [x] **Step 1: Start the API in the background**
 
   In a separate terminal:
   ```bash
@@ -258,7 +258,7 @@
 
   Wait until you see `Now listening on: http://localhost:5000` in the output before proceeding.
 
-- [ ] **Step 2: Generate the SDK from the running API**
+- [x] **Step 2: Generate the SDK from the running API**
 
   ```bash
   cd src/HC.LIS.Frontend/packages/hc-lis-api-client
@@ -272,7 +272,7 @@
   grep -l "getOrderList\|placeExamInProgress" src/generated/
   ```
 
-- [ ] **Step 3: Build the SDK package**
+- [x] **Step 3: Build the SDK package**
 
   ```bash
   yarn build
@@ -280,7 +280,7 @@
 
   Expected: `dist/index.js` and `dist/index.cjs` updated, no TypeScript errors.
 
-- [ ] **Step 4: Reinstall in the SPA to pick up the new build**
+- [x] **Step 4: Reinstall in the SPA to pick up the new build**
 
   ```bash
   cd ../hc-lis-spa
@@ -289,7 +289,7 @@
 
   Expected: symlink in `node_modules/@hc-lis/api-client` points to the rebuilt package.
 
-- [ ] **Step 5: Stop the API** (Ctrl+C in its terminal)
+- [x] **Step 5: Stop the API** (Ctrl+C in its terminal)
 
 ---
 
@@ -298,11 +298,11 @@
 **Files:**
 - Modify: `src/HC.LIS.Frontend/packages/hc-lis-spa/src/app/core/infrastructure/orders/sdk-orders-api.ts`
 
-- [ ] **Step 1: Check the generated SDK type for the order details DTO**
+- [x] **Step 1: Check the generated SDK type for the order details DTO**
 
   Open `src/HC.LIS.Frontend/packages/hc-lis-api-client/src/generated/types.gen.ts` and find the type returned by `getOrderDetails`. Look for a type with an `items` array property. Note its exact TypeScript type name — you'll use it in the import below if needed.
 
-- [ ] **Step 2: Update the import in sdk-orders-api.ts**
+- [x] **Step 2: Update the import in sdk-orders-api.ts**
 
   In `src/HC.LIS.Frontend/packages/hc-lis-spa/src/app/core/infrastructure/orders/sdk-orders-api.ts`, update the import for domain types:
 
@@ -310,7 +310,7 @@
   import type { OrderDetails, ExamItemStatus } from '../../domain/order-details';
   ```
 
-- [ ] **Step 3: Replace the getOrderDetails method with items mapping**
+- [x] **Step 3: Replace the getOrderDetails method with items mapping**
 
   Replace the existing `getOrderDetails` method body in `sdk-orders-api.ts`:
 
@@ -349,7 +349,7 @@
 
   > **Note:** If TypeScript reports that `item.someField` doesn't exist, the SDK generated a different property name. Check `types.gen.ts` for the exact field names on the item DTO type and update accordingly.
 
-- [ ] **Step 4: TypeScript compile check**
+- [x] **Step 4: TypeScript compile check**
 
   ```bash
   cd src/HC.LIS.Frontend/packages/hc-lis-spa
@@ -364,7 +364,7 @@
 
 **Files:** no changes — verification only.
 
-- [ ] **Step 1: Run the SPA unit tests**
+- [x] **Step 1: Run the SPA unit tests**
 
   ```bash
   cd src/HC.LIS.Frontend/packages/hc-lis-spa
@@ -395,7 +395,7 @@
 
 **Files:** all staged/untracked frontend files from F-2 through F-7 plus the items mapping fix.
 
-- [ ] **Step 1: Commit F-1 (SDK regeneration)**
+- [x] **Step 1: Commit F-1 (SDK regeneration)**
 
   > **Note:** `src/generated/` is listed in `.gitignore` for the api-client package — `git add src/generated/` will produce no changes. Skip this commit step; the SDK is regenerated locally as part of the dev workflow.
 
