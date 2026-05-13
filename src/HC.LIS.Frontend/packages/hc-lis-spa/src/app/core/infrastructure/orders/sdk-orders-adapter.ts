@@ -2,6 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import type { IOrdersPort, CreateOrderParams, RequestExamParams } from '../../application/i-orders-port';
 import { ORDERS_API } from './i-orders-api';
 import type { OrderSummary } from '../../domain/order-summary';
+import type { OrderListItem } from '../../domain/order-list-item';
+import type { OrderDetails } from '../../domain/order-details';
 
 @Injectable()
 export class SdkOrdersAdapter implements IOrdersPort {
@@ -29,5 +31,37 @@ export class SdkOrdersAdapter implements IOrdersPort {
       processingType: params.processingType,
       storageCondition: params.storageCondition,
     });
+  }
+
+  getOrderList(): Promise<OrderListItem[]> {
+    return this.api.getOrderList();
+  }
+
+  getOrderDetails(orderId: string): Promise<OrderDetails> {
+    return this.api.getOrderDetails(orderId);
+  }
+
+  acceptExam(orderId: string, itemId: string): Promise<void> {
+    return this.api.acceptExam(orderId, itemId);
+  }
+
+  cancelExam(orderId: string, itemId: string): Promise<void> {
+    return this.api.cancelExam(orderId, itemId);
+  }
+
+  rejectExam(orderId: string, itemId: string, reason: string): Promise<void> {
+    return this.api.rejectExam(orderId, itemId, reason);
+  }
+
+  placeExamOnHold(orderId: string, itemId: string, reason: string): Promise<void> {
+    return this.api.placeExamOnHold(orderId, itemId, reason);
+  }
+
+  placeExamInProgress(orderId: string, itemId: string): Promise<void> {
+    return this.api.placeExamInProgress(orderId, itemId);
+  }
+
+  partiallyCompleteExam(orderId: string, itemId: string): Promise<void> {
+    return this.api.partiallyCompleteExam(orderId, itemId);
   }
 }
