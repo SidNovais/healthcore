@@ -38,3 +38,46 @@ test.describe('Test Order Request', () => {
     await expect(page).toHaveURL('/unauthorized', { timeout: 5_000 });
   });
 });
+
+const LAB_TECH_EMAIL = 'labtech@hclis.local';
+const LAB_TECH_PASSWORD = 'Admin1234!';
+
+async function loginAsLabTechnician(page: import('@playwright/test').Page) {
+  await page.goto('/login');
+  await page.getByLabel('Email').fill(LAB_TECH_EMAIL);
+  await page.getByLabel('Password').fill(LAB_TECH_PASSWORD);
+  await page.getByRole('button', { name: /sign in/i }).click();
+  await expect(page).toHaveURL('/waiting-room', { timeout: 10_000 });
+}
+
+test.describe('Order List', () => {
+  test('Receptionist sees order list table at /orders', async ({ page }) => {
+    await loginAsReceptionist(page);
+    await page.goto('/orders');
+    await expect(page.getByTestId('order-list-table')).toBeVisible({ timeout: 5_000 });
+  });
+
+  test('Clicking an order row navigates to /orders/:id', async ({ page }) => {
+    await loginAsReceptionist(page);
+
+    // Create an order so the list has at least one row
+    await page.getByTestId('patient-id-input').fill('00000000-0000-0000-0000-000000000001');
+    await page.getByTestId('create-order-btn').click();
+    await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
+
+    await page.goto('/orders');
+    await expect(page.getByTestId('order-list-table')).toBeVisible({ timeout: 5_000 });
+
+    await page.getByTestId('order-list-row').first().click();
+    await expect(page).toHaveURL(
+      /\/orders\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
+      { timeout: 5_000 }
+    );
+  });
+
+  test('LabTechnician is redirected to /unauthorized when accessing /orders', async ({ page }) => {
+    await loginAsLabTechnician(page);
+    await page.goto('/orders');
+    await expect(page).toHaveURL('/unauthorized', { timeout: 5_000 });
+  });
+});
