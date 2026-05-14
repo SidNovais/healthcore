@@ -81,3 +81,120 @@ test.describe('Order List', () => {
     await expect(page).toHaveURL('/unauthorized', { timeout: 5_000 });
   });
 });
+
+const PHYSICIAN_EMAIL = 'physician@hclis.local';
+const PHYSICIAN_PASSWORD = 'Admin1234!';
+
+async function loginAsPhysician(page: import('@playwright/test').Page) {
+  await page.goto('/login');
+  await page.getByLabel('Email').fill(PHYSICIAN_EMAIL);
+  await page.getByLabel('Password').fill(PHYSICIAN_PASSWORD);
+  await page.getByRole('button', { name: /sign in/i }).click();
+  await expect(page).toHaveURL('/worklist', { timeout: 10_000 });
+}
+
+test.describe('Order Detail', () => {
+  test('Receptionist sees order detail page at /orders/:id', async ({ page }) => {
+    await loginAsReceptionist(page);
+
+    await page.getByTestId('patient-id-input').fill('00000000-0000-0000-0000-000000000001');
+    await page.getByTestId('create-order-btn').click();
+    await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
+    await page.getByTestId('exam-mnemonic-input').fill('GLU');
+    await page.getByTestId('container-type-input').fill('RedTop');
+    await page.getByTestId('request-exam-btn').click();
+    await expect(page.getByTestId('exam-added-confirmation')).toBeVisible({ timeout: 5_000 });
+
+    await page.goto('/orders');
+    await expect(page.getByTestId('order-list-table')).toBeVisible({ timeout: 5_000 });
+    await page.getByTestId('order-list-row').first().click();
+    await expect(page).toHaveURL(
+      /\/orders\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
+      { timeout: 5_000 }
+    );
+
+    await expect(page.getByTestId('order-detail')).toBeVisible({ timeout: 5_000 });
+  });
+
+  test('Order detail page shows exam items table with one row', async ({ page }) => {
+    await loginAsReceptionist(page);
+
+    await page.getByTestId('patient-id-input').fill('00000000-0000-0000-0000-000000000001');
+    await page.getByTestId('create-order-btn').click();
+    await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
+    await page.getByTestId('exam-mnemonic-input').fill('GLU');
+    await page.getByTestId('container-type-input').fill('RedTop');
+    await page.getByTestId('request-exam-btn').click();
+    await expect(page.getByTestId('exam-added-confirmation')).toBeVisible({ timeout: 5_000 });
+
+    await page.goto('/orders');
+    await page.getByTestId('order-list-row').first().click();
+    await expect(page).toHaveURL(
+      /\/orders\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
+      { timeout: 5_000 }
+    );
+
+    await expect(page.getByTestId('exam-items-table')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('exam-item-row').first()).toBeVisible({ timeout: 5_000 });
+  });
+
+  test('LabTechnician is redirected to /unauthorized when accessing /orders/:id', async ({ page }) => {
+    await loginAsLabTechnician(page);
+    await page.goto('/orders/00000000-0000-0000-0000-000000000001');
+    await expect(page).toHaveURL('/unauthorized', { timeout: 5_000 });
+  });
+
+  test('Receptionist can Accept a Requested exam item — status updates to Accepted', async ({ page }) => {
+    await loginAsReceptionist(page);
+
+    await page.getByTestId('patient-id-input').fill('00000000-0000-0000-0000-000000000001');
+    await page.getByTestId('create-order-btn').click();
+    await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
+    await page.getByTestId('exam-mnemonic-input').fill('GLU');
+    await page.getByTestId('container-type-input').fill('RedTop');
+    await page.getByTestId('request-exam-btn').click();
+    await expect(page.getByTestId('exam-added-confirmation')).toBeVisible({ timeout: 5_000 });
+
+    await page.goto('/orders');
+    await page.getByTestId('order-list-row').first().click();
+    await expect(page).toHaveURL(
+      /\/orders\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
+      { timeout: 5_000 }
+    );
+
+    await expect(page.getByTestId('exam-items-table')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('accept-btn').first()).toBeVisible({ timeout: 5_000 });
+
+    await page.getByTestId('accept-btn').first().click();
+
+    await expect(page.getByTestId('item-status').first()).toHaveText('Accepted', { timeout: 10_000 });
+  });
+
+  test('Receptionist can Reject an exam item with a reason — status updates to Rejected', async ({ page }) => {
+    await loginAsReceptionist(page);
+
+    await page.getByTestId('patient-id-input').fill('00000000-0000-0000-0000-000000000001');
+    await page.getByTestId('create-order-btn').click();
+    await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
+    await page.getByTestId('exam-mnemonic-input').fill('HGB');
+    await page.getByTestId('container-type-input').fill('EDTA');
+    await page.getByTestId('request-exam-btn').click();
+    await expect(page.getByTestId('exam-added-confirmation')).toBeVisible({ timeout: 5_000 });
+
+    await page.goto('/orders');
+    await page.getByTestId('order-list-row').first().click();
+    await expect(page).toHaveURL(
+      /\/orders\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
+      { timeout: 5_000 }
+    );
+
+    await expect(page.getByTestId('exam-items-table')).toBeVisible({ timeout: 5_000 });
+    await page.getByTestId('reject-btn').first().click();
+
+    await expect(page.getByTestId('reject-reason-form')).toBeVisible({ timeout: 5_000 });
+    await page.getByTestId('reject-reason-input').fill('Hemolyzed sample');
+    await page.getByTestId('confirm-reject-btn').click();
+
+    await expect(page.getByTestId('item-status').first()).toHaveText('Rejected', { timeout: 10_000 });
+  });
+});
