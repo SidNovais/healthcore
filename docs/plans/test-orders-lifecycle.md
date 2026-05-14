@@ -72,13 +72,13 @@ order lifecycle UX for receptionists and physicians.
 
 ## Phase 5 — Frontend: Order List page
 
-- [ ] **F-8** [E2E first] Add tests to `e2e/orders.spec.ts`:
+- [x] **F-8** [E2E first] Add tests to `e2e/orders.spec.ts`:
   - Receptionist sees order list at `/orders` (`data-testid="order-list-table"`)
   - Clicking a row navigates to `/orders/<id>`
   - LabTechnician is redirected to `/unauthorized`
-- [ ] **F-9** Add `/orders` route to `app.routes.ts`
+- [x] **F-9** Add `/orders` route to `app.routes.ts`
   — guard: `roleGuard('Receptionist', 'Physician', 'ITAdmin')`
-- [ ] **F-10** Implement `OrderListComponent` (`features/orders/order-list.component.ts`)
+- [x] **F-10** Implement `OrderListComponent` (`features/orders/order-list.component.ts`)
   — signals-based; table with `data-testid="order-list-row"` per item; each row is a `[routerLink]`
 
 ---
