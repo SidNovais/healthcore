@@ -27,6 +27,12 @@ export const routes: Routes = [
           import('./features/orders/new-order.component').then(m => m.NewOrderComponent),
       },
       {
+        path: 'orders',
+        canActivate: [roleGuard('Receptionist', 'Physician', 'ITAdmin')],
+        loadComponent: () =>
+          import('./features/orders/order-list.component').then(m => m.OrderListComponent),
+      },
+      {
         path: 'waiting-room',
         canActivate: [roleGuard('LabTechnician', 'ITAdmin')],
         loadComponent: () =>
