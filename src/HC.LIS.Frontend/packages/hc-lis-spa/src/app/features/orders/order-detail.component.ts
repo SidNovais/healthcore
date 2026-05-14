@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, NgZone, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { OrdersService } from './orders.service';
@@ -130,6 +130,7 @@ import { OrdersService } from './orders.service';
 export class OrderDetailComponent implements OnInit {
   protected readonly ordersService = inject(OrdersService);
   private readonly route = inject(ActivatedRoute);
+  private readonly ngZone = inject(NgZone);
 
   protected readonly activeRejectItemId = signal<string | null>(null);
   protected readonly activeOnHoldItemId = signal<string | null>(null);
@@ -140,10 +141,23 @@ export class OrderDetailComponent implements OnInit {
     void this.ordersService.loadOrderDetails(this.route.snapshot.params['id'] as string);
   }
 
+  // Fires an immediate reload and retries after 3 s outside Angular's zone so that
+  // the outbox-driven projection (Quartz every 2 s) has time to commit before the
+  // second GET fires. Running outside the zone prevents TestBed.whenStable() from
+  // blocking on the timer in integration tests.
+  private scheduleReload(orderId: string): void {
+    void this.ordersService.loadOrderDetails(orderId);
+    this.ngZone.runOutsideAngular(() => {
+      setTimeout(() => {
+        this.ngZone.run(() => void this.ordersService.loadOrderDetails(orderId));
+      }, 3000);
+    });
+  }
+
   protected async onAccept(itemId: string): Promise<void> {
     const orderId = this.route.snapshot.params['id'] as string;
     await this.ordersService.acceptExam(orderId, itemId);
-    void this.ordersService.loadOrderDetails(orderId);
+    this.scheduleReload(orderId);
   }
 
   protected startReject(itemId: string): void {
@@ -156,13 +170,13 @@ export class OrderDetailComponent implements OnInit {
     await this.ordersService.rejectExam(orderId, itemId, this.rejectReason.trim());
     this.activeRejectItemId.set(null);
     this.rejectReason = '';
-    void this.ordersService.loadOrderDetails(orderId);
+    this.scheduleReload(orderId);
   }
 
   protected async onCancel(itemId: string): Promise<void> {
     const orderId = this.route.snapshot.params['id'] as string;
     await this.ordersService.cancelExam(orderId, itemId);
-    void this.ordersService.loadOrderDetails(orderId);
+    this.scheduleReload(orderId);
   }
 
   protected startOnHold(itemId: string): void {
@@ -175,18 +189,18 @@ export class OrderDetailComponent implements OnInit {
     await this.ordersService.placeExamOnHold(orderId, itemId, this.onHoldReason.trim());
     this.activeOnHoldItemId.set(null);
     this.onHoldReason = '';
-    void this.ordersService.loadOrderDetails(orderId);
+    this.scheduleReload(orderId);
   }
 
   protected async onPlaceInProgress(itemId: string): Promise<void> {
     const orderId = this.route.snapshot.params['id'] as string;
     await this.ordersService.placeExamInProgress(orderId, itemId);
-    void this.ordersService.loadOrderDetails(orderId);
+    this.scheduleReload(orderId);
   }
 
   protected async onPartiallyComplete(itemId: string): Promise<void> {
     const orderId = this.route.snapshot.params['id'] as string;
     await this.ordersService.partiallyCompleteExam(orderId, itemId);
-    void this.ordersService.loadOrderDetails(orderId);
+    this.scheduleReload(orderId);
   }
 }
