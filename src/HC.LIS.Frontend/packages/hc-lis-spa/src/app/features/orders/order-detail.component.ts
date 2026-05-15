@@ -22,6 +22,10 @@ import { OrdersService } from './orders.service';
           <p>Requested At: <span data-testid="order-requested-at">{{ details.requestedAt }}</span></p>
         </div>
 
+        @if (errorMessage()) {
+          <div class="error-banner" data-testid="exam-action-error">{{ errorMessage() }}</div>
+        }
+
         <h2 class="section-title">Exam Items</h2>
 
         <table data-testid="exam-items-table" class="items-table">
@@ -125,6 +129,7 @@ import { OrdersService } from './orders.service';
     .reason-form { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.5rem; min-width: 220px; }
     .reason-form input { padding: 0.35rem 0.6rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.8rem; }
     .empty-cell { text-align: center; color: #9ca3af; padding: 2rem; }
+    .error-banner { margin-bottom: 1rem; padding: 0.75rem 1rem; border-radius: 6px; background: #fef2f2; border: 1px solid #fca5a5; color: #b91c1c; font-size: 0.875rem; }
   `],
 })
 export class OrderDetailComponent implements OnInit {
@@ -134,6 +139,7 @@ export class OrderDetailComponent implements OnInit {
 
   protected readonly activeRejectItemId = signal<string | null>(null);
   protected readonly activeOnHoldItemId = signal<string | null>(null);
+  protected readonly errorMessage = signal<string | null>(null);
   protected rejectReason = '';
   protected onHoldReason = '';
 
@@ -156,8 +162,13 @@ export class OrderDetailComponent implements OnInit {
 
   protected async onAccept(itemId: string): Promise<void> {
     const orderId = this.route.snapshot.params['id'] as string;
-    await this.ordersService.acceptExam(orderId, itemId);
-    this.scheduleReload(orderId);
+    this.errorMessage.set(null);
+    try {
+      await this.ordersService.acceptExam(orderId, itemId);
+      this.scheduleReload(orderId);
+    } catch (err: unknown) {
+      this.errorMessage.set(err instanceof Error ? err.message : 'Unexpected error.');
+    }
   }
 
   protected startReject(itemId: string): void {
@@ -167,16 +178,26 @@ export class OrderDetailComponent implements OnInit {
 
   protected async onReject(itemId: string): Promise<void> {
     const orderId = this.route.snapshot.params['id'] as string;
-    await this.ordersService.rejectExam(orderId, itemId, this.rejectReason.trim());
-    this.activeRejectItemId.set(null);
-    this.rejectReason = '';
-    this.scheduleReload(orderId);
+    this.errorMessage.set(null);
+    try {
+      await this.ordersService.rejectExam(orderId, itemId, this.rejectReason.trim());
+      this.activeRejectItemId.set(null);
+      this.rejectReason = '';
+      this.scheduleReload(orderId);
+    } catch (err: unknown) {
+      this.errorMessage.set(err instanceof Error ? err.message : 'Unexpected error.');
+    }
   }
 
   protected async onCancel(itemId: string): Promise<void> {
     const orderId = this.route.snapshot.params['id'] as string;
-    await this.ordersService.cancelExam(orderId, itemId);
-    this.scheduleReload(orderId);
+    this.errorMessage.set(null);
+    try {
+      await this.ordersService.cancelExam(orderId, itemId);
+      this.scheduleReload(orderId);
+    } catch (err: unknown) {
+      this.errorMessage.set(err instanceof Error ? err.message : 'Unexpected error.');
+    }
   }
 
   protected startOnHold(itemId: string): void {
@@ -186,21 +207,36 @@ export class OrderDetailComponent implements OnInit {
 
   protected async onPlaceOnHold(itemId: string): Promise<void> {
     const orderId = this.route.snapshot.params['id'] as string;
-    await this.ordersService.placeExamOnHold(orderId, itemId, this.onHoldReason.trim());
-    this.activeOnHoldItemId.set(null);
-    this.onHoldReason = '';
-    this.scheduleReload(orderId);
+    this.errorMessage.set(null);
+    try {
+      await this.ordersService.placeExamOnHold(orderId, itemId, this.onHoldReason.trim());
+      this.activeOnHoldItemId.set(null);
+      this.onHoldReason = '';
+      this.scheduleReload(orderId);
+    } catch (err: unknown) {
+      this.errorMessage.set(err instanceof Error ? err.message : 'Unexpected error.');
+    }
   }
 
   protected async onPlaceInProgress(itemId: string): Promise<void> {
     const orderId = this.route.snapshot.params['id'] as string;
-    await this.ordersService.placeExamInProgress(orderId, itemId);
-    this.scheduleReload(orderId);
+    this.errorMessage.set(null);
+    try {
+      await this.ordersService.placeExamInProgress(orderId, itemId);
+      this.scheduleReload(orderId);
+    } catch (err: unknown) {
+      this.errorMessage.set(err instanceof Error ? err.message : 'Unexpected error.');
+    }
   }
 
   protected async onPartiallyComplete(itemId: string): Promise<void> {
     const orderId = this.route.snapshot.params['id'] as string;
-    await this.ordersService.partiallyCompleteExam(orderId, itemId);
-    this.scheduleReload(orderId);
+    this.errorMessage.set(null);
+    try {
+      await this.ordersService.partiallyCompleteExam(orderId, itemId);
+      this.scheduleReload(orderId);
+    } catch (err: unknown) {
+      this.errorMessage.set(err instanceof Error ? err.message : 'Unexpected error.');
+    }
   }
 }
