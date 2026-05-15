@@ -192,4 +192,111 @@ test.describe('Order Detail', () => {
 
     await expect(page.getByTestId('item-status').first()).toHaveText('Rejected', { timeout: 10_000 });
   });
+
+  test('Full workflow: accept exam then place in progress — status updates to InProgress', async ({ page }) => {
+    await loginAsReceptionist(page);
+
+    await page.getByTestId('patient-id-input').fill('00000000-0000-0000-0000-000000000001');
+    await page.getByTestId('create-order-btn').click();
+    await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
+    const orderId = (await page.locator('.order-id').textContent())!.trim();
+    await page.getByTestId('exam-mnemonic-input').fill('CBC');
+    await page.getByTestId('container-type-input').fill('EDTA');
+    await page.getByTestId('request-exam-btn').click();
+    await expect(page.getByTestId('exam-added-confirmation')).toBeVisible({ timeout: 5_000 });
+
+    await page.goto('/orders');
+    await expect(page.getByTestId('order-list-table')).toBeVisible({ timeout: 5_000 });
+    await page.goto(`/orders/${orderId}`);
+    await expect(page.getByTestId('exam-items-table')).toBeVisible({ timeout: 5_000 });
+
+    await expect(page.getByTestId('accept-btn').first()).toBeVisible({ timeout: 5_000 });
+    await page.getByTestId('accept-btn').first().click();
+    await expect(page.getByTestId('item-status').first()).toHaveText('Accepted', { timeout: 10_000 });
+
+    await expect(page.getByTestId('in-progress-btn').first()).toBeVisible({ timeout: 5_000 });
+    await page.getByTestId('in-progress-btn').first().click();
+    await expect(page.getByTestId('item-status').first()).toHaveText('InProgress', { timeout: 10_000 });
+  });
+
+  test('Receptionist can Cancel a Requested exam item — status updates to Canceled', async ({ page }) => {
+    await loginAsReceptionist(page);
+
+    await page.getByTestId('patient-id-input').fill('00000000-0000-0000-0000-000000000001');
+    await page.getByTestId('create-order-btn').click();
+    await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
+    const orderId = (await page.locator('.order-id').textContent())!.trim();
+    await page.getByTestId('exam-mnemonic-input').fill('TSH');
+    await page.getByTestId('container-type-input').fill('GoldTop');
+    await page.getByTestId('request-exam-btn').click();
+    await expect(page.getByTestId('exam-added-confirmation')).toBeVisible({ timeout: 5_000 });
+
+    await page.goto('/orders');
+    await expect(page.getByTestId('order-list-table')).toBeVisible({ timeout: 5_000 });
+    await page.goto(`/orders/${orderId}`);
+    await expect(page.getByTestId('exam-items-table')).toBeVisible({ timeout: 5_000 });
+
+    await expect(page.getByTestId('cancel-btn').first()).toBeVisible({ timeout: 5_000 });
+    await page.getByTestId('cancel-btn').first().click();
+    await expect(page.getByTestId('item-status').first()).toHaveText('Canceled', { timeout: 10_000 });
+  });
+
+  test('Receptionist can Place a Requested exam On Hold with reason — status updates to OnHold', async ({ page }) => {
+    await loginAsReceptionist(page);
+
+    await page.getByTestId('patient-id-input').fill('00000000-0000-0000-0000-000000000001');
+    await page.getByTestId('create-order-btn').click();
+    await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
+    const orderId = (await page.locator('.order-id').textContent())!.trim();
+    await page.getByTestId('exam-mnemonic-input').fill('CRP');
+    await page.getByTestId('container-type-input').fill('GoldTop');
+    await page.getByTestId('request-exam-btn').click();
+    await expect(page.getByTestId('exam-added-confirmation')).toBeVisible({ timeout: 5_000 });
+
+    await page.goto('/orders');
+    await expect(page.getByTestId('order-list-table')).toBeVisible({ timeout: 5_000 });
+    await page.goto(`/orders/${orderId}`);
+    await expect(page.getByTestId('exam-items-table')).toBeVisible({ timeout: 5_000 });
+
+    await expect(page.getByTestId('on-hold-btn').first()).toBeVisible({ timeout: 5_000 });
+    await page.getByTestId('on-hold-btn').first().click();
+
+    await expect(page.getByTestId('on-hold-reason-form')).toBeVisible({ timeout: 5_000 });
+    await page.getByTestId('on-hold-reason-input').fill('Awaiting physician confirmation');
+    await page.getByTestId('confirm-on-hold-btn').click();
+
+    await expect(page.getByTestId('item-status').first()).toHaveText('OnHold', { timeout: 10_000 });
+  });
+
+  test('Shows exam-action-error when an exam action returns a 409 business rule error', async ({ page }) => {
+    await loginAsReceptionist(page);
+
+    await page.getByTestId('patient-id-input').fill('00000000-0000-0000-0000-000000000001');
+    await page.getByTestId('create-order-btn').click();
+    await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
+    const orderId = (await page.locator('.order-id').textContent())!.trim();
+    await page.getByTestId('exam-mnemonic-input').fill('LDL');
+    await page.getByTestId('container-type-input').fill('GoldTop');
+    await page.getByTestId('request-exam-btn').click();
+    await expect(page.getByTestId('exam-added-confirmation')).toBeVisible({ timeout: 5_000 });
+
+    await page.goto('/orders');
+    await expect(page.getByTestId('order-list-table')).toBeVisible({ timeout: 5_000 });
+    await page.goto(`/orders/${orderId}`);
+    await expect(page.getByTestId('exam-items-table')).toBeVisible({ timeout: 5_000 });
+
+    await page.route(`**/orders/${orderId}/exams/**/accept`, route =>
+      route.fulfill({
+        status: 409,
+        contentType: 'application/problem+json',
+        body: JSON.stringify({ detail: 'Cannot accept item: already accepted.' }),
+      })
+    );
+
+    await expect(page.getByTestId('accept-btn').first()).toBeVisible({ timeout: 5_000 });
+    await page.getByTestId('accept-btn').first().click();
+
+    await expect(page.getByTestId('exam-action-error')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('exam-action-error')).toContainText('Cannot accept item: already accepted.');
+  });
 });
