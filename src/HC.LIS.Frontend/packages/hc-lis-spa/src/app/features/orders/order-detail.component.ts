@@ -138,7 +138,7 @@ export class OrderDetailComponent implements OnInit {
   protected onHoldReason = '';
 
   ngOnInit(): void {
-    void this.ordersService.loadOrderDetails(this.route.snapshot.params['id'] as string);
+    this.scheduleReload(this.route.snapshot.params['id'] as string);
   }
 
   // Fires an immediate reload and retries after 3 s outside Angular's zone so that
