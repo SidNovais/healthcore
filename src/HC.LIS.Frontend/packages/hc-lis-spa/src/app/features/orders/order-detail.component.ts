@@ -56,7 +56,7 @@ import { OrdersService } from './orders.service';
                   @if (item.status === 'Requested') {
                     <button data-testid="reject-btn" (click)="startReject(item.orderItemId)">Reject</button>
                   }
-                  @if (item.status === 'Accepted') {
+                  @if (item.status === 'Requested') {
                     <button data-testid="on-hold-btn" (click)="startOnHold(item.orderItemId)">On Hold</button>
                   }
                   @if (item.status !== 'Canceled' && item.status !== 'Rejected' && item.status !== 'Completed' && item.status !== 'PartiallyCompleted') {
