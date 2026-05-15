@@ -53,7 +53,7 @@ import { OrdersService } from './orders.service';
                   @if (item.status === 'InProgress') {
                     <button data-testid="partially-complete-btn" (click)="onPartiallyComplete(item.orderItemId)">Partially Complete</button>
                   }
-                  @if (item.status === 'Requested' || item.status === 'Accepted') {
+                  @if (item.status === 'Requested') {
                     <button data-testid="reject-btn" (click)="startReject(item.orderItemId)">Reject</button>
                   }
                   @if (item.status === 'Accepted') {

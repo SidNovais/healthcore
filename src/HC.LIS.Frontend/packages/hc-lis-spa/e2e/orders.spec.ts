@@ -122,17 +122,16 @@ test.describe('Order Detail', () => {
     await page.getByTestId('patient-id-input').fill('00000000-0000-0000-0000-000000000001');
     await page.getByTestId('create-order-btn').click();
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
+    const orderId = (await page.locator('.order-id').textContent())!.trim();
     await page.getByTestId('exam-mnemonic-input').fill('GLU');
     await page.getByTestId('container-type-input').fill('RedTop');
     await page.getByTestId('request-exam-btn').click();
     await expect(page.getByTestId('exam-added-confirmation')).toBeVisible({ timeout: 5_000 });
 
+    // Navigate via /orders to allow the exam projection time to commit (Quartz outbox ~2 s)
     await page.goto('/orders');
-    await page.getByTestId('order-list-row').first().click();
-    await expect(page).toHaveURL(
-      /\/orders\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
-      { timeout: 5_000 }
-    );
+    await expect(page.getByTestId('order-list-table')).toBeVisible({ timeout: 5_000 });
+    await page.goto(`/orders/${orderId}`);
 
     await expect(page.getByTestId('exam-items-table')).toBeVisible({ timeout: 5_000 });
     await expect(page.getByTestId('exam-item-row').first()).toBeVisible({ timeout: 5_000 });
@@ -150,17 +149,15 @@ test.describe('Order Detail', () => {
     await page.getByTestId('patient-id-input').fill('00000000-0000-0000-0000-000000000001');
     await page.getByTestId('create-order-btn').click();
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
+    const orderId = (await page.locator('.order-id').textContent())!.trim();
     await page.getByTestId('exam-mnemonic-input').fill('GLU');
     await page.getByTestId('container-type-input').fill('RedTop');
     await page.getByTestId('request-exam-btn').click();
     await expect(page.getByTestId('exam-added-confirmation')).toBeVisible({ timeout: 5_000 });
 
     await page.goto('/orders');
-    await page.getByTestId('order-list-row').first().click();
-    await expect(page).toHaveURL(
-      /\/orders\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
-      { timeout: 5_000 }
-    );
+    await expect(page.getByTestId('order-list-table')).toBeVisible({ timeout: 5_000 });
+    await page.goto(`/orders/${orderId}`);
 
     await expect(page.getByTestId('exam-items-table')).toBeVisible({ timeout: 5_000 });
     await expect(page.getByTestId('accept-btn').first()).toBeVisible({ timeout: 5_000 });
@@ -176,17 +173,15 @@ test.describe('Order Detail', () => {
     await page.getByTestId('patient-id-input').fill('00000000-0000-0000-0000-000000000001');
     await page.getByTestId('create-order-btn').click();
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
+    const orderId = (await page.locator('.order-id').textContent())!.trim();
     await page.getByTestId('exam-mnemonic-input').fill('HGB');
     await page.getByTestId('container-type-input').fill('EDTA');
     await page.getByTestId('request-exam-btn').click();
     await expect(page.getByTestId('exam-added-confirmation')).toBeVisible({ timeout: 5_000 });
 
     await page.goto('/orders');
-    await page.getByTestId('order-list-row').first().click();
-    await expect(page).toHaveURL(
-      /\/orders\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
-      { timeout: 5_000 }
-    );
+    await expect(page.getByTestId('order-list-table')).toBeVisible({ timeout: 5_000 });
+    await page.goto(`/orders/${orderId}`);
 
     await expect(page.getByTestId('exam-items-table')).toBeVisible({ timeout: 5_000 });
     await page.getByTestId('reject-btn').first().click();
