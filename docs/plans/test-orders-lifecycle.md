@@ -85,13 +85,13 @@ order lifecycle UX for receptionists and physicians.
 
 ## Phase 6 — Frontend: Order Detail page
 
-- [ ] **F-11** [E2E first] Add tests to `e2e/orders.spec.ts`:
+- [x] **F-11** [E2E first] Add tests to `e2e/orders.spec.ts`:
   - Receptionist sees `data-testid="order-detail-header"` at `/orders/:id`
   - Exam items listed with `data-testid="exam-item-row"` and `data-testid="exam-status-badge"`
   - Physician can access the page (no redirect)
-- [ ] **F-12** Add `/orders/:id` route to `app.routes.ts`
+- [x] **F-12** Add `/orders/:id` route to `app.routes.ts`
   — guard: `roleGuard('Receptionist', 'Physician', 'ITAdmin')`
-- [ ] **F-13** Implement `OrderDetailComponent` (`features/orders/order-detail.component.ts`)
+- [x] **F-13** Implement `OrderDetailComponent` (`features/orders/order-detail.component.ts`)
   — reads `id` from `ActivatedRoute`; calls `ordersService.getOrderDetails(id)` on init
   — shows order header + exam item list; `data-testid="back-to-orders-link"` back nav
 
