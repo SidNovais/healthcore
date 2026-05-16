@@ -18,7 +18,7 @@ internal class CreateCollectionRequestForOrderCommandHandler(
         CollectionRequest collectionRequest = CollectionRequest.Create(
             command.CollectionRequestId,
             command.PatientId,
-            examPreparationVerified: false,
+            examPreparationVerified: true,
             command.IsUrgent,
             command.AcceptedAt
         );
