@@ -37,16 +37,13 @@ test.describe('Authentication', () => {
 });
 
 const RECEPTIONIST_EMAIL = 'receptionist@hclis.local';
-const RECEPTIONIST_PASSWORD = 'Admin1234!';
 const PHYSICIAN_EMAIL = 'physician@hclis.local';
-const PHYSICIAN_PASSWORD = 'Admin1234!';
 const LAB_TECH_EMAIL = 'labtech@hclis.local';
-const LAB_TECH_PASSWORD = 'Admin1234!';
 
 async function loginAsReceptionist(page: import('@playwright/test').Page) {
   await page.goto('/login');
   await page.getByLabel('Email').fill(RECEPTIONIST_EMAIL);
-  await page.getByLabel('Password').fill(RECEPTIONIST_PASSWORD);
+  await page.getByLabel('Password').fill(ROOT_PASSWORD);
   await page.getByRole('button', { name: /sign in/i }).click();
   await expect(page).toHaveURL('/orders/new', { timeout: 10_000 });
 }
@@ -54,7 +51,7 @@ async function loginAsReceptionist(page: import('@playwright/test').Page) {
 async function loginAsPhysician(page: import('@playwright/test').Page) {
   await page.goto('/login');
   await page.getByLabel('Email').fill(PHYSICIAN_EMAIL);
-  await page.getByLabel('Password').fill(PHYSICIAN_PASSWORD);
+  await page.getByLabel('Password').fill(ROOT_PASSWORD);
   await page.getByRole('button', { name: /sign in/i }).click();
   await expect(page).toHaveURL('/worklist', { timeout: 10_000 });
 }
@@ -62,9 +59,17 @@ async function loginAsPhysician(page: import('@playwright/test').Page) {
 async function loginAsLabTechnician(page: import('@playwright/test').Page) {
   await page.goto('/login');
   await page.getByLabel('Email').fill(LAB_TECH_EMAIL);
-  await page.getByLabel('Password').fill(LAB_TECH_PASSWORD);
+  await page.getByLabel('Password').fill(ROOT_PASSWORD);
   await page.getByRole('button', { name: /sign in/i }).click();
   await expect(page).toHaveURL('/waiting-room', { timeout: 10_000 });
+}
+
+async function loginAsITAdmin(page: import('@playwright/test').Page) {
+  await page.goto('/login');
+  await page.getByLabel('Email').fill(ROOT_EMAIL);
+  await page.getByLabel('Password').fill(ROOT_PASSWORD);
+  await page.getByRole('button', { name: /sign in/i }).click();
+  await expect(page).toHaveURL('/admin/users', { timeout: 10_000 });
 }
 
 test.describe('Shell Navigation', () => {
@@ -83,11 +88,7 @@ test.describe('Shell Navigation', () => {
   });
 
   test('ITAdmin sees Orders nav link', async ({ page }) => {
-    await page.goto('/login');
-    await page.getByLabel('Email').fill(ROOT_EMAIL);
-    await page.getByLabel('Password').fill(ROOT_PASSWORD);
-    await page.getByRole('button', { name: /sign in/i }).click();
-    await expect(page).toHaveURL('/admin/users', { timeout: 10_000 });
+    await loginAsITAdmin(page);
     await expect(page.getByTestId('nav-orders-link')).toBeVisible({ timeout: 5_000 });
   });
 
