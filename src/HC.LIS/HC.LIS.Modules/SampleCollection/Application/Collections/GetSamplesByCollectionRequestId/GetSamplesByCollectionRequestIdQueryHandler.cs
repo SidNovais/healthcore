@@ -9,11 +9,11 @@ namespace HC.LIS.Modules.SampleCollection.Application.Collections.GetSamplesByCo
 
 internal class GetSamplesByCollectionRequestIdQueryHandler(
     ISqlConnectionFactory sqlConnectionFactory
-) : IQueryHandler<GetSamplesByCollectionRequestIdQuery, IReadOnlyCollection<SampleSummaryDto>?>
+) : IQueryHandler<GetSamplesByCollectionRequestIdQuery, IReadOnlyCollection<SampleSummaryDto>>
 {
     private readonly ISqlConnectionFactory _sqlConnectionFactory = sqlConnectionFactory;
 
-    public async Task<IReadOnlyCollection<SampleSummaryDto>?> Handle(
+    public async Task<IReadOnlyCollection<SampleSummaryDto>> Handle(
         GetSamplesByCollectionRequestIdQuery query,
         CancellationToken cancellationToken)
     {

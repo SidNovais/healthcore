@@ -4,10 +4,12 @@ using HC.LIS.API.Modules.SampleCollection.CollectionRequests.CreateBarcode;
 using HC.LIS.API.Modules.SampleCollection.CollectionRequests.CreateCollectionRequest;
 using HC.LIS.API.Modules.SampleCollection.CollectionRequests.GetCollectionRequestDetails;
 using HC.LIS.API.Modules.SampleCollection.CollectionRequests.GetCollectionRequestList;
+using HC.LIS.API.Modules.SampleCollection.CollectionRequests.GetSamplesByCollectionRequestId;
 using HC.LIS.API.Modules.SampleCollection.CollectionRequests.MovePatientToWaiting;
 using HC.LIS.API.Modules.SampleCollection.CollectionRequests.RecordSampleCollection;
 using HC.LIS.Modules.SampleCollection.Application.Collections.GetCollectionRequestDetails;
 using HC.LIS.Modules.SampleCollection.Application.Collections.GetCollectionRequestList;
+using HC.LIS.Modules.SampleCollection.Application.Collections.GetSamplesByCollectionRequestId;
 
 namespace HC.LIS.API.Modules.SampleCollection.CollectionRequests;
 
@@ -63,6 +65,11 @@ internal static class CollectionRequestsEndpoints
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status409Conflict);
+
+        group.MapGet("{id:guid}/samples", GetSamplesByCollectionRequestIdEndpoint.Handle)
+            .WithName("GetSamplesByCollectionRequestId")
+            .WithSummary("Get sample tubes for a collection request.")
+            .Produces<IReadOnlyCollection<SampleSummaryDto>>();
 
         return group;
     }
