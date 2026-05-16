@@ -4,9 +4,12 @@ import {
   callPatient as sdkCallPatient,
   createBarcode as sdkCreateBarcode,
   recordSampleCollection,
+  movePatientToWaiting as sdkMovePatientToWaiting,
+  client,
 } from '@hc-lis/api-client';
 import type { ICollectionRequestsApi, ApiCreateBarcodeParams, ApiRecordCollectionParams } from './i-collection-requests-api';
 import type { CollectionRequestSummary } from '../../domain/collection-request-summary';
+import type { SampleSummary } from '../../domain/sample-summary';
 
 @Injectable()
 export class SdkCollectionRequestsApi implements ICollectionRequestsApi {
@@ -52,5 +55,44 @@ export class SdkCollectionRequestsApi implements ICollectionRequestsApi {
         patientGender: params.patientGender,
       },
     });
+  }
+
+  async getArrived(): Promise<CollectionRequestSummary[]> {
+    const result = await getCollectionRequestList({ query: { status: 'Arrived' } });
+    const data = (result.data ?? []) as Array<{
+      collectionRequestId: string;
+      patientId: string;
+      status: string;
+      arrivedAt: string;
+    }>;
+    return data.map(item => ({
+      collectionRequestId: item.collectionRequestId,
+      patientId: item.patientId,
+      status: item.status,
+      arrivedAt: item.arrivedAt,
+    }));
+  }
+
+  async moveToWaiting(id: string): Promise<void> {
+    await sdkMovePatientToWaiting({ path: { id } });
+  }
+
+  async getSamples(id: string): Promise<SampleSummary[]> {
+    const result = await client.get({
+      url: '/api/v1/collection-requests/{id}/samples',
+      path: { id },
+    });
+    const data = (result.data ?? []) as Array<{
+      id: string;
+      tubeType: string;
+      barcode: string | null;
+      status: string;
+    }>;
+    return data.map(item => ({
+      id: item.id,
+      tubeType: item.tubeType,
+      barcode: item.barcode,
+      status: item.status,
+    }));
   }
 }

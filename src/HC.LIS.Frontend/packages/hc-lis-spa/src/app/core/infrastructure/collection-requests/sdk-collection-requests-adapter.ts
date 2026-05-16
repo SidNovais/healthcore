@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import type { ICollectionRequestsPort, CreateBarcodeParams, RecordCollectionParams } from '../../application/i-collection-requests-port';
 import { COLLECTION_REQUESTS_API } from './i-collection-requests-api';
 import type { CollectionRequestSummary } from '../../domain/collection-request-summary';
+import type { SampleSummary } from '../../domain/sample-summary';
 
 @Injectable()
 export class SdkCollectionRequestsAdapter implements ICollectionRequestsPort {
@@ -27,5 +28,17 @@ export class SdkCollectionRequestsAdapter implements ICollectionRequestsPort {
       patientBirthdate: params.patientBirthdate,
       patientGender: params.patientGender,
     });
+  }
+
+  async loadArrived(): Promise<CollectionRequestSummary[]> {
+    return this.api.getArrived();
+  }
+
+  async moveToWaiting(id: string): Promise<void> {
+    await this.api.moveToWaiting(id);
+  }
+
+  async getSamples(id: string): Promise<SampleSummary[]> {
+    return this.api.getSamples(id);
   }
 }

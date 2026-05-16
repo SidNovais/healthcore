@@ -39,6 +39,12 @@ export const routes: Routes = [
           import('./features/orders/order-list.component').then(m => m.OrderListComponent),
       },
       {
+        path: 'triage',
+        canActivate: [roleGuard('LabTechnician', 'ITAdmin')],
+        loadComponent: () =>
+          import('./features/triage/triage.component').then(m => m.TriageComponent),
+      },
+      {
         path: 'waiting-room',
         canActivate: [roleGuard('LabTechnician', 'ITAdmin')],
         loadComponent: () =>
