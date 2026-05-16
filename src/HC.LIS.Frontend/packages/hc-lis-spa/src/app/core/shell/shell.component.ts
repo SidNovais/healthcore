@@ -7,23 +7,27 @@ interface NavItem {
   label: string;
   route: string;
   icon: string;
+  testId: string;
 }
 
 const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
   Receptionist: [
-    { label: 'New Order', route: '/orders/new', icon: 'order' },
+    { label: 'New Order', route: '/orders/new', icon: 'order', testId: 'nav-new-order-link' },
+    { label: 'Orders',    route: '/orders',     icon: 'list',  testId: 'nav-orders-link'    },
   ],
   LabTechnician: [
-    { label: 'Waiting Room', route: '/waiting-room', icon: 'queue' },
+    { label: 'Waiting Room', route: '/waiting-room', icon: 'queue', testId: 'nav-waiting-room-link' },
   ],
   Physician: [
-    { label: 'Worklist', route: '/worklist', icon: 'worklist' },
+    { label: 'Orders',   route: '/orders',   icon: 'list',     testId: 'nav-orders-link'   },
+    { label: 'Worklist', route: '/worklist', icon: 'worklist', testId: 'nav-worklist-link'  },
   ],
   ITAdmin: [
-    { label: 'New Order', route: '/orders/new', icon: 'order' },
-    { label: 'Waiting Room', route: '/waiting-room', icon: 'queue' },
-    { label: 'Worklist', route: '/worklist', icon: 'worklist' },
-    { label: 'Users', route: '/admin/users', icon: 'users' },
+    { label: 'New Order',    route: '/orders/new',  icon: 'order',    testId: 'nav-new-order-link'    },
+    { label: 'Orders',       route: '/orders',       icon: 'list',     testId: 'nav-orders-link'       },
+    { label: 'Waiting Room', route: '/waiting-room', icon: 'queue',    testId: 'nav-waiting-room-link' },
+    { label: 'Worklist',     route: '/worklist',     icon: 'worklist', testId: 'nav-worklist-link'     },
+    { label: 'Users',        route: '/admin/users',  icon: 'users',    testId: 'nav-users-link'        },
   ],
 };
 
