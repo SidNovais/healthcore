@@ -112,17 +112,17 @@ Actions live inline within each `exam-item-row`. Only show buttons valid for the
 
 > `CompleteExam` is enqueued by `WorklistItemCompletedIntegrationEventNotificationHandler` — **no HTTP button**.
 
-- [ ] **F-14** [E2E first] Add full-workflow E2E test to `e2e/orders.spec.ts`:
+- [x] **F-14** [E2E first] Add full-workflow E2E test to `e2e/orders.spec.ts`:
   1. Create order + request exam → navigate to `/orders/:id`
   2. Click `data-testid="accept-exam-btn"` → assert badge changes to "Accepted"
   3. Click `data-testid="place-in-progress-btn"` → assert badge changes to "InProgress"
   4. Individual tests: reject with reason, cancel, place-on-hold with reason
-- [ ] **F-15** Add no-reason action buttons to `OrderDetailComponent`:
+- [x] **F-15** Add no-reason action buttons to `OrderDetailComponent`:
   - `data-testid="accept-exam-btn"` → `ordersService.acceptExam(orderId, itemId)`
   - `data-testid="place-in-progress-btn"` → `ordersService.placeExamInProgress(orderId, itemId)`
   - `data-testid="cancel-exam-btn"` → `ordersService.cancelExam(orderId, itemId)`
   - `data-testid="partially-complete-exam-btn"` → `ordersService.partiallyCompleteExam(orderId, itemId)`
-- [ ] **F-16** Add reason-required action inline forms to `OrderDetailComponent`:
+- [x] **F-16** Add reason-required action inline forms to `OrderDetailComponent`:
   - Reject: `data-testid="reject-exam-btn"` reveals `data-testid="reject-reason-input"` +
     `data-testid="confirm-reject-btn"` → `ordersService.rejectExam(orderId, itemId, reason)`
   - PlaceOnHold: `data-testid="place-on-hold-btn"` reveals `data-testid="hold-reason-input"` +
