@@ -22,8 +22,8 @@ import { OrdersService } from './orders.service';
           <p>Requested At: <span data-testid="order-requested-at">{{ details.requestedAt }}</span></p>
         </div>
 
-        @if (errorMessage()) {
-          <div class="error-banner" data-testid="exam-action-error">{{ errorMessage() }}</div>
+        @if (errorMessage(); as msg) {
+          <div class="error-banner" data-testid="exam-action-error">{{ msg }}</div>
         }
 
         <h2 class="section-title">Exam Items</h2>
