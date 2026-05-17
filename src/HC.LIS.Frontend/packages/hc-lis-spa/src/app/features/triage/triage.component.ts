@@ -43,7 +43,6 @@ import { PreparingPatientCardComponent } from './preparing-patient-card.componen
             @for (item of service.preparing(); track item.collectionRequestId) {
               <app-preparing-patient-card
                 [item]="item"
-                (barcodeCreated)="onBarcodeCreated()"
               />
             }
           </div>
@@ -94,7 +93,4 @@ export class TriageComponent implements OnInit {
     }
   }
 
-  protected async onBarcodeCreated(): Promise<void> {
-    await this.service.loadPreparing();
-  }
 }

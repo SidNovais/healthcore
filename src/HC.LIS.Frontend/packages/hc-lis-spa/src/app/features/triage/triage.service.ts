@@ -1,6 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { COLLECTION_REQUESTS_PORT } from '../../core/application/i-collection-requests-port';
-import type { CreateBarcodeParams } from '../../core/application/i-collection-requests-port';
 import type { CollectionRequestSummary } from '../../core/domain/collection-request-summary';
 import type { SampleSummary } from '../../core/domain/sample-summary';
 
@@ -29,8 +28,4 @@ export class TriageService {
     return this.port.getSamples(id);
   }
 
-  async createBarcode(collectionRequestId: string, tubeType: string, barcodeValue: string, technicianId: string): Promise<void> {
-    const params: CreateBarcodeParams = { tubeType, barcodeValue, technicianId };
-    await this.port.createBarcode(collectionRequestId, params);
-  }
 }

@@ -2,12 +2,6 @@ import { InjectionToken } from '@angular/core';
 import type { CollectionRequestSummary } from '../domain/collection-request-summary';
 import type { SampleSummary } from '../domain/sample-summary';
 
-export interface CreateBarcodeParams {
-  tubeType: string;
-  barcodeValue: string;
-  technicianId: string;
-}
-
 export interface RecordCollectionParams {
   sampleId: string;
   patientName: string;
@@ -19,7 +13,6 @@ export interface RecordCollectionParams {
 export interface ICollectionRequestsPort {
   loadQueue(): Promise<CollectionRequestSummary[]>;
   callPatient(id: string): Promise<void>;
-  createBarcode(id: string, params: CreateBarcodeParams): Promise<void>;
   recordCollection(id: string, params: RecordCollectionParams): Promise<void>;
   loadArrived(): Promise<CollectionRequestSummary[]>;
   moveToWaiting(id: string): Promise<void>;

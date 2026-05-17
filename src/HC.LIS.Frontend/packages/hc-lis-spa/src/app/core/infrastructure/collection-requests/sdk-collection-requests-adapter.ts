@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import type { ICollectionRequestsPort, CreateBarcodeParams, RecordCollectionParams } from '../../application/i-collection-requests-port';
+import type { ICollectionRequestsPort, RecordCollectionParams } from '../../application/i-collection-requests-port';
 import { COLLECTION_REQUESTS_API } from './i-collection-requests-api';
 import type { CollectionRequestSummary } from '../../domain/collection-request-summary';
 import type { SampleSummary } from '../../domain/sample-summary';
@@ -14,10 +14,6 @@ export class SdkCollectionRequestsAdapter implements ICollectionRequestsPort {
 
   async callPatient(id: string): Promise<void> {
     await this.api.callPatient(id);
-  }
-
-  async createBarcode(id: string, params: CreateBarcodeParams): Promise<void> {
-    await this.api.createBarcode(id, params);
   }
 
   async recordCollection(id: string, params: RecordCollectionParams): Promise<void> {

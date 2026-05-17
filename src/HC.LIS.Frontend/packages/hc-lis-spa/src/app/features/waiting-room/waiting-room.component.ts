@@ -73,11 +73,6 @@ export class WaitingRoomComponent implements OnInit {
   protected async onCollect(id: string, data: CollectSampleFormData): Promise<void> {
     const technicianId = this.auth.currentUser()?.userId ?? '';
     try {
-      await this.service.createBarcode(id, {
-        tubeType: data.tubeType,
-        barcodeValue: data.barcodeValue,
-        technicianId,
-      });
       await this.service.recordCollection(id, {
         sampleId: crypto.randomUUID(),
         patientName: data.patientName,

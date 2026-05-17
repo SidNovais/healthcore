@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { COLLECTION_REQUESTS_PORT } from '../../core/application/i-collection-requests-port';
-import type { CreateBarcodeParams, RecordCollectionParams } from '../../core/application/i-collection-requests-port';
+import type { RecordCollectionParams } from '../../core/application/i-collection-requests-port';
 import type { CollectionRequestSummary } from '../../core/domain/collection-request-summary';
 
 @Injectable({ providedIn: 'root' })
@@ -16,10 +16,6 @@ export class CollectionRequestsService {
 
   async callPatient(id: string): Promise<void> {
     await this.port.callPatient(id);
-  }
-
-  async createBarcode(id: string, params: CreateBarcodeParams): Promise<void> {
-    await this.port.createBarcode(id, params);
   }
 
   async recordCollection(id: string, params: RecordCollectionParams): Promise<void> {
