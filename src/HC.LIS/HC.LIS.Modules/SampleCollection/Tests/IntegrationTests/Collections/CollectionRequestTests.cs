@@ -8,8 +8,8 @@ using HC.Core.Domain;
 using HC.Core.Infrastructure.Serialization;
 using HC.LIS.Modules.SampleCollection.Application.Collections.AddExamToCollection;
 using HC.LIS.Modules.SampleCollection.Application.Collections.CallPatient;
-using HC.LIS.Modules.SampleCollection.Application.Collections.CreateBarcode;
 using HC.LIS.Modules.SampleCollection.Application.Collections.CreateCollectionRequest;
+using HC.LIS.Modules.SampleCollection.Application.Collections.GenerateSampleBarcodes;
 using HC.LIS.Modules.SampleCollection.Application.Collections.MovePatientToWaiting;
 using HC.LIS.Modules.SampleCollection.Application.Collections.RecordSampleCollection;
 using HC.LIS.Modules.SampleCollection.Domain.Collections;
@@ -110,7 +110,7 @@ public class CollectionRequestTests : TestBase
     }
 
     [Fact]
-    public async Task CreateBarcodeIsSuccessful()
+    public async Task GenerateSampleBarcodesAfterMoveToWaitingIsSuccessful()
     {
         await CollectionRequestFactory.CreateAsync(SampleCollectionModule).ConfigureAwait(true);
         await SampleCollectionModule.ExecuteCommandAsync(
@@ -128,19 +128,46 @@ public class CollectionRequestTests : TestBase
                 CollectionRequestSampleData.CollectionRequestId,
                 CollectionRequestSampleData.WaitingAt)).ConfigureAwait(true);
         await SampleCollectionModule.ExecuteCommandAsync(
-            new CreateBarcodeCommand(
-                CollectionRequestSampleData.CollectionRequestId,
-                CollectionRequestSampleData.TubeType,
-                CollectionRequestSampleData.BarcodeValue,
-                CollectionRequestSampleData.TechnicianId,
-                CollectionRequestSampleData.BarcodeCreatedAt)).ConfigureAwait(true);
+            new GenerateSampleBarcodesForCollectionRequestCommand(
+                CollectionRequestSampleData.CollectionRequestId)).ConfigureAwait(true);
 
         var details = await GetEventually(
             new GetSampleDetailsWithBarcodeProbe(sampleId, SampleCollectionModule),
             15000).ConfigureAwait(true);
 
         details.Should().NotBeNull();
-        details!.Barcode.Should().Be(CollectionRequestSampleData.BarcodeValue);
+        details!.Barcode.Should().NotBeNullOrEmpty();
+        details.Status.Should().Be(SampleStatus.BarcodeCreated.Value);
+    }
+
+    [Fact]
+    public async Task GenerateSampleBarcodesIsSuccessful()
+    {
+        await CollectionRequestFactory.CreateAsync(SampleCollectionModule).ConfigureAwait(true);
+        await SampleCollectionModule.ExecuteCommandAsync(
+            new AddExamToCollectionCommand(
+                CollectionRequestSampleData.CollectionRequestId,
+                CollectionRequestSampleData.ExamId,
+                CollectionRequestSampleData.ExamMnemonic,
+                CollectionRequestSampleData.TubeType)).ConfigureAwait(true);
+
+        var sampleNotification = await GetLastOutboxMessage<SampleCreatedForExamNotification>().ConfigureAwait(true);
+        var sampleId = sampleNotification!.DomainEvent.SampleId;
+
+        await SampleCollectionModule.ExecuteCommandAsync(
+            new MovePatientToWaitingCommand(
+                CollectionRequestSampleData.CollectionRequestId,
+                CollectionRequestSampleData.WaitingAt)).ConfigureAwait(true);
+        await SampleCollectionModule.ExecuteCommandAsync(
+            new GenerateSampleBarcodesForCollectionRequestCommand(
+                CollectionRequestSampleData.CollectionRequestId)).ConfigureAwait(true);
+
+        var details = await GetEventually(
+            new GetSampleDetailsWithBarcodeProbe(sampleId, SampleCollectionModule),
+            15000).ConfigureAwait(true);
+
+        details.Should().NotBeNull();
+        details!.Barcode.Should().NotBeNullOrEmpty();
         details.Status.Should().Be(SampleStatus.BarcodeCreated.Value);
     }
 
@@ -163,12 +190,8 @@ public class CollectionRequestTests : TestBase
                 CollectionRequestSampleData.CollectionRequestId,
                 CollectionRequestSampleData.WaitingAt)).ConfigureAwait(true);
         await SampleCollectionModule.ExecuteCommandAsync(
-            new CreateBarcodeCommand(
-                CollectionRequestSampleData.CollectionRequestId,
-                CollectionRequestSampleData.TubeType,
-                CollectionRequestSampleData.BarcodeValue,
-                CollectionRequestSampleData.TechnicianId,
-                CollectionRequestSampleData.BarcodeCreatedAt)).ConfigureAwait(true);
+            new GenerateSampleBarcodesForCollectionRequestCommand(
+                CollectionRequestSampleData.CollectionRequestId)).ConfigureAwait(true);
         await SampleCollectionModule.ExecuteCommandAsync(
             new CallPatientCommand(
                 CollectionRequestSampleData.CollectionRequestId,
