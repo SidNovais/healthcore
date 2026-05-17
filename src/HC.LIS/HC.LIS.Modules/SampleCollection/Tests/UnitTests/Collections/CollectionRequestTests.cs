@@ -90,7 +90,6 @@ public class CollectionRequestTests : TestBase
         _sut.CreateBarcode(
             CollectionRequestSampleData.TubeType,
             CollectionRequestSampleData.BarcodeValue,
-            CollectionRequestSampleData.TechnicianId,
             CollectionRequestSampleData.CreatedAt
         );
 
@@ -100,7 +99,6 @@ public class CollectionRequestTests : TestBase
         evt.PatientId.Should().Be(CollectionRequestSampleData.PatientId);
         evt.BarcodeValue.Should().Be(CollectionRequestSampleData.BarcodeValue);
         evt.TubeType.Should().Be(CollectionRequestSampleData.TubeType);
-        evt.TechnicianId.Should().Be(CollectionRequestSampleData.TechnicianId);
         evt.Exams.Select(e => e.ExamId).Should().BeEquivalentTo([CollectionRequestSampleData.ExamId1, CollectionRequestSampleData.ExamId2]);
         evt.Exams.Select(e => e.ExamMnemonic).Should().BeEquivalentTo([CollectionRequestSampleData.ExamMnemonic1, CollectionRequestSampleData.ExamMnemonic2]);
         evt.CreatedAt.Should().Be(CollectionRequestSampleData.CreatedAt);
@@ -114,7 +112,6 @@ public class CollectionRequestTests : TestBase
         _sut.CreateBarcode(
             CollectionRequestSampleData.TubeType,
             CollectionRequestSampleData.BarcodeValue,
-            CollectionRequestSampleData.TechnicianId,
             CollectionRequestSampleData.CreatedAt
         );
         _sut.CallPatient(CollectionRequestSampleData.TechnicianId, CollectionRequestSampleData.CalledAt);
@@ -149,7 +146,6 @@ public class CollectionRequestTests : TestBase
         urgentRequest.CreateBarcode(
             CollectionRequestSampleData.TubeType,
             CollectionRequestSampleData.BarcodeValue,
-            CollectionRequestSampleData.TechnicianId,
             CollectionRequestSampleData.CreatedAt
         );
         urgentRequest.CallPatient(CollectionRequestSampleData.TechnicianId, CollectionRequestSampleData.CalledAt);
@@ -208,7 +204,6 @@ public class CollectionRequestTests : TestBase
         void action() => _sut.CreateBarcode(
             CollectionRequestSampleData.TubeType,
             CollectionRequestSampleData.BarcodeValue,
-            CollectionRequestSampleData.TechnicianId,
             CollectionRequestSampleData.CreatedAt
         );
 
@@ -223,7 +218,6 @@ public class CollectionRequestTests : TestBase
         void action() => _sut.CreateBarcode(
             tubeType: "Citrate",
             CollectionRequestSampleData.BarcodeValue,
-            CollectionRequestSampleData.TechnicianId,
             CollectionRequestSampleData.CreatedAt
         );
 
@@ -238,7 +232,6 @@ public class CollectionRequestTests : TestBase
         _sut.CreateBarcode(
             CollectionRequestSampleData.TubeType,
             CollectionRequestSampleData.BarcodeValue,
-            CollectionRequestSampleData.TechnicianId,
             CollectionRequestSampleData.CreatedAt
         );
 
@@ -262,7 +255,6 @@ public class CollectionRequestTests : TestBase
         _sut.CreateBarcode(
             CollectionRequestSampleData.TubeType,
             CollectionRequestSampleData.BarcodeValue,
-            CollectionRequestSampleData.TechnicianId,
             CollectionRequestSampleData.CreatedAt
         );
         _sut.CallPatient(CollectionRequestSampleData.TechnicianId, CollectionRequestSampleData.CalledAt);
