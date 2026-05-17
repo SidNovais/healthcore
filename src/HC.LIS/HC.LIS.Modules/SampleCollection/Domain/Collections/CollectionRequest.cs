@@ -122,7 +122,7 @@ public class CollectionRequest : AggregateRoot
     }
 
     public IReadOnlyCollection<string> GetPendingSampleTubeTypes()
-        => _samples.Where(s => !s.HasBarcode).Select(s => s.TubeType).ToList().AsReadOnly();
+        => _samples.Where(s => !s.HasBarcode).Select(s => s.TubeType).ToArray();
 
     public void RecordCollection(
         Guid sampleId,

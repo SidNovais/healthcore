@@ -4,7 +4,7 @@ using HC.LIS.Modules.SampleCollection.Application.Configuration.Commands;
 
 namespace HC.LIS.Modules.SampleCollection.Application.Collections.MovePatientToWaiting;
 
-public class PatientWaitingNotificationHandler(
+internal class PatientWaitingNotificationHandler(
     ICommandsScheduler commandsScheduler
 ) : INotificationHandler<PatientWaitingNotification>
 {
