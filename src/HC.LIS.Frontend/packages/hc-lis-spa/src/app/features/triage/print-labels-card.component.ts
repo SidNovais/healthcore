@@ -15,7 +15,7 @@ import type { SampleSummary } from '../../core/domain/sample-summary';
         </div>
       }
       @if (samplesWithBarcode().length > 0) {
-        <button class="btn-print" (click)="print()">Print Labels</button>
+        <button data-testid="print-labels-btn" class="btn-print" (click)="print()">Print Labels</button>
       }
     </div>
   `,
