@@ -121,6 +121,9 @@ public class CollectionRequest : AggregateRoot
         AddDomainEvent(barcodeCreatedDomainEvent);
     }
 
+    public IReadOnlyCollection<string> GetPendingSampleTubeTypes()
+        => _samples.Where(s => !s.HasBarcode).Select(s => s.TubeType).ToList().AsReadOnly();
+
     public void RecordCollection(
         Guid sampleId,
         Guid technicianId,
