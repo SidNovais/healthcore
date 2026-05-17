@@ -9,6 +9,7 @@ using HC.LIS.Modules.SampleCollection.Application.Collections.MovePatientToWaiti
 using HC.LIS.Modules.SampleCollection.Application.Collections.AddExamToCollection;
 using HC.LIS.Modules.SampleCollection.Application.Collections.RecordSampleCollection;
 using HC.LIS.Modules.SampleCollection.Application.Collections.HandleExamAccepted;
+using HC.LIS.Modules.SampleCollection.Application.Collections.GenerateSampleBarcodes;
 using HC.LIS.Modules.SampleCollection.Infrastructure.Configurations.Authentication;
 using HC.LIS.Modules.SampleCollection.Infrastructure.Configurations.DataAccess;
 using HC.LIS.Modules.SampleCollection.Infrastructure.Configurations.EventBus;
@@ -71,6 +72,7 @@ public class SampleCollectionStartup
         BiMap internalCommandsMap = new();
         internalCommandsMap.Add("CreateCollectionRequestForOrderCommand", typeof(CreateCollectionRequestForOrderCommand));
         internalCommandsMap.Add("AddExamToCollectionForOrderCommand", typeof(AddExamToCollectionForOrderCommand));
+        internalCommandsMap.Add("GenerateSampleBarcodesForCollectionRequestCommand", typeof(GenerateSampleBarcodesForCollectionRequestCommand));
         containerBuilder.RegisterModule(new InternalCommandsModule(internalCommandsMap));
         containerBuilder.RegisterModule(new QuartzModule());
         containerBuilder.RegisterInstance(executionContextAccessor);
