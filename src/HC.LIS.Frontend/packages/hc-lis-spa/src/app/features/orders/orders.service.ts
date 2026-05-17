@@ -48,11 +48,4 @@ export class OrdersService {
     await this.port.placeExamOnHold(orderId, itemId, reason);
   }
 
-  async placeExamInProgress(orderId: string, itemId: string): Promise<void> {
-    await this.port.placeExamInProgress(orderId, itemId);
-  }
-
-  async partiallyCompleteExam(orderId: string, itemId: string): Promise<void> {
-    await this.port.partiallyCompleteExam(orderId, itemId);
-  }
 }

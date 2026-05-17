@@ -58,8 +58,6 @@ describe('OrderDetailComponent (integration)', () => {
       cancelExam: vi.fn().mockResolvedValue(undefined),
       rejectExam: vi.fn().mockResolvedValue(undefined),
       placeExamOnHold: vi.fn().mockResolvedValue(undefined),
-      placeExamInProgress: vi.fn().mockResolvedValue(undefined),
-      partiallyCompleteExam: vi.fn().mockResolvedValue(undefined),
     };
 
     await TestBed.configureTestingModule({
@@ -175,11 +173,4 @@ describe('OrderDetailComponent (integration)', () => {
     expect(mockService.rejectExam).toHaveBeenCalledWith(orderId, 'item-1', 'Hemolyzed sample');
   });
 
-  it('shows In Progress button for an Accepted item', () => {
-    detailsSignal.set({ ...baseOrder, items: [acceptedItem] });
-    fixture.detectChanges();
-
-    const btn = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="in-progress-btn"]');
-    expect(btn).not.toBeNull();
-  });
 });

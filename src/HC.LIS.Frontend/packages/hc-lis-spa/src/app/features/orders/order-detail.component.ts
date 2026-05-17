@@ -51,12 +51,6 @@ import { OrdersService } from './orders.service';
                   @if (item.status === 'Requested' || item.status === 'OnHold') {
                     <button data-testid="accept-btn" (click)="onAccept(item.orderItemId)">Accept</button>
                   }
-                  @if (item.status === 'Accepted') {
-                    <button data-testid="in-progress-btn" (click)="onPlaceInProgress(item.orderItemId)">In Progress</button>
-                  }
-                  @if (item.status === 'InProgress') {
-                    <button data-testid="partially-complete-btn" (click)="onPartiallyComplete(item.orderItemId)">Partially Complete</button>
-                  }
                   @if (item.status === 'Requested') {
                     <button data-testid="reject-btn" (click)="startReject(item.orderItemId)">Reject</button>
                   }
@@ -218,25 +212,4 @@ export class OrderDetailComponent implements OnInit {
     }
   }
 
-  protected async onPlaceInProgress(itemId: string): Promise<void> {
-    const orderId = this.route.snapshot.params['id'] as string;
-    this.errorMessage.set(null);
-    try {
-      await this.ordersService.placeExamInProgress(orderId, itemId);
-      this.scheduleReload(orderId);
-    } catch (err: unknown) {
-      this.errorMessage.set(err instanceof Error ? err.message : 'Unexpected error.');
-    }
-  }
-
-  protected async onPartiallyComplete(itemId: string): Promise<void> {
-    const orderId = this.route.snapshot.params['id'] as string;
-    this.errorMessage.set(null);
-    try {
-      await this.ordersService.partiallyCompleteExam(orderId, itemId);
-      this.scheduleReload(orderId);
-    } catch (err: unknown) {
-      this.errorMessage.set(err instanceof Error ? err.message : 'Unexpected error.');
-    }
-  }
 }

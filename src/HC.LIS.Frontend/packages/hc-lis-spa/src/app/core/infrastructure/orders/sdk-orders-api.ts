@@ -8,8 +8,6 @@ import {
   cancelExam as sdkCancelExam,
   rejectExam as sdkRejectExam,
   placeExamOnHold as sdkPlaceExamOnHold,
-  placeExamInProgress as sdkPlaceExamInProgress,
-  partiallyCompleteExam as sdkPartiallyCompleteExam,
 } from '@hc-lis/api-client';
 import type {
   HcLisApiCommonCreatedIdResponse,
@@ -110,11 +108,4 @@ export class SdkOrdersApi implements IOrdersApi {
     await sdkPlaceExamOnHold({ path: { orderId, itemId }, body: { reason } });
   }
 
-  async placeExamInProgress(orderId: string, itemId: string): Promise<void> {
-    await sdkPlaceExamInProgress({ path: { orderId, itemId } });
-  }
-
-  async partiallyCompleteExam(orderId: string, itemId: string): Promise<void> {
-    await sdkPartiallyCompleteExam({ path: { orderId, itemId } });
-  }
 }

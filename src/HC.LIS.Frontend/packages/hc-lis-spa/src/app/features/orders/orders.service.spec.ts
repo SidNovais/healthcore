@@ -39,8 +39,6 @@ describe('OrdersService', () => {
       cancelExam: vi.fn(),
       rejectExam: vi.fn(),
       placeExamOnHold: vi.fn(),
-      placeExamInProgress: vi.fn(),
-      partiallyCompleteExam: vi.fn(),
     };
 
     TestBed.configureTestingModule({
@@ -177,19 +175,4 @@ describe('OrdersService', () => {
     expect(mockPort.placeExamOnHold).toHaveBeenCalledWith('order-uuid-1', 'item-uuid-1', 'Awaiting reagent');
   });
 
-  it('placeExamInProgress() calls port.placeExamInProgress with orderId and itemId', async () => {
-    vi.mocked(mockPort.placeExamInProgress).mockResolvedValue();
-
-    await service.placeExamInProgress('order-uuid-1', 'item-uuid-1');
-
-    expect(mockPort.placeExamInProgress).toHaveBeenCalledWith('order-uuid-1', 'item-uuid-1');
-  });
-
-  it('partiallyCompleteExam() calls port.partiallyCompleteExam with orderId and itemId', async () => {
-    vi.mocked(mockPort.partiallyCompleteExam).mockResolvedValue();
-
-    await service.partiallyCompleteExam('order-uuid-1', 'item-uuid-1');
-
-    expect(mockPort.partiallyCompleteExam).toHaveBeenCalledWith('order-uuid-1', 'item-uuid-1');
-  });
 });

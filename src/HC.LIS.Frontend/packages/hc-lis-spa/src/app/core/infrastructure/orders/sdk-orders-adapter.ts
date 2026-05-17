@@ -57,11 +57,4 @@ export class SdkOrdersAdapter implements IOrdersPort {
     return this.api.placeExamOnHold(orderId, itemId, reason);
   }
 
-  placeExamInProgress(orderId: string, itemId: string): Promise<void> {
-    return this.api.placeExamInProgress(orderId, itemId);
-  }
-
-  partiallyCompleteExam(orderId: string, itemId: string): Promise<void> {
-    return this.api.partiallyCompleteExam(orderId, itemId);
-  }
 }

@@ -27,8 +27,6 @@ export interface IOrdersPort {
   cancelExam(orderId: string, itemId: string): Promise<void>;
   rejectExam(orderId: string, itemId: string, reason: string): Promise<void>;
   placeExamOnHold(orderId: string, itemId: string, reason: string): Promise<void>;
-  placeExamInProgress(orderId: string, itemId: string): Promise<void>;
-  partiallyCompleteExam(orderId: string, itemId: string): Promise<void>;
 }
 
 export const ORDERS_PORT = new InjectionToken<IOrdersPort>('ORDERS_PORT');
