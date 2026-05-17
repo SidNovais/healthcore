@@ -5,8 +5,6 @@ using HC.LIS.API.Modules.TestOrders.Orders.CreateOrder;
 using HC.LIS.API.Modules.TestOrders.Orders.GetOrderDetails;
 using HC.LIS.API.Modules.TestOrders.Orders.GetOrderItemDetails;
 using HC.LIS.API.Modules.TestOrders.Orders.GetOrderList;
-using HC.LIS.API.Modules.TestOrders.Orders.PartiallyCompleteExam;
-using HC.LIS.API.Modules.TestOrders.Orders.PlaceExamInProgress;
 using HC.LIS.API.Modules.TestOrders.Orders.PlaceExamOnHold;
 using HC.LIS.API.Modules.TestOrders.Orders.RejectExam;
 using HC.LIS.API.Modules.TestOrders.Orders.RequestExam;
@@ -64,20 +62,6 @@ internal static class OrdersEndpoints
         group.MapPost("{orderId:guid}/exams/{itemId:guid}/cancel", CancelExamEndpoint.Handle)
             .WithName("CancelExam")
             .WithSummary("Cancel an exam on an order.")
-            .Produces(StatusCodes.Status204NoContent)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status409Conflict);
-
-        group.MapPost("{orderId:guid}/exams/{itemId:guid}/partially-complete", PartiallyCompleteExamEndpoint.Handle)
-            .WithName("PartiallyCompleteExam")
-            .WithSummary("Partially complete an exam on an order.")
-            .Produces(StatusCodes.Status204NoContent)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status409Conflict);
-
-        group.MapPost("{orderId:guid}/exams/{itemId:guid}/place-in-progress", PlaceExamInProgressEndpoint.Handle)
-            .WithName("PlaceExamInProgress")
-            .WithSummary("Place an exam in progress.")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status409Conflict);
