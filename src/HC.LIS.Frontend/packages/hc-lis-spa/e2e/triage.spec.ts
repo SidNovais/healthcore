@@ -81,7 +81,7 @@ test.describe('Triage — Full Workflow', () => {
   //   3. RabbitMQ must be active so the Outbox relay delivers the integration events.
   // Without this seed data the "arriving-section" will have no patient cards and the workflow
   // cannot be exercised. Use test.fixme until a reliable seed/setup mechanism is in place.
-  test.fixme('LabTechnician sends arrived patient to waiting room then creates barcode', async ({ page }) => {
+  test.fixme('LabTechnician sends arrived patient to waiting room and sees generated barcode labels', async ({ page }) => {
     await loginAsLabTechnician(page);
     await page.goto('/triage');
 
@@ -100,11 +100,8 @@ test.describe('Triage — Full Workflow', () => {
     // Preparing section must now have the patient card
     await expect(page.getByTestId('preparing-patient-card').first()).toBeVisible({ timeout: 10_000 });
 
-    // Fill in barcode and submit
-    await page.getByTestId('preparing-patient-card').first().getByTestId('barcode-value-input').fill('BC-TRIAGE-001');
-    await page.getByTestId('preparing-patient-card').first().getByTestId('create-barcode-btn').click();
-    await page.waitForResponse(
-      resp => resp.url().includes('barcode') && resp.status() === 204
-    );
+    // Print labels section with backend-generated barcodes must be visible
+    await expect(page.getByTestId('preparing-patient-card').first().getByTestId('print-labels-section')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('preparing-patient-card').first().getByTestId('barcode-label').first()).toBeVisible({ timeout: 5_000 });
   });
 });
