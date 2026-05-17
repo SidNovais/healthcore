@@ -72,7 +72,7 @@ public abstract class TestBase : HC.LIS.Tests.IntegrationEvents.TestBase
             new MovePatientToWaitingCommand(collectionRequestId, SystemClock.Now));
 
         await SampleCollectionModule.ExecuteCommandAsync(
-            new CreateBarcodeCommand(collectionRequestId, "EDTA Tube", barcode, ExecutionContext.UserId, SystemClock.Now));
+            new CreateBarcodeCommand(collectionRequestId, "EDTA Tube", barcode, SystemClock.Now));
 
         await SampleCollectionModule.ExecuteCommandAsync(
             new CallPatientCommand(collectionRequestId, ExecutionContext.UserId, SystemClock.Now));

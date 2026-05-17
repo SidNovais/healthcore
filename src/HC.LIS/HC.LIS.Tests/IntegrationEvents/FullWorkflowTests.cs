@@ -68,7 +68,7 @@ public class FullWorkflowTests : TestBase
 
         // Step 3: Drive SampleCollection state machine + record sample
         await _sampleCollection.ExecuteCommandAsync(new MovePatientToWaitingCommand(collectionRequestId, SystemClock.Now));
-        await _sampleCollection.ExecuteCommandAsync(new CreateBarcodeCommand(collectionRequestId, "EDTA Tube", barcode, ExecutionContext.UserId, SystemClock.Now));
+        await _sampleCollection.ExecuteCommandAsync(new CreateBarcodeCommand(collectionRequestId, "EDTA Tube", barcode, SystemClock.Now));
         await _sampleCollection.ExecuteCommandAsync(new CallPatientCommand(collectionRequestId, ExecutionContext.UserId, SystemClock.Now));
 
         var samples = await _sampleCollection.ExecuteQueryAsync(

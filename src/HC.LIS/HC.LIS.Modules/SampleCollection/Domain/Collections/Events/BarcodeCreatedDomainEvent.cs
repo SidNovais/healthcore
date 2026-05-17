@@ -10,7 +10,6 @@ public class BarcodeCreatedDomainEvent(
     Guid patientId,
     string barcodeValue,
     string tubeType,
-    Guid technicianId,
     IReadOnlyCollection<CollectionExam> exams,
     DateTime createdAt
 ) : DomainEvent
@@ -20,7 +19,6 @@ public class BarcodeCreatedDomainEvent(
     public Guid PatientId { get; } = patientId;
     public string BarcodeValue { get; } = barcodeValue;
     public string TubeType { get; } = tubeType;
-    public Guid TechnicianId { get; } = technicianId;
     public IReadOnlyCollection<CollectionExam> Exams { get; } = exams;
     public DateTime CreatedAt { get; } = createdAt;
 }

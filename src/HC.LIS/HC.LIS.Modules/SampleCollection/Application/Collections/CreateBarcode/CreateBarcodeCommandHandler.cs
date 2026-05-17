@@ -18,7 +18,7 @@ internal class CreateBarcodeCommandHandler(
         CollectionRequest? request = await _aggregateStore
             .Load<CollectionRequest>(new CollectionRequestId(command.CollectionRequestId))
             .ConfigureAwait(false);
-        request!.CreateBarcode(command.TubeType, command.BarcodeValue, command.TechnicianId, command.CreatedAt);
+        request!.CreateBarcode(command.TubeType, command.BarcodeValue, command.CreatedAt);
         _aggregateStore.AppendChanges(request);
     }
 }

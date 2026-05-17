@@ -16,7 +16,6 @@ internal static class CreateBarcodeEndpoint
             id,
             request.TubeType,
             request.BarcodeValue,
-            request.TechnicianId,
             SystemClock.Now)).ConfigureAwait(false);
 
         return TypedResults.NoContent();

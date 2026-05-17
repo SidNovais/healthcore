@@ -100,7 +100,6 @@ public class CollectionRequest : AggregateRoot
     public void CreateBarcode(
         string tubeType,
         string barcodeValue,
-        Guid technicianId,
         DateTime createdAt
     )
     {
@@ -115,7 +114,6 @@ public class CollectionRequest : AggregateRoot
             _patientId.Value,
             barcodeValue,
             tubeType,
-            technicianId,
             pendingSample!.Exams,
             createdAt
         );
