@@ -129,6 +129,7 @@ public class CollectionRequestTests : TestBase
                 CollectionRequestSampleData.WaitingAt)).ConfigureAwait(true);
         await SampleCollectionModule.ExecuteCommandAsync(
             new GenerateSampleBarcodesForCollectionRequestCommand(
+                Guid.CreateVersion7(),
                 CollectionRequestSampleData.CollectionRequestId)).ConfigureAwait(true);
 
         var details = await GetEventually(
@@ -160,6 +161,7 @@ public class CollectionRequestTests : TestBase
                 CollectionRequestSampleData.WaitingAt)).ConfigureAwait(true);
         await SampleCollectionModule.ExecuteCommandAsync(
             new GenerateSampleBarcodesForCollectionRequestCommand(
+                Guid.CreateVersion7(),
                 CollectionRequestSampleData.CollectionRequestId)).ConfigureAwait(true);
 
         var details = await GetEventually(
@@ -191,6 +193,7 @@ public class CollectionRequestTests : TestBase
                 CollectionRequestSampleData.WaitingAt)).ConfigureAwait(true);
         await SampleCollectionModule.ExecuteCommandAsync(
             new GenerateSampleBarcodesForCollectionRequestCommand(
+                Guid.CreateVersion7(),
                 CollectionRequestSampleData.CollectionRequestId)).ConfigureAwait(true);
         await SampleCollectionModule.ExecuteCommandAsync(
             new CallPatientCommand(

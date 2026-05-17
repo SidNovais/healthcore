@@ -17,6 +17,7 @@ public class PatientWaitingNotificationHandler(
     {
         await _commandsScheduler.EnqueueAsync(
             new GenerateSampleBarcodesForCollectionRequestCommand(
+                Guid.CreateVersion7(),
                 notification.DomainEvent.CollectionRequestId
             )
         ).ConfigureAwait(false);
