@@ -1,5 +1,5 @@
 import { Component, input, output, signal, HostListener } from '@angular/core';
-import { SlicePipe } from '@angular/common';
+import { SlicePipe, NgClass } from '@angular/common';
 import { CollectSampleFormComponent } from './collect-sample-form.component';
 import type { CollectSampleFormData } from './collect-sample-form.component';
 import type { CollectionRequestSummary } from '../../core/domain/collection-request-summary';
@@ -7,9 +7,9 @@ import type { CollectionRequestSummary } from '../../core/domain/collection-requ
 @Component({
   selector: 'app-patient-row',
   standalone: true,
-  imports: [SlicePipe, CollectSampleFormComponent],
+  imports: [SlicePipe, NgClass, CollectSampleFormComponent],
   template: `
-    <div data-testid="patient-row" class="card" [class]="cardClass()">
+    <div data-testid="patient-row" class="card" [ngClass]="cardClass()">
       <div class="row">
         <div class="info">
           <span class="patient-id mono">{{ item().patientId | slice:0:8 }}…</span>
@@ -126,7 +126,7 @@ export class PatientRowComponent {
 
   protected onRecordCollection(): void {
     this.menuOpen.set(false);
-    this.showCollectForm.update(v => !v);
+    this.showCollectForm.set(true);
   }
 
   protected onFormSubmit(data: CollectSampleFormData): void {

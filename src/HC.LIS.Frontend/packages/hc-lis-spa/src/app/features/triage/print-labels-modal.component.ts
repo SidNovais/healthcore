@@ -70,9 +70,12 @@ export class PrintLabelsModalComponent implements OnInit {
   protected readonly loading = signal(true);
 
   async ngOnInit(): Promise<void> {
-    const result = await this.triageService.getSamples(this.collectionRequestId());
-    this.samples.set(result);
-    this.loading.set(false);
+    try {
+      const result = await this.triageService.getSamples(this.collectionRequestId());
+      this.samples.set(result);
+    } finally {
+      this.loading.set(false);
+    }
   }
 
   protected onOverlayClick(event: MouseEvent): void {
