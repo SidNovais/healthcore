@@ -108,3 +108,18 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0; margin: -1px; overflow: hidden;
   clip: rect(0,0,0,0); white-space: nowrap; border: 0;
 }
+
+/* ── Print isolation for label modal ─────────────────────────── */
+@media print {
+  body.printing-labels * { visibility: hidden !important; }
+  body.printing-labels .print-labels-section,
+  body.printing-labels .print-labels-section * { visibility: visible !important; }
+  body.printing-labels .print-labels-section {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    background: #fff !important;
+    padding: 1rem !important;
+  }
+}
