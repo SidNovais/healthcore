@@ -34,13 +34,13 @@ import { PreparingPatientCardComponent } from './preparing-patient-card.componen
 
       <section class="section" data-testid="preparing-section">
         <h2 class="section-title">Preparing Barcodes</h2>
-        @if (service.preparing().length === 0) {
+        @if (service.waiting().length === 0) {
           <div data-testid="preparing-empty-state" class="empty-state">
             <p>No patients preparing.</p>
           </div>
         } @else {
           <div class="card-list">
-            @for (item of service.preparing(); track item.collectionRequestId) {
+            @for (item of service.waiting(); track item.collectionRequestId) {
               <app-preparing-patient-card
                 [item]="item"
               />
@@ -79,7 +79,7 @@ export class TriageComponent implements OnInit {
   protected async refresh(): Promise<void> {
     await Promise.all([
       this.service.loadArrived(),
-      this.service.loadPreparing(),
+      this.service.loadWaiting(),
     ]);
   }
 
