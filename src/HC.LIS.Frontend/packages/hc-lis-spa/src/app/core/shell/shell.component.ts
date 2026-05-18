@@ -16,20 +16,18 @@ const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
     { label: 'Orders',    route: '/orders',     icon: 'list',  testId: 'nav-orders-link'    },
   ],
   LabTechnician: [
-    { label: 'Triage',       route: '/triage',       icon: 'triage', testId: 'nav-triage-link'        },
-    { label: 'Waiting Room', route: '/waiting-room', icon: 'queue',  testId: 'nav-waiting-room-link' },
+    { label: 'Triage', route: '/triage', icon: 'triage', testId: 'nav-triage-link' },
   ],
   Physician: [
     { label: 'Orders',   route: '/orders',   icon: 'list',     testId: 'nav-orders-link'   },
     { label: 'Worklist', route: '/worklist', icon: 'worklist', testId: 'nav-worklist-link'  },
   ],
   ITAdmin: [
-    { label: 'New Order',    route: '/orders/new',  icon: 'order',    testId: 'nav-new-order-link'    },
-    { label: 'Orders',       route: '/orders',       icon: 'list',     testId: 'nav-orders-link'       },
-    { label: 'Triage',        route: '/triage',       icon: 'triage',   testId: 'nav-triage-link'       },
-    { label: 'Waiting Room', route: '/waiting-room', icon: 'queue',    testId: 'nav-waiting-room-link' },
-    { label: 'Worklist',     route: '/worklist',     icon: 'worklist', testId: 'nav-worklist-link'     },
-    { label: 'Users',        route: '/admin/users',  icon: 'users',    testId: 'nav-users-link'        },
+    { label: 'New Order', route: '/orders/new',  icon: 'order',    testId: 'nav-new-order-link'  },
+    { label: 'Orders',    route: '/orders',       icon: 'list',     testId: 'nav-orders-link'     },
+    { label: 'Triage',    route: '/triage',       icon: 'triage',   testId: 'nav-triage-link'     },
+    { label: 'Worklist',  route: '/worklist',     icon: 'worklist', testId: 'nav-worklist-link'   },
+    { label: 'Users',     route: '/admin/users',  icon: 'users',    testId: 'nav-users-link'      },
   ],
 };
 
