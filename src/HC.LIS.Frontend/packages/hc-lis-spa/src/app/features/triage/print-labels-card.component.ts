@@ -14,7 +14,7 @@ import type { SampleSummary } from '../../core/domain/sample-summary';
           <span class="barcode-text mono">{{ sample.barcode }}</span>
         </div>
       }
-      @if (samplesWithBarcode().length > 0) {
+      @if (samplesWithBarcode().length > 0 && showPrintButton()) {
         <button data-testid="print-labels-btn" class="btn-print" (click)="print()">Print Labels</button>
       }
     </div>
@@ -28,14 +28,12 @@ import type { SampleSummary } from '../../core/domain/sample-summary';
     .mono { font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace; }
     .btn-print { margin-top: 0.5rem; padding: 0.4rem 1rem; background: #0284c7; color: #fff; border: none; border-radius: 2px; font-size: 0.85rem; font-weight: 500; cursor: pointer; }
     .btn-print:hover { background: #0369a1; }
-
-    @media print {
-      .btn-print { display: none; }
-    }
+    @media print { .btn-print { display: none; } }
   `],
 })
 export class PrintLabelsCardComponent {
   readonly samples = input<SampleSummary[]>([]);
+  readonly showPrintButton = input<boolean>(true);
 
   protected readonly samplesWithBarcode = computed(() =>
     this.samples().filter(s => s.barcode !== null && s.barcode !== '')
@@ -47,9 +45,7 @@ export class PrintLabelsCardComponent {
     effect(() => {
       const svgElements = this.barcodeSvgs();
       const barcoded = this.samplesWithBarcode();
-
       if (svgElements.length === 0 || barcoded.length === 0) return;
-
       svgElements.forEach((ref, index) => {
         const sample = barcoded[index];
         if (sample?.barcode) {
