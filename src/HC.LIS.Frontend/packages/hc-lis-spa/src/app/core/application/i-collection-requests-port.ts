@@ -12,6 +12,7 @@ export interface RecordCollectionParams {
 
 export interface ICollectionRequestsPort {
   loadQueue(): Promise<CollectionRequestSummary[]>;
+  loadCalled(): Promise<CollectionRequestSummary[]>;
   callPatient(id: string): Promise<void>;
   recordCollection(id: string, params: RecordCollectionParams): Promise<void>;
   loadArrived(): Promise<CollectionRequestSummary[]>;

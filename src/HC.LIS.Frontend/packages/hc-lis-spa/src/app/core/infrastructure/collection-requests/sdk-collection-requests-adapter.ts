@@ -30,6 +30,10 @@ export class SdkCollectionRequestsAdapter implements ICollectionRequestsPort {
     return this.api.getArrived();
   }
 
+  async loadCalled(): Promise<CollectionRequestSummary[]> {
+    return this.api.getQueue('Called');
+  }
+
   async moveToWaiting(id: string): Promise<void> {
     await this.api.moveToWaiting(id);
   }
