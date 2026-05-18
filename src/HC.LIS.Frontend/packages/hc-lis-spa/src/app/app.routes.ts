@@ -46,9 +46,8 @@ export const routes: Routes = [
       },
       {
         path: 'waiting-room',
-        canActivate: [roleGuard('LabTechnician', 'ITAdmin')],
-        loadComponent: () =>
-          import('./features/waiting-room/waiting-room.component').then(m => m.WaitingRoomComponent),
+        redirectTo: 'triage',
+        pathMatch: 'full',
       },
       {
         path: 'worklist',
