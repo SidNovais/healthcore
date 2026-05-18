@@ -153,6 +153,7 @@ export class TriageComponent implements OnInit {
   }
 
   protected async onSendToWaiting(id: string): Promise<void> {
+    this.error.set(null);
     try {
       await this.service.moveToWaiting(id);
       await Promise.all([this.service.loadArrived(), this.service.loadWaiting()]);
@@ -162,6 +163,7 @@ export class TriageComponent implements OnInit {
   }
 
   protected onPrintLabel(collectionRequestId: string): void {
+    this.error.set(null);
     const item = this.service.waiting().find(r => r.collectionRequestId === collectionRequestId);
     if (item) {
       this.printModalRequest.set({ collectionRequestId, patientId: item.patientId });
@@ -169,6 +171,7 @@ export class TriageComponent implements OnInit {
   }
 
   protected async onCallPatient(id: string): Promise<void> {
+    this.error.set(null);
     try {
       await this.service.callPatient(id);
       await Promise.all([this.service.loadWaiting(), this.service.loadCalled()]);
@@ -178,6 +181,7 @@ export class TriageComponent implements OnInit {
   }
 
   protected async onCollect(id: string, data: CollectSampleFormData): Promise<void> {
+    this.error.set(null);
     const technicianId = this.auth.currentUser()?.userId ?? '';
     try {
       await this.service.recordCollection(id, {

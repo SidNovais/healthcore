@@ -63,7 +63,7 @@ describe('LoginComponent (integration)', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/orders/new']);
   });
 
-  it('valid LabTechnician login navigates to /waiting-room', async () => {
+  it('valid LabTechnician login navigates to /triage', async () => {
     vi.mocked(mockAuthService.login!).mockImplementation(async () => {
       (mockAuthService as any).currentUser = signal(labTech);
     });
@@ -71,7 +71,7 @@ describe('LoginComponent (integration)', () => {
     fillAndSubmit('lab@hclis.local', 'password123');
     await fixture.whenStable();
 
-    expect(router.navigate).toHaveBeenCalledWith(['/waiting-room']);
+    expect(router.navigate).toHaveBeenCalledWith(['/triage']);
   });
 
   it('invalid credentials shows error alert; currentUser remains null', async () => {

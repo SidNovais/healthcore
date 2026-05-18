@@ -135,7 +135,7 @@ export class PatientRowComponent {
   }
 
   @HostListener('document:click')
-  onDocumentClick(): void {
+  protected onDocumentClick(): void {
     if (this.menuOpen()) {
       this.menuOpen.set(false);
     }
