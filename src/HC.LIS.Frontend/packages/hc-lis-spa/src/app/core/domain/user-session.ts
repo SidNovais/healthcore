@@ -8,7 +8,7 @@ export interface UserSession {
 
 export const ROLE_HOME_ROUTE: Record<UserRole, string> = {
   Receptionist: '/orders/new',
-  LabTechnician: '/waiting-room',
+  LabTechnician: '/triage',
   Physician: '/worklist',
   ITAdmin: '/admin/users',
 };
