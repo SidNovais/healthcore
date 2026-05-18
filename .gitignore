@@ -3,3 +3,6 @@
 launch.json
 **/settings.local.json
 .worktrees/
+
+# Brainstorm session files
+.superpowers/
