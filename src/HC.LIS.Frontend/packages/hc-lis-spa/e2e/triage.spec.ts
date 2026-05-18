@@ -1,10 +1,17 @@
 import { test, expect } from '@playwright/test';
 
-// Dev seed users — all share the same password
-const RECEPTIONIST_EMAIL = 'receptionist@hclis.local';
 const LAB_TECH_EMAIL = 'labtech@hclis.local';
+const RECEPTIONIST_EMAIL = 'receptionist@hclis.local';
 const ITADMIN_EMAIL = 'itadmin@hclis.local';
 const PASSWORD = 'Admin1234!';
+
+async function loginAsLabTechnician(page: import('@playwright/test').Page) {
+  await page.goto('/login');
+  await page.getByLabel('Email').fill(LAB_TECH_EMAIL);
+  await page.getByLabel('Password').fill(PASSWORD);
+  await page.getByRole('button', { name: /sign in/i }).click();
+  await expect(page).toHaveURL('/triage', { timeout: 10_000 });
+}
 
 async function loginAsReceptionist(page: import('@playwright/test').Page) {
   await page.goto('/login');
@@ -12,14 +19,6 @@ async function loginAsReceptionist(page: import('@playwright/test').Page) {
   await page.getByLabel('Password').fill(PASSWORD);
   await page.getByRole('button', { name: /sign in/i }).click();
   await expect(page).toHaveURL('/orders/new', { timeout: 10_000 });
-}
-
-async function loginAsLabTechnician(page: import('@playwright/test').Page) {
-  await page.goto('/login');
-  await page.getByLabel('Email').fill(LAB_TECH_EMAIL);
-  await page.getByLabel('Password').fill(PASSWORD);
-  await page.getByRole('button', { name: /sign in/i }).click();
-  await expect(page).toHaveURL('/waiting-room', { timeout: 10_000 });
 }
 
 async function loginAsITAdmin(page: import('@playwright/test').Page) {
@@ -38,70 +37,91 @@ test.describe('Triage — Role Guard', () => {
   });
 });
 
-test.describe('Triage — Nav Link Visibility', () => {
-  test('LabTechnician sees nav-triage-link in shell', async ({ page }) => {
+test.describe('Triage — Navigation', () => {
+  test('LabTechnician sees nav-triage-link and no nav-waiting-room-link', async ({ page }) => {
     await loginAsLabTechnician(page);
     await expect(page.getByTestId('nav-triage-link')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('nav-waiting-room-link')).not.toBeVisible({ timeout: 3_000 });
   });
 
-  test('ITAdmin sees nav-triage-link in shell', async ({ page }) => {
+  test('ITAdmin sees nav-triage-link and no nav-waiting-room-link', async ({ page }) => {
     await loginAsITAdmin(page);
+    await page.goto('/triage');
     await expect(page.getByTestId('nav-triage-link')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('nav-waiting-room-link')).not.toBeVisible({ timeout: 3_000 });
   });
 
-  test('Receptionist does not see nav-triage-link in shell', async ({ page }) => {
-    await loginAsReceptionist(page);
-    await expect(page.getByTestId('nav-triage-link')).not.toBeVisible({ timeout: 5_000 });
+  test('/waiting-room redirects to /triage', async ({ page }) => {
+    await loginAsLabTechnician(page);
+    await page.goto('/waiting-room');
+    await expect(page).toHaveURL('/triage', { timeout: 5_000 });
   });
 });
 
 test.describe('Triage — Page Structure', () => {
-  test('LabTechnician navigates to /triage and sees the page title', async ({ page }) => {
+  test('page title is visible', async ({ page }) => {
     await loginAsLabTechnician(page);
-    await page.getByTestId('nav-triage-link').click();
-    await expect(page).toHaveURL('/triage', { timeout: 10_000 });
-    await expect(page.getByTestId('triage-title')).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByTestId('triage-title')).toContainText('Triage');
+    await expect(page.getByTestId('triage-title')).toContainText('Triage', { timeout: 5_000 });
   });
 
-  test('Triage page shows arriving and preparing sections', async ({ page }) => {
+  test('filter tabs are visible', async ({ page }) => {
     await loginAsLabTechnician(page);
-    await page.goto('/triage');
-    await expect(page.getByTestId('arriving-section')).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByTestId('preparing-section')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('filter-tab-all')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('filter-tab-arrived')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('filter-tab-waiting')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('filter-tab-called')).toBeVisible({ timeout: 5_000 });
   });
 });
 
 test.describe('Triage — Full Workflow', () => {
-  // This test requires a CollectionRequest in "Arrived" status to exist in the database.
-  // Pre-conditions:
-  //   1. A TestOrder with at least one accepted exam must have been placed via the Receptionist flow.
-  //   2. The SampleCollection module must have processed the integration event and created a
-  //      CollectionRequest, which must subsequently have arrived at the lab (status = Arrived).
-  //   3. RabbitMQ must be active so the Outbox relay delivers the integration events.
-  // Without this seed data the "arriving-section" will have no patient cards and the workflow
-  // cannot be exercised. Use test.fixme until a reliable seed/setup mechanism is in place.
-  test.fixme('LabTechnician sends arrived patient to waiting room and sees generated barcode labels', async ({ page }) => {
+  test.fixme('full lifecycle: Arrived → Waiting (print modal) → Called → Collected', async ({ page }) => {
     await loginAsLabTechnician(page);
     await page.goto('/triage');
 
-    // Arriving section must have at least one patient card
-    await expect(page.getByTestId('arrived-patient-card').first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByTestId('arrived-group').getByTestId('patient-row').first()).toBeVisible({ timeout: 10_000 });
 
-    // Send the first arrived patient to the waiting room
-    await page.getByTestId('arrived-patient-card').first().getByTestId('send-to-waiting-btn').click();
+    await page.getByTestId('arrived-group').getByTestId('patient-row').first()
+      .getByTestId('patient-row-menu-btn').click();
+    await expect(page.getByTestId('action-send-to-waiting')).toBeVisible({ timeout: 3_000 });
+
+    await page.getByTestId('action-send-to-waiting').click();
     await page.waitForResponse(
       resp => resp.url().includes('move-to-waiting') && resp.status() === 204
     );
 
-    // Patient card disappears from the arriving section after being sent
-    await expect(page.getByTestId('arrived-patient-card')).toHaveCount(0, { timeout: 10_000 });
+    await expect(page.getByTestId('arrived-group').getByTestId('patient-row')).toHaveCount(0, { timeout: 10_000 });
+    await expect(page.getByTestId('waiting-group').getByTestId('patient-row').first()).toBeVisible({ timeout: 10_000 });
 
-    // Preparing section must now have the patient card
-    await expect(page.getByTestId('preparing-patient-card').first()).toBeVisible({ timeout: 10_000 });
+    await page.getByTestId('waiting-group').getByTestId('patient-row').first()
+      .getByTestId('patient-row-menu-btn').click();
+    await expect(page.getByTestId('action-print-label')).toBeVisible({ timeout: 3_000 });
+    await page.getByTestId('action-print-label').click();
+    await expect(page.getByTestId('print-labels-modal')).toBeVisible({ timeout: 5_000 });
+    await page.getByTestId('print-modal-cancel-btn').click();
+    await expect(page.getByTestId('print-labels-modal')).not.toBeVisible({ timeout: 3_000 });
 
-    // Print labels section with backend-generated barcodes must be visible
-    await expect(page.getByTestId('preparing-patient-card').first().getByTestId('print-labels-section')).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByTestId('preparing-patient-card').first().getByTestId('barcode-label').first()).toBeVisible({ timeout: 5_000 });
+    await page.getByTestId('waiting-group').getByTestId('patient-row').first()
+      .getByTestId('patient-row-menu-btn').click();
+    await page.getByTestId('action-call-patient').click();
+    await page.waitForResponse(
+      resp => resp.url().includes('call-patient') && resp.status() === 204
+    );
+
+    await expect(page.getByTestId('called-group').getByTestId('patient-row').first()).toBeVisible({ timeout: 10_000 });
+
+    await page.getByTestId('called-group').getByTestId('patient-row').first()
+      .getByTestId('patient-row-menu-btn').click();
+    await page.getByTestId('action-record-collection').click();
+    await expect(page.getByTestId('collect-sample-form')).toBeVisible({ timeout: 3_000 });
+
+    await page.getByTestId('tube-type-input').fill('EDTA');
+    await page.getByTestId('barcode-value-input').fill('BC-TEST-001');
+    await page.getByTestId('patient-name-input').fill('Test Patient');
+    await page.getByTestId('patient-birthdate-input').fill('1990-01-15');
+    await page.getByTestId('patient-gender-select').selectOption('M');
+    await page.getByTestId('collect-submit-btn').click();
+
+    await page.waitForResponse(resp => resp.url().includes('collect') && resp.status() === 204);
+    await expect(page.getByTestId('called-group').getByTestId('patient-row')).toHaveCount(0, { timeout: 10_000 });
   });
 });
