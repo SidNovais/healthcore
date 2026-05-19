@@ -21,9 +21,6 @@ internal class RecordSampleCollectionCommandHandler(
         request!.RecordCollection(
             command.SampleId,
             command.TechnicianId,
-            command.PatientName,
-            command.PatientBirthdate,
-            command.PatientGender,
             command.CollectedAt);
         _aggregateStore.AppendChanges(request);
     }
