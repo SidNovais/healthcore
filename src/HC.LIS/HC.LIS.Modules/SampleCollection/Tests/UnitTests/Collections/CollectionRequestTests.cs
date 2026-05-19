@@ -118,9 +118,6 @@ public class CollectionRequestTests : TestBase
         _sut.RecordCollection(
             sampleId,
             CollectionRequestSampleData.TechnicianId,
-            CollectionRequestSampleData.PatientName,
-            CollectionRequestSampleData.PatientBirthdate,
-            CollectionRequestSampleData.PatientGender,
             CollectionRequestSampleData.CollectedAt);
 
         SampleCollectedDomainEvent evt = AssertPublishedDomainEvent<SampleCollectedDomainEvent>(_sut);
@@ -152,9 +149,6 @@ public class CollectionRequestTests : TestBase
         urgentRequest.RecordCollection(
             sampleId,
             CollectionRequestSampleData.TechnicianId,
-            CollectionRequestSampleData.PatientName,
-            CollectionRequestSampleData.PatientBirthdate,
-            CollectionRequestSampleData.PatientGender,
             CollectionRequestSampleData.CollectedAt
         );
 
@@ -238,9 +232,6 @@ public class CollectionRequestTests : TestBase
         void action() => _sut.RecordCollection(
             sampleId,
             CollectionRequestSampleData.TechnicianId,
-            CollectionRequestSampleData.PatientName,
-            CollectionRequestSampleData.PatientBirthdate,
-            CollectionRequestSampleData.PatientGender,
             CollectionRequestSampleData.CollectedAt
         );
 
@@ -261,17 +252,11 @@ public class CollectionRequestTests : TestBase
         _sut.RecordCollection(
             sampleId,
             CollectionRequestSampleData.TechnicianId,
-            CollectionRequestSampleData.PatientName,
-            CollectionRequestSampleData.PatientBirthdate,
-            CollectionRequestSampleData.PatientGender,
             CollectionRequestSampleData.CollectedAt);
 
         void action() => _sut.RecordCollection(
             sampleId,
             CollectionRequestSampleData.TechnicianId,
-            CollectionRequestSampleData.PatientName,
-            CollectionRequestSampleData.PatientBirthdate,
-            CollectionRequestSampleData.PatientGender,
             CollectionRequestSampleData.CollectedAt
         );
 
