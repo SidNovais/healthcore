@@ -127,9 +127,6 @@ public class CollectionRequest : AggregateRoot
     public void RecordCollection(
         Guid sampleId,
         Guid technicianId,
-        string patientName,
-        DateTime patientBirthdate,
-        string patientGender,
         DateTime collectedAt)
     {
         CheckRule(new CannotCollectSampleBeforePatientIsCalledRule(_status));
@@ -139,9 +136,6 @@ public class CollectionRequest : AggregateRoot
             sampleId,
             _patientId.Value,
             technicianId,
-            patientName,
-            patientBirthdate,
-            patientGender,
             _isUrgent,
             sample.Exams,
             sample.Barcode!,
