@@ -1,3 +1,4 @@
+using HC.Core.Application;
 using HC.Core.Domain;
 using HC.LIS.Modules.SampleCollection.Application.Collections.RecordSampleCollection;
 using HC.LIS.Modules.SampleCollection.Application.Contracts;
@@ -10,15 +11,13 @@ internal static class RecordSampleCollectionEndpoint
         Guid id,
         RecordSampleCollectionRequest request,
         ISampleCollectionModule module,
+        IExecutionContextAccessor executionContext,
         CancellationToken ct)
     {
         await module.ExecuteCommandAsync(new RecordSampleCollectionCommand(
             id,
             request.SampleId,
-            request.TechnicianId,
-            request.PatientName,
-            request.PatientBirthdate,
-            request.PatientGender,
+            executionContext.UserId,
             SystemClock.Now)).ConfigureAwait(false);
 
         return TypedResults.NoContent();
