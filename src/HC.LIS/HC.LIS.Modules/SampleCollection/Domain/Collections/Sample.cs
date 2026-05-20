@@ -34,6 +34,7 @@ public class Sample : Entity
 
     internal void Collect(SampleCollectedDomainEvent domainEvent)
     {
+        CheckRule(new CannotCollectSampleWithoutBarcodeRule(HasBarcode));
         CheckRule(new CannotCollectSampleMoreThanOnceRule(_status));
         Apply(domainEvent);
     }

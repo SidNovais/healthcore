@@ -99,7 +99,7 @@ export class PatientRowComponent {
   readonly item = input.required<CollectionRequestSummary>();
   readonly samples = input<SampleSummary[] | null>(null);
   readonly pendingSamples = computed(() =>
-    (this.samples() ?? []).filter(s => s.status !== 'Collected')
+    (this.samples() ?? []).filter(s => s.status !== 'Collected' && s.barcode !== null)
   );
   readonly sendToWaiting        = output<string>();
   readonly printLabel           = output<string>();
