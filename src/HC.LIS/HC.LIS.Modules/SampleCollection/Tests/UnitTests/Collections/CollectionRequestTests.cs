@@ -239,6 +239,22 @@ public class CollectionRequestTests : TestBase
     }
 
     [Fact]
+    public void RecordCollectionShouldBreakCannotCollectSampleWithoutBarcodeRuleWhenNoBarcodeAssigned()
+    {
+        Guid sampleId = CollectionRequestFactory.AddExams(_sut);
+        _sut.MoveToWaiting(CollectionRequestSampleData.WaitingAt);
+        _sut.CallPatient(CollectionRequestSampleData.TechnicianId, CollectionRequestSampleData.CalledAt);
+
+        void action() => _sut.RecordCollection(
+            sampleId,
+            CollectionRequestSampleData.TechnicianId,
+            CollectionRequestSampleData.CollectedAt
+        );
+
+        AssertBrokenRule<CannotCollectSampleWithoutBarcodeRule>(action);
+    }
+
+    [Fact]
     public void RecordCollectionShouldBreakCannotCollectSampleMoreThanOnceRuleWhenAlreadyCollected()
     {
         Guid sampleId = CollectionRequestFactory.AddExams(_sut);
