@@ -61,7 +61,7 @@ async function loginAsLabTechnician(page: import('@playwright/test').Page) {
   await page.getByLabel('Email').fill(LAB_TECH_EMAIL);
   await page.getByLabel('Password').fill(ROOT_PASSWORD);
   await page.getByRole('button', { name: /sign in/i }).click();
-  await expect(page).toHaveURL('/waiting-room', { timeout: 10_000 });
+  await expect(page).toHaveURL('/triage', { timeout: 10_000 });
 }
 
 async function loginAsITAdmin(page: import('@playwright/test').Page) {

@@ -24,10 +24,10 @@ test.describe('User Management', () => {
     await expect(page).toHaveURL('/orders/new', { timeout: 5_000 });
   });
 
-  test('ITAdmin can access /waiting-room', async ({ page }) => {
+  test('ITAdmin can access /triage via /waiting-room redirect', async ({ page }) => {
     await loginAsITAdmin(page);
     await page.goto('/waiting-room');
-    await expect(page).toHaveURL('/waiting-room', { timeout: 5_000 });
+    await expect(page).toHaveURL('/triage', { timeout: 5_000 });
   });
 
   test('ITAdmin can access /worklist', async ({ page }) => {
