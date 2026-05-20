@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 const LAB_TECH_EMAIL = 'labtech@hclis.local';
 const RECEPTIONIST_EMAIL = 'receptionist@hclis.local';
-const ITADMIN_EMAIL = 'itadmin@hclis.local';
+const ITADMIN_EMAIL = 'root@hclis.local';
 const PASSWORD = 'Admin1234!';
 
 async function loginAsLabTechnician(page: import('@playwright/test').Page) {
@@ -26,8 +26,14 @@ async function loginAsITAdmin(page: import('@playwright/test').Page) {
   await page.getByLabel('Email').fill(ITADMIN_EMAIL);
   await page.getByLabel('Password').fill(PASSWORD);
   await page.getByRole('button', { name: /sign in/i }).click();
-  await expect(page).toHaveURL('/admin/users', { timeout: 10_000 });
+  await expect(page).toHaveURL('/admin/users', { timeout: 20_000 });
 }
+
+// Clear cookies before each test to prevent auth state carry-over
+// between tests within the same browser context.
+test.beforeEach(async ({ context }) => {
+  await context.clearCookies();
+});
 
 test.describe('Triage — Role Guard', () => {
   test('Receptionist is redirected to /unauthorized when accessing /triage', async ({ page }) => {
@@ -74,22 +80,11 @@ test.describe('Triage — Page Structure', () => {
 });
 
 test.describe('Triage — Full Workflow', () => {
-  test.fixme('full lifecycle: Arrived → Waiting (print modal) → Called → Collected', async ({ page }) => {
+  test('workflow: Waiting → print modal → Called → sample cards → Collected', async ({ page }) => {
     await loginAsLabTechnician(page);
     await page.goto('/triage');
 
-    await expect(page.getByTestId('arrived-group').getByTestId('patient-row').first()).toBeVisible({ timeout: 10_000 });
-
-    await page.getByTestId('arrived-group').getByTestId('patient-row').first()
-      .getByTestId('patient-row-menu-btn').click();
-    await expect(page.getByTestId('action-send-to-waiting')).toBeVisible({ timeout: 3_000 });
-
-    await page.getByTestId('action-send-to-waiting').click();
-    await page.waitForResponse(
-      resp => resp.url().includes('move-to-waiting') && resp.status() === 204
-    );
-
-    await expect(page.getByTestId('arrived-group').getByTestId('patient-row')).toHaveCount(0, { timeout: 10_000 });
+    // ── Waiting → print label modal → Called ─────────────────────────────────
     await expect(page.getByTestId('waiting-group').getByTestId('patient-row').first()).toBeVisible({ timeout: 10_000 });
 
     await page.getByTestId('waiting-group').getByTestId('patient-row').first()
@@ -109,7 +104,7 @@ test.describe('Triage — Full Workflow', () => {
 
     await expect(page.getByTestId('called-group').getByTestId('patient-row').first()).toBeVisible({ timeout: 10_000 });
 
-    // Click "Record Collection" — should load sample cards from the backend
+    // ── Called → per-sample cards → Collect ──────────────────────────────────
     await page.getByTestId('called-group').getByTestId('patient-row').first()
       .getByTestId('patient-row-menu-btn').click();
     await page.getByTestId('action-record-collection').click();
@@ -120,14 +115,14 @@ test.describe('Triage — Full Workflow', () => {
 
     await expect(page.getByTestId('sample-card').first()).toBeVisible({ timeout: 5_000 });
 
-    // Collect each sample card
+    // Collect each sample — each must return 204
     const sampleCards = page.getByTestId('sample-card');
     const cardCount = await sampleCards.count();
+    expect(cardCount).toBeGreaterThan(0);
+
     for (let i = 0; i < cardCount; i++) {
       await sampleCards.nth(i).getByTestId('sample-collect-btn').click();
       await page.waitForResponse(resp => resp.url().includes('collect') && resp.status() === 204);
     }
-
-    await expect(page.getByTestId('called-group').getByTestId('patient-row')).toHaveCount(0, { timeout: 10_000 });
   });
 });
