@@ -109,19 +109,25 @@ test.describe('Triage — Full Workflow', () => {
 
     await expect(page.getByTestId('called-group').getByTestId('patient-row').first()).toBeVisible({ timeout: 10_000 });
 
+    // Click "Record Collection" — should load sample cards from the backend
     await page.getByTestId('called-group').getByTestId('patient-row').first()
       .getByTestId('patient-row-menu-btn').click();
     await page.getByTestId('action-record-collection').click();
-    await expect(page.getByTestId('collect-sample-form')).toBeVisible({ timeout: 3_000 });
 
-    await page.getByTestId('tube-type-input').fill('EDTA');
-    await page.getByTestId('barcode-value-input').fill('BC-TEST-001');
-    await page.getByTestId('patient-name-input').fill('Test Patient');
-    await page.getByTestId('patient-birthdate-input').fill('1990-01-15');
-    await page.getByTestId('patient-gender-select').selectOption('M');
-    await page.getByTestId('collect-submit-btn').click();
+    await page.waitForResponse(
+      resp => resp.url().includes('/samples') && resp.status() === 200
+    );
 
-    await page.waitForResponse(resp => resp.url().includes('collect') && resp.status() === 204);
+    await expect(page.getByTestId('sample-card').first()).toBeVisible({ timeout: 5_000 });
+
+    // Collect each sample card
+    const sampleCards = page.getByTestId('sample-card');
+    const cardCount = await sampleCards.count();
+    for (let i = 0; i < cardCount; i++) {
+      await sampleCards.nth(i).getByTestId('sample-collect-btn').click();
+      await page.waitForResponse(resp => resp.url().includes('collect') && resp.status() === 204);
+    }
+
     await expect(page.getByTestId('called-group').getByTestId('patient-row')).toHaveCount(0, { timeout: 10_000 });
   });
 });
