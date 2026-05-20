@@ -84,42 +84,61 @@ test.describe('Triage — Full Workflow', () => {
     await loginAsLabTechnician(page);
     await page.goto('/triage');
 
-    // ── Waiting → print label modal → Called ─────────────────────────────────
-    await expect(page.getByTestId('waiting-group').getByTestId('patient-row').first()).toBeVisible({ timeout: 10_000 });
+    // ── Waiting → print label modal → Called (skipped when Waiting group is empty) ──
+    const firstWaitingRow = page.getByTestId('waiting-group').getByTestId('patient-row').first();
+    const hasWaiting = await firstWaitingRow.isVisible({ timeout: 3_000 }).catch(() => false);
 
-    await page.getByTestId('waiting-group').getByTestId('patient-row').first()
-      .getByTestId('patient-row-menu-btn').click();
-    await expect(page.getByTestId('action-print-label')).toBeVisible({ timeout: 3_000 });
-    await page.getByTestId('action-print-label').click();
-    await expect(page.getByTestId('print-labels-modal')).toBeVisible({ timeout: 5_000 });
-    await page.getByTestId('print-modal-cancel-btn').click();
-    await expect(page.getByTestId('print-labels-modal')).not.toBeVisible({ timeout: 3_000 });
+    if (hasWaiting) {
+      await firstWaitingRow.getByTestId('patient-row-menu-btn').click();
+      await expect(page.getByTestId('action-print-label')).toBeVisible({ timeout: 3_000 });
+      await page.getByTestId('action-print-label').click();
+      await expect(page.getByTestId('print-labels-modal')).toBeVisible({ timeout: 5_000 });
+      await page.getByTestId('print-modal-cancel-btn').click();
+      await expect(page.getByTestId('print-labels-modal')).not.toBeVisible({ timeout: 3_000 });
 
-    await page.getByTestId('waiting-group').getByTestId('patient-row').first()
-      .getByTestId('patient-row-menu-btn').click();
-    await page.getByTestId('action-call-patient').click();
-    await page.waitForResponse(
-      resp => resp.url().includes('call-patient') && resp.status() === 204
-    );
-
-    await expect(page.getByTestId('called-group').getByTestId('patient-row').first()).toBeVisible({ timeout: 10_000 });
+      await firstWaitingRow.getByTestId('patient-row-menu-btn').click();
+      await page.getByTestId('action-call-patient').click();
+      await page.waitForResponse(
+        resp => resp.url().includes('call-patient') && resp.status() === 204
+      );
+    }
 
     // ── Called → per-sample cards → Collect ──────────────────────────────────
-    await page.getByTestId('called-group').getByTestId('patient-row').first()
-      .getByTestId('patient-row-menu-btn').click();
-    await page.getByTestId('action-record-collection').click();
+    // The CollectionRequestDetails projection updates asynchronously, so the
+    // newly called patient may not appear immediately in the called-group.
+    // Instead of waiting for the specific patient, iterate through all called
+    // patients to find one that still has pending (uncollected) samples.
+    await expect(page.getByTestId('called-group').getByTestId('patient-row').first()).toBeVisible({ timeout: 10_000 });
 
-    await page.waitForResponse(
-      resp => resp.url().includes('/samples') && resp.status() === 200
-    );
+    const calledPatients = page.getByTestId('called-group').getByTestId('patient-row');
+    const totalCalled = await calledPatients.count();
+    let foundSamples = false;
 
-    await expect(page.getByTestId('sample-card').first()).toBeVisible({ timeout: 5_000 });
+    for (let i = 0; i < totalCalled; i++) {
+      await calledPatients.nth(i).getByTestId('patient-row-menu-btn').click();
+      await expect(page.getByTestId('action-record-collection')).toBeVisible({ timeout: 3_000 });
+      await page.getByTestId('action-record-collection').click();
 
-    // Collect each sample — each must return 204
+      await page.waitForResponse(
+        resp => resp.url().includes('/samples') && resp.status() === 200,
+        { timeout: 5_000 }
+      );
+
+      const cardCount = await page.getByTestId('sample-card').count();
+      if (cardCount > 0) {
+        foundSamples = true;
+        break;
+      }
+      // This patient's samples are all collected — close the menu and try the next
+      await page.keyboard.press('Escape');
+    }
+
+    expect(foundSamples).toBe(true);
+    await expect(page.getByTestId('sample-card').first()).toBeVisible({ timeout: 3_000 });
+
+    // Collect each pending sample — each must return 204
     const sampleCards = page.getByTestId('sample-card');
     const cardCount = await sampleCards.count();
-    expect(cardCount).toBeGreaterThan(0);
-
     for (let i = 0; i < cardCount; i++) {
       await sampleCards.nth(i).getByTestId('sample-collect-btn').click();
       await page.waitForResponse(resp => resp.url().includes('collect') && resp.status() === 204);

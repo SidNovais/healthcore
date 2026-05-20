@@ -1,4 +1,4 @@
-import { Component, input, output, signal, HostListener } from '@angular/core';
+import { Component, input, output, signal, computed, HostListener } from '@angular/core';
 import { SlicePipe, NgClass } from '@angular/common';
 import type { CollectionRequestSummary } from '../../core/domain/collection-request-summary';
 import type { SampleSummary } from '../../core/domain/sample-summary';
@@ -8,7 +8,7 @@ import type { SampleSummary } from '../../core/domain/sample-summary';
   standalone: true,
   imports: [SlicePipe, NgClass],
   template: `
-    <div data-testid="patient-row" class="card" [ngClass]="cardClass()">
+    <div data-testid="patient-row" [attr.data-cr-id]="item().collectionRequestId" class="card" [ngClass]="cardClass()">
       <div class="row">
         <div class="info">
           <span class="patient-id mono">{{ item().patientId | slice:0:8 }}…</span>
@@ -50,9 +50,9 @@ import type { SampleSummary } from '../../core/domain/sample-summary';
         </div>
       </div>
 
-      @if (samples() !== null) {
+      @if (pendingSamples().length > 0) {
         <div data-testid="sample-cards-panel" class="sample-cards">
-          @for (sample of samples()!; track sample.id) {
+          @for (sample of pendingSamples(); track sample.id) {
             <div data-testid="sample-card" class="sample-card">
               <span class="mono">{{ sample.tubeType }}</span>
               <span class="mono">{{ sample.barcode }}</span>
@@ -98,6 +98,9 @@ import type { SampleSummary } from '../../core/domain/sample-summary';
 export class PatientRowComponent {
   readonly item = input.required<CollectionRequestSummary>();
   readonly samples = input<SampleSummary[] | null>(null);
+  readonly pendingSamples = computed(() =>
+    (this.samples() ?? []).filter(s => s.status !== 'Collected')
+  );
   readonly sendToWaiting        = output<string>();
   readonly printLabel           = output<string>();
   readonly callPatient          = output<string>();
