@@ -19,10 +19,6 @@ export class SdkCollectionRequestsAdapter implements ICollectionRequestsPort {
   async recordCollection(id: string, params: RecordCollectionParams): Promise<void> {
     await this.api.recordCollection(id, {
       sampleId: params.sampleId,
-      technicianId: params.technicianId,
-      patientName: params.patientName,
-      patientBirthdate: params.patientBirthdate,
-      patientGender: params.patientGender,
     });
   }
 

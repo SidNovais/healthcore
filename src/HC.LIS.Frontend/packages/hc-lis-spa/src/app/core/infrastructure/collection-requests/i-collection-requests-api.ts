@@ -10,10 +10,6 @@ export interface ApiCreateBarcodeParams {
 
 export interface ApiRecordCollectionParams {
   sampleId: string;
-  technicianId: string;
-  patientName: string;
-  patientBirthdate: string;
-  patientGender: string;
 }
 
 export interface ICollectionRequestsApi {

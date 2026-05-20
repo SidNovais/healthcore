@@ -4,10 +4,6 @@ import type { SampleSummary } from '../domain/sample-summary';
 
 export interface RecordCollectionParams {
   sampleId: string;
-  patientName: string;
-  patientBirthdate: string;
-  patientGender: string;
-  technicianId: string;
 }
 
 export interface ICollectionRequestsPort {

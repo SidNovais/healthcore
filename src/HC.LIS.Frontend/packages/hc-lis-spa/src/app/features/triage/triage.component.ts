@@ -2,8 +2,7 @@ import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { TriageService } from './triage.service';
 import { PatientRowComponent } from './patient-row.component';
 import { PrintLabelsModalComponent } from './print-labels-modal.component';
-import { AuthService } from '../../core/application/auth.service';
-import type { CollectSampleFormData } from './collect-sample-form.component';
+import type { SampleSummary } from '../../core/domain/sample-summary';
 
 type StatusFilter = 'All' | 'Arrived' | 'Waiting' | 'Called';
 
@@ -74,7 +73,9 @@ interface PrintModalRequest {
               @for (item of service.called(); track item.collectionRequestId) {
                 <app-patient-row
                   [item]="item"
-                  (collectSubmitted)="onCollect($event.id, $event.data)"
+                  [samples]="samplesMap().get(item.collectionRequestId) ?? null"
+                  (loadSamplesRequested)="onLoadSamples($event)"
+                  (sampleCollectRequested)="onCollectSample($event)"
                 />
               }
             }
@@ -121,11 +122,11 @@ interface PrintModalRequest {
 })
 export class TriageComponent implements OnInit {
   protected readonly service = inject(TriageService);
-  private readonly auth = inject(AuthService);
 
   protected readonly error = signal<string | null>(null);
   protected readonly activeFilter = signal<StatusFilter>('All');
   protected readonly printModalRequest = signal<PrintModalRequest | null>(null);
+  protected readonly samplesMap = signal<Map<string, SampleSummary[]>>(new Map());
 
   protected readonly arrivedCount = computed(() => this.service.arrived().length);
   protected readonly waitingCount  = computed(() => this.service.waiting().length);
@@ -180,17 +181,20 @@ export class TriageComponent implements OnInit {
     }
   }
 
-  protected async onCollect(id: string, data: CollectSampleFormData): Promise<void> {
+  protected async onLoadSamples(id: string): Promise<void> {
     this.error.set(null);
-    const technicianId = this.auth.currentUser()?.userId ?? '';
     try {
-      await this.service.recordCollection(id, {
-        sampleId: crypto.randomUUID(),
-        patientName: data.patientName,
-        patientBirthdate: data.patientBirthdate,
-        patientGender: data.patientGender,
-        technicianId,
-      });
+      const samples = await this.service.getSamples(id);
+      this.samplesMap.update(m => new Map(m).set(id, samples));
+    } catch {
+      this.error.set('Failed to load sample information.');
+    }
+  }
+
+  protected async onCollectSample({ collectionRequestId, sampleId }: { collectionRequestId: string; sampleId: string }): Promise<void> {
+    this.error.set(null);
+    try {
+      await this.service.recordCollection(collectionRequestId, { sampleId });
       await this.service.loadCalled();
     } catch {
       this.error.set('Failed to record collection.');

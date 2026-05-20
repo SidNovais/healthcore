@@ -49,10 +49,6 @@ export class SdkCollectionRequestsApi implements ICollectionRequestsApi {
       path: { id },
       body: {
         sampleId: params.sampleId,
-        technicianId: params.technicianId,
-        patientName: params.patientName,
-        patientBirthdate: params.patientBirthdate,
-        patientGender: params.patientGender,
       },
     });
   }

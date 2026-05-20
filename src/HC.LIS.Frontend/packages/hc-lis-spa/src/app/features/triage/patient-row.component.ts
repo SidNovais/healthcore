@@ -1,13 +1,12 @@
 import { Component, input, output, signal, HostListener } from '@angular/core';
 import { SlicePipe, NgClass } from '@angular/common';
-import { CollectSampleFormComponent } from './collect-sample-form.component';
-import type { CollectSampleFormData } from './collect-sample-form.component';
 import type { CollectionRequestSummary } from '../../core/domain/collection-request-summary';
+import type { SampleSummary } from '../../core/domain/sample-summary';
 
 @Component({
   selector: 'app-patient-row',
   standalone: true,
-  imports: [SlicePipe, NgClass, CollectSampleFormComponent],
+  imports: [SlicePipe, NgClass],
   template: `
     <div data-testid="patient-row" class="card" [ngClass]="cardClass()">
       <div class="row">
@@ -51,8 +50,20 @@ import type { CollectionRequestSummary } from '../../core/domain/collection-requ
         </div>
       </div>
 
-      @if (showCollectForm()) {
-        <app-collect-sample-form (formSubmitted)="onFormSubmit($event)" />
+      @if (samples() !== null) {
+        <div data-testid="sample-cards-panel" class="sample-cards">
+          @for (sample of samples()!; track sample.id) {
+            <div data-testid="sample-card" class="sample-card">
+              <span class="mono">{{ sample.tubeType }}</span>
+              <span class="mono">{{ sample.barcode }}</span>
+              <button
+                data-testid="sample-collect-btn"
+                class="btn-collect"
+                (click)="onCollectSample(sample.id)"
+              >Collect</button>
+            </div>
+          }
+        </div>
       }
     </div>
   `,
@@ -77,17 +88,23 @@ import type { CollectionRequestSummary } from '../../core/domain/collection-requ
     .menu-item { display: flex; align-items: center; gap: 8px; padding: 10px 14px; font-size: 0.85rem; color: #374151; cursor: pointer; border: none; background: none; width: 100%; text-align: left; }
     .menu-item:hover { background: #f9fafb; }
     .divider { height: 1px; background: #f3f4f6; margin: 2px 0; border: none; }
+    .sample-cards { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e5e7eb; }
+    .sample-card { display: flex; align-items: center; gap: 1rem; padding: 0.5rem 0.75rem; background: #f8faff; border: 1px solid #dbeafe; border-radius: 4px; }
+    .sample-card span { flex: 1; font-size: 0.8rem; color: #374151; }
+    .btn-collect { padding: 0.3rem 0.75rem; background: #1d4ed8; color: #fff; border: none; border-radius: 4px; font-size: 0.8rem; cursor: pointer; }
+    .btn-collect:hover { background: #1e40af; }
   `],
 })
 export class PatientRowComponent {
   readonly item = input.required<CollectionRequestSummary>();
-  readonly sendToWaiting   = output<string>();
-  readonly printLabel      = output<string>();
-  readonly callPatient     = output<string>();
-  readonly collectSubmitted = output<{ id: string; data: CollectSampleFormData }>();
+  readonly samples = input<SampleSummary[] | null>(null);
+  readonly sendToWaiting        = output<string>();
+  readonly printLabel           = output<string>();
+  readonly callPatient          = output<string>();
+  readonly loadSamplesRequested = output<string>();
+  readonly sampleCollectRequested = output<{ collectionRequestId: string; sampleId: string }>();
 
   protected readonly menuOpen = signal(false);
-  protected readonly showCollectForm = signal(false);
 
   protected cardClass(): string {
     return `card-${this.item().status.toLowerCase()}`;
@@ -126,12 +143,11 @@ export class PatientRowComponent {
 
   protected onRecordCollection(): void {
     this.menuOpen.set(false);
-    this.showCollectForm.set(true);
+    this.loadSamplesRequested.emit(this.item().collectionRequestId);
   }
 
-  protected onFormSubmit(data: CollectSampleFormData): void {
-    this.collectSubmitted.emit({ id: this.item().collectionRequestId, data });
-    this.showCollectForm.set(false);
+  protected onCollectSample(sampleId: string): void {
+    this.sampleCollectRequested.emit({ collectionRequestId: this.item().collectionRequestId, sampleId });
   }
 
   @HostListener('document:click')
