@@ -257,7 +257,12 @@ public class CollectionRequestTests : TestBase
     [Fact]
     public void RecordCollectionShouldBreakCannotCollectSampleMoreThanOnceRuleWhenAlreadyCollected()
     {
-        Guid sampleId = CollectionRequestFactory.AddExams(_sut);
+        _sut.AddExam(CollectionRequestSampleData.ExamId1, CollectionRequestSampleData.TubeType, CollectionRequestSampleData.ExamMnemonic1);
+        _sut.AddExam(CollectionRequestSampleData.ExamId2, "Citrate", CollectionRequestSampleData.ExamMnemonic2);
+        Guid sampleId = _sut.GetDomainEvents()
+            .OfType<SampleCreatedForExamDomainEvent>()
+            .Single(e => e.TubeType == CollectionRequestSampleData.TubeType)
+            .SampleId;
         _sut.MoveToWaiting(CollectionRequestSampleData.WaitingAt);
         _sut.CreateBarcode(
             CollectionRequestSampleData.TubeType,
@@ -277,5 +282,50 @@ public class CollectionRequestTests : TestBase
         );
 
         AssertBrokenRule<CannotCollectSampleMoreThanOnceRule>(action);
+    }
+
+    [Fact]
+    public void RecordCollectionForLastSamplePublishesAllSamplesCollectedDomainEvent()
+    {
+        Guid sampleId = CollectionRequestFactory.AddExams(_sut);
+        _sut.MoveToWaiting(CollectionRequestSampleData.WaitingAt);
+        _sut.CreateBarcode(
+            CollectionRequestSampleData.TubeType,
+            CollectionRequestSampleData.BarcodeValue,
+            CollectionRequestSampleData.CreatedAt
+        );
+        _sut.CallPatient(CollectionRequestSampleData.TechnicianId, CollectionRequestSampleData.CalledAt);
+        _sut.RecordCollection(
+            sampleId,
+            CollectionRequestSampleData.TechnicianId,
+            CollectionRequestSampleData.CollectedAt);
+
+        AllSamplesCollectedDomainEvent evt = AssertPublishedDomainEvent<AllSamplesCollectedDomainEvent>(_sut);
+        evt.CollectionRequestId.Should().Be(CollectionRequestSampleData.CollectionRequestId);
+        evt.CollectedAt.Should().Be(CollectionRequestSampleData.CollectedAt);
+    }
+
+    [Fact]
+    public void RecordCollectionWhenNotLastSampleDoesNotPublishAllSamplesCollectedDomainEvent()
+    {
+        _sut.AddExam(CollectionRequestSampleData.ExamId1, CollectionRequestSampleData.TubeType, CollectionRequestSampleData.ExamMnemonic1);
+        _sut.AddExam(CollectionRequestSampleData.ExamId2, "Citrate", CollectionRequestSampleData.ExamMnemonic2);
+        Guid sampleId = _sut.GetDomainEvents()
+            .OfType<SampleCreatedForExamDomainEvent>()
+            .Single(e => e.TubeType == CollectionRequestSampleData.TubeType)
+            .SampleId;
+        _sut.MoveToWaiting(CollectionRequestSampleData.WaitingAt);
+        _sut.CreateBarcode(
+            CollectionRequestSampleData.TubeType,
+            CollectionRequestSampleData.BarcodeValue,
+            CollectionRequestSampleData.CreatedAt
+        );
+        _sut.CallPatient(CollectionRequestSampleData.TechnicianId, CollectionRequestSampleData.CalledAt);
+        _sut.RecordCollection(
+            sampleId,
+            CollectionRequestSampleData.TechnicianId,
+            CollectionRequestSampleData.CollectedAt);
+
+        AssertDomainEventNotPublished<AllSamplesCollectedDomainEvent>(_sut);
     }
 }
