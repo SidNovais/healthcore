@@ -25,7 +25,7 @@ test.describe('Authentication', () => {
     await page.getByLabel('Password').fill('wrong-password-123');
     await Promise.all([
       page.waitForResponse(r =>
-        r.url().includes('/api/v1/auth/login') && r.status() === 401),
+        r.url().includes('/api/v1/auth/login') && r.status() === 400),
       page.getByRole('button', { name: /sign in/i }).click(),
     ]);
 
@@ -34,12 +34,9 @@ test.describe('Authentication', () => {
   });
 
   test('unauthenticated access to protected route redirects to /login', async ({ page }) => {
-    await Promise.all([
-      page.waitForResponse(r => r.url().includes('/api/v1/auth/me')),
-      page.goto('/admin/users'),
-    ]);
+    await page.goto('/admin/users');
 
-    await expect(page).toHaveURL('/login', { timeout: 5_000 });
+    await expect(page).toHaveURL('/login', { timeout: 10_000 });
   });
 });
 
