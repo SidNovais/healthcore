@@ -66,6 +66,7 @@ public class SampleCollectionStartup
         domainNotificationsMap.Add("PatientCalledNotification", typeof(PatientCalledNotification));
         domainNotificationsMap.Add("BarcodeCreatedNotification", typeof(BarcodeCreatedNotification));
         domainNotificationsMap.Add("SampleCollectedNotification", typeof(SampleCollectedNotification));
+        domainNotificationsMap.Add("AllSamplesCollectedNotification", typeof(AllSamplesCollectedNotification));
         domainNotificationsMap.Add("SampleCreatedForExamNotification", typeof(SampleCreatedForExamNotification));
         domainNotificationsMap.Add("ExamAddedToExistingSampleNotification", typeof(ExamAddedToExistingSampleNotification));
         containerBuilder.RegisterModule(new OutboxModule(domainNotificationsMap));

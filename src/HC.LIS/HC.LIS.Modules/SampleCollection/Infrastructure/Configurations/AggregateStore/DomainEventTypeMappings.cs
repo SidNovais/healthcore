@@ -17,6 +17,7 @@ internal static class DomainEventTypeMappings
             { "PatientCalledDomainEvent", typeof(PatientCalledDomainEvent) },
             { "BarcodeCreatedDomainEvent", typeof(BarcodeCreatedDomainEvent) },
             { "SampleCollectedDomainEvent", typeof(SampleCollectedDomainEvent) },
+            { "AllSamplesCollectedDomainEvent", typeof(AllSamplesCollectedDomainEvent) },
         };
     }
 }

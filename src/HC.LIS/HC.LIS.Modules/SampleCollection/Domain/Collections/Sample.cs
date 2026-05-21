@@ -13,6 +13,7 @@ public class Sample : Entity
     private readonly List<CollectionExam> _exams = [];
     internal IReadOnlyCollection<CollectionExam> Exams => _exams.AsReadOnly();
     internal bool HasBarcode => !_status.IsPending;
+    internal bool IsCollected => _status.IsCollected;
     private string? _barcodeValue;
     internal string? Barcode => _barcodeValue;
     private SampleStatus _status = null!;

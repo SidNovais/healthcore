@@ -8,4 +8,5 @@ public class CollectionRequestDetailsDto
     public DateTime ArrivedAt { get; set; }
     public DateTime? WaitingAt { get; set; }
     public DateTime? CalledAt { get; set; }
+    public DateTime? SamplesCollectedAt { get; set; }
 }

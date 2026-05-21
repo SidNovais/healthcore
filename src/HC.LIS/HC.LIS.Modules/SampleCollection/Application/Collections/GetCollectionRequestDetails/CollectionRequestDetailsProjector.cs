@@ -67,5 +67,21 @@ internal class CollectionRequestDetailsProjector(
         ).ConfigureAwait(false);
     }
 
+    private async Task When(AllSamplesCollectedDomainEvent e)
+    {
+        using var connection = _sqlConnectionFactory.CreateConnection();
+        await connection.ExecuteScalarAsync(
+            @"UPDATE sample_collection.""CollectionRequestDetails""
+              SET ""Status"" = @Status, ""SamplesCollectedAt"" = @SamplesCollectedAt
+              WHERE ""Id"" = @CollectionRequestId",
+            new
+            {
+                e.CollectionRequestId,
+                Status = CollectionStatus.SamplesCollected.Value,
+                SamplesCollectedAt = e.CollectedAt
+            }
+        ).ConfigureAwait(false);
+    }
+
     private static new Task When(IDomainEvent _) => Task.CompletedTask;
 }

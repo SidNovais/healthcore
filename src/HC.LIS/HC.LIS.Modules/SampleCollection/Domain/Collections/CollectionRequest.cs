@@ -143,6 +143,13 @@ public class CollectionRequest : AggregateRoot
         );
         Apply(sampleCollectedDomainEvent);
         AddDomainEvent(sampleCollectedDomainEvent);
+
+        if (_samples.All(s => s.IsCollected))
+        {
+            AllSamplesCollectedDomainEvent allCollectedEvent = new(Id, collectedAt);
+            Apply(allCollectedEvent);
+            AddDomainEvent(allCollectedEvent);
+        }
     }
 
     private void When(PatientArrivedDomainEvent domainEvent)
@@ -171,4 +178,7 @@ public class CollectionRequest : AggregateRoot
 
     private void When(SampleCollectedDomainEvent domainEvent)
         => _samples.Single(s => s.SampleId.Value == domainEvent.SampleId).Collect(domainEvent);
+
+    private void When(AllSamplesCollectedDomainEvent _)
+        => _status = CollectionStatus.SamplesCollected;
 }
