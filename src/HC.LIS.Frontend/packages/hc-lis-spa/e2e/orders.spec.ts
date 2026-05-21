@@ -13,14 +13,23 @@ async function loginAsReceptionist(page: import('@playwright/test').Page) {
 }
 
 test.describe('Test Order Request', () => {
+  test.beforeEach(async ({ context }) => {
+    await context.clearCookies();
+  });
+
   test('Receptionist creates an order and requests an exam — confirmation visible', async ({ page }) => {
     await loginAsReceptionist(page);
 
-    // Fill patient ID and create order
+    // Fill patient ID and create order; wait for the API response before asserting the exam section
     await page.getByTestId('patient-id-input').fill('00000000-0000-0000-0000-000000000001');
-    await page.getByTestId('create-order-btn').click();
+    await Promise.all([
+      page.waitForResponse(r =>
+        r.url().includes('/api/v1/orders') &&
+        r.request().method() === 'POST' &&
+        r.status() === 201),
+      page.getByTestId('create-order-btn').click(),
+    ]);
 
-    // Exam section appears after order creation
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
 
     // Fill exam mnemonic + container type and request exam
@@ -51,6 +60,10 @@ async function loginAsLabTechnician(page: import('@playwright/test').Page) {
 }
 
 test.describe('Order List', () => {
+  test.beforeEach(async ({ context }) => {
+    await context.clearCookies();
+  });
+
   test('Receptionist sees order list table at /orders', async ({ page }) => {
     await loginAsReceptionist(page);
     await page.goto('/orders');
@@ -94,6 +107,10 @@ async function loginAsPhysician(page: import('@playwright/test').Page) {
 }
 
 test.describe('Order Detail', () => {
+  test.beforeEach(async ({ context }) => {
+    await context.clearCookies();
+  });
+
   test('Receptionist sees order detail page at /orders/:id', async ({ page }) => {
     await loginAsReceptionist(page);
 
