@@ -23,14 +23,21 @@ test.describe('Authentication', () => {
 
     await page.getByLabel('Email').fill('nobody@hclis.local');
     await page.getByLabel('Password').fill('wrong-password-123');
-    await page.getByRole('button', { name: /sign in/i }).click();
+    await Promise.all([
+      page.waitForResponse(r =>
+        r.url().includes('/api/v1/auth/login') && r.status() === 401),
+      page.getByRole('button', { name: /sign in/i }).click(),
+    ]);
 
     await expect(page.getByRole('alert')).toBeVisible({ timeout: 5_000 });
     await expect(page).toHaveURL('/login');
   });
 
   test('unauthenticated access to protected route redirects to /login', async ({ page }) => {
-    await page.goto('/admin/users');
+    await Promise.all([
+      page.waitForResponse(r => r.url().includes('/api/v1/auth/me')),
+      page.goto('/admin/users'),
+    ]);
 
     await expect(page).toHaveURL('/login', { timeout: 5_000 });
   });
