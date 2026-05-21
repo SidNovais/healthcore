@@ -23,7 +23,8 @@ internal class AnalyzerSampleDetailsProjector(
         await connection.ExecuteScalarAsync(
             @"INSERT INTO analyzer.analyzer_sample_details
               (id, sample_id, patient_id, sample_barcode, patient_name, patient_birthdate, patient_gender, is_urgent, status, created_at)
-              VALUES (@AnalyzerSampleId, @SampleId, @PatientId, @SampleBarcode, @PatientName, @PatientBirthdate, @PatientGender, @IsUrgent, @Status, @CreatedAt)",
+              VALUES (@AnalyzerSampleId, @SampleId, @PatientId, @SampleBarcode, @PatientName, @PatientBirthdate, @PatientGender, @IsUrgent, @Status, @CreatedAt)
+              ON CONFLICT (id) DO NOTHING",
             new
             {
                 e.AnalyzerSampleId,
