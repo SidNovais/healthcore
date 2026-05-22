@@ -13,11 +13,17 @@ internal class CreateWorklistItemCommandHandler(
 {
     private readonly IAggregateStore _aggregateStore = aggregateStore;
 
-    public Task<Guid> Handle(
+    public async Task<Guid> Handle(
         CreateWorklistItemCommand command,
         CancellationToken cancellationToken
     )
     {
+        WorklistItem? existing = await _aggregateStore
+            .Load<WorklistItem>(new WorklistItemId(command.WorklistItemId))
+            .ConfigureAwait(false);
+        if (existing is not null)
+            return command.WorklistItemId;
+
         WorklistItem worklistItem = WorklistItem.Create(
             command.WorklistItemId,
             command.SampleId,
@@ -29,6 +35,6 @@ internal class CreateWorklistItemCommandHandler(
             command.CreatedAt
         );
         _aggregateStore.Start(worklistItem);
-        return Task.FromResult(command.WorklistItemId);
+        return command.WorklistItemId;
     }
 }
