@@ -1,3 +1,4 @@
+using System;
 using FluentAssertions;
 using HC.Core.Domain;
 using HC.LIS.Modules.PatientManagement.Domain.Patients;
@@ -27,5 +28,22 @@ public class PatientTests : TestBase
         @event.Phone.Should().Be(PatientSampleData.Phone);
         @event.Email.Should().Be(PatientSampleData.Email);
         @event.RegisteredAt.Should().Be(PatientSampleData.RegisteredAt);
+    }
+
+    [Fact]
+    public void UpdatePatientIsSuccessful()
+    {
+        DateTime updatedAt = SystemClock.Now;
+        string newFullName = "Jane Doe";
+        DateTime newDateOfBirth = new DateTime(1985, 6, 20, 0, 0, 0, DateTimeKind.Utc);
+
+        _sut.Update(newFullName, newDateOfBirth, null, null, null, null, null, updatedAt);
+
+        PatientUpdatedDomainEvent @event = AssertPublishedDomainEvent<PatientUpdatedDomainEvent>(_sut);
+        @event.PatientId.Should().Be(PatientSampleData.PatientId);
+        @event.FullName.Should().Be(newFullName);
+        @event.DateOfBirth.Should().Be(newDateOfBirth);
+        @event.Gender.Should().BeNull();
+        @event.UpdatedAt.Should().Be(updatedAt);
     }
 }
