@@ -3,6 +3,7 @@ using FluentAssertions;
 using HC.Core.Domain;
 using HC.LIS.Modules.PatientManagement.Domain.Patients;
 using HC.LIS.Modules.PatientManagement.Domain.Patients.Events;
+using HC.LIS.Modules.PatientManagement.Domain.Patients.Rules;
 
 namespace HC.LIS.Modules.PatientManagement.UnitTests.Patients;
 
@@ -45,5 +46,42 @@ public class PatientTests : TestBase
         @event.DateOfBirth.Should().Be(newDateOfBirth);
         @event.Gender.Should().BeNull();
         @event.UpdatedAt.Should().Be(updatedAt);
+    }
+
+    [Fact]
+    public void AnonymizePatientIsSuccessful()
+    {
+        DateTime anonymizedAt = SystemClock.Now;
+
+        _sut.Anonymize(anonymizedAt);
+
+        PatientAnonymizedDomainEvent @event = AssertPublishedDomainEvent<PatientAnonymizedDomainEvent>(_sut);
+        @event.PatientId.Should().Be(PatientSampleData.PatientId);
+        @event.AnonymizedAt.Should().Be(anonymizedAt);
+    }
+
+    [Fact]
+    public void AnonymizePatientThrowsWhenAlreadyAnonymized()
+    {
+        _sut.Anonymize(SystemClock.Now);
+
+        void action() => _sut.Anonymize(SystemClock.Now);
+
+        AssertBrokenRule<CannotAnonymizeAlreadyAnonymizedPatientRule>(action);
+    }
+
+    [Fact]
+    public void UpdatePatientThrowsWhenAnonymized()
+    {
+        _sut.Anonymize(SystemClock.Now);
+
+        void action() => _sut.Update(
+            PatientSampleData.FullName,
+            PatientSampleData.DateOfBirth,
+            null, null, null, null, null,
+            SystemClock.Now
+        );
+
+        AssertBrokenRule<CannotUpdateAnonymizedPatientRule>(action);
     }
 }
