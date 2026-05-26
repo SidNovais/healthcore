@@ -56,6 +56,19 @@ public class Patient : AggregateRoot
     )
     {
         CheckRule(new CannotUpdateAnonymizedPatientRule(_status));
+        PatientUpdatedDomainEvent @event = new(
+            Id,
+            fullName,
+            dateOfBirth,
+            gender,
+            mothersFullName,
+            documentId,
+            phone,
+            email,
+            updatedAt
+        );
+        Apply(@event);
+        AddDomainEvent(@event);
     }
 
     public void Anonymize(DateTime anonymizedAt)
