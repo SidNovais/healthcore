@@ -63,7 +63,6 @@ public class Patient : AggregateRoot
 
     private void When(PatientAnonymizedDomainEvent @event)
     {
-        _ = @event.AnonymizedAt;
         _info = PatientInfo.Anonymized();
         _status = PatientStatus.Anonymized;
     }
