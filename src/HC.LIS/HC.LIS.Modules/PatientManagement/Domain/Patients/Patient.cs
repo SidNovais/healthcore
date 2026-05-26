@@ -28,6 +28,19 @@ public class Patient : AggregateRoot
     )
     {
         Patient patient = new();
+        PatientRegisteredDomainEvent @event = new(
+            id,
+            fullName,
+            dateOfBirth,
+            gender,
+            mothersFullName,
+            documentId,
+            phone,
+            email,
+            registeredAt
+        );
+        patient.Apply(@event);
+        patient.AddDomainEvent(@event);
         return patient;
     }
 
@@ -52,7 +65,16 @@ public class Patient : AggregateRoot
 
     private void When(PatientRegisteredDomainEvent @event)
     {
-        _info = PatientInfo.Of(@event.FullName, @event.DateOfBirth, @event.Gender, @event.MothersFullName, @event.DocumentId, @event.Phone, @event.Email);
+        Id = @event.PatientId;
+        _info = PatientInfo.Of(
+            @event.FullName,
+            @event.DateOfBirth,
+            @event.Gender,
+            @event.MothersFullName,
+            @event.DocumentId,
+            @event.Phone,
+            @event.Email
+        );
         _status = PatientStatus.Active;
     }
 
