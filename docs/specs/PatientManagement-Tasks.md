@@ -16,7 +16,7 @@
 
 ### Phase 1: Module Skeleton
 
-- [ ] **Task 1.1** — Scaffold module structure
+- [x] **Task 1.1** — Scaffold module structure
   - **Skill:** `/create-module PatientManagement`
   - **Creates:** 7 projects (Domain, Application, Infrastructure, IntegrationEvents, UnitTests, IntegrationTests, ArchTests) + 4 database migrations (schema, inbox, internal commands, outbox)
   - **Verify:** `dotnet build` succeeds
