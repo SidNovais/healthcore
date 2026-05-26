@@ -38,4 +38,11 @@
   <Project Path="../HC.LIS/HC.LIS.Modules/UserAccess/Tests/UnitTests/HC.LIS.Modules.UserAccess.UnitTests.csproj" />
   <Project Path="../HC.LIS/HC.LIS.Modules/UserAccess/Tests/IntegrationTests/HC.LIS.Modules.UserAccess.IntegrationTests.csproj" />
   <Project Path="../HC.LIS/HC.LIS.Modules/UserAccess/Tests/ArchTests/HC.LIS.Modules.UserAccess.ArchTests.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/PatientManagement/Domain/HC.LIS.Modules.PatientManagement.Domain.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/PatientManagement/Application/HC.LIS.Modules.PatientManagement.Application.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/PatientManagement/Infrastructure/HC.LIS.Modules.PatientManagement.Infrastructure.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/PatientManagement/IntegrationEvents/HC.LIS.Modules.PatientManagement.IntegrationEvents.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/PatientManagement/Tests/UnitTests/HC.LIS.Modules.PatientManagement.UnitTests.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/PatientManagement/Tests/IntegrationTests/HC.LIS.Modules.PatientManagement.IntegrationTests.csproj" />
+  <Project Path="../HC.LIS/HC.LIS.Modules/PatientManagement/Tests/ArchTests/HC.LIS.Modules.PatientManagement.ArchTests.csproj" />
 </Solution>
