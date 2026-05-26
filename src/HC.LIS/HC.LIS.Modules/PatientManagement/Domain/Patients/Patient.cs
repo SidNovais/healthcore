@@ -74,6 +74,9 @@ public class Patient : AggregateRoot
     public void Anonymize(DateTime anonymizedAt)
     {
         CheckRule(new CannotAnonymizeAlreadyAnonymizedPatientRule(_status));
+        PatientAnonymizedDomainEvent @event = new(Id, anonymizedAt);
+        Apply(@event);
+        AddDomainEvent(@event);
     }
 
     private void When(PatientRegisteredDomainEvent @event)
