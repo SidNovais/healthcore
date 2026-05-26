@@ -4,15 +4,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using HC.Core.Domain;
+using HC.Core.Domain.EventSourcing;
 
 namespace HC.LIS.Modules.PatientManagement.UnitTests;
 
 public abstract class TestBase
 {
-    public static T AssertPublishedDomainEvent<T>(Entity aggregate)
+    public static T AssertPublishedDomainEvent<T>(AggregateRoot aggregate)
         where T : IDomainEvent
     {
-        var domainEvent = DomainEventsTestHelper.GetAllDomainEvents(aggregate).OfType<T>().SingleOrDefault();
+        var domainEvent = aggregate.GetDomainEvents().OfType<T>().SingleOrDefault();
 
         if (domainEvent == null)
         {
@@ -22,17 +23,17 @@ public abstract class TestBase
         return domainEvent;
     }
 
-    public static void AssertDomainEventNotPublished<T>(Entity aggregate)
+    public static void AssertDomainEventNotPublished<T>(AggregateRoot aggregate)
         where T : IDomainEvent
     {
-        var domainEvent = DomainEventsTestHelper.GetAllDomainEvents(aggregate).OfType<T>().SingleOrDefault();
+        var domainEvent = aggregate.GetDomainEvents().OfType<T>().SingleOrDefault();
         domainEvent.Should().BeNull();
     }
 
-    public static IReadOnlyCollection<T> AssertPublishedDomainEvents<T>(Entity aggregate)
+    public static IReadOnlyCollection<T> AssertPublishedDomainEvents<T>(AggregateRoot aggregate)
         where T : IDomainEvent
     {
-        var domainEvents = DomainEventsTestHelper.GetAllDomainEvents(aggregate).OfType<T>().ToList();
+        var domainEvents = aggregate.GetDomainEvents().OfType<T>().ToList();
 
         if (domainEvents.Count == 0)
         {
