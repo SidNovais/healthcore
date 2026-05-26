@@ -23,38 +23,38 @@
 
 ---
 
-### Phase 2: Domain Layer (TDD)
+### Phase 2: Domain Layer (TDD) (COMPLETED)
 
-- [ ] **Task 2.1** — Write failing unit tests for `Patient` registration
+- [x] **Task 2.1** — Write failing unit tests for `Patient` registration
   - **Skill:** `/unit-test PatientManagement register a patient`
   - **Creates:** `Tests/UnitTests/Patients/PatientTests.cs`, `PatientFactory.cs`, `PatientSampleData.cs`
   - **Tests:** `RegisterPatientIsSuccessful`
   - **Expected:** Tests fail — `PatientRegisteredDomainEvent` and `Patient.Register()` do not exist yet
 
-- [ ] **Task 2.2** — Implement `Patient` aggregate with `Register` method
+- [x] **Task 2.2** — Implement `Patient` aggregate with `Register` method
   - **Skill:** `/domain PatientManagement register a patient`
   - **Creates:** `Domain/Patients/Patient.cs`, `PatientId.cs`, `PatientStatus.cs`, `PatientInfo.cs`, `Events/PatientRegisteredDomainEvent.cs`
   - **Verify:** Unit tests from Task 2.1 pass
 
-- [ ] **Task 2.3** — Write failing unit tests for `Patient.Update`
+- [x] **Task 2.3** — Write failing unit tests for `Patient.Update`
   - **Skill:** `/unit-test PatientManagement update a patient`
   - **Modifies:** `Tests/UnitTests/Patients/PatientTests.cs`
   - **Tests:** `UpdatePatientIsSuccessful`, `UpdatePatientThrowsWhenAnonymized`
   - **Expected:** Tests fail — `PatientUpdatedDomainEvent`, `CannotUpdateAnonymizedPatientRule`, and `Patient.Update()` do not exist yet
 
-- [ ] **Task 2.4** — Implement `Patient.Update` method
+- [x] **Task 2.4** — Implement `Patient.Update` method
   - **Skill:** `/domain PatientManagement update a patient`
   - **Creates:** `Events/PatientUpdatedDomainEvent.cs`, `Rules/CannotUpdateAnonymizedPatientRule.cs`
   - **Modifies:** `Domain/Patients/Patient.cs`
   - **Verify:** Unit tests from Task 2.3 pass
 
-- [ ] **Task 2.5** — Write failing unit tests for `Patient.Anonymize`
+- [x] **Task 2.5** — Write failing unit tests for `Patient.Anonymize`
   - **Skill:** `/unit-test PatientManagement anonymize a patient`
   - **Modifies:** `Tests/UnitTests/Patients/PatientTests.cs`
   - **Tests:** `AnonymizePatientIsSuccessful`, `AnonymizePatientThrowsWhenAlreadyAnonymized`
   - **Expected:** Tests fail — `PatientAnonymizedDomainEvent`, `CannotAnonymizeAlreadyAnonymizedPatientRule`, and `Patient.Anonymize()` do not exist yet
 
-- [ ] **Task 2.6** — Implement `Patient.Anonymize` method
+- [x] **Task 2.6** — Implement `Patient.Anonymize` method
   - **Skill:** `/domain PatientManagement anonymize a patient`
   - **Creates:** `Events/PatientAnonymizedDomainEvent.cs`, `Rules/CannotAnonymizeAlreadyAnonymizedPatientRule.cs`
   - **Modifies:** `Domain/Patients/Patient.cs`, `Domain/Patients/PatientInfo.cs` (add `Anonymized()` factory)
