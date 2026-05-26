@@ -13,5 +13,5 @@ public readonly struct PatientSampleData
     public static readonly string DocumentId = "DOC123456";
     public static readonly string Phone = "+1234567890";
     public static readonly string Email = "john.doe@example.com";
-    public static readonly DateTime RegisteredAt = new DateTime(2026, 1, 10, 8, 30, 0, DateTimeKind.Utc);
+    public static readonly DateTime RegisteredAt = SystemClock.Now;
 }
