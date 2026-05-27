@@ -62,39 +62,39 @@
 
 ---
 
-### Phase 3: Application Layer — Commands & Notifications
+### Phase 3: Application Layer — Commands & Notifications (COMPLETED)
 
-- [ ] **Task 3.1** — Implement `RegisterPatientCommand` and handler
+- [x] **Task 3.1** — Implement `RegisterPatientCommand` and handler
   - **Skill:** `/application PatientManagement RegisterPatient command`
   - **Creates:** `Application/Patients/RegisterPatient/RegisterPatientCommand.cs`, `RegisterPatientCommandHandler.cs`
   - **Pattern:** Handler calls `IAggregateStore.Start(patient)` — extends `CommandBase<Guid>`
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 3.2** — Implement `PatientRegisteredNotification` and projection
+- [x] **Task 3.2** — Implement `PatientRegisteredNotification` and projection
   - **Skill:** `/application PatientManagement PatientRegistered notification`
   - **Creates:** `Application/Patients/RegisterPatient/PatientRegisteredNotification.cs`, `PatientRegisteredNotificationProjection.cs`
   - **Note:** Projection performs INSERT into `PatientDetails` with Status = `"Active"`
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 3.3** — Implement `UpdatePatientCommand` and handler
+- [x] **Task 3.3** — Implement `UpdatePatientCommand` and handler
   - **Skill:** `/application PatientManagement UpdatePatient command`
   - **Creates:** `Application/Patients/UpdatePatient/UpdatePatientCommand.cs`, `UpdatePatientCommandHandler.cs`
   - **Pattern:** Handler calls `IAggregateStore.AppendChanges(patient)` — extends `CommandBase`
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 3.4** — Implement `PatientUpdatedNotification` and projection
+- [x] **Task 3.4** — Implement `PatientUpdatedNotification` and projection
   - **Skill:** `/application PatientManagement PatientUpdated notification`
   - **Creates:** `Application/Patients/UpdatePatient/PatientUpdatedNotification.cs`, `PatientUpdatedNotificationProjection.cs`
   - **Note:** Projection performs UPDATE on all PII fields
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 3.5** — Implement `AnonymizePatientCommand` and handler
+- [x] **Task 3.5** — Implement `AnonymizePatientCommand` and handler
   - **Skill:** `/application PatientManagement AnonymizePatient command`
   - **Creates:** `Application/Patients/AnonymizePatient/AnonymizePatientCommand.cs`, `AnonymizePatientCommandHandler.cs`
   - **Pattern:** Handler calls `IAggregateStore.AppendChanges(patient)` — extends `CommandBase`
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 3.6** — Implement `PatientAnonymizedNotification` and projection
+- [x] **Task 3.6** — Implement `PatientAnonymizedNotification` and projection
   - **Skill:** `/application PatientManagement PatientAnonymized notification`
   - **Creates:** `Application/Patients/AnonymizePatient/PatientAnonymizedNotification.cs`, `PatientAnonymizedNotificationProjection.cs`
   - **Note:** Projection performs UPDATE — sets Status = `"Anonymized"`, replaces PII fields with sentinel values (`"ANONYMIZED"` / null / `1900-01-01`), sets AnonymizedAt
