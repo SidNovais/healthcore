@@ -14,7 +14,7 @@ internal class PatientDetailsProjector(
 
     public async Task Project(IDomainEvent @event)
     {
-        await When((dynamic)@event).ConfigureAwait(false);
+        await When((dynamic)@event);
     }
 
     private async Task When(PatientRegisteredDomainEvent patientRegistered)
