@@ -90,4 +90,6 @@ internal class PatientDetailsProjector(
             }
         ).ConfigureAwait(false);
     }
+
+    private static new Task When(IDomainEvent _) => Task.CompletedTask;
 }
