@@ -2,6 +2,8 @@ using Autofac;
 using HC.Core.Application;
 using HC.Core.Infrastructure;
 using HC.Core.Infrastructure.EventBus;
+using HC.LIS.Modules.PatientManagement.Application.Patients.RegisterPatient;
+using HC.LIS.Modules.PatientManagement.Application.Patients.UpdatePatient;
 using HC.LIS.Modules.PatientManagement.Infrastructure.Configurations.Authentication;
 using HC.LIS.Modules.PatientManagement.Infrastructure.Configurations.DataAccess;
 using HC.LIS.Modules.PatientManagement.Infrastructure.Configurations.EventBus;
@@ -53,6 +55,8 @@ public class PatientManagementStartup
         containerBuilder.RegisterModule(new MediatorModule());
         containerBuilder.RegisterModule(new AuthenticationModule());
         var domainNotificationsMap = new BiMap();
+        domainNotificationsMap.Add("PatientRegisteredNotification", typeof(PatientRegisteredNotification));
+        domainNotificationsMap.Add("PatientUpdatedNotification", typeof(PatientUpdatedNotification));
         containerBuilder.RegisterModule(new OutboxModule(domainNotificationsMap));
         BiMap internalCommandsMap = new();
         containerBuilder.RegisterModule(new InternalCommandsModule(internalCommandsMap));
