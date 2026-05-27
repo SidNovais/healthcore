@@ -2,6 +2,7 @@ using Autofac;
 using HC.Core.Application;
 using HC.Core.Infrastructure;
 using HC.Core.Infrastructure.EventBus;
+using HC.LIS.Modules.PatientManagement.Application.Patients.AnonymizePatient;
 using HC.LIS.Modules.PatientManagement.Application.Patients.RegisterPatient;
 using HC.LIS.Modules.PatientManagement.Application.Patients.UpdatePatient;
 using HC.LIS.Modules.PatientManagement.Infrastructure.Configurations.Authentication;
@@ -57,6 +58,7 @@ public class PatientManagementStartup
         var domainNotificationsMap = new BiMap();
         domainNotificationsMap.Add("PatientRegisteredNotification", typeof(PatientRegisteredNotification));
         domainNotificationsMap.Add("PatientUpdatedNotification", typeof(PatientUpdatedNotification));
+        domainNotificationsMap.Add("PatientAnonymizedNotification", typeof(PatientAnonymizedNotification));
         containerBuilder.RegisterModule(new OutboxModule(domainNotificationsMap));
         BiMap internalCommandsMap = new();
         containerBuilder.RegisterModule(new InternalCommandsModule(internalCommandsMap));
