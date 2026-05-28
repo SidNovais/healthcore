@@ -120,13 +120,13 @@
 
 ### Phase 5: Integration Events
 
-- [ ] **Task 5.1** — Define outbound integration events
+- [x] **Task 5.1** — Define outbound integration events
   - **Manual**
   - **Creates:** `IntegrationEvents/PatientRegisteredIntegrationEvent.cs`, `PatientUpdatedIntegrationEvent.cs`, `PatientAnonymizedIntegrationEvent.cs`
   - **Note:** All inherit `IntegrationEvent(Guid id, DateTime occurredAt)`; nullable fields use `string?`
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 5.2** — Implement publish notification handlers
+- [x] **Task 5.2** — Implement publish notification handlers
   - **Skill:** `/application PatientManagement publish event notification handlers`
   - **Creates:** `Application/Patients/RegisterPatient/PatientRegisteredPublishEventNotificationHandler.cs`, `Application/Patients/UpdatePatient/PatientUpdatedPublishEventNotificationHandler.cs`, `Application/Patients/AnonymizePatient/PatientAnonymizedPublishEventNotificationHandler.cs`
   - **Note:** Use `notification.DomainEvent.{Prop}` inline — no intermediate variable
