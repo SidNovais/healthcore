@@ -104,13 +104,13 @@
 
 ### Phase 4: Application Layer — Read Models
 
-- [ ] **Task 4.1** — Implement `PatientDetails` read model
+- [x] **Task 4.1** — Implement `PatientDetails` read model
   - **Skill:** `/application PatientManagement GetPatientDetails read model`
   - **Creates:** `Application/Patients/GetPatientDetails/PatientDetailsDto.cs`, `GetPatientDetailsQuery.cs`, `GetPatientDetailsQueryHandler.cs`, `PatientDetailsProjector.cs`
   - **Note:** Projector has `When()` for all 3 domain events + fall-through `When(IDomainEvent)`
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 4.2** — Implement `SearchPatients` read model query
+- [x] **Task 4.2** — Implement `SearchPatients` read model query
   - **Manual**
   - **Creates:** `Application/Patients/SearchPatients/PatientSearchResultDto.cs`, `SearchPatientsQuery.cs`, `SearchPatientsQueryHandler.cs`
   - **Note:** Handler uses `WHERE "FullName" ILIKE @SearchTerm OR "DocumentId" ILIKE @SearchTerm`; `SearchTerm` should be passed as `%{term}%` by the query
