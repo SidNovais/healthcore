@@ -1,3 +1,5 @@
+using HC.LIS.Modules.PatientManagement.Domain.Patients.Events;
+
 namespace HC.LIS.Modules.PatientManagement.Infrastructure.Configurations.AggregateStore;
 
 internal static class DomainEventTypeMappings
@@ -8,8 +10,9 @@ internal static class DomainEventTypeMappings
     {
         Dictionary = new Dictionary<string, Type>
         {
-            // Register domain event type mappings here, e.g.:
-            // { "MyDomainEvent", typeof(MyDomainEvent) },
+            { "PatientRegisteredDomainEvent", typeof(PatientRegisteredDomainEvent) },
+            { "PatientUpdatedDomainEvent", typeof(PatientUpdatedDomainEvent) },
+            { "PatientAnonymizedDomainEvent", typeof(PatientAnonymizedDomainEvent) },
         };
     }
 }

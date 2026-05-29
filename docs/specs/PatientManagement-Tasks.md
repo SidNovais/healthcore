@@ -136,13 +136,13 @@
 
 ### Phase 6: Infrastructure Wiring
 
-- [ ] **Task 6.1** — Register domain events in `DomainEventTypeMappings`
+- [x] **Task 6.1** — Register domain events in `DomainEventTypeMappings`
   - **Manual**
   - **Modifies:** `Infrastructure/Configurations/AggregateStore/DomainEventTypeMappings.cs`
   - **Adds:** `AddEventType<PatientRegisteredDomainEvent>()`, `AddEventType<PatientUpdatedDomainEvent>()`, `AddEventType<PatientAnonymizedDomainEvent>()`
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 6.2** — Register notifications in OutboxModule BiMap
+- [x] **Task 6.2** — Register notifications in OutboxModule BiMap
   - **Manual**
   - **Modifies:** `Infrastructure/Configurations/PatientManagementStartup.cs`
   - **Adds:** 3 BiMap entries for `PatientRegisteredNotification`, `PatientUpdatedNotification`, `PatientAnonymizedNotification`
