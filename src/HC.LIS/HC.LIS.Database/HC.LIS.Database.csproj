@@ -17,5 +17,6 @@
     <ProjectReference Include="..\HC.LIS.Modules\SampleCollection\Infrastructure\HC.LIS.Modules.SampleCollection.Infrastructure.csproj" />
     <ProjectReference Include="..\HC.LIS.Modules\LabAnalysis\Infrastructure\HC.LIS.Modules.LabAnalysis.Infrastructure.csproj" />
     <ProjectReference Include="..\HC.LIS.Modules\Analyzer\Infrastructure\HC.LIS.Modules.Analyzer.Infrastructure.csproj" />
+    <ProjectReference Include="..\HC.LIS.Modules\PatientManagement\Infrastructure\HC.LIS.Modules.PatientManagement.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

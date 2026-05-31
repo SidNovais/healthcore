@@ -7,6 +7,7 @@ using TestOrdersMartenConfig = HC.LIS.Modules.TestOrders.Infrastructure.Configur
 using SampleCollectionMartenConfig = HC.LIS.Modules.SampleCollection.Infrastructure.Configurations.DataAccess.MartenConfig;
 using LabAnalysisMartenConfig = HC.LIS.Modules.LabAnalysis.Infrastructure.Configurations.DataAccess.MartenConfig;
 using AnalyzerMartenConfig = HC.LIS.Modules.Analyzer.Infrastructure.Configurations.DataAccess.MartenConfig;
+using PatientManagementMartenConfig = HC.LIS.Modules.PatientManagement.Infrastructure.Configurations.DataAccess.MartenConfig;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console(
@@ -33,6 +34,9 @@ labAnalysisStore.Storage.ApplyAllConfiguredChangesToDatabaseAsync().Wait();
 
 IDocumentStore analyzerStore = AnalyzerMartenConfig.BuildDocumentStore(connectionString);
 analyzerStore.Storage.ApplyAllConfiguredChangesToDatabaseAsync().Wait();
+
+IDocumentStore patientManagementStore = PatientManagementMartenConfig.BuildDocumentStore(connectionString);
+patientManagementStore.Storage.ApplyAllConfiguredChangesToDatabaseAsync().Wait();
 
 Log.Logger.Information("Migration executed!");
 Log.CloseAndFlush();
