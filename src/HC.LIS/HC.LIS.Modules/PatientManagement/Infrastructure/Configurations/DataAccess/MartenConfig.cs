@@ -12,7 +12,7 @@ public static class MartenConfig
         {
             options.Connection(connectionString);
             options.DatabaseSchemaName = "patient_management";
-            options.AutoCreateSchemaObjects = AutoCreate.None;
+            options.AutoCreateSchemaObjects = AutoCreate.CreateOrUpdate;
             options.Events.StreamIdentity = StreamIdentity.AsString;
             // Register domain event types here, e.g.:
             // options.Events.AddEventType<MyDomainEvent>();
