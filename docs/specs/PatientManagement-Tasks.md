@@ -163,22 +163,24 @@
 
 ### Phase 8: Integration Tests (TDD)
 
-- [ ] **Task 8.1** — Write integration tests for `RegisterPatient`
+- [x] **Task 8.1** — Write integration tests for `RegisterPatient`
+  - **Session note (2026-05-31):** Created `PatientTests.cs`, `GetPatientDetailsFromPatientManagementProbe.cs`, `PatientFactory.cs`, `PatientSampleData.cs`; also patched `TestBase.cs` to add `GetEventually<T>`, `IDisposable`, and Marten/PatientDetails table cleanup
   - **Skill:** `/integration-test PatientManagement register a patient`
   - **Creates:** `Tests/IntegrationTests/Patients/PatientTests.cs`, `GetPatientDetailsFromPatientManagementProbe.cs`, `PatientFactory.cs`, `PatientSampleData.cs`
   - **Tests:** `RegisterPatientIsSuccessful` — asserts `PatientDetails.Status == "Active"`, all fields set correctly
 
-- [ ] **Task 8.2** — Write integration tests for `UpdatePatient`
+- [x] **Task 8.2** — Write integration tests for `UpdatePatient`
   - **Skill:** `/integration-test PatientManagement update a patient`
   - **Modifies:** `Tests/IntegrationTests/Patients/PatientTests.cs`
   - **Tests:** `UpdatePatientIsSuccessful` — asserts PII fields updated in `PatientDetails`
 
-- [ ] **Task 8.3** — Write integration tests for `AnonymizePatient`
+- [x] **Task 8.3** — Write integration tests for `AnonymizePatient`
   - **Skill:** `/integration-test PatientManagement anonymize a patient`
   - **Modifies:** `Tests/IntegrationTests/Patients/PatientTests.cs`
   - **Tests:** `AnonymizePatientIsSuccessful` — asserts `Status == "Anonymized"`, `FullName == "ANONYMIZED"`, `DocumentId == "ANONYMIZED"`, `AnonymizedAt` set
 
-- [ ] **Task 8.4** — Verify all integration tests pass
+- [x] **Task 8.4** — Verify all integration tests pass
+  - **Session note (2026-05-31):** 3/3 passed. Also fixed `MartenConfig` (`AutoCreate.None` → `AutoCreate.CreateOrUpdate`) and made `ClearDatabase` conditional for Marten tables via `DO` block so tests work on a fresh schema where Marten tables haven't been created yet.
   - **Verify:** `dotnet test src/HC.LIS/HC.LIS.Modules/PatientManagement/Tests/IntegrationTests/HC.LIS.Modules.PatientManagement.IntegrationTests.csproj` — all tests green
 
 ---
