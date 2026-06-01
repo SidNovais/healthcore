@@ -33,7 +33,7 @@ internal class GetPatientSnapshotDetailsQueryHandler(
                 "Status",
                 "RegisteredAt",
                 "AnonymizedAt"
-            FROM test_orders."PatientSnapshotDetails"
+            FROM "test_orders"."PatientSnapshotDetails"
             WHERE "Id" = @PatientId
             """;
         return await connection
