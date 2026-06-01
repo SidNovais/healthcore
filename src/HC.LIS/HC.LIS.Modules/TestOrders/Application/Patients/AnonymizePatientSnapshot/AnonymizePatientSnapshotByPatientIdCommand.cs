@@ -1,0 +1,15 @@
+using System.Text.Json.Serialization;
+using HC.LIS.Modules.TestOrders.Application.Configuration.Commands;
+
+namespace HC.LIS.Modules.TestOrders.Application.Patients.AnonymizePatientSnapshot;
+
+[method: JsonConstructor]
+public class AnonymizePatientSnapshotByPatientIdCommand(
+    Guid id,
+    Guid patientId,
+    DateTime anonymizedAt
+) : InternalCommandBase(id)
+{
+    public Guid PatientId { get; } = patientId;
+    public DateTime AnonymizedAt { get; } = anonymizedAt;
+}
