@@ -6,7 +6,9 @@ using HC.Core.Infastructure;
 using HC.Core.Infrastructure;
 using HC.Core.Infrastructure.Data;
 using HC.LIS.Modules.TestOrders.Application;
+using HC.LIS.Modules.TestOrders.Application.Patients;
 using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.AggregateStore;
+using HC.LIS.Modules.TestOrders.Infrastructure.Patients;
 using Marten;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -60,6 +62,10 @@ internal class DataAccessModule(
         ;
         builder.RegisterType<MartenAggregateStore>()
         .As<IAggregateStore>()
+        .InstancePerLifetimeScope()
+        ;
+        builder.RegisterType<PatientSnapshotRepository>()
+        .As<IPatientSnapshotRepository>()
         .InstancePerLifetimeScope()
         ;
     }
