@@ -187,18 +187,18 @@
 
 ### Phase 9: Cross-Module Changes (TestOrders)
 
-- [ ] **Task 9.1** — Add `PatientManagement.IntegrationEvents` project reference to TestOrders Application
+- [x] **Task 9.1** — Add `PatientManagement.IntegrationEvents` project reference to TestOrders Application
   - **Manual**
   - **Modifies:** `src/HC.LIS/HC.LIS.Modules/TestOrders/Application/HC.LIS.Modules.TestOrders.Application.csproj`
   - **Adds:** `<ProjectReference>` to `HC.LIS.Modules.PatientManagement.IntegrationEvents.csproj`
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 9.2** — Define `IPatientSnapshotRepository` interface in TestOrders Application
+- [x] **Task 9.2** — Define `IPatientSnapshotRepository` interface in TestOrders Application
   - **Manual**
   - **Creates:** `src/HC.LIS/HC.LIS.Modules/TestOrders/Application/Patients/IPatientSnapshotRepository.cs`
   - **Methods:** `StoreAsync(...)`, `UpdateAsync(...)`, `AnonymizeAsync(...)`
 
-- [ ] **Task 9.3** — Implement 3 internal commands + handlers in TestOrders Application
+- [x] **Task 9.3** — Implement 3 internal commands + handlers in TestOrders Application
   - **Manual**
   - **Creates:**
     - `Application/Patients/StorePatientSnapshot/StorePatientSnapshotByPatientIdCommand.cs` + `StorePatientSnapshotByPatientIdCommandHandler.cs`
@@ -207,7 +207,7 @@
   - **Note:** Commands extend `InternalCommandBase`, use `[method: JsonConstructor]`; handlers inject `IPatientSnapshotRepository`
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 9.4** — Implement 3 integration event handlers in TestOrders Application
+- [x] **Task 9.4** — Implement 3 integration event handlers in TestOrders Application
   - **Manual**
   - **Creates:**
     - `Application/Patients/StorePatientSnapshot/PatientRegisteredIntegrationEventHandler.cs` (class: `PatientRegisteredIntegrationEventNotificationHandler`)
@@ -216,29 +216,30 @@
   - **Note:** Each handler injects `ICommandsScheduler` and calls `EnqueueAsync(internalCommand)` — never executes the command directly
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 9.5** — Implement `IPatientSnapshotRepository` in TestOrders Infrastructure
+- [x] **Task 9.5** — Implement `IPatientSnapshotRepository` in TestOrders Infrastructure
   - **Manual**
   - **Creates:** `src/HC.LIS/HC.LIS.Modules/TestOrders/Infrastructure/Patients/PatientSnapshotRepository.cs`
   - **Note:** Uses Dapper + `ISqlConnectionFactory`; INSERT on store, UPDATE on update/anonymize; all awaited calls use `.ConfigureAwait(false)`
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 9.6** — Implement `GetPatientSnapshotDetailsQuery` and handler in TestOrders
+- [x] **Task 9.6** — Implement `GetPatientSnapshotDetailsQuery` and handler in TestOrders
   - **Manual**
   - **Creates:** `Application/Patients/GetPatientSnapshotDetails/PatientSnapshotDetailsDto.cs`, `GetPatientSnapshotDetailsQuery.cs`, `GetPatientSnapshotDetailsQueryHandler.cs`
   - **Note:** Dapper SELECT from `test_orders.PatientSnapshotDetails`
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 9.7** — Register internal commands in TestOrders BiMap + EventsBus subscriptions
+- [x] **Task 9.7** — Register internal commands in TestOrders BiMap + EventsBus subscriptions
   - **Manual**
   - **Modifies:** `Infrastructure/Configurations/TestOrdersStartup.cs` — add 3 BiMap entries for `StorePatientSnapshotByPatientIdCommand`, `UpdatePatientSnapshotByPatientIdCommand`, `AnonymizePatientSnapshotByPatientIdCommand`
   - **Modifies:** `Infrastructure/Configurations/EventsBus/EventsBusModule.cs` (or `EventsBusStartup.cs`) — subscribe to `PatientRegisteredIntegrationEvent`, `PatientUpdatedIntegrationEvent`, `PatientAnonymizedIntegrationEvent`
   - **Verify:** `dotnet build` succeeds
 
-- [ ] **Task 9.8** — Create `PatientSnapshotDetails` table migration in TestOrders
+- [x] **Task 9.8** — Create `PatientSnapshotDetails` table migration in TestOrders
   - **Manual**
-  - **Creates:** `src/HC.LIS/HC.LIS.Database/TestOrders/{timestamp}_TestOrdersModule_AddTablePatientSnapshotDetails.cs`
+  - **Creates:** `src/HC.LIS/HC.LIS.Database/TestOrders/20260601120000_TestOrdersModule_AddTablePatientSnapshotDetails.cs`
   - **Columns:** `Id (UUID PK)`, `FullName (VARCHAR 255)`, `DateOfBirth (TIMESTAMPTZ)`, `Gender (VARCHAR 50 NULL)`, `MothersFullName (VARCHAR 255 NULL)`, `DocumentId (VARCHAR 100 NULL)`, `Phone (VARCHAR 50 NULL)`, `Email (VARCHAR 255 NULL)`, `Status (VARCHAR 50)`, `RegisteredAt (TIMESTAMPTZ)`, `AnonymizedAt (TIMESTAMPTZ NULL)`
   - **Verify:** `dotnet run --project src/HC.LIS/HC.LIS.Database/HC.LIS.Database.csproj` succeeds
+  - **Session note (2026-06-01):** All 8 tasks completed. 19/19 unit tests pass, 22/22 arch tests pass, 0 build errors/warnings.
 
 ---
 
