@@ -25,6 +25,9 @@ using HC.LIS.API.Modules.UserAccess.Auth;
 using HC.LIS.API.Modules.UserAccess.AuditLog;
 using HC.LIS.API.Modules.UserAccess.Users;
 using HC.LIS.Modules.UserAccess.Infrastructure.Configurations;
+using HC.LIS.API.Modules.PatientManagement;
+using HC.LIS.API.Modules.PatientManagement.Patients;
+using HC.LIS.Modules.PatientManagement.Infrastructure.Configurations;
 using Serilog;
 using Serilog.Events;
 
@@ -67,6 +70,7 @@ try
         containerBuilder.RegisterModule(new AnalyzerAutofacModule());
         containerBuilder.RegisterModule(new LabAnalysisAutofacModule());
         containerBuilder.RegisterModule(new UserAccessAutofacModule());
+        containerBuilder.RegisterModule(new PatientManagementAutofacModule());
     });
 
     // ─── Services ──────────────────────────────────────────────────────────
@@ -77,6 +81,7 @@ try
     builder.Services.AddAuthorization(options =>
     {
         options.AddPolicy("ITAdmin", policy => policy.RequireRole("ITAdmin"));
+        options.AddPolicy("PatientManagement", policy => policy.RequireRole("Receptionist", "ITAdmin"));
     });
 
     if (builder.Environment.IsDevelopment())
@@ -121,6 +126,7 @@ try
     AnalyzerStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: null);
     LabAnalysisStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: null);
     UserAccessStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: null);
+    PatientManagementStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: null);
 
     // ─── Middleware pipeline ────────────────────────────────────────────────
     if (app.Environment.IsDevelopment())
@@ -157,6 +163,7 @@ try
     v1.MapGroup("worklist-items").MapWorklistItemsEndpoints();
     v1.MapGroup("users").MapUsersEndpoints();
     v1.MapGroup("audit-log").MapAuditLogEndpoints();
+    v1.MapGroup("patients").MapPatientsEndpoints();
 
     app.Run();
 }
