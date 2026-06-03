@@ -17,7 +17,7 @@ Every test task (`test:` commit) immediately precedes its implementation task (`
 
 > Changes to `HC.LIS.API` and `HC.LIS.API.Modules.PatientManagement`. All subsequent phases depend on Phase 0 completing first (SDK regeneration in Phase 1 requires Swagger to be up to date).
 
-- [ ] **Task 0.1** — Add `PatientManagementAutofacModule` and wire `Program.cs`
+- [x] **Task 0.1** — Add `PatientManagementAutofacModule` and wire `Program.cs`
   - **Creates:**
     - `src/HC.LIS/HC.LIS.API/Modules/PatientManagement/PatientManagementAutofacModule.cs`
   - **Modifies:** `Program.cs`
@@ -27,39 +27,39 @@ Every test task (`test:` commit) immediately precedes its implementation task (`
     - Add `v1.MapGroup("patients").MapPatientsEndpoints()`
   - **Verify:** API starts without errors; Swagger UI shows a "Patients" section
 
-- [ ] **Task 0.2** — Add `POST /api/v1/patients` — Register Patient
+- [x] **Task 0.2** — Add `POST /api/v1/patients` — Register Patient
   - **Creates:**
     - `Modules/PatientManagement/Patients/RegisterPatient/RegisterPatientRequest.cs` — `FullName`, `DateOfBirth`, `Gender?`, `MothersFullName?`, `DocumentId?`, `Phone?`, `Email?`
     - `Modules/PatientManagement/Patients/RegisterPatient/RegisterPatientEndpoint.cs` — `Guid.CreateVersion7()` for id, `SystemClock.Now` for `RegisteredAt`; returns `TypedResults.Created`
     - `Modules/PatientManagement/Patients/PatientsEndpoints.cs` — `MapPatientsEndpoints()` with first `MapPost` entry
   - **Verify:** `POST /api/v1/patients` with valid body returns `201` with `{ id: Guid }` and `Location` header
 
-- [ ] **Task 0.3** — Add `GET /api/v1/patients?search={term}` — Search Patients
+- [x] **Task 0.3** — Add `GET /api/v1/patients?search={term}` — Search Patients
   - **Creates:**
     - `Modules/PatientManagement/Patients/SearchPatients/SearchPatientsEndpoint.cs` — binds `string search` from query; wraps term with `%` wildcards; calls `SearchPatientsQuery`
   - **Modifies:** `PatientsEndpoints.cs` — add `MapGet("")` entry
   - **Verify:** `GET /api/v1/patients?search=John` returns `200` with array of `PatientSearchResultDto`
 
-- [ ] **Task 0.4** — Add `GET /api/v1/patients/{id:guid}` — Get Patient Details
+- [x] **Task 0.4** — Add `GET /api/v1/patients/{id:guid}` — Get Patient Details
   - **Creates:**
     - `Modules/PatientManagement/Patients/GetPatientDetails/GetPatientDetailsEndpoint.cs` — calls `GetPatientDetailsQuery`; returns `404` if null
   - **Modifies:** `PatientsEndpoints.cs` — add `MapGet("{id:guid}")` entry
   - **Verify:** `GET /api/v1/patients/{id}` for a registered patient returns `200` with `PatientDetailsDto`; unknown id returns `404`
 
-- [ ] **Task 0.5** — Add `PUT /api/v1/patients/{id:guid}` — Update Patient
+- [x] **Task 0.5** — Add `PUT /api/v1/patients/{id:guid}` — Update Patient
   - **Creates:**
     - `Modules/PatientManagement/Patients/UpdatePatient/UpdatePatientRequest.cs`
     - `Modules/PatientManagement/Patients/UpdatePatient/UpdatePatientEndpoint.cs` — `SystemClock.Now` for `UpdatedAt`; returns `TypedResults.NoContent()`
   - **Modifies:** `PatientsEndpoints.cs` — add `MapPut("{id:guid}")` entry
   - **Verify:** `PUT /api/v1/patients/{id}` for an Active patient returns `204`; for an Anonymized patient returns `400`
 
-- [ ] **Task 0.6** — Add `POST /api/v1/patients/{id:guid}/anonymize` — Anonymize Patient
+- [x] **Task 0.6** — Add `POST /api/v1/patients/{id:guid}/anonymize` — Anonymize Patient
   - **Creates:**
     - `Modules/PatientManagement/Patients/AnonymizePatient/AnonymizePatientEndpoint.cs` — `SystemClock.Now` for `AnonymizedAt`; `.RequireAuthorization("ITAdmin")`; returns `TypedResults.NoContent()`
   - **Modifies:** `PatientsEndpoints.cs` — add `MapPost("{id:guid}/anonymize")` entry
   - **Verify:** ITAdmin `POST /api/v1/patients/{id}/anonymize` returns `204`; second call returns `400`; Receptionist call returns `403`
 
-- [ ] **Task 0.7** — Verify Swagger spec and regenerate SDK
+- [x] **Task 0.7** — Verify Swagger spec and regenerate SDK
   - **Verify:** Start API; open `/swagger/v1/swagger.json` — all 5 patient endpoints present with correct request/response schemas
   - **Action:** Run `yarn workspace @hc-lis/api-client generate` to regenerate the SDK; verify `src/generated/` contains patient service functions
 
@@ -69,27 +69,27 @@ Every test task (`test:` commit) immediately precedes its implementation task (`
 
 > Pure TypeScript layer — no Angular components. Can proceed in parallel with Phase 0's API work, but SDK adapter (Task 1.4) requires the regenerated SDK from Task 0.7.
 
-- [ ] **Task 1.1** — Add domain interfaces
+- [x] **Task 1.1** — Add domain interfaces
   - **Creates:**
     - `src/app/core/domain/patient-details.ts` — `PatientDetails` interface
     - `src/app/core/domain/patient-search-result.ts` — `PatientSearchResult` interface
     - `src/app/core/domain/register-patient-params.ts` — `RegisterPatientParams` and `UpdatePatientParams` types
   - **Verify:** `tsc --noEmit` passes with zero errors
 
-- [ ] **Task 1.2** — Add port interface
+- [x] **Task 1.2** — Add port interface
   - **Creates:**
     - `src/app/core/application/i-patients-port.ts` — `IPatientsPort` interface + `PATIENTS_PORT` injection token
   - **Verify:** `tsc --noEmit` passes
 
-- [ ] **Task 1.3 (test)** — Write unit tests for `PatientsService`
+- [x] **Task 1.3 (test)** — Write unit tests for `PatientsService`
   - **Creates:** `src/app/core/application/patients.service.spec.ts` — 5 failing tests (see TechSpec §8.1)
   - **Verify:** Tests fail (service not implemented yet)
 
-- [ ] **Task 1.4 (feat)** — Implement `PatientsService`
+- [x] **Task 1.4 (feat)** — Implement `PatientsService`
   - **Creates:** `src/app/core/application/patients.service.ts` — signals + methods; injects `PATIENTS_PORT`
   - **Verify:** All 5 unit tests in Task 1.3 pass
 
-- [ ] **Task 1.5** — Add SDK infrastructure adapter
+- [x] **Task 1.5** — Add SDK infrastructure adapter
   - **Creates:** `src/app/core/infrastructure/patients/sdk-patients-adapter.ts` — implements `IPatientsPort`; calls generated SDK functions
   - **Modifies:** `src/app/app.config.ts` — add `{ provide: PATIENTS_PORT, useClass: SdkPatientsAdapter }` to providers
   - **Verify:** `tsc --noEmit` passes; `yarn workspace hc-lis-spa test` passes
