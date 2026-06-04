@@ -98,11 +98,11 @@ Every test task (`test:` commit) immediately precedes its implementation task (`
 
 ### Phase 2: Guard Extension + Routing + Shell Navigation
 
-- [ ] **Task 2.1** — Extend `roleGuard` to accept rest params
+- [x] **Task 2.1** — Extend `roleGuard` to accept rest params
   - **Modifies:** `src/app/core/guards/role.guard.ts` — change `role: UserRole` to `...roles: UserRole[]`; update `includes()` check
   - **Verify:** Existing E2E specs still pass (`auth.spec.ts`, `admin-users.spec.ts`); `tsc --noEmit` passes
 
-- [ ] **Task 2.2** — Add patient routes and shell nav link
+- [x] **Task 2.2** — Add patient routes and shell nav link
   - **Modifies:** `src/app/app.routes.ts` — add 3 patient routes (search before detail to avoid `:id` capturing `"new"`)
   - **Modifies:** `src/app/core/shell/shell.component.html` — add Patients nav link with `data-testid="nav-patients"` gated on Receptionist + ITAdmin role
   - **Verify:** Navigating to `/patients` while logged in as Receptionist loads without a routing error; Physician is redirected to `/unauthorized`
