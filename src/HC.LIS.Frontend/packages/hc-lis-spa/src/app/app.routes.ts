@@ -62,6 +62,24 @@ export const routes: Routes = [
           import('./features/admin/user-list.component').then(m => m.UserListComponent),
       },
       {
+        path: 'patients',
+        canActivate: [roleGuard('Receptionist', 'ITAdmin')],
+        loadComponent: () =>
+          import('./features/patients/patient-search.component').then(m => m.PatientSearchComponent),
+      },
+      {
+        path: 'patients/new',
+        canActivate: [roleGuard('Receptionist', 'ITAdmin')],
+        loadComponent: () =>
+          import('./features/patients/register-patient.component').then(m => m.RegisterPatientComponent),
+      },
+      {
+        path: 'patients/:id',
+        canActivate: [roleGuard('Receptionist', 'ITAdmin')],
+        loadComponent: () =>
+          import('./features/patients/patient-detail.component').then(m => m.PatientDetailComponent),
+      },
+      {
         path: 'unauthorized',
         loadComponent: () =>
           import('./core/shell/unauthorized.component').then(m => m.UnauthorizedComponent),

@@ -12,8 +12,9 @@ interface NavItem {
 
 const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
   Receptionist: [
-    { label: 'New Order', route: '/orders/new', icon: 'order', testId: 'nav-new-order-link' },
-    { label: 'Orders',    route: '/orders',     icon: 'list',  testId: 'nav-orders-link'    },
+    { label: 'New Order', route: '/orders/new', icon: 'order',    testId: 'nav-new-order-link' },
+    { label: 'Orders',    route: '/orders',     icon: 'list',     testId: 'nav-orders-link'    },
+    { label: 'Patients',  route: '/patients',   icon: 'patients', testId: 'nav-patients'       },
   ],
   LabTechnician: [
     { label: 'Triage', route: '/triage', icon: 'triage', testId: 'nav-triage-link' },
@@ -25,6 +26,7 @@ const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
   ITAdmin: [
     { label: 'New Order', route: '/orders/new',  icon: 'order',    testId: 'nav-new-order-link'  },
     { label: 'Orders',    route: '/orders',       icon: 'list',     testId: 'nav-orders-link'     },
+    { label: 'Patients',  route: '/patients',     icon: 'patients', testId: 'nav-patients'        },
     { label: 'Triage',    route: '/triage',       icon: 'triage',   testId: 'nav-triage-link'     },
     { label: 'Worklist',  route: '/worklist',     icon: 'worklist', testId: 'nav-worklist-link'   },
     { label: 'Users',     route: '/admin/users',  icon: 'users',    testId: 'nav-users-link'      },
