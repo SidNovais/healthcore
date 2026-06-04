@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import {
   getCollectionRequestList,
   callPatient as sdkCallPatient,
-  createBarcode as sdkCreateBarcode,
   recordSampleCollection,
   movePatientToWaiting as sdkMovePatientToWaiting,
   client,
@@ -34,7 +33,8 @@ export class SdkCollectionRequestsApi implements ICollectionRequestsApi {
   }
 
   async createBarcode(id: string, params: ApiCreateBarcodeParams): Promise<void> {
-    await sdkCreateBarcode({
+    await client.post({
+      url: '/api/v1/collection-requests/{id}/create-barcode',
       path: { id },
       body: {
         tubeType: params.tubeType,
