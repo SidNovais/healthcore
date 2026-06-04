@@ -128,23 +128,25 @@ Every test task (`test:` commit) immediately precedes its implementation task (`
 
 ### Phase 4: Register Patient Screen
 
-- [ ] **Task 4.1 (feat)** — Implement `PatientFormComponent`
+- [x] **Task 4.1 (feat)** — Implement `PatientFormComponent`
   - **Creates:**
     - `src/app/features/patients/patient-form.component.ts` — reactive form; `@Input() initialValues`; `@Output() formSubmit`
     - `src/app/features/patients/patient-form.component.html` — all 7 fields with `data-testid` attributes
     - `src/app/features/patients/patient-form.component.css`
   - **Verify:** `tsc --noEmit` passes; form renders with all required `data-testid` attributes present
 
-- [ ] **Task 4.2 (test)** — Write integration test for `RegisterPatientComponent`
+- [x] **Task 4.2 (test)** — Write integration test for `RegisterPatientComponent`
   - **Creates:** integration test block in `patient-search.component.integration.spec.ts` or a new `register-patient.component.integration.spec.ts` — covers form submit navigates to detail (see TechSpec §8.2)
   - **Verify:** Test fails (component not implemented yet)
 
-- [ ] **Task 4.3 (feat)** — Implement `RegisterPatientComponent`
+- [x] **Task 4.3 (feat)** — Implement `RegisterPatientComponent`
   - **Creates:**
     - `src/app/features/patients/register-patient.component.ts` — embeds `PatientFormComponent`; on `formSubmit` calls `PatientsService.register()` then navigates to `/patients/:newId`
     - `src/app/features/patients/register-patient.component.html`
     - `src/app/features/patients/register-patient.component.css`
   - **Verify:** Integration test from Task 4.2 passes; `yarn workspace hc-lis-spa test` passes
+
+> ✅ **Completed 2026-06-04** — `PatientFormComponent` (reactive form, 7 fields, `@Input() initialValues`, `@Output() formSubmit`) and `RegisterPatientComponent` (embeds form, calls `PatientsService.register()`, navigates to `/patients/:newId`) implemented; 73/73 tests pass (2 new integration tests).
 
 ---
 
