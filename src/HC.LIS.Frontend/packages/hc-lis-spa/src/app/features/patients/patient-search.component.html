@@ -1,0 +1,59 @@
+<div class="patient-search-page">
+  <div class="search-header">
+    <h2>Patient Search</h2>
+    <button
+      data-testid="register-patient-btn"
+      class="btn-primary"
+      (click)="onRegisterClick()"
+    >
+      Register New Patient
+    </button>
+  </div>
+
+  <div class="search-bar">
+    <input
+      type="text"
+      data-testid="patient-search-input"
+      placeholder="Search by name or document ID..."
+      [value]="searchTerm"
+      (input)="onSearchInput($any($event.target).value)"
+    />
+  </div>
+
+  @if (service.searchResults().length === 0) {
+    <p data-testid="patient-search-empty-state" class="empty-state">
+      No patients found. Try a different search term or register a new patient.
+    </p>
+  } @else {
+    <table data-testid="patient-search-results" class="results-table">
+      <thead>
+        <tr>
+          <th>Full Name</th>
+          <th>Date of Birth</th>
+          <th>Document ID</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (patient of service.searchResults(); track patient.id) {
+          <tr
+            data-testid="patient-row"
+            class="patient-row"
+            (click)="onRowClick(patient.id)"
+          >
+            <td>{{ patient.fullName }}</td>
+            <td>{{ patient.dateOfBirth }}</td>
+            <td>{{ patient.documentId ?? '—' }}</td>
+            <td>
+              <span
+                class="status-badge"
+                [class.status-active]="patient.status === 'Active'"
+                [class.status-anonymized]="patient.status === 'Anonymized'"
+              >{{ patient.status }}</span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

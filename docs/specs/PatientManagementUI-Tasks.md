@@ -111,16 +111,18 @@ Every test task (`test:` commit) immediately precedes its implementation task (`
 
 ### Phase 3: Patient Search Screen
 
-- [ ] **Task 3.1 (test)** — Write integration tests for `PatientSearchComponent`
+- [x] **Task 3.1 (test)** — Write integration tests for `PatientSearchComponent`
   - **Creates:** `src/app/features/patients/patient-search.component.integration.spec.ts` — 3 failing tests (see TechSpec §8.2)
   - **Verify:** Tests fail (component not implemented yet)
 
-- [ ] **Task 3.2 (feat)** — Implement `PatientSearchComponent`
+- [x] **Task 3.2 (feat)** — Implement `PatientSearchComponent`
   - **Creates:**
     - `src/app/features/patients/patient-search.component.ts` — debounced search input, result table, empty state; injects `PatientsService` and `Router`
     - `src/app/features/patients/patient-search.component.html`
     - `src/app/features/patients/patient-search.component.css`
   - **Verify:** All 3 integration tests in Task 3.1 pass; `yarn workspace hc-lis-spa test` passes
+
+> ✅ **Completed 2026-06-04** — `PatientSearchComponent` implemented with debounced search input, result table with `patient-row` rows, empty-state element, and `register-patient-btn` navigating to `/patients/new`; all 71 tests pass (3 new integration tests).
 
 ---
 
