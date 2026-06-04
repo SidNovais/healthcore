@@ -1,0 +1,9 @@
+<div class="register-patient-page">
+  <h1 data-testid="register-patient-heading">Register New Patient</h1>
+
+  @if (error()) {
+    <p role="alert" data-testid="register-patient-error" class="error-text">{{ error() }}</p>
+  }
+
+  <app-patient-form (formSubmit)="onFormSubmit($event)" />
+</div>

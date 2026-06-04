@@ -1,0 +1,17 @@
+.register-patient-page {
+  padding: 2rem;
+  max-width: 600px;
+}
+
+h1 {
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111;
+}
+
+.error-text {
+  color: #b91c1c;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
