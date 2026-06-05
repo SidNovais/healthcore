@@ -185,6 +185,8 @@ Every test task (`test:` commit) immediately precedes its implementation task (`
 
 ### Phase 7: HIPAA
 
-- [ ] **Task 7.1** — Add patient PHI assertions to `hipaa.spec.ts`
+- [x] **Task 7.1** — Add patient PHI assertions to `hipaa.spec.ts`
   - **Modifies:** `e2e/hipaa.spec.ts` — add assertions that patient `FullName`, `DateOfBirth`, and `DocumentId` values do not appear in browser console output during a patient search or detail load
   - **Verify:** `yarn workspace hc-lis-spa e2e --grep hipaa` passes
+
+> ✅ **Completed 2026-06-05** — Added `patient PHI does not appear in console output during patient search or detail load` test to `hipaa.spec.ts`; registers a patient with known FullName, DateOfBirth, and DocumentId; exercises search API and detail load; asserts none of the captured console messages contain PHI values. 15/15 tests pass across Chromium, Firefox, and WebKit.

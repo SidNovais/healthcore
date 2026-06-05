@@ -89,6 +89,58 @@ test.describe('HIPAA Compliance', () => {
     expect(badKeys).toHaveLength(0);
   });
 
+  test('patient PHI does not appear in console output during patient search or detail load', async ({ page }) => {
+    const consoleMessages: string[] = [];
+    page.on('console', msg => consoleMessages.push(msg.text()));
+
+    await loginAsITAdmin(page);
+
+    const uniqueName = `HipaaTest-${Date.now()}`;
+    const dob = '1992-07-15';
+    const documentId = `DOC-${Date.now()}`;
+
+    await page.goto('/patients/new');
+    await page.getByTestId('patient-full-name-input').fill(uniqueName);
+    await page.getByTestId('patient-dob-input').fill(dob);
+    await page.getByTestId('patient-document-id-input').fill(documentId);
+
+    await Promise.all([
+      page.waitForResponse(r =>
+        r.url().includes('/api/v1/patients') &&
+        r.request().method() === 'POST' &&
+        r.status() === 201,
+      ),
+      page.getByTestId('patient-form-submit-btn').click(),
+    ]);
+
+    await expect(page).toHaveURL(
+      /\/patients\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
+      { timeout: 10_000 },
+    );
+    await expect(page.getByTestId('patient-status-badge')).toBeVisible({ timeout: 15_000 });
+
+    // Search workflow — exercises the search API call and component rendering
+    await page.goto('/patients');
+    await page.getByTestId('patient-search-input').fill(uniqueName);
+    await expect(page.getByTestId('patient-row').first()).toBeVisible({ timeout: 10_000 });
+
+    // Detail load — exercises the detail API call and component rendering
+    await page.getByTestId('patient-row').first().click();
+    await expect(page).toHaveURL(
+      /\/patients\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
+      { timeout: 10_000 },
+    );
+    await expect(page.getByTestId('patient-status-badge')).toBeVisible({ timeout: 15_000 });
+
+    // Assert no PHI in any console message
+    const phi = [uniqueName, dob, documentId];
+    for (const msg of consoleMessages) {
+      for (const value of phi) {
+        expect(msg, `Console message contains PHI "${value}": "${msg}"`).not.toContain(value);
+      }
+    }
+  });
+
   test('navigating to waiting room does not expose patientId in URL path', async ({ page }) => {
     const spaUrls: string[] = [];
     const baseUrl = process.env['E2E_BASE_URL'] ?? 'localhost:4200';
