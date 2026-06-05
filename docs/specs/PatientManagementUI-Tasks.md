@@ -152,16 +152,18 @@ Every test task (`test:` commit) immediately precedes its implementation task (`
 
 ### Phase 5: Patient Detail Screen
 
-- [ ] **Task 5.1 (test)** — Write integration tests for `PatientDetailComponent`
+- [x] **Task 5.1 (test)** — Write integration tests for `PatientDetailComponent`
   - **Creates:** `src/app/features/patients/patient-detail.component.integration.spec.ts` — 4 failing tests (see TechSpec §8.2)
   - **Verify:** Tests fail (component not implemented yet)
 
-- [ ] **Task 5.2 (feat)** — Implement `PatientDetailComponent`
+- [x] **Task 5.2 (feat)** — Implement `PatientDetailComponent`
   - **Creates:**
     - `src/app/features/patients/patient-detail.component.ts` — loads patient on init; status badge; edit form toggle; anonymize with confirm step; ITAdmin-only visibility guard using `AuthService.currentUser()`
     - `src/app/features/patients/patient-detail.component.html`
     - `src/app/features/patients/patient-detail.component.css`
   - **Verify:** All 4 integration tests in Task 5.1 pass; `yarn workspace hc-lis-spa test` passes
+
+> ✅ **Completed 2026-06-04** — `PatientDetailComponent` implemented with status badge, role-gated edit/anonymize buttons, two-step anonymize confirmation, and inline edit form via `PatientFormComponent`; all 77 tests pass (4 new integration tests).
 
 ---
 
