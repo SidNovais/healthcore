@@ -1,0 +1,174 @@
+import { test, expect } from '@playwright/test';
+
+const RECEPTIONIST_EMAIL = 'receptionist@hclis.local';
+const ITADMIN_EMAIL = 'root@hclis.local';
+const LABTECH_EMAIL = 'labtech@hclis.local';
+const PHYSICIAN_EMAIL = 'physician@hclis.local';
+const PASSWORD = 'Admin1234!';
+
+async function loginAsReceptionist(page: import('@playwright/test').Page) {
+  await page.goto('/login');
+  await page.getByLabel('Email').fill(RECEPTIONIST_EMAIL);
+  await page.getByLabel('Password').fill(PASSWORD);
+  await page.getByRole('button', { name: /sign in/i }).click();
+  await expect(page).toHaveURL('/orders/new', { timeout: 10_000 });
+}
+
+async function loginAsITAdmin(page: import('@playwright/test').Page) {
+  await page.goto('/login');
+  await page.getByLabel('Email').fill(ITADMIN_EMAIL);
+  await page.getByLabel('Password').fill(PASSWORD);
+  await page.getByRole('button', { name: /sign in/i }).click();
+  await expect(page).toHaveURL('/admin/users', { timeout: 10_000 });
+}
+
+async function loginAsLabTechnician(page: import('@playwright/test').Page) {
+  await page.goto('/login');
+  await page.getByLabel('Email').fill(LABTECH_EMAIL);
+  await page.getByLabel('Password').fill(PASSWORD);
+  await page.getByRole('button', { name: /sign in/i }).click();
+  await expect(page).toHaveURL('/triage', { timeout: 10_000 });
+}
+
+async function loginAsPhysician(page: import('@playwright/test').Page) {
+  await page.goto('/login');
+  await page.getByLabel('Email').fill(PHYSICIAN_EMAIL);
+  await page.getByLabel('Password').fill(PASSWORD);
+  await page.getByRole('button', { name: /sign in/i }).click();
+  await expect(page).toHaveURL('/worklist', { timeout: 10_000 });
+}
+
+test.describe('Patient Management', () => {
+  test.beforeEach(async ({ context }) => {
+    await context.clearCookies();
+  });
+
+  test('Receptionist: full register + edit workflow', async ({ page }) => {
+    await loginAsReceptionist(page);
+
+    const uniqueName = `TestPatient-${Date.now()}`;
+
+    await page.goto('/patients');
+
+    // Search for unique name — expect no results yet
+    await page.getByTestId('patient-search-input').fill(uniqueName);
+    await expect(page.getByTestId('patient-search-empty-state')).toBeVisible({ timeout: 10_000 });
+
+    // Navigate to register form
+    await page.getByTestId('register-patient-btn').click();
+    await expect(page).toHaveURL('/patients/new', { timeout: 5_000 });
+
+    // Fill form and submit; wait for POST 201
+    await page.getByTestId('patient-full-name-input').fill(uniqueName);
+    await page.getByTestId('patient-dob-input').fill('1990-01-15');
+
+    await Promise.all([
+      page.waitForResponse(r =>
+        r.url().includes('/api/v1/patients') &&
+        r.request().method() === 'POST' &&
+        r.status() === 201),
+      page.getByTestId('patient-form-submit-btn').click(),
+    ]);
+
+    // Wait for router to navigate to the detail page, then for loadDetails() to render
+    await expect(page).toHaveURL(
+      /\/patients\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
+      { timeout: 10_000 },
+    );
+    // patient-status-badge is inside @if(patientsService.patient()) — only visible once GET resolves
+    await expect(page.getByTestId('patient-status-badge')).toBeVisible({ timeout: 15_000 });
+
+    // Verify registered name is displayed
+    await expect(page.getByText(uniqueName)).toBeVisible({ timeout: 5_000 });
+
+    // Open inline edit form
+    await page.getByTestId('patient-edit-btn').click();
+
+    // Change full name and submit; wait for PUT 204
+    const updatedName = `${uniqueName}-edited`;
+    await page.getByTestId('patient-full-name-input').clear();
+    await page.getByTestId('patient-full-name-input').fill(updatedName);
+
+    await Promise.all([
+      page.waitForResponse(r =>
+        r.url().includes('/api/v1/patients/') &&
+        r.request().method() === 'PUT' &&
+        r.status() === 204),
+      page.getByTestId('patient-form-submit-btn').click(),
+    ]);
+
+    // onFormSubmit reloads details; wait for the badge to re-render with fresh data
+    await expect(page.getByTestId('patient-status-badge')).toBeVisible({ timeout: 10_000 });
+
+    // Verify updated name is displayed
+    await expect(page.getByText(updatedName)).toBeVisible({ timeout: 5_000 });
+  });
+
+  test('ITAdmin: anonymize workflow', async ({ page }) => {
+    await loginAsITAdmin(page);
+
+    const uniqueName = `AnonymizePatient-${Date.now()}`;
+
+    // Register a patient first and wait for the detail page to fully load
+    await page.goto('/patients/new');
+    await page.getByTestId('patient-full-name-input').fill(uniqueName);
+    await page.getByTestId('patient-dob-input').fill('1985-03-20');
+
+    await Promise.all([
+      page.waitForResponse(r =>
+        r.url().includes('/api/v1/patients') &&
+        r.request().method() === 'POST' &&
+        r.status() === 201),
+      page.getByTestId('patient-form-submit-btn').click(),
+    ]);
+
+    await expect(page).toHaveURL(
+      /\/patients\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
+      { timeout: 10_000 },
+    );
+    // Confirm detail is loaded before navigating away — ensures patient row is committed
+    await expect(page.getByTestId('patient-status-badge')).toBeVisible({ timeout: 15_000 });
+
+    // Navigate to search and find the patient by name
+    await page.goto('/patients');
+    await page.getByTestId('patient-search-input').fill(uniqueName);
+    // Generous timeout: debounce 300ms + API round-trip + Angular render
+    await expect(page.getByTestId('patient-row').first()).toBeVisible({ timeout: 10_000 });
+    await page.getByTestId('patient-row').first().click();
+
+    await expect(page).toHaveURL(
+      /\/patients\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
+      { timeout: 10_000 },
+    );
+    await expect(page.getByTestId('patient-status-badge')).toBeVisible({ timeout: 15_000 });
+
+    // Two-step anonymize: click button then confirm
+    await page.getByTestId('patient-anonymize-btn').click();
+    await expect(page.getByTestId('anonymize-confirm-btn')).toBeVisible({ timeout: 5_000 });
+
+    await Promise.all([
+      page.waitForResponse(r =>
+        r.url().includes('/anonymize') &&
+        r.request().method() === 'POST' &&
+        r.status() === 204),
+      page.getByTestId('anonymize-confirm-btn').click(),
+    ]);
+
+    // confirmAnonymize() reloads details; wait for the badge to reflect new status
+    await expect(page.getByTestId('patient-status-badge')).toHaveText('Anonymized', { timeout: 15_000 });
+    await expect(page.getByTestId('patient-edit-btn')).not.toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('patient-anonymize-btn')).not.toBeVisible({ timeout: 5_000 });
+  });
+
+  test('LabTechnician is redirected to /unauthorized when accessing /patients', async ({ page }) => {
+    await loginAsLabTechnician(page);
+    await page.goto('/patients');
+    await expect(page).toHaveURL('/unauthorized', { timeout: 5_000 });
+  });
+
+  test('Physician is redirected to /unauthorized when accessing /patients', async ({ page }) => {
+    await loginAsPhysician(page);
+    await page.goto('/patients');
+    await expect(page).toHaveURL('/unauthorized', { timeout: 5_000 });
+  });
+});
