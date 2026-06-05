@@ -169,13 +169,17 @@ Every test task (`test:` commit) immediately precedes its implementation task (`
 
 ### Phase 6: Playwright E2E
 
-- [ ] **Task 6.1 (test)** — Write `patients.spec.ts` — all 4 flows failing
+- [x] **Task 6.1 (test)** — Write `patients.spec.ts` — all 4 flows failing
   - **Creates:** `src/HC.LIS.Frontend/packages/hc-lis-spa/e2e/patients.spec.ts` — full register + edit workflow, anonymize workflow, LabTech role guard, Physician role guard (see TechSpec §8.3)
   - **Verify:** All 4 tests fail (as expected — screens not wired to real API yet in E2E)
 
-- [ ] **Task 6.2** — Wire E2E environment and verify all flows pass
+> ✅ **Completed 2026-06-05** — `patients.spec.ts` created with 4 E2E tests: register+edit workflow (Receptionist), anonymize workflow (ITAdmin), LabTech role guard, Physician role guard; follows `waitForResponse()` pattern; TypeScript compiles clean.
+
+- [x] **Task 6.2** — Wire E2E environment and verify all flows pass
   - **Requires:** Backend API running with seed data; Tasks 0.1–0.7, 3.2, 4.3, 5.2 complete
   - **Verify:** `yarn workspace hc-lis-spa e2e --grep patients` — all 4 flows green across Chromium, Firefox, WebKit
+
+> ✅ **Completed 2026-06-05** — All 12 tests green (4 flows × 3 browsers). Fixed two production bugs uncovered during debugging: (1) `PatientFormComponent.ngOnChanges` was calling `patchValue` on every Angular change-detection cycle (because `toFormValues(patient)` creates a new object each call), resetting user edits — fixed with `isFirstChange()` guard; (2) `PatientDetailComponent` didn't retry `loadDetails()` when the read model is transiently stale immediately after a write (outbox/Quartz ~2 s lag) — fixed with a predicate-based retry loop (10 × 1 s) and reset-before-fetch in `PatientsService.loadDetails()`.
 
 ---
 
