@@ -1,0 +1,58 @@
+<div class="patient-detail-page">
+  @if (patientsService.patient(); as patient) {
+    <div class="patient-header">
+      <h1 class="patient-name">{{ patient.fullName }}</h1>
+      <span data-testid="patient-status-badge" class="status-badge status-{{ patient.status.toLowerCase() }}">
+        {{ patient.status }}
+      </span>
+    </div>
+
+    @if (error()) {
+      <p role="alert" data-testid="patient-detail-error" class="error-text">{{ error() }}</p>
+    }
+
+    <dl class="patient-fields">
+      <dt>Date of Birth</dt>
+      <dd>{{ patient.dateOfBirth }}</dd>
+      <dt>Gender</dt>
+      <dd>{{ patient.gender ?? '—' }}</dd>
+      <dt>Mother's Full Name</dt>
+      <dd>{{ patient.mothersFullName ?? '—' }}</dd>
+      <dt>Document ID</dt>
+      <dd>{{ patient.documentId ?? '—' }}</dd>
+      <dt>Phone</dt>
+      <dd>{{ patient.phone ?? '—' }}</dd>
+      <dt>Email</dt>
+      <dd>{{ patient.email ?? '—' }}</dd>
+      <dt>Registered At</dt>
+      <dd>{{ patient.registeredAt }}</dd>
+    </dl>
+
+    <div class="patient-actions">
+      @if (patient.status === 'Active') {
+        <button data-testid="patient-edit-btn" class="btn-secondary" (click)="toggleEdit()">
+          {{ isEditMode() ? 'Cancel' : 'Edit' }}
+        </button>
+      }
+
+      @if (isITAdmin && patient.status === 'Active') {
+        <button data-testid="patient-anonymize-btn" class="btn-danger" (click)="startAnonymize()">
+          Anonymize
+        </button>
+      }
+
+      @if (showAnonymizeConfirm()) {
+        <button data-testid="anonymize-confirm-btn" class="btn-danger-confirm" (click)="confirmAnonymize()">
+          Confirm anonymize
+        </button>
+      }
+    </div>
+
+    @if (isEditMode() && patient.status === 'Active') {
+      <app-patient-form
+        [initialValues]="toFormValues(patient)"
+        (formSubmit)="onFormSubmit($event)"
+      />
+    }
+  }
+</div>

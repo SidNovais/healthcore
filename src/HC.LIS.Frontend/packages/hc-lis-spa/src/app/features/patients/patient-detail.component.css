@@ -1,0 +1,56 @@
+.patient-detail-page {
+  max-width: 700px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.patient-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.patient-name {
+  margin: 0;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.status-active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-anonymized {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.patient-fields {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 0.5rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.patient-fields dt {
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.patient-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.error-text {
+  color: #dc2626;
+  margin-bottom: 1rem;
+}
