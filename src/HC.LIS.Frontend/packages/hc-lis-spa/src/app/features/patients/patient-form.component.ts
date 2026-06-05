@@ -24,7 +24,8 @@ export class PatientFormComponent implements OnChanges {
   });
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['initialValues'] && this.initialValues) {
+    const change = changes['initialValues'];
+    if (change?.isFirstChange() && this.initialValues) {
       this.form.patchValue(this.initialValues);
     }
   }
