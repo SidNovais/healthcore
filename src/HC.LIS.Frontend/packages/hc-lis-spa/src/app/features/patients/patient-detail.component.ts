@@ -43,7 +43,18 @@ export class PatientDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    void this.patientsService.loadDetails(this.patientId);
+    void this.loadWithRetry();
+  }
+
+  // The API may transiently return stale data immediately after a write
+  // (read model settles asynchronously). Retry up to 10 × 1 s until fresh.
+  private async loadWithRetry(validate?: (p: PatientDetails) => boolean): Promise<void> {
+    for (let attempt = 0; attempt < 10; attempt++) {
+      await this.patientsService.loadDetails(this.patientId);
+      const p = this.patientsService.patient();
+      if (p !== null && (!validate || validate(p))) return;
+      await new Promise<void>(r => setTimeout(r, 1_000));
+    }
   }
 
   protected toggleEdit(): void {
@@ -59,7 +70,7 @@ export class PatientDetailComponent implements OnInit {
     try {
       await this.patientsService.anonymize(this.patientId);
       this.showAnonymizeConfirm.set(false);
-      await this.patientsService.loadDetails(this.patientId);
+      await this.loadWithRetry(p => p.status === 'Anonymized');
     } catch (err) {
       this.error.set(err instanceof Error ? err.message : 'Failed to anonymize patient');
     }
@@ -70,7 +81,7 @@ export class PatientDetailComponent implements OnInit {
     try {
       await this.patientsService.update(this.patientId, data);
       this.isEditMode.set(false);
-      await this.patientsService.loadDetails(this.patientId);
+      await this.loadWithRetry(p => p.fullName === data.fullName && p.dateOfBirth === data.dateOfBirth);
     } catch (err) {
       this.error.set(err instanceof Error ? err.message : 'Failed to update patient');
     }

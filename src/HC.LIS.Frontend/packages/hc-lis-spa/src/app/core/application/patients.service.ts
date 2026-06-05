@@ -22,6 +22,7 @@ export class PatientsService {
   }
 
   async loadDetails(id: string): Promise<void> {
+    this.patient.set(null);
     try {
       const details = await this.port.getDetails(id);
       this.patient.set(details);
