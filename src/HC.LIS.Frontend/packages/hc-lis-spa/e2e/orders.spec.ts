@@ -12,6 +12,40 @@ async function loginAsReceptionist(page: import('@playwright/test').Page) {
   await expect(page).toHaveURL('/orders/new', { timeout: 10_000 });
 }
 
+// Mock the patient search endpoint and select a patient via the picker.
+// The fake patient ID is the well-known seed UUID accepted by the TestOrders module.
+async function pickPatient(
+  page: import('@playwright/test').Page,
+  patientId = '00000000-0000-0000-0000-000000000001',
+): Promise<void> {
+  await page.route(/\/api\/v1\/patients(\?.*)?$/, async route => {
+    if (route.request().method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([{
+          id: patientId,
+          fullName: 'Seeded Test Patient',
+          dateOfBirth: '1990-01-01',
+          documentId: 'SEED-001',
+          status: 'Active',
+        }]),
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.getByTestId('patient-picker-input').fill('Seeded');
+  await page.waitForResponse(r =>
+    r.url().includes('/api/v1/patients') &&
+    r.request().method() === 'GET',
+  );
+  await expect(page.getByTestId('patient-picker-result-item').first()).toBeVisible({ timeout: 5_000 });
+  await page.getByTestId('patient-picker-result-item').first().click();
+  await expect(page.getByTestId('patient-picker-selected-card')).toBeVisible({ timeout: 5_000 });
+}
+
 test.describe('Test Order Request', () => {
   test.beforeEach(async ({ context }) => {
     await context.clearCookies();
@@ -19,15 +53,14 @@ test.describe('Test Order Request', () => {
 
   test('Receptionist creates an order and requests an exam — confirmation visible', async ({ page }) => {
     await loginAsReceptionist(page);
+    await pickPatient(page);
 
-    // Fill patient ID and create order; wait for the API response before asserting the exam section
-    await page.getByTestId('patient-id-input').fill('00000000-0000-0000-0000-000000000001');
     await Promise.all([
       page.waitForResponse(r =>
         r.url().includes('/api/v1/orders') &&
         r.request().method() === 'POST' &&
         r.status() === 201),
-      page.getByTestId('create-order-btn').click(),
+      page.getByTestId('create-order-submit-btn').click(),
     ]);
 
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
@@ -74,8 +107,8 @@ test.describe('Order List', () => {
     await loginAsReceptionist(page);
 
     // Create an order so the list has at least one row
-    await page.getByTestId('patient-id-input').fill('00000000-0000-0000-0000-000000000001');
-    await page.getByTestId('create-order-btn').click();
+    await pickPatient(page);
+    await page.getByTestId('create-order-submit-btn').click();
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
 
     await page.goto('/orders');
@@ -113,9 +146,9 @@ test.describe('Order Detail', () => {
 
   test('Receptionist sees order detail page at /orders/:id', async ({ page }) => {
     await loginAsReceptionist(page);
+    await pickPatient(page);
 
-    await page.getByTestId('patient-id-input').fill('00000000-0000-0000-0000-000000000001');
-    await page.getByTestId('create-order-btn').click();
+    await page.getByTestId('create-order-submit-btn').click();
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
     await page.getByTestId('exam-mnemonic-input').fill('GLU');
     await page.getByTestId('container-type-input').fill('RedTop');
@@ -135,9 +168,9 @@ test.describe('Order Detail', () => {
 
   test('Order detail page shows exam items table with one row', async ({ page }) => {
     await loginAsReceptionist(page);
+    await pickPatient(page);
 
-    await page.getByTestId('patient-id-input').fill('00000000-0000-0000-0000-000000000001');
-    await page.getByTestId('create-order-btn').click();
+    await page.getByTestId('create-order-submit-btn').click();
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
     const orderId = (await page.locator('.order-id').textContent())!.trim();
     await page.getByTestId('exam-mnemonic-input').fill('GLU');
@@ -162,9 +195,9 @@ test.describe('Order Detail', () => {
 
   test('Receptionist can Accept a Requested exam item — status updates to Accepted', async ({ page }) => {
     await loginAsReceptionist(page);
+    await pickPatient(page);
 
-    await page.getByTestId('patient-id-input').fill('00000000-0000-0000-0000-000000000001');
-    await page.getByTestId('create-order-btn').click();
+    await page.getByTestId('create-order-submit-btn').click();
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
     const orderId = (await page.locator('.order-id').textContent())!.trim();
     await page.getByTestId('exam-mnemonic-input').fill('GLU');
@@ -186,9 +219,9 @@ test.describe('Order Detail', () => {
 
   test('Receptionist can Reject an exam item with a reason — status updates to Rejected', async ({ page }) => {
     await loginAsReceptionist(page);
+    await pickPatient(page);
 
-    await page.getByTestId('patient-id-input').fill('00000000-0000-0000-0000-000000000001');
-    await page.getByTestId('create-order-btn').click();
+    await page.getByTestId('create-order-submit-btn').click();
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
     const orderId = (await page.locator('.order-id').textContent())!.trim();
     await page.getByTestId('exam-mnemonic-input').fill('HGB');
@@ -212,9 +245,9 @@ test.describe('Order Detail', () => {
 
   test('Receptionist can Cancel a Requested exam item — status updates to Canceled', async ({ page }) => {
     await loginAsReceptionist(page);
+    await pickPatient(page);
 
-    await page.getByTestId('patient-id-input').fill('00000000-0000-0000-0000-000000000001');
-    await page.getByTestId('create-order-btn').click();
+    await page.getByTestId('create-order-submit-btn').click();
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
     const orderId = (await page.locator('.order-id').textContent())!.trim();
     await page.getByTestId('exam-mnemonic-input').fill('TSH');
@@ -234,9 +267,9 @@ test.describe('Order Detail', () => {
 
   test('Receptionist can Place a Requested exam On Hold with reason — status updates to OnHold', async ({ page }) => {
     await loginAsReceptionist(page);
+    await pickPatient(page);
 
-    await page.getByTestId('patient-id-input').fill('00000000-0000-0000-0000-000000000001');
-    await page.getByTestId('create-order-btn').click();
+    await page.getByTestId('create-order-submit-btn').click();
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
     const orderId = (await page.locator('.order-id').textContent())!.trim();
     await page.getByTestId('exam-mnemonic-input').fill('CRP');
@@ -261,9 +294,9 @@ test.describe('Order Detail', () => {
 
   test('Shows exam-action-error when an exam action returns a 409 business rule error', async ({ page }) => {
     await loginAsReceptionist(page);
+    await pickPatient(page);
 
-    await page.getByTestId('patient-id-input').fill('00000000-0000-0000-0000-000000000001');
-    await page.getByTestId('create-order-btn').click();
+    await page.getByTestId('create-order-submit-btn').click();
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
     const orderId = (await page.locator('.order-id').textContent())!.trim();
     await page.getByTestId('exam-mnemonic-input').fill('LDL');
