@@ -24,7 +24,8 @@ internal class PatientDetailsProjector(
         await connection.ExecuteScalarAsync(
             @"INSERT INTO patient_management.""PatientDetails""
               (""Id"", ""FullName"", ""DateOfBirth"", ""Gender"", ""MothersFullName"", ""DocumentId"", ""Phone"", ""Email"", ""Status"", ""RegisteredAt"")
-              VALUES (@PatientId, @FullName, @DateOfBirth, @Gender, @MothersFullName, @DocumentId, @Phone, @Email, @Status, @RegisteredAt)",
+              VALUES (@PatientId, @FullName, @DateOfBirth, @Gender, @MothersFullName, @DocumentId, @Phone, @Email, @Status, @RegisteredAt)
+              ON CONFLICT (""Id"") DO NOTHING",
             new
             {
                 patientRegistered.PatientId,
