@@ -1,0 +1,108 @@
+.picker-wrap {
+  position: relative;
+}
+
+.picker-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0;
+  font-size: 0.875rem;
+  font-family: system-ui, sans-serif;
+  box-sizing: border-box;
+  background: #fff;
+}
+
+.picker-input:focus {
+  outline: 2px solid #00897B;
+  outline-offset: -1px;
+}
+
+.results-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-top: none;
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 100;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+.result-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.result-item:last-child {
+  border-bottom: none;
+}
+
+.result-item:hover {
+  background: #f0faf9;
+}
+
+.result-name {
+  flex: 1;
+  color: #111827;
+  font-weight: 500;
+}
+
+.result-doc {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+}
+
+.selected-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.75rem;
+  background: #e6f4f1;
+  border-left: 3px solid #00897B;
+}
+
+.card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.patient-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.patient-meta {
+  font-size: 0.75rem;
+  color: #374151;
+}
+
+.clear-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  line-height: 1;
+  border-radius: 2px;
+}
+
+.clear-btn:hover {
+  color: #111827;
+  background: rgba(0, 0, 0, 0.06);
+}

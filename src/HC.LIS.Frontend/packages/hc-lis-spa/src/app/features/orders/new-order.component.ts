@@ -1,14 +1,15 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { OrdersService } from './orders.service';
 import { RequestExamFormComponent } from './request-exam-form.component';
+import { PatientPickerComponent } from './patient-picker.component';
 import { AuthService } from '../../core/application/auth.service';
 import type { RequestExamParams } from '../../core/application/i-orders-port';
+import type { PatientSearchResult } from '../../core/domain/patient-search-result';
 
 @Component({
   selector: 'app-new-order',
   standalone: true,
-  imports: [FormsModule, RequestExamFormComponent],
+  imports: [RequestExamFormComponent, PatientPickerComponent],
   template: `
     <div class="page">
       <h1 class="page-title">New Test Order</h1>
@@ -17,27 +18,17 @@ import type { RequestExamParams } from '../../core/application/i-orders-port';
         <section class="order-create-section">
           <form (ngSubmit)="createOrder()">
             <div class="field">
-              <label for="patient-id">Patient ID</label>
-              <input
-                id="patient-id"
-                data-testid="patient-id-input"
-                type="text"
-                [(ngModel)]="patientId"
-                name="patientId"
-                required
-                placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                class="mono-input"
-                autocomplete="off"
-              />
+              <label>Patient</label>
+              <app-patient-picker (patientSelected)="selectedPatient.set($event)" />
             </div>
             @if (createError()) {
               <p role="alert" class="error-text">{{ createError() }}</p>
             }
             <button
               type="submit"
-              data-testid="create-order-btn"
+              data-testid="create-order-submit-btn"
               class="btn-primary"
-              [disabled]="!patientId() || creating()"
+              [disabled]="!selectedPatient() || creating()"
             >
               {{ creating() ? 'Creating…' : 'Create Order' }}
             </button>
@@ -73,17 +64,6 @@ import type { RequestExamParams } from '../../core/application/i-orders-port';
     .order-create-section, .exam-section { display: flex; flex-direction: column; gap: 1.25rem; }
     .field { display: flex; flex-direction: column; gap: 0.25rem; }
     label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #6b7280; }
-    .mono-input {
-      font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
-      padding: 0.5rem 0.75rem;
-      border: 1px solid #d1d5db;
-      border-radius: 0;
-      font-size: 0.9rem;
-      width: 100%;
-      box-sizing: border-box;
-      background: #fff;
-    }
-    .mono-input:focus { outline: 2px solid #00897B; outline-offset: -1px; }
     .btn-primary {
       align-self: flex-start;
       padding: 0.5rem 1.5rem;
@@ -122,18 +102,20 @@ export class NewOrderComponent {
   protected readonly ordersService = inject(OrdersService);
   private readonly authService = inject(AuthService);
 
-  protected patientId = signal('');
+  protected selectedPatient = signal<PatientSearchResult | null>(null);
   protected creating = signal(false);
   protected createError = signal<string | null>(null);
   protected lastExamAdded = signal<string | null>(null);
   protected examError = signal<string | null>(null);
 
   protected async createOrder(): Promise<void> {
+    const patient = this.selectedPatient();
+    if (!patient) return;
     this.creating.set(true);
     this.createError.set(null);
     try {
       await this.ordersService.createOrder({
-        patientId: this.patientId(),
+        patientId: patient.id,
         requestedBy: this.authService.currentUser()?.userId ?? '',
       });
     } catch (err) {

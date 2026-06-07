@@ -1,0 +1,48 @@
+@if (selectedPatient(); as patient) {
+  <div class="selected-card" data-testid="patient-picker-selected-card">
+    <div class="card-info">
+      <span class="patient-name">{{ patient.fullName }}</span>
+      <span class="patient-meta">
+        {{ patient.dateOfBirth }}
+        @if (patient.documentId) {
+          · {{ patient.documentId }}
+        }
+      </span>
+    </div>
+    <button
+      type="button"
+      class="clear-btn"
+      data-testid="patient-picker-clear-btn"
+      (click)="clearSelection()"
+    >✕</button>
+  </div>
+} @else {
+  <div class="picker-wrap">
+    <input
+      #searchInput
+      type="text"
+      class="picker-input"
+      data-testid="patient-picker-input"
+      placeholder="Search by name or document ID..."
+      autocomplete="off"
+      (input)="onSearchInput($any($event.target).value)"
+    />
+    @if (results().length > 0) {
+      <ul class="results-dropdown" data-testid="patient-picker-results" role="listbox">
+        @for (patient of results(); track patient.id) {
+          <li
+            class="result-item"
+            data-testid="patient-picker-result-item"
+            role="option"
+            (click)="selectPatient(patient)"
+          >
+            <span class="result-name">{{ patient.fullName }}</span>
+            @if (patient.documentId) {
+              <span class="result-doc">{{ patient.documentId }}</span>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </div>
+}
