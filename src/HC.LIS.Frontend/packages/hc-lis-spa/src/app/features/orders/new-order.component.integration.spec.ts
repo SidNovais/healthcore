@@ -1,11 +1,17 @@
+import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ComponentFixture } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { NewOrderComponent } from './new-order.component';
+import { PatientPickerComponent } from './patient-picker.component';
 import { OrdersService } from './orders.service';
 import { AuthService } from '../../core/application/auth.service';
 import type { OrderSummary } from '../../core/domain/order-summary';
 import type { UserSession } from '../../core/domain/user-session';
+import type { PatientSearchResult } from '../../core/domain/patient-search-result';
+
+@Component({ selector: 'app-patient-picker', standalone: true, template: '' })
+class StubPatientPickerComponent {}
 
 describe('NewOrderComponent (integration)', () => {
   let fixture: ComponentFixture<NewOrderComponent>;
@@ -15,6 +21,13 @@ describe('NewOrderComponent (integration)', () => {
 
   const receptionist: UserSession = { userId: 'user-uuid-1', userName: 'rcpt@hclis.local', role: 'Receptionist' };
   const createdOrder: OrderSummary = { orderId: 'order-uuid-1', patientId: 'patient-uuid-1' };
+  const testPatient: PatientSearchResult = {
+    id: 'patient-uuid-1',
+    fullName: 'Test Patient',
+    dateOfBirth: '1990-01-01',
+    documentId: null,
+    status: 'Active',
+  };
 
   beforeEach(async () => {
     orderSignal = signal<OrderSummary | null>(null);
@@ -35,7 +48,12 @@ describe('NewOrderComponent (integration)', () => {
         { provide: OrdersService, useValue: mockOrdersService },
         { provide: AuthService, useValue: mockAuthService },
       ],
-    }).compileComponents();
+    })
+      .overrideComponent(NewOrderComponent, {
+        remove: { imports: [PatientPickerComponent] },
+        add: { imports: [StubPatientPickerComponent] },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(NewOrderComponent);
     fixture.detectChanges();
@@ -47,24 +65,34 @@ describe('NewOrderComponent (integration)', () => {
     return (fixture.nativeElement as HTMLElement).querySelector<T>(selector);
   }
 
-  function fillPatientIdAndSubmit(patientId: string) {
-    const input = getElement<HTMLInputElement>('[data-testid="patient-id-input"]')!;
-    input.value = patientId;
-    input.dispatchEvent(new Event('input'));
+  function selectPatientAndSubmit(patient: PatientSearchResult): void {
+    (fixture.componentInstance as unknown as { selectedPatient: ReturnType<typeof signal<PatientSearchResult | null>> })
+      .selectedPatient.set(patient);
     fixture.detectChanges();
-
-    const btn = getElement<HTMLButtonElement>('[data-testid="create-order-btn"]')!;
-    btn.click();
+    getElement<HTMLButtonElement>('[data-testid="create-order-submit-btn"]')!.click();
   }
 
   it('exam form section is not visible before order is created', () => {
     expect(getElement('[data-testid="exam-section"]')).toBeNull();
   });
 
-  it('submitting patient ID calls createOrder() with the typed ID', async () => {
+  it('shows the create-order form on init even when a previous order is already set in the service', async () => {
+    orderSignal.set(createdOrder);
+
+    const freshFixture = TestBed.createComponent(NewOrderComponent);
+    freshFixture.detectChanges();
+    await freshFixture.whenStable();
+    freshFixture.detectChanges();
+
+    const el = freshFixture.nativeElement as HTMLElement;
+    expect(el.querySelector('[data-testid="create-order-submit-btn"]')).not.toBeNull();
+    expect(el.querySelector('[data-testid="exam-section"]')).toBeNull();
+  });
+
+  it('submitting a selected patient calls createOrder() with the patient ID', async () => {
     vi.mocked(mockOrdersService.createOrder!).mockResolvedValue(undefined);
 
-    fillPatientIdAndSubmit('patient-uuid-1');
+    selectPatientAndSubmit(testPatient);
     await fixture.whenStable();
 
     expect(mockOrdersService.createOrder).toHaveBeenCalledWith(
@@ -77,7 +105,7 @@ describe('NewOrderComponent (integration)', () => {
       orderSignal.set(createdOrder);
     });
 
-    fillPatientIdAndSubmit('patient-uuid-1');
+    selectPatientAndSubmit(testPatient);
     await fixture.whenStable();
     fixture.detectChanges();
 
@@ -90,7 +118,7 @@ describe('NewOrderComponent (integration)', () => {
     });
     vi.mocked(mockOrdersService.requestExam!).mockResolvedValue(undefined);
 
-    fillPatientIdAndSubmit('patient-uuid-1');
+    selectPatientAndSubmit(testPatient);
     await fixture.whenStable();
     fixture.detectChanges();
 
@@ -119,7 +147,7 @@ describe('NewOrderComponent (integration)', () => {
     });
     vi.mocked(mockOrdersService.requestExam!).mockResolvedValue(undefined);
 
-    fillPatientIdAndSubmit('patient-uuid-1');
+    selectPatientAndSubmit(testPatient);
     await fixture.whenStable();
     fixture.detectChanges();
 
