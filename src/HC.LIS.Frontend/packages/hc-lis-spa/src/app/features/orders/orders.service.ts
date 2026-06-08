@@ -48,4 +48,8 @@ export class OrdersService {
     await this.port.placeExamOnHold(orderId, itemId, reason);
   }
 
+  resetOrder(): void {
+    this.order.set(null);
+  }
+
 }

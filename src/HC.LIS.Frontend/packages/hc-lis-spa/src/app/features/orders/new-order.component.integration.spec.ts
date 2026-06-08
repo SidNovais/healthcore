@@ -36,6 +36,7 @@ describe('NewOrderComponent (integration)', () => {
       order: orderSignal,
       createOrder: vi.fn(),
       requestExam: vi.fn(),
+      resetOrder: vi.fn().mockImplementation(() => orderSignal.set(null)),
     };
 
     mockAuthService = {

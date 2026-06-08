@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { OrdersService } from './orders.service';
 import { RequestExamFormComponent } from './request-exam-form.component';
 import { PatientPickerComponent } from './patient-picker.component';
@@ -9,7 +10,7 @@ import type { PatientSearchResult } from '../../core/domain/patient-search-resul
 @Component({
   selector: 'app-new-order',
   standalone: true,
-  imports: [RequestExamFormComponent, PatientPickerComponent],
+  imports: [FormsModule, RequestExamFormComponent, PatientPickerComponent],
   template: `
     <div class="page">
       <h1 class="page-title">New Test Order</h1>
@@ -98,7 +99,7 @@ import type { PatientSearchResult } from '../../core/domain/patient-search-resul
     .error-text { color: #b91c1c; font-size: 0.875rem; margin: 0; }
   `],
 })
-export class NewOrderComponent {
+export class NewOrderComponent implements OnInit {
   protected readonly ordersService = inject(OrdersService);
   private readonly authService = inject(AuthService);
 
@@ -107,6 +108,10 @@ export class NewOrderComponent {
   protected createError = signal<string | null>(null);
   protected lastExamAdded = signal<string | null>(null);
   protected examError = signal<string | null>(null);
+
+  ngOnInit(): void {
+    this.ordersService.resetOrder();
+  }
 
   protected async createOrder(): Promise<void> {
     const patient = this.selectedPatient();
