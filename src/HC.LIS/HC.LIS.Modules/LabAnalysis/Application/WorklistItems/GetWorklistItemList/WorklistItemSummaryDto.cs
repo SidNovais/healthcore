@@ -5,5 +5,8 @@ public record WorklistItemSummaryDto(
     string SampleBarcode,
     string ExamCode,
     Guid PatientId,
+    string? PatientName,
+    DateTime? PatientDateOfBirth,
+    string? PatientGender,
     string Status,
     DateTime CreatedAt);
