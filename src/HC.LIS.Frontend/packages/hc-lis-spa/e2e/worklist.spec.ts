@@ -33,9 +33,16 @@ test.describe('Doctor Worklist', () => {
     await page.getByTestId('refresh-btn').click();
     await expect(page.getByTestId('worklist-row').first()).toBeVisible({ timeout: 10_000 });
 
+    // Assert patient name is not displayed as UUID
+    const patientCell = page.getByTestId('patient-name-cell').first();
+    await expect(patientCell).not.toContainText(/^[0-9a-f]{8}-/i);
+
     // Click a row to open detail panel
     await page.getByTestId('worklist-row').first().click();
     await expect(page.getByTestId('worklist-item-detail')).toBeVisible({ timeout: 3_000 });
+
+    // Assert patient name in detail panel is not displayed as UUID
+    await expect(page.getByTestId('patient-name')).not.toContainText(/^[0-9a-f]{8}-/i);
 
     // Fill signature and sign report
     await page.getByTestId('signature-input').fill('Dr. House');
