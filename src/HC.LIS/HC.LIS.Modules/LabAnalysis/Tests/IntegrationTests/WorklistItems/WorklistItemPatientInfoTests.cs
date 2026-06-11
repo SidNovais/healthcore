@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Dapper;
 using FluentAssertions;
 using Npgsql;
+using HC.LIS.Modules.LabAnalysis.Application.WorklistItems.GetWorklistItemDetails;
 using HC.LIS.Modules.LabAnalysis.Application.WorklistItems.GetWorklistItemList;
 
 namespace HC.LIS.Modules.LabAnalysis.IntegrationTests.WorklistItems;
@@ -105,5 +106,59 @@ public class WorklistItemPatientInfoTests : TestBase
         item.PatientName.Should().BeNull();
         item.PatientDateOfBirth.Should().BeNull();
         item.PatientGender.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task WorklistDetailIncludesPatientNameWhenSnapshotExists()
+    {
+        using var connection = new NpgsqlConnection(ConnectionString);
+
+        await connection.ExecuteAsync(
+            """
+            INSERT INTO lab_analysis.worklist_item_details
+                (id, sample_id, sample_barcode, exam_code, patient_id, order_id, order_item_id, status, created_at)
+            VALUES
+                (@Id, @SampleId, @SampleBarcode, @ExamCode, @PatientId, @OrderId, @OrderItemId, @Status, @CreatedAt)
+            """,
+            new
+            {
+                Id            = WorklistItemId,
+                SampleId      = Guid.NewGuid(),
+                SampleBarcode = "SC-PAT-003",
+                ExamCode      = "GLU",
+                PatientId,
+                OrderId       = Guid.NewGuid(),
+                OrderItemId   = Guid.NewGuid(),
+                Status        = "Pending",
+                CreatedAt     = DateTime.UtcNow
+            }
+        ).ConfigureAwait(true);
+
+        await connection.ExecuteAsync(
+            """
+            INSERT INTO "lab_analysis"."PatientSnapshotDetails"
+                ("Id", "FullName", "DateOfBirth", "Gender", "Status", "RegisteredAt")
+            VALUES
+                (@Id, @FullName, @DateOfBirth, @Gender, @Status, @RegisteredAt)
+            """,
+            new
+            {
+                Id           = PatientId,
+                FullName     = "John Doe",
+                DateOfBirth,
+                Gender       = "Male",
+                Status       = "Active",
+                RegisteredAt = DateTime.UtcNow
+            }
+        ).ConfigureAwait(true);
+
+        WorklistItemDetailsDto? dto = await LabAnalysisModule
+            .ExecuteQueryAsync(new GetWorklistItemDetailsQuery(WorklistItemId))
+            .ConfigureAwait(true);
+
+        dto.Should().NotBeNull();
+        dto!.PatientName.Should().Be("John Doe");
+        dto.PatientDateOfBirth.Should().Be(DateOfBirth);
+        dto.PatientGender.Should().Be("Male");
     }
 }
