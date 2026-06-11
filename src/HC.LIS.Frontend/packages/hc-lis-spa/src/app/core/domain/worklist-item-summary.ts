@@ -3,6 +3,9 @@ export interface WorklistItemSummary {
   sampleBarcode: string;
   examCode: string;
   patientId: string;
+  patientName: string | null;
+  patientDateOfBirth: string | null;
+  patientGender: string | null;
   status: string;
   createdAt: string;
 }

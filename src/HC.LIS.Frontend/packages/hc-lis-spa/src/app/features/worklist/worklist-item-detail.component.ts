@@ -1,4 +1,5 @@
 import { Component, Input, inject, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { WorklistService } from './worklist.service';
 import { AuthService } from '../../core/application/auth.service';
@@ -7,11 +8,17 @@ import type { WorklistItemDetails } from '../../core/domain/worklist-item-detail
 @Component({
   selector: 'app-worklist-item-detail',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, DatePipe],
   template: `
     <div data-testid="worklist-item-detail" class="detail-panel">
       <h3>{{ item.examCode }} — {{ item.sampleBarcode }}</h3>
-      <p>Patient ID: {{ item.patientId }}</p>
+      <p data-testid="patient-name">Patient: {{ item.patientName ?? item.patientId }}</p>
+      @if (item.patientDateOfBirth) {
+        <p data-testid="patient-dob">Date of birth: {{ item.patientDateOfBirth | date:'shortDate' }}</p>
+      }
+      @if (item.patientGender) {
+        <p data-testid="patient-gender">Gender: {{ item.patientGender }}</p>
+      }
       <p>Status: <span class="status-badge">{{ item.status }}</span></p>
 
       @if (item.analyteResults.length > 0) {

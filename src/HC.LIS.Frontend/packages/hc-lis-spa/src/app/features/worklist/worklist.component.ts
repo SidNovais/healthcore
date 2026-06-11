@@ -24,7 +24,7 @@ import { WorklistItemDetailComponent } from './worklist-item-detail.component';
                 <tr>
                   <th>Barcode</th>
                   <th>Exam</th>
-                  <th>Patient ID</th>
+                  <th>Patient</th>
                   <th>Status</th>
                   <th>Created</th>
                 </tr>
@@ -39,7 +39,7 @@ import { WorklistItemDetailComponent } from './worklist-item-detail.component';
                   >
                     <td>{{ item.sampleBarcode }}</td>
                     <td>{{ item.examCode }}</td>
-                    <td>{{ item.patientId }}</td>
+                    <td data-testid="patient-name-cell">{{ item.patientName ?? item.patientId }}</td>
                     <td><span class="status-badge">{{ item.status }}</span></td>
                     <td>{{ item.createdAt | slice: 0 : 10 }}</td>
                   </tr>

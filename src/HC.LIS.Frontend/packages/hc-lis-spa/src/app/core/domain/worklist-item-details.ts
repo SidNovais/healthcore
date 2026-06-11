@@ -15,6 +15,9 @@ export interface WorklistItemDetails {
   sampleBarcode: string;
   examCode: string;
   patientId: string;
+  patientName: string | null;
+  patientDateOfBirth: string | null;
+  patientGender: string | null;
   orderId: string;
   orderItemId: string;
   status: string;
