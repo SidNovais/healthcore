@@ -90,6 +90,7 @@ public class TestBase : IDisposable
                              DELETE FROM ""lab_analysis"".""OutboxMessages"";
                              DELETE FROM lab_analysis.worklist_item_analyte_results;
                              DELETE FROM lab_analysis.worklist_item_details;
+                             DELETE FROM ""lab_analysis"".""PatientSnapshotDetails"";
                              DELETE FROM ""lab_analysis"".""mt_doc_deadletterevent"";
                              DELETE FROM ""lab_analysis"".""mt_event_progression"";
                              DELETE FROM ""lab_analysis"".""mt_events"";
