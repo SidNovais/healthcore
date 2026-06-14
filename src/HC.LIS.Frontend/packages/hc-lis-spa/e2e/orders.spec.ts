@@ -121,6 +121,38 @@ test.describe('Order List', () => {
     );
   });
 
+  test('Order list displays patient name instead of GUID', async ({ page }) => {
+    await loginAsReceptionist(page);
+
+    await page.route(/\/api\/v1\/orders(\?.*)?$/, async route => {
+      if (route.request().method() === 'GET') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify([{
+            orderId: '00000000-0000-0000-0000-000000000099',
+            patientId: '00000000-0000-0000-0000-000000000001',
+            patientName: 'Maria Silva',
+            requestedBy: '00000000-0000-0000-0000-000000000002',
+            orderPriority: 'Routine',
+            requestedAt: new Date().toISOString(),
+            itemCount: 1,
+          }]),
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    await page.goto('/orders');
+    await expect(page.getByTestId('order-list-table')).toBeVisible({ timeout: 5_000 });
+
+    const patientCell = page.getByTestId('patient-name-cell').first();
+    await expect(patientCell).toBeVisible({ timeout: 5_000 });
+    await expect(patientCell).toHaveText('Maria Silva');
+    await expect(patientCell).not.toContainText(/^[0-9a-f]{8}-/i);
+  });
+
   test('LabTechnician is redirected to /unauthorized when accessing /orders', async ({ page }) => {
     await loginAsLabTechnician(page);
     await page.goto('/orders');
