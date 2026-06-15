@@ -54,6 +54,7 @@ export class SdkOrdersApi implements IOrdersApi {
     return items.map((dto) => ({
       orderId: dto.orderId ?? '',
       patientId: dto.patientId ?? '',
+      patientName: dto.patientName ?? null,
       requestedBy: dto.requestedBy ?? '',
       orderPriority: dto.orderPriority ?? '',
       requestedAt: dto.requestedAt ?? '',

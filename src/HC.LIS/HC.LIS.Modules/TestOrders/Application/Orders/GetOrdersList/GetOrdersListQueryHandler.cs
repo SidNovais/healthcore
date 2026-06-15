@@ -19,6 +19,7 @@ internal class GetOrdersListQueryHandler(
         string sql = @$"SELECT
             ""OrderDetails"".""Id"" AS ""{nameof(OrderListItemDto.OrderId)}"",
             ""OrderDetails"".""PatientId"" AS ""{nameof(OrderListItemDto.PatientId)}"",
+            ""PatientSnapshot"".""FullName"" AS ""{nameof(OrderListItemDto.PatientName)}"",
             ""OrderDetails"".""RequestedBy"" AS ""{nameof(OrderListItemDto.RequestedBy)}"",
             ""OrderDetails"".""Priority"" AS ""{nameof(OrderListItemDto.OrderPriority)}"",
             ""OrderDetails"".""RequestedAt"" AS ""{nameof(OrderListItemDto.RequestedAt)}"",
@@ -26,9 +27,12 @@ internal class GetOrdersListQueryHandler(
             FROM ""test_orders"".""OrderDetails"" AS ""OrderDetails""
             LEFT JOIN ""test_orders"".""OrderItemDetails"" AS ""OrderItemDetails""
                 ON ""OrderDetails"".""Id"" = ""OrderItemDetails"".""OrderId""
+            LEFT JOIN ""test_orders"".""PatientSnapshotDetails"" AS ""PatientSnapshot""
+                ON ""PatientSnapshot"".""Id"" = ""OrderDetails"".""PatientId""
             GROUP BY
                 ""OrderDetails"".""Id"",
                 ""OrderDetails"".""PatientId"",
+                ""PatientSnapshot"".""FullName"",
                 ""OrderDetails"".""RequestedBy"",
                 ""OrderDetails"".""Priority"",
                 ""OrderDetails"".""RequestedAt""

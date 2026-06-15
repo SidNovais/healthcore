@@ -34,7 +34,7 @@ import { OrdersService } from './orders.service';
                 [routerLink]="['/orders', item.orderId]"
                 class="order-row"
               >
-                <td>{{ item.patientId }}</td>
+                <td data-testid="patient-name-cell">{{ item.patientName ?? item.patientId }}</td>
                 <td>{{ item.requestedBy }}</td>
                 <td>{{ item.orderPriority }}</td>
                 <td>{{ item.requestedAt }}</td>
