@@ -70,6 +70,18 @@
       }
     },
     {
+      "label": "build: HC.LIS.TcpMessage",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/src/HC.LIS/HC.LIS.TcpMessage/TcpMessage/HC.LIS.TcpMessage.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
       "label": "prepare:fullstack",
       "dependsOn": [
         "docker:dev:up",
