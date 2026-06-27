@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Analyzer\IntegrationEvents\HC.LIS.Modules.Analyzer.IntegrationEvents.csproj" />
     <ProjectReference Include="..\..\SampleCollection\IntegrationEvents\HC.LIS.Modules.SampleCollection.IntegrationEvents.csproj" />
     <ProjectReference Include="..\..\PatientManagement\IntegrationEvents\HC.LIS.Modules.PatientManagement.IntegrationEvents.csproj" />
   </ItemGroup>

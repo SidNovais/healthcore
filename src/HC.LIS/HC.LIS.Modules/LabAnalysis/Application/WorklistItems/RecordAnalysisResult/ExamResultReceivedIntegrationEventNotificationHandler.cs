@@ -1,25 +1,25 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using HC.LIS.Modules.Analyzer.IntegrationEvents;
 using HC.LIS.Modules.LabAnalysis.Application.Configuration.Commands;
-using HC.LIS.Modules.LabAnalysis.IntegrationEvents;
 
 namespace HC.LIS.Modules.LabAnalysis.Application.WorklistItems.RecordAnalysisResult;
 
-public class AnalyzerResultReceivedIntegrationEventNotificationHandler(
+public class ExamResultReceivedIntegrationEventNotificationHandler(
     ICommandsScheduler commandsScheduler
-) : INotificationHandler<AnalyzerResultReceivedIntegrationEvent>
+) : INotificationHandler<ExamResultReceivedIntegrationEvent>
 {
     private readonly ICommandsScheduler _commandsScheduler = commandsScheduler;
 
     public async Task Handle(
-        AnalyzerResultReceivedIntegrationEvent notification,
+        ExamResultReceivedIntegrationEvent notification,
         CancellationToken cancellationToken
     )
     {
         await _commandsScheduler.EnqueueAsync(new RecordAnalysisResultCommand(
             notification.WorklistItemId,
-            notification.AnalyteCode,
+            notification.ExamMnemonic,
             notification.ResultValue,
             notification.ResultUnit,
             notification.ReferenceRange,
