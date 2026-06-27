@@ -14,6 +14,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Analyzer\IntegrationEvents\HC.LIS.Modules.Analyzer.IntegrationEvents.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 </Project>

@@ -11,7 +11,7 @@ using HC.LIS.Modules.LabAnalysis.Application.WorklistItems.CompleteWorklistItem;
 using HC.LIS.Modules.LabAnalysis.Application.WorklistItems.CreateWorklistItem;
 using HC.LIS.Modules.LabAnalysis.Application.WorklistItems.GetWorklistItemDetails;
 using HC.LIS.Modules.LabAnalysis.Application.WorklistItems.RecordAnalysisResult;
-using HC.LIS.Modules.LabAnalysis.IntegrationEvents;
+using HC.LIS.Modules.Analyzer.IntegrationEvents;
 
 namespace HC.LIS.Modules.LabAnalysis.IntegrationTests.WorklistItems;
 
@@ -25,6 +25,7 @@ public class WorklistItemTests : TestBase
     private static readonly Guid OrderId = Guid.Parse("019b664c-52a4-7f37-a794-6da2481551a0");
     private static readonly Guid OrderItemId = Guid.Parse("019b664c-52a4-7f37-a794-6da2481551b0");
     private static readonly Guid PerformedById = Guid.Parse("019b6c5d-fbf9-7e35-aa12-c38922ec5041");
+    private static readonly Guid AnalyzerSampleId = Guid.Parse("019b6c5d-fbf9-7e35-aa12-c38922ec5042");
     private const string AnalyteCode = "GLU";
     private const string ResultValue = "7.4";
     private const string ResultUnit = "mmol/L";
@@ -193,12 +194,13 @@ public class WorklistItemTests : TestBase
             15000
         ).ConfigureAwait(true);
 
-        var integrationEvent = new AnalyzerResultReceivedIntegrationEvent(
+        var integrationEvent = new ExamResultReceivedIntegrationEvent(
             Guid.CreateVersion7(),
             SystemClock.Now,
+            AnalyzerSampleId,
             WorklistItemId,
-            PerformedById,
             AnalyteCode,
+            PerformedById,
             ResultValue,
             ResultUnit,
             ReferenceRange,
