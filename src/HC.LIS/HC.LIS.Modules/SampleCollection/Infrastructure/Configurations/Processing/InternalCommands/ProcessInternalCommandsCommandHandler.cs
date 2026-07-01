@@ -1,6 +1,7 @@
 using Dapper;
 using Polly;
 using System.Data;
+using System.Diagnostics;
 using Newtonsoft.Json;
 using HC.Core.Domain;
 using HC.Core.Infrastructure.Data;
@@ -12,12 +13,15 @@ namespace HC.LIS.Modules.SampleCollection.Infrastructure.Configurations.Processi
 
 internal class ProcessInternalCommandsCommandHandler(
     ISqlConnectionFactory sqlConnectionFactory,
-    IInternalCommandsMapper internalCommandsMapper
+    IInternalCommandsMapper internalCommandsMapper,
+    ActivitySource activitySource
 ) : ICommandHandler<ProcessInternalCommandsCommand>
 {
     private readonly ISqlConnectionFactory _sqlConnectionFactory = sqlConnectionFactory;
 
     private readonly IInternalCommandsMapper _internalCommandsMapper = internalCommandsMapper;
+
+    private readonly ActivitySource _activitySource = activitySource;
 
     public async Task Handle(ProcessInternalCommandsCommand command, CancellationToken cancellationToken)
     {
@@ -26,7 +30,8 @@ internal class ProcessInternalCommandsCommandHandler(
         string sql = @$"SELECT
                     ""Command"".""Id"" AS ""{nameof(InternalCommandDto.Id)}"",
                     ""Command"".""Type"" AS ""{nameof(InternalCommandDto.Type)}"",
-                    ""Command"".""Data"" AS ""{nameof(InternalCommandDto.Data)}""
+                    ""Command"".""Data"" AS ""{nameof(InternalCommandDto.Data)}"",
+                    ""Command"".""TraceContext"" AS ""{nameof(InternalCommandDto.TraceContext)}""
                     FROM ""sample_collection"".""InternalCommands"" AS ""Command""
                     WHERE ""Command"".""ProcessedDate"" IS NULL
                     ORDER BY ""Command"".""EnqueueDate""";
@@ -68,12 +73,15 @@ internal class ProcessInternalCommandsCommandHandler(
         }
     }
 
-    private async Task ProcessCommand(
-        InternalCommandDto internalCommand)
+    private async Task ProcessCommand(InternalCommandDto internalCommand)
     {
         Type? type = _internalCommandsMapper.GetTypeByName(internalCommand.Type);
         if (type is not null)
         {
+            ActivityContext parentContext = default;
+            if (!string.IsNullOrEmpty(internalCommand.TraceContext))
+                ActivityContext.TryParse(internalCommand.TraceContext, null, out parentContext);
+            using var activity = _activitySource.StartActivity("InternalCommand.Process", ActivityKind.Consumer, parentContext);
             dynamic? commandToProcess = JsonConvert.DeserializeObject(internalCommand.Data, type);
             await CommandsExecutor.Execute(commandToProcess).ConfigureAwait(false);
         }
@@ -86,5 +94,7 @@ internal class ProcessInternalCommandsCommandHandler(
         public string Type { get; set; } = string.Empty;
 
         public string Data { get; set; } = string.Empty;
+
+        public string? TraceContext { get; set; }
     }
 }

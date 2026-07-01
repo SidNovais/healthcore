@@ -1,4 +1,5 @@
 using System.Data;
+using System.Diagnostics;
 using System.Reflection;
 using Dapper;
 using MediatR;
@@ -11,11 +12,13 @@ namespace HC.LIS.Modules.PatientManagement.Infrastructure.Configurations.Process
 
 internal class ProcessInboxCommandHandler(
   IMediator mediator,
-  ISqlConnectionFactory sqlConnectionFactory
+  ISqlConnectionFactory sqlConnectionFactory,
+  ActivitySource activitySource
 ) : ICommandHandler<ProcessInboxCommand>
 {
     private readonly IMediator _mediator = mediator;
     private readonly ISqlConnectionFactory _sqlConnectionFactory = sqlConnectionFactory;
+    private readonly ActivitySource _activitySource = activitySource;
 
     public async Task Handle(ProcessInboxCommand command, CancellationToken cancellationToken)
     {
@@ -24,7 +27,8 @@ internal class ProcessInboxCommandHandler(
         string sql = @$"SELECT
                    ""InboxMessage"".""Id"" AS ""{nameof(InboxMessageDto.Id)}"",
                    ""InboxMessage"".""Type"" AS ""{nameof(InboxMessageDto.Type)}"",
-                   ""InboxMessage"".""Data"" AS ""{nameof(InboxMessageDto.Data)}""
+                   ""InboxMessage"".""Data"" AS ""{nameof(InboxMessageDto.Data)}"",
+                   ""InboxMessage"".""TraceContext"" AS ""{nameof(InboxMessageDto.TraceContext)}""
                    FROM ""patient_management"".""InboxMessages"" AS ""InboxMessage""
                    WHERE ""InboxMessage"".""ProcessedDate"" IS NULL
                    ORDER BY ""InboxMessage"".""OccurredAt""";
@@ -51,7 +55,10 @@ internal class ProcessInboxCommandHandler(
                 if (type is not null)
                 {
                     object? request = JsonConvert.DeserializeObject(message.Data, type);
-
+                    ActivityContext parentContext = default;
+                    if (!string.IsNullOrEmpty(message.TraceContext))
+                        ActivityContext.TryParse(message.TraceContext, null, out parentContext);
+                    using var activity = _activitySource.StartActivity("InboxMessage.Publish", ActivityKind.Consumer, parentContext);
                     if (request is not null)
                         try
                         {

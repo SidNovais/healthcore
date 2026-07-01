@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using MediatR;
 using Newtonsoft.Json;
 using System.Data;
@@ -17,7 +18,8 @@ namespace HC.LIS.Modules.Analyzer.Infrastructure.Configurations.Processing.Outbo
 internal class ProcessOutboxCommandHandler(
     IMediator mediator,
     ISqlConnectionFactory sqlConnectionFactory,
-    IDomainNotificationsMapper domainNotificationsMapper
+    IDomainNotificationsMapper domainNotificationsMapper,
+    ActivitySource activitySource
 ) : ICommandHandler<ProcessOutboxCommand>
 {
     private readonly IMediator _mediator = mediator;
@@ -25,6 +27,8 @@ internal class ProcessOutboxCommandHandler(
     private readonly ISqlConnectionFactory _sqlConnectionFactory = sqlConnectionFactory;
 
     private readonly IDomainNotificationsMapper _domainNotificationsMapper = domainNotificationsMapper;
+
+    private readonly ActivitySource _activitySource = activitySource;
 
     public async Task Handle(
         ProcessOutboxCommand command,
@@ -36,7 +40,8 @@ internal class ProcessOutboxCommandHandler(
         string sql = @$"SELECT
                     ""OutboxMessage"".""Id"" AS ""{nameof(OutboxMessageDto.Id)}"",
                     ""OutboxMessage"".""Type"" AS ""{nameof(OutboxMessageDto.Type)}"",
-                    ""OutboxMessage"".""Data"" AS ""{nameof(OutboxMessageDto.Data)}""
+                    ""OutboxMessage"".""Data"" AS ""{nameof(OutboxMessageDto.Data)}"",
+                    ""OutboxMessage"".""TraceContext"" AS ""{nameof(OutboxMessageDto.TraceContext)}""
                     FROM ""analyzer"".""OutboxMessages"" AS ""OutboxMessage""
                     WHERE ""OutboxMessage"".""ProcessedDate"" IS NULL
                     ORDER BY ""OutboxMessage"".""OccurredAt""";
@@ -57,6 +62,11 @@ internal class ProcessOutboxCommandHandler(
                     var @event = JsonConvert.DeserializeObject(message.Data, type) as IDomainEventNotification;
 
                     if (@event is not null)
+                    {
+                        ActivityContext parentContext = default;
+                        if (!string.IsNullOrEmpty(message.TraceContext))
+                            ActivityContext.TryParse(message.TraceContext, null, out parentContext);
+                        using var activity = _activitySource.StartActivity("OutboxMessage.Publish", ActivityKind.Consumer, parentContext);
                         using (LogContext.Push(new OutboxMessageContextEnricher(@event)))
                         {
                             await _mediator.Publish(@event, cancellationToken).ConfigureAwait(false);
@@ -67,6 +77,7 @@ internal class ProcessOutboxCommandHandler(
                                 message.Id
                             }).ConfigureAwait(false);
                         }
+                    }
                 }
             }
         }

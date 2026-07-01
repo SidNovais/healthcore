@@ -7,4 +7,6 @@ public class OutboxMessageDto
     public string Type { get; set; }
 
     public string Data { get; set; }
+
+    public string? TraceContext { get; set; }
 }
