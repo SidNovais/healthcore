@@ -10,6 +10,7 @@
     <PackageReference Include="Serilog"/>
     <PackageReference Include="Serilog.Extensions.Logging"/>
     <PackageReference Include="Serilog.Sinks.Console"/>
+    <PackageReference Include="Serilog.Enrichers.Span" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\HC.Core\Infrastructure\HC.Core.Infrastructure.csproj" />
