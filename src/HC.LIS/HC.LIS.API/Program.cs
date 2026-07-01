@@ -28,7 +28,11 @@ using HC.LIS.Modules.UserAccess.Infrastructure.Configurations;
 using HC.LIS.API.Modules.PatientManagement;
 using HC.LIS.API.Modules.PatientManagement.Patients;
 using HC.LIS.Modules.PatientManagement.Infrastructure.Configurations;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Serilog;
+using Serilog.Enrichers.Span;
 using Serilog.Events;
 
 // ─── Logger ────────────────────────────────────────────────────────────────
@@ -36,8 +40,9 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
     .Enrich.FromLogContext()
+    .Enrich.WithSpan()
     .WriteTo.Console(
-        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{Module}] {Message:lj}{NewLine}{Exception}",
+        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{Module}] [{TraceId}] {Message:lj}{NewLine}{Exception}",
         formatProvider: CultureInfo.InvariantCulture)
     .CreateBootstrapLogger();
 
@@ -56,9 +61,10 @@ try
     builder.Host.UseSerilog((ctx, _, config) =>
         config.ReadFrom.Configuration(ctx.Configuration)
               .Enrich.FromLogContext()
+              .Enrich.WithSpan()
               .WriteTo.Console(
                   outputTemplate:
-                      "[{Timestamp:HH:mm:ss} {Level:u3}] [{Module}] {Message:lj}{NewLine}{Exception}",
+                      "[{Timestamp:HH:mm:ss} {Level:u3}] [{Module}] [{TraceId}] {Message:lj}{NewLine}{Exception}",
                   formatProvider: CultureInfo.InvariantCulture));
 
     // ─── Autofac ───────────────────────────────────────────────────────────
@@ -72,6 +78,29 @@ try
         containerBuilder.RegisterModule(new UserAccessAutofacModule());
         containerBuilder.RegisterModule(new PatientManagementAutofacModule());
     });
+
+    // ─── OpenTelemetry ─────────────────────────────────────────────────────
+    builder.Services.AddOpenTelemetry()
+        .ConfigureResource(r => r.AddService("HC.LIS.API"))
+        .WithTracing(tracing => tracing
+            .AddSource(
+                "HC.LIS.TestOrders",
+                "HC.LIS.Analyzer",
+                "HC.LIS.LabAnalysis",
+                "HC.LIS.SampleCollection",
+                "HC.LIS.PatientManagement",
+                "HC.LIS.UserAccess")
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddEntityFrameworkCoreInstrumentation()
+            .AddQuartzInstrumentation()
+            .AddConsoleExporter()
+            .AddOtlpExporter())
+        .WithMetrics(metrics => metrics
+            .AddMeter("HC.LIS")
+            .AddAspNetCoreInstrumentation()
+            .AddConsoleExporter()
+            .AddOtlpExporter());
 
     // ─── Services ──────────────────────────────────────────────────────────
     builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();

@@ -12,15 +12,19 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Serilog;
+using Serilog.Enrichers.Span;
 using Serilog.Events;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
     .Enrich.FromLogContext()
+    .Enrich.WithSpan()
     .WriteTo.Console(
-        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{Module}] {Message:lj}{NewLine}{Exception}",
+        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{Module}] [{TraceId}] {Message:lj}{NewLine}{Exception}",
         formatProvider: CultureInfo.InvariantCulture)
     .CreateBootstrapLogger();
 
@@ -34,8 +38,9 @@ try
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
+                .Enrich.WithSpan()
                 .WriteTo.Console(
-                    outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{Module}] {Message:lj}{NewLine}{Exception}",
+                    outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{Module}] [{TraceId}] {Message:lj}{NewLine}{Exception}",
                     formatProvider: CultureInfo.InvariantCulture))
         .UseServiceProviderFactory(new AutofacServiceProviderFactory())
         .ConfigureContainer<ContainerBuilder>(cb =>
@@ -47,6 +52,14 @@ try
 
             // ConnectionHandler takes TcpOptions directly (not IOptions<TcpOptions>)
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<TcpOptions>>().Value);
+
+            services.AddOpenTelemetry()
+                .ConfigureResource(r => r.AddService("HC.LIS.TcpMessage"))
+                .WithTracing(tracing => tracing
+                    .AddSource("HC.LIS.Analyzer")
+                    .AddQuartzInstrumentation()
+                    .AddConsoleExporter()
+                    .AddOtlpExporter());
 
             services.AddSingleton<IExecutionContextAccessor, SystemExecutionContextAccessor>();
             services.AddSingleton<TcpAuditLogger>();

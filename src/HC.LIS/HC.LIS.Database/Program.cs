@@ -3,6 +3,7 @@ using FluentMigrator.Runner;
 using Marten;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Serilog.Enrichers.Span;
 using TestOrdersMartenConfig = HC.LIS.Modules.TestOrders.Infrastructure.Configurations.DataAccess.MartenConfig;
 using SampleCollectionMartenConfig = HC.LIS.Modules.SampleCollection.Infrastructure.Configurations.DataAccess.MartenConfig;
 using LabAnalysisMartenConfig = HC.LIS.Modules.LabAnalysis.Infrastructure.Configurations.DataAccess.MartenConfig;
@@ -10,9 +11,11 @@ using AnalyzerMartenConfig = HC.LIS.Modules.Analyzer.Infrastructure.Configuratio
 using PatientManagementMartenConfig = HC.LIS.Modules.PatientManagement.Infrastructure.Configurations.DataAccess.MartenConfig;
 
 Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .Enrich.WithSpan()
     .WriteTo.Console(
         formatProvider: CultureInfo.CurrentCulture,
-        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{TraceId}] {Message:lj}{NewLine}{Exception}")
     .CreateLogger()
 ;
 IServiceProvider serviceProvider = CreateServices();
