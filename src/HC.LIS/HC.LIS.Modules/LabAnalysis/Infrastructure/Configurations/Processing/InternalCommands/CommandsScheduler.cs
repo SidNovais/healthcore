@@ -1,5 +1,6 @@
 using Dapper;
 using System.Data;
+using System.Diagnostics;
 using Newtonsoft.Json;
 using HC.Core.Domain;
 using HC.Core.Infrastructure.Data;
@@ -23,8 +24,8 @@ public class CommandsScheduler(
     {
         using IDbConnection connection = _sqlConnectionFactory.CreateConnection();
 
-        const string sqlInsert = @$"INSERT INTO ""lab_analysis"".""InternalCommands"" (""Id"", ""EnqueueDate"" , ""Type"", ""Data"") VALUES " +
-                                 "(@Id, @EnqueueDate, @Type, @Data)";
+        const string sqlInsert = @$"INSERT INTO ""lab_analysis"".""InternalCommands"" (""Id"", ""EnqueueDate"", ""Type"", ""Data"", ""TraceContext"") VALUES " +
+                                 "(@Id, @EnqueueDate, @Type, @Data, @TraceContext)";
 
         await connection.ExecuteAsync(sqlInsert, new
         {
@@ -34,7 +35,8 @@ public class CommandsScheduler(
             Data = JsonConvert.SerializeObject(command, new JsonSerializerSettings
             {
                 ContractResolver = new AllPropertiesContractResolver()
-            })
+            }),
+            TraceContext = Activity.Current?.Id
         }).ConfigureAwait(false);
     }
 
@@ -42,8 +44,8 @@ public class CommandsScheduler(
     {
         using IDbConnection connection = _sqlConnectionFactory.CreateConnection();
 
-        const string sqlInsert = @$"INSERT INTO ""lab_analysis"".""InternalCommands"" (""Id"", ""EnqueueDate"" , ""Type"", ""Data"") VALUES " +
-                                 "(@Id, @EnqueueDate, @Type, @Data)";
+        const string sqlInsert = @$"INSERT INTO ""lab_analysis"".""InternalCommands"" (""Id"", ""EnqueueDate"", ""Type"", ""Data"", ""TraceContext"") VALUES " +
+                                 "(@Id, @EnqueueDate, @Type, @Data, @TraceContext)";
 
         await connection.ExecuteAsync(sqlInsert, new
         {
@@ -53,7 +55,8 @@ public class CommandsScheduler(
             Data = JsonConvert.SerializeObject(command, new JsonSerializerSettings
             {
                 ContractResolver = new AllPropertiesContractResolver()
-            })
+            }),
+            TraceContext = Activity.Current?.Id
         }).ConfigureAwait(false);
     }
 }

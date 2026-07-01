@@ -1,5 +1,6 @@
 using Dapper;
 using System.Data;
+using System.Diagnostics;
 using Newtonsoft.Json;
 using HC.Core.Domain;
 using HC.Core.Infrastructure.Data;
@@ -24,8 +25,8 @@ public class CommandsScheduler(
         IDbConnection? connection = _sqlConnectionFactory.GetConnection()
         ?? throw new InvalidOperationException("Must exist connection to insert internal commands");
 
-        const string sqlInsert = @$"INSERT INTO ""analyzer"".""InternalCommands"" (""Id"", ""EnqueueDate"" , ""Type"", ""Data"") VALUES " +
-                                 "(@Id, @EnqueueDate, @Type, @Data)";
+        const string sqlInsert = @$"INSERT INTO ""analyzer"".""InternalCommands"" (""Id"", ""EnqueueDate"", ""Type"", ""Data"", ""TraceContext"") VALUES " +
+                                 "(@Id, @EnqueueDate, @Type, @Data, @TraceContext)";
 
         await connection.ExecuteAsync(sqlInsert, new
         {
@@ -35,7 +36,8 @@ public class CommandsScheduler(
             Data = JsonConvert.SerializeObject(command, new JsonSerializerSettings
             {
                 ContractResolver = new AllPropertiesContractResolver()
-            })
+            }),
+            TraceContext = Activity.Current?.Id
         }).ConfigureAwait(false);
     }
 
@@ -44,8 +46,8 @@ public class CommandsScheduler(
         IDbConnection? connection = _sqlConnectionFactory.GetConnection()
         ?? throw new InvalidOperationException("Must exist connection to insert internal commands");
 
-        const string sqlInsert = @$"INSERT INTO ""analyzer"".""InternalCommands"" (""Id"", ""EnqueueDate"" , ""Type"", ""Data"") VALUES " +
-                                 "(@Id, @EnqueueDate, @Type, @Data)";
+        const string sqlInsert = @$"INSERT INTO ""analyzer"".""InternalCommands"" (""Id"", ""EnqueueDate"", ""Type"", ""Data"", ""TraceContext"") VALUES " +
+                                 "(@Id, @EnqueueDate, @Type, @Data, @TraceContext)";
 
         await connection.ExecuteAsync(sqlInsert, new
         {
@@ -55,7 +57,8 @@ public class CommandsScheduler(
             Data = JsonConvert.SerializeObject(command, new JsonSerializerSettings
             {
                 ContractResolver = new AllPropertiesContractResolver()
-            })
+            }),
+            TraceContext = Activity.Current?.Id
         }).ConfigureAwait(false);
     }
 }
