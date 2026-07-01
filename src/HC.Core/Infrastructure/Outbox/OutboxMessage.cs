@@ -14,12 +14,15 @@ public class OutboxMessage
 
     public DateTime? ProcessedDate { get; set; }
 
-    public OutboxMessage(Guid id, DateTime occurredAt, string type, string data)
+    public string? TraceContext { get; set; }
+
+    public OutboxMessage(Guid id, DateTime occurredAt, string type, string data, string? traceContext = null)
     {
         Id = id;
         OccurredAt = occurredAt;
         Type = type;
         Data = data;
+        TraceContext = traceContext;
     }
 
     private OutboxMessage()

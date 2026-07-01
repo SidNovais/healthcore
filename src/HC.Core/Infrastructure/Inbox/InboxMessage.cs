@@ -14,12 +14,15 @@ public class InboxMessage
 
     public DateTime? ProcessedDate { get; set; }
 
-    public InboxMessage(DateTime occurredAt, string type, string data)
+    public string? TraceContext { get; set; }
+
+    public InboxMessage(DateTime occurredAt, string type, string data, string? traceContext = null)
     {
         Id = Guid.CreateVersion7();
         OccurredAt = occurredAt;
         Type = type;
         Data = data;
+        TraceContext = traceContext;
     }
 
     private InboxMessage()

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Core;
@@ -69,7 +70,8 @@ public class DomainEventsDispatcher(
                     domainEventNotification.Id,
                     domainEventNotification.DomainEvent.OcurredAt,
                     type,
-                    data
+                    data,
+                    Activity.Current?.Id
                 );
                 _outbox.Add(outboxMessage);
             }
