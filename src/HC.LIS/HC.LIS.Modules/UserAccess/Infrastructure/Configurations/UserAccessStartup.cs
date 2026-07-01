@@ -10,6 +10,7 @@ using HC.LIS.Modules.UserAccess.Infrastructure.Configurations.DataAccess;
 using HC.LIS.Modules.UserAccess.Infrastructure.Configurations.EventBus;
 using HC.LIS.Modules.UserAccess.Infrastructure.Configurations.Logging;
 using HC.LIS.Modules.UserAccess.Infrastructure.Configurations.Mediation;
+using HC.LIS.Modules.UserAccess.Infrastructure.Configurations.Observability;
 using HC.LIS.Modules.UserAccess.Infrastructure.Configurations.Processing;
 using HC.LIS.Modules.UserAccess.Infrastructure.Configurations.Processing.InternalCommands;
 using HC.LIS.Modules.UserAccess.Infrastructure.Configurations.Processing.Outbox;
@@ -52,6 +53,7 @@ public class UserAccessStartup
         containerBuilder.RegisterModule(new DataAccessModule(databaseConnectionString));
         containerBuilder.RegisterModule(new ApplicationModule());
         containerBuilder.RegisterModule(new ProcessingModule());
+        containerBuilder.RegisterModule(new ObservabilityModule());
         containerBuilder.RegisterModule(new EventsBusModule(eventsBus));
         containerBuilder.RegisterModule(new MediatorModule());
         containerBuilder.RegisterModule(new AuthenticationModule());

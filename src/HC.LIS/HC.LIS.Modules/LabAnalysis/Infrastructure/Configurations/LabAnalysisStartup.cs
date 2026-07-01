@@ -19,6 +19,7 @@ using HC.LIS.Modules.LabAnalysis.Infrastructure.Configurations.EventBus;
 using HC.LIS.Modules.LabAnalysis.Infrastructure.Configurations.Storage;
 using HC.LIS.Modules.LabAnalysis.Infrastructure.Configurations.Logging;
 using HC.LIS.Modules.LabAnalysis.Infrastructure.Configurations.Mediation;
+using HC.LIS.Modules.LabAnalysis.Infrastructure.Configurations.Observability;
 using HC.LIS.Modules.LabAnalysis.Infrastructure.Configurations.Processing;
 using HC.LIS.Modules.LabAnalysis.Infrastructure.Configurations.Processing.InternalCommands;
 using HC.LIS.Modules.LabAnalysis.Infrastructure.Configurations.Processing.Outbox;
@@ -62,6 +63,7 @@ public class LabAnalysisStartup
         containerBuilder.RegisterModule(new StorageModule());
         containerBuilder.RegisterModule(new ApplicationModule());
         containerBuilder.RegisterModule(new ProcessingModule());
+        containerBuilder.RegisterModule(new ObservabilityModule());
         containerBuilder.RegisterModule(new EventsBusModule(eventsBus));
         containerBuilder.RegisterModule(new MediatorModule());
         containerBuilder.RegisterModule(new AuthenticationModule());

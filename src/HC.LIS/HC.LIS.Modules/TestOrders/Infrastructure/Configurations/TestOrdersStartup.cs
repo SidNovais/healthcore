@@ -19,6 +19,7 @@ using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.DataAccess;
 using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.EventBus;
 using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.Logging;
 using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.Mediation;
+using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.Observability;
 using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.Processing;
 using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.Processing.Outbox;
 using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.Quartz;
@@ -60,6 +61,7 @@ public class TestOrdersStartup
         containerBuilder.RegisterModule(new DataAccessModule(databaseConnectionString));
         containerBuilder.RegisterModule(new ApplicationModule());
         containerBuilder.RegisterModule(new ProcessingModule());
+        containerBuilder.RegisterModule(new ObservabilityModule());
         containerBuilder.RegisterModule(new EventsBusModule(eventsBus));
         containerBuilder.RegisterModule(new MediatorModule());
         containerBuilder.RegisterModule(new AuthenticationModule());

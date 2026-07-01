@@ -3,6 +3,7 @@ using MediatR;
 using HC.Core.Application.Events;
 using HC.Core.Infrastructure;
 using HC.Core.Infrastructure.DomainEventsDispatching;
+using HC.Core.Infrastructure.Observability;
 using HC.LIS.Modules.UserAccess.Application.Configuration.Commands;
 using HC.LIS.Modules.UserAccess.Infrastructure.Configurations.Processing.InternalCommands;
 
@@ -50,6 +51,14 @@ internal class ProcessingModule : Autofac.Module
 
         builder.RegisterGenericDecorator(
             typeof(LoggingCommandHandlerWithResultDecorator<,>),
+            typeof(IRequestHandler<,>));
+
+        builder.RegisterGenericDecorator(
+            typeof(TracingCommandHandlerDecorator<>),
+            typeof(IRequestHandler<>));
+
+        builder.RegisterGenericDecorator(
+            typeof(TracingCommandHandlerWithResultDecorator<,>),
             typeof(IRequestHandler<,>));
 
         builder.RegisterGenericDecorator(
