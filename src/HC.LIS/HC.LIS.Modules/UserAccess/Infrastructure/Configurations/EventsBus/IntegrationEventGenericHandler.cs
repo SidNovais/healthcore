@@ -1,4 +1,5 @@
 using System.Data;
+using System.Diagnostics;
 using Autofac;
 using Dapper;
 using Newtonsoft.Json;
@@ -22,15 +23,16 @@ internal class IntegrationEventGenericHandler<T> : IIntegrationEventListener<T>
             ContractResolver = new AllPropertiesContractResolver()
         });
 
-        string sql = @$"INSERT INTO ""user_access"".""InboxMessages"" (""Id"", ""OccurredAt"", ""Type"", ""Data"") " +
-                  "VALUES (@Id, @OccurredAt, @Type, @Data)";
+        string sql = @$"INSERT INTO ""user_access"".""InboxMessages"" (""Id"", ""OccurredAt"", ""Type"", ""Data"", ""TraceContext"") " +
+                  "VALUES (@Id, @OccurredAt, @Type, @Data, @TraceContext)";
 
         await connection.ExecuteScalarAsync(sql, new
         {
             integrationEvent.Id,
             integrationEvent.OccurredAt,
             type,
-            data
+            data,
+            TraceContext = Activity.Current?.Id
         }).ConfigureAwait(false);
     }
 }

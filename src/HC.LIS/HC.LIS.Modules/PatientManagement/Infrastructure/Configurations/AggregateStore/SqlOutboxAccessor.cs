@@ -19,14 +19,15 @@ public class SqlOutboxAccessor(
         if (_messages.Count != 0)
         {
             const string sql = @"INSERT INTO ""patient_management"".""OutboxMessages""
-                      (""Id"", ""OccurredAt"", ""Type"", ""Data"")
-                      VALUES (?::uuid, ?::timestamptz, ?, ?::jsonb)";
+                      (""Id"", ""OccurredAt"", ""Type"", ""Data"", ""TraceContext"")
+                      VALUES (?::uuid, ?::timestamptz, ?, ?::jsonb, ?)";
             foreach (OutboxMessage message in _messages)
                 _documentSession.QueueSqlCommand(sql,
                   message.Id,
                   message.OccurredAt,
                   message.Type!,
-                  message.Data!
+                  message.Data!,
+                  message.TraceContext!
                 );
             _messages.Clear();
         }
