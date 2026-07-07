@@ -31,6 +31,13 @@ using HC.LIS.Modules.PatientManagement.Infrastructure.Configurations;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using RabbitMQ.Client;
+using HC.Core.Infrastructure.EventBus;
+using HC.LIS.Modules.TestOrders.IntegrationEvents;
+using HC.LIS.Modules.SampleCollection.IntegrationEvents;
+using HC.LIS.Modules.Analyzer.IntegrationEvents;
+using HC.LIS.Modules.LabAnalysis.IntegrationEvents;
+using HC.LIS.Modules.PatientManagement.IntegrationEvents;
 using Serilog;
 using Serilog.Enrichers.Span;
 using Serilog.Events;
@@ -150,12 +157,91 @@ try
 
     var executionContext = app.Services.GetRequiredService<IExecutionContextAccessor>();
 
-    TestOrdersStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: null);
-    SampleCollectionStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: null);
-    AnalyzerStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: null);
-    LabAnalysisStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: null);
-    UserAccessStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: null);
-    PatientManagementStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: null);
+    // ─── Event registry ────────────────────────────────────────────────────
+    // Canonical mapping of every integration event to its bounded-context exchange
+    // and semantic routing key. Defined once here, shared across all module buses.
+    EventRegistry eventRegistry = new EventRegistry.RegistryBuilder()
+        // TestOrders → orders.events
+        .Register<OrderItemAcceptedIntegrationEvent>("orders.events", "order_item.accepted")
+        .Register<OrderItemRequestedIntegrationEvent>("orders.events", "order_item.requested")
+        .Register<OrderItemCanceledIntegrationEvent>("orders.events", "order_item.cancelled")
+        .Register<OrderItemRejectedIntegrationEvent>("orders.events", "order_item.rejected")
+        // SampleCollection → sample_collection.events
+        .Register<SampleCollectedIntegrationEvent>("sample_collection.events", "sample.collected")
+        // Analyzer → analyzer.events
+        .Register<ExamResultReceivedIntegrationEvent>("analyzer.events", "exam_result.received")
+        // LabAnalysis → lab_analysis.events
+        .Register<WorklistItemCreatedIntegrationEvent>("lab_analysis.events", "worklist_item.created")
+        .Register<WorklistItemCompletedIntegrationEvent>("lab_analysis.events", "worklist_item.completed")
+        // PatientManagement → patient_management.events
+        .Register<PatientRegisteredIntegrationEvent>("patient_management.events", "patient.registered")
+        .Register<PatientUpdatedIntegrationEvent>("patient_management.events", "patient.updated")
+        .Register<PatientAnonymizedIntegrationEvent>("patient_management.events", "patient.anonymized")
+        .Build();
+
+    // ─── RabbitMQ connection ───────────────────────────────────────────────
+    var rabbitFactory = new ConnectionFactory
+    {
+        HostName = builder.Configuration["RABBITMQ_HOST"] ?? "localhost",
+        Port = int.Parse(
+            builder.Configuration["RABBITMQ_PORT"] ?? "5672",
+            System.Globalization.CultureInfo.InvariantCulture),
+        UserName = builder.Configuration["RABBITMQ_USERNAME"] ?? "guest",
+        Password = builder.Configuration["RABBITMQ_PASSWORD"] ?? "guest",
+    };
+
+    // using var: IConnection implements IDisposable; connection stays alive until
+    // app.RunAsync() returns, then is disposed synchronously on shutdown.
+    using var rabbitConnection =
+        await rabbitFactory.CreateConnectionAsync().ConfigureAwait(false);
+
+    // ─── Per-module bus instances ──────────────────────────────────────────
+    // Each bus: one IChannel, one publisher exchange, one consumer queue.
+    // RabbitMqEventBus implements IDisposable (not IAsyncDisposable) — use plain using.
+    using var testOrdersBus = await RabbitMqEventBus.CreateAsync(
+        rabbitConnection, "orders.events", "hclis.test_orders", eventRegistry, Log.Logger)
+        .ConfigureAwait(false);
+    using var sampleCollectionBus = await RabbitMqEventBus.CreateAsync(
+        rabbitConnection, "sample_collection.events", "hclis.sample_collection", eventRegistry, Log.Logger)
+        .ConfigureAwait(false);
+    using var analyzerBus = await RabbitMqEventBus.CreateAsync(
+        rabbitConnection, "analyzer.events", "hclis.analyzer", eventRegistry, Log.Logger)
+        .ConfigureAwait(false);
+    using var labAnalysisBus = await RabbitMqEventBus.CreateAsync(
+        rabbitConnection, "lab_analysis.events", "hclis.lab_analysis", eventRegistry, Log.Logger)
+        .ConfigureAwait(false);
+    using var userAccessBus = await RabbitMqEventBus.CreateAsync(
+        rabbitConnection, "user_access.events", "hclis.user_access", eventRegistry, Log.Logger)
+        .ConfigureAwait(false);
+    using var patientManagementBus = await RabbitMqEventBus.CreateAsync(
+        rabbitConnection, "patient_management.events", "hclis.patient_management", eventRegistry, Log.Logger)
+        .ConfigureAwait(false);
+
+    // ─── Module wiring ─────────────────────────────────────────────────────
+    // Each *Startup registers the bus via EventsBusModule, then calls
+    // EventsBusStartup.Initialize() which calls eventBus.Subscribe<T>() for
+    // every integration event the module cares about.
+    TestOrdersStartup.Initialize(connectionString, executionContext, Log.Logger,
+        eventBus: testOrdersBus);
+    SampleCollectionStartup.Initialize(connectionString, executionContext, Log.Logger,
+        eventBus: sampleCollectionBus);
+    AnalyzerStartup.Initialize(connectionString, executionContext, Log.Logger,
+        eventBus: analyzerBus);
+    LabAnalysisStartup.Initialize(connectionString, executionContext, Log.Logger,
+        eventBus: labAnalysisBus);
+    UserAccessStartup.Initialize(connectionString, executionContext, Log.Logger,
+        eventBus: userAccessBus);
+    PatientManagementStartup.Initialize(connectionString, executionContext, Log.Logger,
+        eventBus: patientManagementBus);
+
+    // ─── Start consumers ───────────────────────────────────────────────────
+    // All Subscribe<T>() calls above must complete before StartConsuming().
+    testOrdersBus.StartConsuming();
+    sampleCollectionBus.StartConsuming();
+    analyzerBus.StartConsuming();
+    labAnalysisBus.StartConsuming();
+    userAccessBus.StartConsuming();
+    patientManagementBus.StartConsuming();
 
     // ─── Middleware pipeline ────────────────────────────────────────────────
     if (app.Environment.IsDevelopment())
@@ -194,7 +280,7 @@ try
     v1.MapGroup("audit-log").MapAuditLogEndpoints();
     v1.MapGroup("patients").MapPatientsEndpoints();
 
-    app.Run();
+    await app.RunAsync().ConfigureAwait(false);
 }
 catch (Exception ex) when (ex is not HostAbortedException)
 {
@@ -202,5 +288,5 @@ catch (Exception ex) when (ex is not HostAbortedException)
 }
 finally
 {
-    Log.CloseAndFlush();
+    await Log.CloseAndFlushAsync().ConfigureAwait(false);
 }
