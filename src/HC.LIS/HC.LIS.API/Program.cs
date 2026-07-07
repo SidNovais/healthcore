@@ -31,6 +31,8 @@ using HC.LIS.Modules.PatientManagement.Infrastructure.Configurations;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Polly;
+using Polly.Retry;
 using RabbitMQ.Client;
 using HC.Core.Infrastructure.EventBus;
 using HC.LIS.Modules.TestOrders.IntegrationEvents;
@@ -190,10 +192,29 @@ try
         Password = builder.Configuration["RABBITMQ_PASSWORD"] ?? "guest",
     };
 
-    // using var: IConnection implements IDisposable; connection stays alive until
-    // app.RunAsync() returns, then is disposed synchronously on shutdown.
-    using var rabbitConnection =
-        await rabbitFactory.CreateConnectionAsync().ConfigureAwait(false);
+    // Retry up to 5 times with exponential back-off so the API survives a slow
+    // RabbitMQ container startup.  IConnection stays alive until app.RunAsync()
+    // returns, then is disposed synchronously on shutdown.
+    var rabbitRetryPipeline = new ResiliencePipelineBuilder<IConnection>()
+        .AddRetry(new RetryStrategyOptions<IConnection>
+        {
+            MaxRetryAttempts = 5,
+            Delay = TimeSpan.FromSeconds(2),
+            BackoffType = DelayBackoffType.Exponential,
+            OnRetry = args =>
+            {
+                Log.Warning(
+                    "RabbitMQ connection attempt {Attempt} failed: {Message}. Retrying...",
+                    args.AttemptNumber + 1,
+                    args.Outcome.Exception?.Message);
+                return default;
+            },
+        })
+        .Build();
+
+    using IConnection rabbitConnection = await rabbitRetryPipeline.ExecuteAsync(
+        async ct => await rabbitFactory.CreateConnectionAsync(ct).ConfigureAwait(false),
+        CancellationToken.None).ConfigureAwait(false);
 
     // ─── Per-module bus instances ──────────────────────────────────────────
     // Each bus: one IChannel, one publisher exchange, one consumer queue.

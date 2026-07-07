@@ -23,6 +23,7 @@
     <PackageReference Include="OpenTelemetry.Exporter.Console" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />
     <PackageReference Include="Serilog.Enrichers.Span" />
+    <PackageReference Include="Polly" />
   </ItemGroup>
 
   <ItemGroup>

@@ -11,7 +11,10 @@ namespace HC.Core.Infrastructure.EventBus;
 
 public sealed class RabbitMqEventBus : IEventsBus
 {
-    private readonly IChannel _channel;
+    private const string DeadLetterExchangeName = "hclis.dead-letter";
+
+    private readonly IChannel _publishChannel;
+    private readonly IChannel _consumeChannel;
     private readonly string _publisherExchange;
     private readonly string _consumerQueue;
     private readonly EventRegistry _registry;
@@ -26,13 +29,15 @@ public sealed class RabbitMqEventBus : IEventsBus
     private bool _disposed;
 
     private RabbitMqEventBus(
-        IChannel channel,
+        IChannel publishChannel,
+        IChannel consumeChannel,
         string publisherExchange,
         string consumerQueue,
         EventRegistry registry,
         ILogger logger)
     {
-        _channel = channel;
+        _publishChannel = publishChannel;
+        _consumeChannel = consumeChannel;
         _publisherExchange = publisherExchange;
         _consumerQueue = consumerQueue;
         _registry = registry;
@@ -54,24 +59,37 @@ public sealed class RabbitMqEventBus : IEventsBus
         ArgumentNullException.ThrowIfNull(registry);
         ArgumentNullException.ThrowIfNull(logger);
 
-        IChannel channel = await connection.CreateChannelAsync().ConfigureAwait(false);
+        IChannel publishChannel = await connection.CreateChannelAsync().ConfigureAwait(false);
+        IChannel consumeChannel = await connection.CreateChannelAsync().ConfigureAwait(false);
 
-        // Declare this module's publisher exchange (idempotent).
-        await channel.ExchangeDeclareAsync(
+        // Declare dead-letter exchange on consume channel (idempotent).
+        await consumeChannel.ExchangeDeclareAsync(
+            exchange: DeadLetterExchangeName,
+            type: ExchangeType.Topic,
+            durable: true,
+            autoDelete: false).ConfigureAwait(false);
+
+        // Declare this module's publisher exchange on publish channel (idempotent).
+        await publishChannel.ExchangeDeclareAsync(
             exchange: publisherExchange,
             type: ExchangeType.Topic,
             durable: true,
             autoDelete: false).ConfigureAwait(false);
 
-        // Declare this module's consumer queue (idempotent).
-        await channel.QueueDeclareAsync(
+        // Declare this module's consumer queue with DLX routing (idempotent).
+        var queueArguments = new Dictionary<string, object?>
+        {
+            ["x-dead-letter-exchange"] = DeadLetterExchangeName,
+        };
+
+        await consumeChannel.QueueDeclareAsync(
             queue: consumerQueue,
             durable: true,
             exclusive: false,
             autoDelete: false,
-            arguments: null).ConfigureAwait(false);
+            arguments: queueArguments).ConfigureAwait(false);
 
-        return new RabbitMqEventBus(channel, publisherExchange, consumerQueue, registry, logger);
+        return new RabbitMqEventBus(publishChannel, consumeChannel, publisherExchange, consumerQueue, registry, logger);
     }
 
     // Looks up the canonical exchange and routing key for T from the registry,
@@ -95,7 +113,7 @@ public sealed class RabbitMqEventBus : IEventsBus
 
         var properties = new BasicProperties { Persistent = true };
 
-        await _channel.BasicPublishAsync(
+        await _publishChannel.BasicPublishAsync(
             exchange: binding.Exchange,
             routingKey: binding.RoutingKey,
             mandatory: false,
@@ -142,13 +160,13 @@ public sealed class RabbitMqEventBus : IEventsBus
             {
                 // Declare the source exchange idempotently so bindings work even if
                 // the publishing module starts after this one.
-                await _channel.ExchangeDeclareAsync(
+                await _consumeChannel.ExchangeDeclareAsync(
                     exchange: exchange,
                     type: ExchangeType.Topic,
                     durable: true,
                     autoDelete: false).ConfigureAwait(false);
 
-                await _channel.QueueBindAsync(
+                await _consumeChannel.QueueBindAsync(
                     queue: _consumerQueue,
                     exchange: exchange,
                     routingKey: routingKey,
@@ -161,10 +179,10 @@ public sealed class RabbitMqEventBus : IEventsBus
 
             _pendingBindings.Clear();
 
-            var consumer = new AsyncEventingBasicConsumer(_channel);
+            var consumer = new AsyncEventingBasicConsumer(_consumeChannel);
             consumer.ReceivedAsync += OnMessageReceivedAsync;
 
-            _ = await _channel.BasicConsumeAsync(
+            _ = await _consumeChannel.BasicConsumeAsync(
                 queue: _consumerQueue,
                 autoAck: false,
                 consumerTag: string.Empty,
@@ -193,7 +211,7 @@ public sealed class RabbitMqEventBus : IEventsBus
             _logger.Warning(
                 "No handlers registered for routing key {RoutingKey} on queue {Queue}; nacking",
                 routingKey, _consumerQueue);
-            await _channel.BasicNackAsync(
+            await _consumeChannel.BasicNackAsync(
                 ea.DeliveryTag, multiple: false, requeue: false).ConfigureAwait(false);
             return;
         }
@@ -204,7 +222,7 @@ public sealed class RabbitMqEventBus : IEventsBus
             _logger.Error(
                 "Registry has no type mapping for routing key {RoutingKey}; nacking",
                 routingKey);
-            await _channel.BasicNackAsync(
+            await _consumeChannel.BasicNackAsync(
                 ea.DeliveryTag, multiple: false, requeue: false).ConfigureAwait(false);
             return;
         }
@@ -223,7 +241,7 @@ public sealed class RabbitMqEventBus : IEventsBus
             _logger.Error(ex,
                 "Deserialization failed for routing key {RoutingKey}; nacking",
                 routingKey);
-            await _channel.BasicNackAsync(
+            await _consumeChannel.BasicNackAsync(
                 ea.DeliveryTag, multiple: false, requeue: false).ConfigureAwait(false);
             return;
         }
@@ -234,13 +252,13 @@ public sealed class RabbitMqEventBus : IEventsBus
             _logger.Error(
                 "Deserialized object is not an IntegrationEvent for {RoutingKey}; nacking",
                 routingKey);
-            await _channel.BasicNackAsync(
+            await _consumeChannel.BasicNackAsync(
                 ea.DeliveryTag, multiple: false, requeue: false).ConfigureAwait(false);
             return;
         }
 
-        // CA1031: nack with requeue on handler failure; the Inbox idempotency guard
-        // prevents double-processing on redelivery.
+        // CA1031: nack to dead-letter exchange on handler failure;
+        // the Inbox idempotency guard prevents double-processing on redelivery.
 #pragma warning disable CA1031
         try
         {
@@ -250,15 +268,15 @@ public sealed class RabbitMqEventBus : IEventsBus
         catch (Exception ex)
         {
             _logger.Error(ex,
-                "Handler threw for routing key {RoutingKey}; nacking with requeue=true",
+                "Handler threw for routing key {RoutingKey}; nacking to dead-letter exchange",
                 routingKey);
-            await _channel.BasicNackAsync(
-                ea.DeliveryTag, multiple: false, requeue: true).ConfigureAwait(false);
+            await _consumeChannel.BasicNackAsync(
+                ea.DeliveryTag, multiple: false, requeue: false).ConfigureAwait(false);
             return;
         }
 #pragma warning restore CA1031
 
-        await _channel.BasicAckAsync(ea.DeliveryTag, multiple: false).ConfigureAwait(false);
+        await _consumeChannel.BasicAckAsync(ea.DeliveryTag, multiple: false).ConfigureAwait(false);
     }
 
     public void Dispose()
@@ -267,7 +285,8 @@ public sealed class RabbitMqEventBus : IEventsBus
             return;
 
         _disposed = true;
-        _channel.Dispose();
+        _publishChannel.Dispose();
+        _consumeChannel.Dispose();
         GC.SuppressFinalize(this);
     }
 
