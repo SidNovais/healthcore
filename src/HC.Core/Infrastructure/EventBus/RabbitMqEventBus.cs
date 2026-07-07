@@ -133,42 +133,55 @@ public sealed class RabbitMqEventBus : IEventsBus
 
     private async Task StartConsumingAsync()
     {
-        foreach ((string exchange, string routingKey) in _pendingBindings)
+        // CA1031: a startup failure must not silently swallow exceptions;
+        // we log and surface the error so the operator knows the consumer never started.
+#pragma warning disable CA1031
+        try
         {
-            // Declare the source exchange idempotently so bindings work even if
-            // the publishing module starts after this one.
-            await _channel.ExchangeDeclareAsync(
-                exchange: exchange,
-                type: ExchangeType.Topic,
-                durable: true,
-                autoDelete: false).ConfigureAwait(false);
+            foreach ((string exchange, string routingKey) in _pendingBindings)
+            {
+                // Declare the source exchange idempotently so bindings work even if
+                // the publishing module starts after this one.
+                await _channel.ExchangeDeclareAsync(
+                    exchange: exchange,
+                    type: ExchangeType.Topic,
+                    durable: true,
+                    autoDelete: false).ConfigureAwait(false);
 
-            await _channel.QueueBindAsync(
+                await _channel.QueueBindAsync(
+                    queue: _consumerQueue,
+                    exchange: exchange,
+                    routingKey: routingKey,
+                    arguments: null).ConfigureAwait(false);
+
+                _logger.Information(
+                    "Bound queue {Queue} ← {Exchange}/{RoutingKey}",
+                    _consumerQueue, exchange, routingKey);
+            }
+
+            _pendingBindings.Clear();
+
+            var consumer = new AsyncEventingBasicConsumer(_channel);
+            consumer.ReceivedAsync += OnMessageReceivedAsync;
+
+            _ = await _channel.BasicConsumeAsync(
                 queue: _consumerQueue,
-                exchange: exchange,
-                routingKey: routingKey,
-                arguments: null).ConfigureAwait(false);
+                autoAck: false,
+                consumerTag: string.Empty,
+                noLocal: false,
+                exclusive: false,
+                arguments: null,
+                consumer: consumer).ConfigureAwait(false);
 
-            _logger.Information(
-                "Bound queue {Queue} ← {Exchange}/{RoutingKey}",
-                _consumerQueue, exchange, routingKey);
+            _logger.Information("Consumer started on queue {Queue}", _consumerQueue);
         }
-
-        _pendingBindings.Clear();
-
-        var consumer = new AsyncEventingBasicConsumer(_channel);
-        consumer.ReceivedAsync += OnMessageReceivedAsync;
-
-        _ = await _channel.BasicConsumeAsync(
-            queue: _consumerQueue,
-            autoAck: false,
-            consumerTag: string.Empty,
-            noLocal: false,
-            exclusive: false,
-            arguments: null,
-            consumer: consumer).ConfigureAwait(false);
-
-        _logger.Information("Consumer started on queue {Queue}", _consumerQueue);
+        catch (Exception ex)
+        {
+            _logger.Error(ex,
+                "Failed to start RabbitMQ consumer on queue {Queue}; the consumer will not run",
+                _consumerQueue);
+        }
+#pragma warning restore CA1031
     }
 
     private async Task OnMessageReceivedAsync(object _, BasicDeliverEventArgs ea)
