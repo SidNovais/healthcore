@@ -217,7 +217,7 @@ try
         CancellationToken.None).ConfigureAwait(false);
 
     // ─── Per-module bus instances ──────────────────────────────────────────
-    // Each bus: one IChannel, one publisher exchange, one consumer queue.
+    // Each bus: two IChannels (publish + consume), one publisher exchange, one consumer queue.
     // RabbitMqEventBus implements IDisposable (not IAsyncDisposable) — use plain using.
     using var testOrdersBus = await RabbitMqEventBus.CreateAsync(
         rabbitConnection, "orders.events", "hclis.test_orders", eventRegistry, Log.Logger)
