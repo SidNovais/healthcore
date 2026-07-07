@@ -1,11 +1,4 @@
-using HC.Core.Application;
 using HC.Core.Infrastructure.EventBus;
-using HC.LIS.Modules.Analyzer.Infrastructure.Configurations;
-using HC.LIS.Modules.LabAnalysis.Infrastructure.Configurations;
-using HC.LIS.Modules.PatientManagement.Infrastructure.Configurations;
-using HC.LIS.Modules.SampleCollection.Infrastructure.Configurations;
-using HC.LIS.Modules.TestOrders.Infrastructure.Configurations;
-using HC.LIS.Modules.UserAccess.Infrastructure.Configurations;
 using RabbitMQ.Client;
 
 namespace HC.LIS.API.Configuration.EventBus;
@@ -19,6 +12,13 @@ internal sealed class ModuleBusSet : IDisposable
     private readonly RabbitMqEventBus _userAccess;
     private readonly RabbitMqEventBus _patientManagement;
     private bool _disposed;
+
+    internal IEventsBus TestOrders => _testOrders;
+    internal IEventsBus SampleCollection => _sampleCollection;
+    internal IEventsBus Analyzer => _analyzer;
+    internal IEventsBus LabAnalysis => _labAnalysis;
+    internal IEventsBus UserAccess => _userAccess;
+    internal IEventsBus PatientManagement => _patientManagement;
 
     private ModuleBusSet(
         RabbitMqEventBus testOrders,
@@ -53,17 +53,6 @@ internal sealed class ModuleBusSet : IDisposable
             connection, "patient_management.events", "hclis.patient_management", registry, logger).ConfigureAwait(false);
 
         return new ModuleBusSet(testOrders, sampleCollection, analyzer, labAnalysis, userAccess, patientManagement);
-    }
-
-    internal void InitializeModules(
-        string connectionString, IExecutionContextAccessor executionContext, Serilog.ILogger logger)
-    {
-        TestOrdersStartup.Initialize(connectionString, executionContext, logger, eventBus: _testOrders);
-        SampleCollectionStartup.Initialize(connectionString, executionContext, logger, eventBus: _sampleCollection);
-        AnalyzerStartup.Initialize(connectionString, executionContext, logger, eventBus: _analyzer);
-        LabAnalysisStartup.Initialize(connectionString, executionContext, logger, eventBus: _labAnalysis);
-        UserAccessStartup.Initialize(connectionString, executionContext, logger, eventBus: _userAccess);
-        PatientManagementStartup.Initialize(connectionString, executionContext, logger, eventBus: _patientManagement);
     }
 
     internal void StartConsuming()

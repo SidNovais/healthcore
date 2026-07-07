@@ -157,7 +157,13 @@ try
     using var buses = await ModuleBusSet
         .CreateAsync(rabbitConnection, HcLisEventRegistry.Build(), Log.Logger).ConfigureAwait(false);
 
-    buses.InitializeModules(connectionString, executionContext, Log.Logger);
+    TestOrdersStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: buses.TestOrders);
+    SampleCollectionStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: buses.SampleCollection);
+    AnalyzerStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: buses.Analyzer);
+    LabAnalysisStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: buses.LabAnalysis);
+    UserAccessStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: buses.UserAccess);
+    PatientManagementStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: buses.PatientManagement);
+
     buses.StartConsuming();
 
     // ─── Middleware pipeline ────────────────────────────────────────────────
