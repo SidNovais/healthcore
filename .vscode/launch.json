@@ -1,0 +1,113 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Prepare DEV ENVIROMENT (Docker)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "prepare:dev:docker",
+      "program": "${workspaceFolder}/src/HC.LIS/HC.LIS.Database/bin/Debug/net10.0/HC.LIS.Database.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false,
+      "console": "integratedTerminal",
+      "env": {
+        "ASPNETCORE_HCLIS_DATABASE_CONNECTION_STRING": "Host=localhost;Port=5432;Database=Healthcore.Dev;Username=dev;Password=dev"
+      }
+    },
+    {
+      "name": "Healthcore.Database",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build:database:migration",
+      "program": "${workspaceFolder}/src/HC.LIS/HC.LIS.Database/bin/Debug/net10.0/HC.LIS.Database.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false,
+      "console": "integratedTerminal",
+      "env": {
+        "ASPNETCORE_HCLIS_DATABASE_CONNECTION_STRING": "Host=localhost;Port=5432;Database=Healthcore.Dev;Username=dev;Password=dev"
+      }
+    },
+    {
+      "name": "HC.LIS.API",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build: HC.LIS.API",
+      "program": "${workspaceFolder}/src/HC.LIS/HC.LIS.API/bin/Debug/net10.0/HC.LIS.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/HC.LIS/HC.LIS.API",
+      "stopAtEntry": false,
+      "console": "integratedTerminal",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_HCLIS_DATABASE_CONNECTION_STRING": "Host=localhost;Port=5432;Database=Healthcore.Dev;Username=dev;Password=dev",
+        "ASPNETCORE_HCLIS_JWT_ISSUER": "hclis",
+        "ASPNETCORE_HCLIS_JWT_AUDIENCE": "hclis",
+        "ASPNETCORE_HCLIS_JWT_SECRET_KEY": "change-me-in-production-min-32-chars!!",
+        "ASPNETCORE_HCLIS_RABBITMQ_HOST": "localhost",
+        "ASPNETCORE_HCLIS_RABBITMQ_PORT": "5672",
+        "ASPNETCORE_HCLIS_RABBITMQ_USERNAME": "dev",
+        "ASPNETCORE_HCLIS_RABBITMQ_PASSWORD": "dev",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4317",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "grpc"
+      }
+    },
+    {
+      "name": "HC.LIS.API (Full Stack)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "prepare:fullstack",
+      "program": "${workspaceFolder}/src/HC.LIS/HC.LIS.API/bin/Debug/net10.0/HC.LIS.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/HC.LIS/HC.LIS.API",
+      "stopAtEntry": false,
+      "console": "integratedTerminal",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_HCLIS_DATABASE_CONNECTION_STRING": "Host=localhost;Port=5432;Database=Healthcore.Dev;Username=dev;Password=dev",
+        "ASPNETCORE_HCLIS_JWT_ISSUER": "hclis",
+        "ASPNETCORE_HCLIS_JWT_AUDIENCE": "hclis",
+        "ASPNETCORE_HCLIS_JWT_SECRET_KEY": "change-me-in-production-min-32-chars!!",
+        "ASPNETCORE_HCLIS_RABBITMQ_HOST": "localhost",
+        "ASPNETCORE_HCLIS_RABBITMQ_PORT": "5672",
+        "ASPNETCORE_HCLIS_RABBITMQ_USERNAME": "dev",
+        "ASPNETCORE_HCLIS_RABBITMQ_PASSWORD": "dev",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4317",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "grpc"
+      }
+    },
+    {
+      "name": "HC.LIS.TcpMessage",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build: HC.LIS.TcpMessage",
+      "program": "${workspaceFolder}/src/HC.LIS/HC.LIS.TcpMessage/TcpMessage/bin/Debug/net10.0/HC.LIS.TcpMessage.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/HC.LIS/HC.LIS.TcpMessage/TcpMessage",
+      "stopAtEntry": false,
+      "console": "integratedTerminal",
+      "env": {
+        "ASPNETCORE_HCLIS_DATABASE_CONNECTION_STRING": "Host=localhost;Port=5432;Database=Healthcore.Dev;Username=dev;Password=dev",
+        "ASPNETCORE_HCLIS_Tcp__Port": "8890",
+        "ASPNETCORE_HCLIS_Tcp__EnableMllpChecksum": "false",
+        "ASPNETCORE_HCLIS_Tcp__EnableHl7Checksum": "false"
+      }
+    },
+    {
+      "name": "HC.LIS.SPA",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4200",
+      "webRoot": "${workspaceFolder}/src/HC.LIS.Frontend/packages/hc-lis-spa",
+      "preLaunchTask": "spa:serve"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full Stack (API + SPA)",
+      "configurations": ["HC.LIS.API (Full Stack)", "HC.LIS.SPA"],
+      "stopAll": true
+    }
+  ]
+}
