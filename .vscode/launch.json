@@ -45,10 +45,28 @@
         "ASPNETCORE_HCLIS_JWT_ISSUER": "hclis",
         "ASPNETCORE_HCLIS_JWT_AUDIENCE": "hclis",
         "ASPNETCORE_HCLIS_JWT_SECRET_KEY": "change-me-in-production-min-32-chars!!",
-        "ASPNETCORE_HCLIS_RABBITMQ_HOST": "localhost",
-        "ASPNETCORE_HCLIS_RABBITMQ_PORT": "5672",
-        "ASPNETCORE_HCLIS_RABBITMQ_USERNAME": "dev",
-        "ASPNETCORE_HCLIS_RABBITMQ_PASSWORD": "dev",
+        "ASPNETCORE_HCLIS_EventBus__ConnectionString": "amqp://dev:dev@localhost:5672/",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4317",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "grpc"
+      }
+    },
+    {
+      "name": "HC.LIS.API (Memory Bus)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build: HC.LIS.API",
+      "program": "${workspaceFolder}/src/HC.LIS/HC.LIS.API/bin/Debug/net10.0/HC.LIS.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/HC.LIS/HC.LIS.API",
+      "stopAtEntry": false,
+      "console": "integratedTerminal",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_HCLIS_DATABASE_CONNECTION_STRING": "Host=localhost;Port=5432;Database=Healthcore.Dev;Username=dev;Password=dev",
+        "ASPNETCORE_HCLIS_JWT_ISSUER": "hclis",
+        "ASPNETCORE_HCLIS_JWT_AUDIENCE": "hclis",
+        "ASPNETCORE_HCLIS_JWT_SECRET_KEY": "change-me-in-production-min-32-chars!!",
+        "ASPNETCORE_HCLIS_EventBus__Type": "memory",
         "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4317",
         "OTEL_EXPORTER_OTLP_PROTOCOL": "grpc"
       }
@@ -69,10 +87,7 @@
         "ASPNETCORE_HCLIS_JWT_ISSUER": "hclis",
         "ASPNETCORE_HCLIS_JWT_AUDIENCE": "hclis",
         "ASPNETCORE_HCLIS_JWT_SECRET_KEY": "change-me-in-production-min-32-chars!!",
-        "ASPNETCORE_HCLIS_RABBITMQ_HOST": "localhost",
-        "ASPNETCORE_HCLIS_RABBITMQ_PORT": "5672",
-        "ASPNETCORE_HCLIS_RABBITMQ_USERNAME": "dev",
-        "ASPNETCORE_HCLIS_RABBITMQ_PASSWORD": "dev",
+        "ASPNETCORE_HCLIS_EventBus__ConnectionString": "amqp://dev:dev@localhost:5672/",
         "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4317",
         "OTEL_EXPORTER_OTLP_PROTOCOL": "grpc"
       }

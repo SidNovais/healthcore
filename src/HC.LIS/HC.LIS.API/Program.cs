@@ -151,20 +151,17 @@ try
 
     var executionContext = app.Services.GetRequiredService<IExecutionContextAccessor>();
 
-    using var rabbitConnection = await builder.Configuration
-        .CreateHcLisRabbitMqConnectionAsync(Log.Logger).ConfigureAwait(false);
+    using var busFactory = await ModuleEventBusFactoryBuilder
+        .CreateAsync(builder.Configuration, Log.Logger).ConfigureAwait(false);
 
-    using var buses = await ModuleBusSet
-        .CreateAsync(rabbitConnection, HcLisEventRegistry.Build(), Log.Logger).ConfigureAwait(false);
+    TestOrdersStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: busFactory.TestOrders);
+    SampleCollectionStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: busFactory.SampleCollection);
+    AnalyzerStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: busFactory.Analyzer);
+    LabAnalysisStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: busFactory.LabAnalysis);
+    UserAccessStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: busFactory.UserAccess);
+    PatientManagementStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: busFactory.PatientManagement);
 
-    TestOrdersStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: buses.TestOrders);
-    SampleCollectionStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: buses.SampleCollection);
-    AnalyzerStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: buses.Analyzer);
-    LabAnalysisStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: buses.LabAnalysis);
-    UserAccessStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: buses.UserAccess);
-    PatientManagementStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: buses.PatientManagement);
-
-    buses.StartConsuming();
+    busFactory.StartConsuming();
 
     // ─── Middleware pipeline ────────────────────────────────────────────────
     if (app.Environment.IsDevelopment())
