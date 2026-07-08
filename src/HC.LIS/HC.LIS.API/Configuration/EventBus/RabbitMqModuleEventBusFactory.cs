@@ -8,7 +8,7 @@ namespace HC.LIS.API.Configuration.EventBus;
 internal sealed class RabbitMqModuleEventBusFactory : IModuleEventBusFactory
 {
     private readonly IConnection _connection;
-    private readonly ModuleBusSet _buses;
+    private readonly RabbitMqModuleBusSet _buses;
 
     public IEventsBus TestOrders => _buses.TestOrders;
     public IEventsBus SampleCollection => _buses.SampleCollection;
@@ -17,7 +17,7 @@ internal sealed class RabbitMqModuleEventBusFactory : IModuleEventBusFactory
     public IEventsBus UserAccess => _buses.UserAccess;
     public IEventsBus PatientManagement => _buses.PatientManagement;
 
-    private RabbitMqModuleEventBusFactory(IConnection connection, ModuleBusSet buses)
+    private RabbitMqModuleEventBusFactory(IConnection connection, RabbitMqModuleBusSet buses)
     {
         _connection = connection;
         _buses = buses;
@@ -49,7 +49,7 @@ internal sealed class RabbitMqModuleEventBusFactory : IModuleEventBusFactory
             async ct => await factory.CreateConnectionAsync(ct).ConfigureAwait(false),
             CancellationToken.None).ConfigureAwait(false);
 
-        var buses = await ModuleBusSet
+        var buses = await RabbitMqModuleBusSet
             .CreateAsync(connection, registry, logger).ConfigureAwait(false);
 
         return new RabbitMqModuleEventBusFactory(connection, buses);

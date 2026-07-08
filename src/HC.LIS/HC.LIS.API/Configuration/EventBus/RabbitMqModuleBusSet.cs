@@ -3,7 +3,7 @@ using RabbitMQ.Client;
 
 namespace HC.LIS.API.Configuration.EventBus;
 
-internal sealed class ModuleBusSet : IDisposable
+internal sealed class RabbitMqModuleBusSet : IDisposable
 {
     private readonly RabbitMqEventBus _testOrders;
     private readonly RabbitMqEventBus _sampleCollection;
@@ -20,7 +20,7 @@ internal sealed class ModuleBusSet : IDisposable
     internal IEventsBus UserAccess => _userAccess;
     internal IEventsBus PatientManagement => _patientManagement;
 
-    private ModuleBusSet(
+    private RabbitMqModuleBusSet(
         RabbitMqEventBus testOrders,
         RabbitMqEventBus sampleCollection,
         RabbitMqEventBus analyzer,
@@ -36,7 +36,7 @@ internal sealed class ModuleBusSet : IDisposable
         _patientManagement = patientManagement;
     }
 
-    internal static async Task<ModuleBusSet> CreateAsync(
+    internal static async Task<RabbitMqModuleBusSet> CreateAsync(
         IConnection connection, EventRegistry registry, Serilog.ILogger logger)
     {
         var testOrders = await RabbitMqEventBus.CreateAsync(
@@ -52,7 +52,7 @@ internal sealed class ModuleBusSet : IDisposable
         var patientManagement = await RabbitMqEventBus.CreateAsync(
             connection, "patient_management.events", "hclis.patient_management", registry, logger).ConfigureAwait(false);
 
-        return new ModuleBusSet(testOrders, sampleCollection, analyzer, labAnalysis, userAccess, patientManagement);
+        return new RabbitMqModuleBusSet(testOrders, sampleCollection, analyzer, labAnalysis, userAccess, patientManagement);
     }
 
     internal void StartConsuming()
