@@ -151,17 +151,17 @@ try
 
     var executionContext = app.Services.GetRequiredService<IExecutionContextAccessor>();
 
-    using var busFactory = await ModuleEventBusFactoryBuilder
+    using var busProvider = await ModuleEventBusFactoryBuilder
         .CreateAsync(builder.Configuration, Log.Logger).ConfigureAwait(false);
 
-    TestOrdersStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: busFactory.TestOrders);
-    SampleCollectionStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: busFactory.SampleCollection);
-    AnalyzerStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: busFactory.Analyzer);
-    LabAnalysisStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: busFactory.LabAnalysis);
-    UserAccessStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: busFactory.UserAccess);
-    PatientManagementStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: busFactory.PatientManagement);
+    TestOrdersStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: busProvider.TestOrders);
+    SampleCollectionStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: busProvider.SampleCollection);
+    AnalyzerStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: busProvider.Analyzer);
+    LabAnalysisStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: busProvider.LabAnalysis);
+    UserAccessStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: busProvider.UserAccess);
+    PatientManagementStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: busProvider.PatientManagement);
 
-    busFactory.StartConsuming();
+    busProvider.StartConsuming();
 
     // ─── Middleware pipeline ────────────────────────────────────────────────
     if (app.Environment.IsDevelopment())

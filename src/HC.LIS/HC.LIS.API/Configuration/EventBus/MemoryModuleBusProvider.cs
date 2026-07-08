@@ -2,7 +2,7 @@ using HC.Core.Infrastructure.EventBus;
 
 namespace HC.LIS.API.Configuration.EventBus;
 
-internal sealed class MemoryModuleEventBusFactory : IModuleEventBusFactory
+internal sealed class MemoryModuleBusProvider : IModuleBusProvider
 {
     public IEventsBus TestOrders { get; }
     public IEventsBus SampleCollection { get; }
@@ -11,7 +11,7 @@ internal sealed class MemoryModuleEventBusFactory : IModuleEventBusFactory
     public IEventsBus UserAccess { get; }
     public IEventsBus PatientManagement { get; }
 
-    internal MemoryModuleEventBusFactory(Serilog.ILogger logger)
+    internal MemoryModuleBusProvider(Serilog.ILogger logger)
     {
         TestOrders = new InMemoryEventBusClient(logger);
         SampleCollection = new InMemoryEventBusClient(logger);

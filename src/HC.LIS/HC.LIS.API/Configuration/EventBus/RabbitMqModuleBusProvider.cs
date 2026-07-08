@@ -5,7 +5,7 @@ using RabbitMQ.Client;
 
 namespace HC.LIS.API.Configuration.EventBus;
 
-internal sealed class RabbitMqModuleEventBusFactory : IModuleEventBusFactory
+internal sealed class RabbitMqModuleBusProvider : IModuleBusProvider
 {
     private readonly IConnection _connection;
     private readonly RabbitMqEventBus _testOrders;
@@ -23,7 +23,7 @@ internal sealed class RabbitMqModuleEventBusFactory : IModuleEventBusFactory
     public IEventsBus UserAccess => _userAccess;
     public IEventsBus PatientManagement => _patientManagement;
 
-    private RabbitMqModuleEventBusFactory(
+    private RabbitMqModuleBusProvider(
         IConnection connection,
         RabbitMqEventBus testOrders,
         RabbitMqEventBus sampleCollection,
@@ -41,7 +41,7 @@ internal sealed class RabbitMqModuleEventBusFactory : IModuleEventBusFactory
         _patientManagement = patientManagement;
     }
 
-    internal static async Task<RabbitMqModuleEventBusFactory> CreateAsync(
+    internal static async Task<RabbitMqModuleBusProvider> CreateAsync(
         EventBusOptions options, EventRegistry registry, Serilog.ILogger logger)
     {
         var connectionFactory = new ConnectionFactory { Uri = new Uri(options.ConnectionString) };
@@ -80,7 +80,7 @@ internal sealed class RabbitMqModuleEventBusFactory : IModuleEventBusFactory
         var patientManagement = await RabbitMqEventBus.CreateAsync(
             connection, "patient_management.events", "hclis.patient_management", registry, logger).ConfigureAwait(false);
 
-        return new RabbitMqModuleEventBusFactory(
+        return new RabbitMqModuleBusProvider(
             connection, testOrders, sampleCollection, analyzer, labAnalysis, userAccess, patientManagement);
     }
 

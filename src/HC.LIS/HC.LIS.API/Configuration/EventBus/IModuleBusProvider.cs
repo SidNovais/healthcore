@@ -2,7 +2,7 @@ using HC.Core.Infrastructure.EventBus;
 
 namespace HC.LIS.API.Configuration.EventBus;
 
-internal interface IModuleEventBusFactory : IDisposable
+internal interface IModuleBusProvider : IDisposable
 {
     IEventsBus TestOrders { get; }
     IEventsBus SampleCollection { get; }
