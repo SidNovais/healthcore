@@ -1,6 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../application/auth.service';
+import { ThemeService } from '../application/theme.service';
 import type { UserRole } from '../domain/user-session';
 
 interface NavItem {
@@ -43,6 +44,7 @@ const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
 export class ShellComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  protected readonly themeService = inject(ThemeService);
 
   readonly user = this.authService.currentUser;
 
