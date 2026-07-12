@@ -14,6 +14,7 @@ describe('OrdersService', () => {
   const sampleOrderListItem: OrderListItem = {
     orderId: 'order-uuid-1',
     patientId: 'patient-uuid-1',
+    patientName: 'Ana Souza',
     requestedBy: 'user-uuid-1',
     orderPriority: 'Routine',
     requestedAt: '2026-05-11T00:00:00Z',
