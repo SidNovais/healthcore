@@ -128,6 +128,17 @@ test.describe('Patient Management', () => {
     await expect(page.getByTestId('patient-anonymize-btn')).not.toBeVisible({ timeout: 5_000 });
   });
 
+  test('register form shows an inline required error when full name is blurred empty', async ({ page }) => {
+    await loginAsReceptionist(page);
+    await page.goto('/patients/new');
+
+    const fullName = page.getByTestId('patient-full-name-input');
+    await fullName.click();
+    await fullName.blur();
+
+    await expect(page.getByText(/full name is required/i)).toBeVisible({ timeout: 5_000 });
+  });
+
   test('LabTechnician is redirected to /unauthorized when accessing /patients', async ({ page }) => {
     await loginAsLabTechnician(page);
     await page.goto('/patients');
