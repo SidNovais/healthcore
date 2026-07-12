@@ -33,12 +33,12 @@ describe('HcDialog', () => {
   it('opens as a modal when the open model becomes true', async () => {
     const { fixture, dialog } = render();
 
-    expect(dialog.open).toBe(false);
+    expect(dialog.hasAttribute('open')).toBe(false);
 
     fixture.componentInstance.open.set(true);
     await fixture.whenStable();
 
-    expect(dialog.open).toBe(true);
+    expect(dialog.hasAttribute('open')).toBe(true);
   });
 
   it('closes when the open model becomes false again', async () => {
@@ -49,7 +49,7 @@ describe('HcDialog', () => {
     fixture.componentInstance.open.set(false);
     await fixture.whenStable();
 
-    expect(dialog.open).toBe(false);
+    expect(dialog.hasAttribute('open')).toBe(false);
   });
 
   it('syncs the model back when the native dialog closes (Esc key path)', async () => {
@@ -58,8 +58,8 @@ describe('HcDialog', () => {
     fixture.componentInstance.open.set(true);
     await fixture.whenStable();
 
-    // jsdom does not simulate the UA Esc behavior; dispatch the resulting event
-    dialog.close();
+    // The test DOM cannot simulate the UA Esc behavior; emulate its outcome
+    dialog.removeAttribute('open');
     dialog.dispatchEvent(new Event('close'));
     await fixture.whenStable();
 

@@ -1,0 +1,10 @@
+:host {
+  display: block;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+  animation: hc-skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes hc-skeleton-pulse {
+  50% { opacity: 0.5; }
+}

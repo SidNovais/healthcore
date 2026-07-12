@@ -1,0 +1,23 @@
+:host {
+  display: inline-flex;
+  opacity: 0;
+  /* >300ms rule: only become visible when loading actually takes a while */
+  animation: hc-spinner-appear 0s linear 300ms forwards;
+}
+
+.hc-spinner__circle {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--color-border-strong);
+  border-top-color: var(--color-accent);
+  border-radius: var(--radius-full);
+  animation: hc-spinner-spin 0.7s linear infinite;
+}
+
+@keyframes hc-spinner-appear {
+  to { opacity: 1; }
+}
+
+@keyframes hc-spinner-spin {
+  to { transform: rotate(360deg); }
+}

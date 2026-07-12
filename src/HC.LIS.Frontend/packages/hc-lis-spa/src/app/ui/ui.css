@@ -52,3 +52,19 @@ textarea.hc-input {
   cursor: not-allowed;
   background: var(--color-surface-2);
 }
+
+/* Tooltip element is appended to <body> by the HcTooltip directive. */
+.hc-tooltip {
+  position: fixed;
+  transform: translate(-50%, -100%);
+  z-index: 110;
+  background: var(--color-text);
+  color: var(--color-bg);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  line-height: 1.3;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+  white-space: nowrap;
+}
