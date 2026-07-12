@@ -1,0 +1,71 @@
+<div data-testid="worklist-item-detail" class="detail-panel">
+  <h3>{{ item.examCode }} — <span class="mono">{{ item.sampleBarcode }}</span></h3>
+  <p data-testid="patient-name">Patient: {{ item.patientName ?? item.patientId }}</p>
+  @if (item.patientDateOfBirth) {
+    <p data-testid="patient-dob">Date of birth: {{ item.patientDateOfBirth | date: 'shortDate' }}</p>
+  }
+  @if (item.patientGender) {
+    <p data-testid="patient-gender">Gender: {{ item.patientGender }}</p>
+  }
+  <p class="status-line">Status: <hc-badge variant="accent">{{ item.status }}</hc-badge></p>
+
+  @if (item.analyteResults.length > 0) {
+    <table hc-table class="analyte-table">
+      <thead>
+        <tr>
+          <th>Analyte</th>
+          <th>Result</th>
+          <th>Unit</th>
+          <th>Ref. Range</th>
+          <th>Out of Range</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of item.analyteResults; track r.id) {
+          <tr [class.out-of-range]="r.isOutOfRange">
+            <td>{{ r.analyteCode }}</td>
+            <td class="tabular-nums">{{ r.resultValue }}</td>
+            <td>{{ r.resultUnit }}</td>
+            <td class="tabular-nums">{{ r.referenceRange }}</td>
+            <td>{{ r.isOutOfRange ? 'Yes' : 'No' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+
+  @if (!reportSigned()) {
+    <div class="sign-form">
+      <hc-field>
+        <label hc-label for="signature-input">Signature</label>
+        <input
+          hc-input
+          id="signature-input"
+          data-testid="signature-input"
+          type="text"
+          [(ngModel)]="signature"
+          placeholder="Your name"
+        />
+      </hc-field>
+      <button
+        hc-button
+        variant="cta"
+        data-testid="sign-report-btn"
+        class="sign-form__submit"
+        (click)="onSignReport()"
+        [disabled]="!signature.trim()"
+      >
+        Sign Report
+      </button>
+      @if (error(); as msg) {
+        <hc-alert variant="error">{{ msg }}</hc-alert>
+      }
+    </div>
+  }
+
+  @if (reportSigned()) {
+    <hc-alert variant="success" data-testid="sign-report-confirmation">
+      Report signed successfully.
+    </hc-alert>
+  }
+</div>

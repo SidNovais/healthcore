@@ -1,0 +1,48 @@
+.detail-panel {
+  padding: 1.5rem;
+  border-left: 1px solid var(--color-border);
+  min-width: 320px;
+  flex: 1;
+}
+
+.detail-panel h3 {
+  margin-top: 0;
+  color: var(--color-text);
+}
+
+.detail-panel p {
+  color: var(--color-text);
+  font-size: 0.9rem;
+}
+
+.status-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mono {
+  font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+}
+
+.analyte-table {
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.out-of-range td {
+  color: var(--color-error);
+  font-weight: 600;
+}
+
+.sign-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 320px;
+  margin-top: 1rem;
+}
+
+.sign-form__submit {
+  align-self: flex-start;
+}
