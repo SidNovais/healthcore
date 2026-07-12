@@ -43,22 +43,12 @@
   letter-spacing: 0.04em;
 }
 
+/* Role badge is an hc-badge (role variant supplies color/shape); position it only. */
 .role-badge {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  padding: 3px 10px;
-  border-radius: var(--radius-full);
-  border: 1px solid currentColor;
-  width: fit-content;
   margin: 0 var(--space-2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
-
-.role-badge[data-role='Receptionist'] { color: var(--color-role-receptionist); }
-.role-badge[data-role='LabTechnician'] { color: var(--color-role-labtech); }
-.role-badge[data-role='Physician'] { color: var(--color-role-physician); }
-.role-badge[data-role='ITAdmin'] { color: var(--color-role-itadmin); }
 
 .sidebar-nav {
   display: flex;
@@ -115,27 +105,18 @@
   white-space: nowrap;
 }
 
-.theme-toggle-btn,
-.logout-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
+/* Footer icon buttons are hc-button ghost, restyled borderless/muted for the sidebar. */
+.sidebar-footer button.hc-btn {
+  border-color: transparent;
   color: var(--color-text-muted);
-  cursor: pointer;
-  padding: var(--space-2);
-  border-radius: var(--radius-sm);
-  transition: color var(--transition-fast), background var(--transition-fast);
-  flex-shrink: 0;
 }
 
-.theme-toggle-btn:hover {
-  color: var(--color-accent);
-  background: var(--color-accent-light);
+.sidebar-footer button.hc-btn:hover:not([disabled]) {
+  background: var(--color-surface-2);
+  color: var(--color-text);
 }
 
-.logout-btn:hover {
+.sidebar-footer button.logout-btn:hover:not([disabled]) {
   color: var(--color-error);
   background: var(--color-error-bg);
 }
@@ -143,4 +124,8 @@
 .shell-main {
   overflow-y: auto;
   background: var(--color-bg);
+}
+
+.outlet-wrapper {
+  min-height: 100%;
 }

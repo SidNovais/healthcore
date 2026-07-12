@@ -103,10 +103,13 @@
   --color-warning-bg:    #451a03;
   --color-success:       #4ade80;
   --color-success-bg:    #052e16;
+  /* Role colors must clear 4.5:1 on the lightest dark surface (--color-surface-2 #334155),
+     since hc-badge's role variant sits on it. receptionist (4.84) and labtech (5.39) pass as
+     400-shades; physician/itadmin needed the 300-shade to pass (blue-400 was 4.07, violet-400 3.81). */
   --color-role-receptionist: #38bdf8;
   --color-role-labtech:      #34d399;
-  --color-role-physician:    #60a5fa;
-  --color-role-itadmin:      #a78bfa;
+  --color-role-physician:    #93c5fd;
+  --color-role-itadmin:      #c4b5fd;
   --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / .20);
   --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / .30), 0 1px 2px -1px rgb(0 0 0 / .30);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / .30), 0 2px 4px -2px rgb(0 0 0 / .30);
