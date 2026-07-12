@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { HcField } from './field';
 import { HcInput } from '../input/input';
@@ -7,15 +7,15 @@ import { HcLabel } from '../input/label';
 @Component({
   imports: [HcField, HcInput, HcLabel],
   template: `
-    <hc-field [helper]="helper" [error]="error" data-testid="email-field">
+    <hc-field [helper]="helper()" [error]="error()" data-testid="email-field">
       <label hc-label for="email">Email</label>
       <input hc-input id="email" type="email" />
     </hc-field>
   `,
 })
 class HostComponent {
-  helper: string | null = 'We never share it.';
-  error: string | null = null;
+  readonly helper = signal<string | null>('We never share it.');
+  readonly error = signal<string | null>(null);
 }
 
 function render() {
@@ -54,7 +54,7 @@ describe('HcField', () => {
   it('replaces the helper with an announced error message', () => {
     const { fixture, host } = render();
 
-    fixture.componentInstance.error = 'Email is required';
+    fixture.componentInstance.error.set('Email is required');
     fixture.detectChanges();
 
     const error = host.querySelector('.hc-field__error')!;

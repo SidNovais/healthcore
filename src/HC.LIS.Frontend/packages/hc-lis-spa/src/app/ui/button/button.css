@@ -1,0 +1,72 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background-color var(--motion-fast) ease, border-color var(--motion-fast) ease,
+    color var(--motion-fast) ease;
+}
+
+:host(.hc-btn--sm)   { height: 2rem;    padding: 0 var(--space-3); }
+:host(.hc-btn--md)   { height: 2.25rem; padding: 0 var(--space-4); }
+:host(.hc-btn--icon) { height: 2.25rem; width: 2.25rem; padding: 0; }
+
+:host(.hc-btn--default) {
+  background: var(--color-accent);
+  color: var(--color-surface);
+}
+:host(.hc-btn--default:hover:not([disabled])) { background: var(--color-accent-mid); }
+
+:host(.hc-btn--cta) {
+  background: var(--color-cta);
+  color: var(--color-surface);
+}
+:host(.hc-btn--cta:hover:not([disabled])) { filter: brightness(1.08); }
+
+:host(.hc-btn--ghost) {
+  background: transparent;
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+}
+:host(.hc-btn--ghost:hover:not([disabled])) { background: var(--color-surface-2); }
+
+:host(.hc-btn--destructive) {
+  background: var(--color-error);
+  color: var(--color-surface);
+}
+:host(.hc-btn--destructive:hover:not([disabled])) { filter: brightness(1.08); }
+
+:host([disabled]) {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Dark theme: white label tokens invert with --color-surface; buttons keep a
+   dark label on the bright accent/cta fills for contrast. */
+:host-context([data-theme="dark"]):host(.hc-btn--default),
+:host-context([data-theme="dark"]):host(.hc-btn--cta),
+:host-context([data-theme="dark"]):host(.hc-btn--destructive) {
+  color: #0f172a;
+}
+
+.hc-btn__spinner {
+  width: 0.875rem;
+  height: 0.875rem;
+  border: 2px solid currentcolor;
+  border-right-color: transparent;
+  border-radius: var(--radius-full);
+  animation: hc-btn-spin 0.7s linear infinite;
+}
+
+@keyframes hc-btn-spin {
+  to { transform: rotate(360deg); }
+}

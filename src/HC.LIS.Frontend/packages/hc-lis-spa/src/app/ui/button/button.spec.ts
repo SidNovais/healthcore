@@ -1,19 +1,25 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { HcButton } from './button';
 
 @Component({
   imports: [HcButton],
   template: `
-    <button hc-button [variant]="variant" [size]="size" [loading]="loading" data-testid="the-btn">
+    <button
+      hc-button
+      [variant]="variant()"
+      [size]="size()"
+      [loading]="loading()"
+      data-testid="the-btn"
+    >
       Save
     </button>
   `,
 })
 class HostComponent {
-  variant: 'default' | 'cta' | 'ghost' | 'destructive' = 'default';
-  size: 'sm' | 'md' | 'icon' = 'md';
-  loading = false;
+  readonly variant = signal<'default' | 'cta' | 'ghost' | 'destructive'>('default');
+  readonly size = signal<'sm' | 'md' | 'icon'>('md');
+  readonly loading = signal(false);
 }
 
 function render() {
@@ -40,7 +46,7 @@ describe('HcButton', () => {
   it('switches variant class when the variant input changes', () => {
     const { fixture, button } = render();
 
-    fixture.componentInstance.variant = 'cta';
+    fixture.componentInstance.variant.set('cta');
     fixture.detectChanges();
 
     expect(button.classList).toContain('hc-btn--cta');
@@ -50,7 +56,7 @@ describe('HcButton', () => {
   it('disables the button, marks aria-busy and shows a spinner while loading', () => {
     const { fixture, button } = render();
 
-    fixture.componentInstance.loading = true;
+    fixture.componentInstance.loading.set(true);
     fixture.detectChanges();
 
     expect(button.disabled).toBe(true);

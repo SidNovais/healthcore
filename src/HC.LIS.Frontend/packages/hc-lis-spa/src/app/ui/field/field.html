@@ -1,0 +1,6 @@
+<ng-content />
+@if (error(); as errorText) {
+  <p class="hc-field__error" role="alert">{{ errorText }}</p>
+} @else if (helper(); as helperText) {
+  <p class="hc-field__helper">{{ helperText }}</p>
+}
