@@ -1,87 +1,93 @@
 <form [formGroup]="form" (ngSubmit)="submit()" class="patient-form">
-  <div class="field">
-    <label for="patient-full-name">Full Name <span class="required">*</span></label>
+  <hc-field [error]="fullNameError()">
+    <label hc-label for="patient-full-name">Full Name <span class="required">*</span></label>
     <input
+      hc-input
       id="patient-full-name"
       data-testid="patient-full-name-input"
       type="text"
       formControlName="fullName"
       autocomplete="off"
+      [attr.aria-invalid]="fullNameError() ? 'true' : null"
     />
-  </div>
+  </hc-field>
 
-  <div class="field">
-    <label for="patient-dob">Date of Birth <span class="required">*</span></label>
+  <hc-field [error]="dateOfBirthError()">
+    <label hc-label for="patient-dob">Date of Birth <span class="required">*</span></label>
     <input
+      hc-input
       id="patient-dob"
       data-testid="patient-dob-input"
       type="date"
       formControlName="dateOfBirth"
+      [attr.aria-invalid]="dateOfBirthError() ? 'true' : null"
     />
-  </div>
+  </hc-field>
 
-  <div class="field">
-    <label for="patient-gender">Gender</label>
-    <select
-      id="patient-gender"
-      data-testid="patient-gender-select"
-      formControlName="gender"
-    >
+  <hc-field>
+    <label hc-label for="patient-gender">Gender</label>
+    <select hc-select id="patient-gender" data-testid="patient-gender-select" formControlName="gender">
       <option value="">— optional —</option>
       <option value="Male">Male</option>
       <option value="Female">Female</option>
       <option value="Other">Other</option>
     </select>
-  </div>
+  </hc-field>
 
-  <div class="field">
-    <label for="patient-mothers-name">Mother's Full Name</label>
+  <hc-field>
+    <label hc-label for="patient-mothers-name">Mother's Full Name</label>
     <input
+      hc-input
       id="patient-mothers-name"
       data-testid="patient-mothers-name-input"
       type="text"
       formControlName="mothersFullName"
       autocomplete="off"
     />
-  </div>
+  </hc-field>
 
-  <div class="field">
-    <label for="patient-document-id">Document ID</label>
+  <hc-field>
+    <label hc-label for="patient-document-id">Document ID</label>
     <input
+      hc-input
       id="patient-document-id"
       data-testid="patient-document-id-input"
       type="text"
       formControlName="documentId"
       autocomplete="off"
     />
-  </div>
+  </hc-field>
 
-  <div class="field">
-    <label for="patient-phone">Phone</label>
+  <hc-field>
+    <label hc-label for="patient-phone">Phone</label>
     <input
+      hc-input
       id="patient-phone"
       data-testid="patient-phone-input"
       type="tel"
       formControlName="phone"
       autocomplete="off"
     />
-  </div>
+  </hc-field>
 
-  <div class="field">
-    <label for="patient-email">Email</label>
+  <hc-field>
+    <label hc-label for="patient-email">Email</label>
     <input
+      hc-input
       id="patient-email"
       data-testid="patient-email-input"
       type="email"
       formControlName="email"
       autocomplete="off"
     />
-  </div>
+  </hc-field>
 
   <button
+    hc-button
+    variant="cta"
     type="submit"
     data-testid="patient-form-submit-btn"
-    class="btn-primary"
+    class="patient-form__submit"
     [disabled]="form.invalid"
   >
     Save

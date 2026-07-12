@@ -1,0 +1,110 @@
+<div class="order-detail-page" data-testid="order-detail">
+  <div class="detail-header">
+    <a class="back-link" routerLink="/orders">← Back to Orders</a>
+    <h1 class="detail-title">Order Detail</h1>
+  </div>
+
+  @if (ordersService.orderDetails(); as details) {
+    <hc-card class="order-meta" data-testid="order-meta">
+      <p>Patient: <span data-testid="patient-id">{{ details.patientId }}</span></p>
+      <p>Requested By: <span data-testid="requested-by">{{ details.requestedBy }}</span></p>
+      <p>Priority: <span data-testid="order-priority">{{ details.orderPriority }}</span></p>
+      <p>Requested At: <span data-testid="order-requested-at">{{ details.requestedAt }}</span></p>
+    </hc-card>
+
+    @if (errorMessage(); as msg) {
+      <hc-alert variant="error" data-testid="exam-action-error">{{ msg }}</hc-alert>
+    }
+
+    <h2 class="section-title">Exam Items</h2>
+
+    <table hc-table data-testid="exam-items-table" class="items-table">
+      <thead>
+        <tr>
+          <th>Specimen</th>
+          <th>Material</th>
+          <th>Container</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of details.items; track item.orderItemId) {
+          <tr data-testid="exam-item-row">
+            <td>{{ item.specimenMnemonic }}</td>
+            <td>{{ item.materialType }}</td>
+            <td>{{ item.containerType }}</td>
+            <td>
+              <hc-badge data-testid="item-status" [variant]="statusVariant(item.status)">{{ item.status }}</hc-badge>
+            </td>
+            <td>
+              <div class="actions-cell">
+                @if (item.status === 'Requested' || item.status === 'OnHold') {
+                  <button hc-button size="sm" data-testid="accept-btn" (click)="onAccept(item.orderItemId)">Accept</button>
+                }
+                @if (item.status === 'Requested') {
+                  <button hc-button variant="destructive" size="sm" data-testid="reject-btn" (click)="startReject(item.orderItemId)">Reject</button>
+                }
+                @if (item.status === 'Requested') {
+                  <button hc-button variant="ghost" size="sm" data-testid="on-hold-btn" (click)="startOnHold(item.orderItemId)">On Hold</button>
+                }
+                @if (item.status !== 'Canceled' && item.status !== 'Rejected' && item.status !== 'Completed' && item.status !== 'PartiallyCompleted') {
+                  <button hc-button variant="ghost" size="sm" data-testid="cancel-btn" (click)="onCancel(item.orderItemId)">Cancel</button>
+                }
+              </div>
+
+              @if (activeRejectItemId() === item.orderItemId) {
+                <div data-testid="reject-reason-form" class="reason-form">
+                  <input
+                    hc-input
+                    data-testid="reject-reason-input"
+                    type="text"
+                    [(ngModel)]="rejectReason"
+                    placeholder="Reason for rejection"
+                  />
+                  <div class="reason-actions">
+                    <button
+                      hc-button
+                      variant="destructive"
+                      size="sm"
+                      data-testid="confirm-reject-btn"
+                      (click)="onReject(item.orderItemId)"
+                      [disabled]="!rejectReason.trim()"
+                    >Confirm Reject</button>
+                    <button hc-button variant="ghost" size="sm" data-testid="cancel-reject-btn" (click)="activeRejectItemId.set(null)">Cancel</button>
+                  </div>
+                </div>
+              }
+
+              @if (activeOnHoldItemId() === item.orderItemId) {
+                <div data-testid="on-hold-reason-form" class="reason-form">
+                  <input
+                    hc-input
+                    data-testid="on-hold-reason-input"
+                    type="text"
+                    [(ngModel)]="onHoldReason"
+                    placeholder="Reason for hold"
+                  />
+                  <div class="reason-actions">
+                    <button
+                      hc-button
+                      size="sm"
+                      data-testid="confirm-on-hold-btn"
+                      (click)="onPlaceOnHold(item.orderItemId)"
+                      [disabled]="!onHoldReason.trim()"
+                    >Confirm On Hold</button>
+                    <button hc-button variant="ghost" size="sm" data-testid="cancel-on-hold-btn" (click)="activeOnHoldItemId.set(null)">Cancel</button>
+                  </div>
+                </div>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" data-testid="empty-items" class="empty-cell">No exam items found.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

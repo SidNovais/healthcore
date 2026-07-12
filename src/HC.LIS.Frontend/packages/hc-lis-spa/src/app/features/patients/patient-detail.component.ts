@@ -5,11 +5,15 @@ import { PatientsService } from '../../core/application/patients.service';
 import { AuthService } from '../../core/application/auth.service';
 import type { PatientDetails } from '../../core/domain/patient-details';
 import type { RegisterPatientParams, UpdatePatientParams } from '../../core/domain/register-patient-params';
+import { HcAlert } from '../../ui/alert/alert';
+import { HcBadge } from '../../ui/badge/badge';
+import { HcButton } from '../../ui/button/button';
+import { HcCard } from '../../ui/card/card';
 
 @Component({
   selector: 'app-patient-detail',
   standalone: true,
-  imports: [PatientFormComponent],
+  imports: [PatientFormComponent, HcAlert, HcBadge, HcButton, HcCard],
   templateUrl: './patient-detail.component.html',
   styleUrl: './patient-detail.component.css',
 })

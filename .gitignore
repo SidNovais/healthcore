@@ -6,3 +6,6 @@ launch.json
 
 # Brainstorm session files
 .superpowers/
+
+# Playwright MCP artifacts
+.playwright-mcp/

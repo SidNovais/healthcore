@@ -2,47 +2,52 @@
   @if (patientsService.patient(); as patient) {
     <div class="patient-header">
       <h1 class="patient-name">{{ patient.fullName }}</h1>
-      <span data-testid="patient-status-badge" class="status-badge status-{{ patient.status.toLowerCase() }}">
+      <hc-badge
+        data-testid="patient-status-badge"
+        [variant]="patient.status === 'Active' ? 'success' : 'neutral'"
+      >
         {{ patient.status }}
-      </span>
+      </hc-badge>
     </div>
 
-    @if (error()) {
-      <p role="alert" data-testid="patient-detail-error" class="error-text">{{ error() }}</p>
+    @if (error(); as message) {
+      <hc-alert variant="error" data-testid="patient-detail-error">{{ message }}</hc-alert>
     }
 
-    <dl class="patient-fields">
-      <dt>Date of Birth</dt>
-      <dd>{{ patient.dateOfBirth }}</dd>
-      <dt>Gender</dt>
-      <dd>{{ patient.gender ?? '—' }}</dd>
-      <dt>Mother's Full Name</dt>
-      <dd>{{ patient.mothersFullName ?? '—' }}</dd>
-      <dt>Document ID</dt>
-      <dd>{{ patient.documentId ?? '—' }}</dd>
-      <dt>Phone</dt>
-      <dd>{{ patient.phone ?? '—' }}</dd>
-      <dt>Email</dt>
-      <dd>{{ patient.email ?? '—' }}</dd>
-      <dt>Registered At</dt>
-      <dd>{{ patient.registeredAt }}</dd>
-    </dl>
+    <hc-card class="patient-card">
+      <dl class="patient-fields">
+        <dt>Date of Birth</dt>
+        <dd class="tabular-nums">{{ patient.dateOfBirth }}</dd>
+        <dt>Gender</dt>
+        <dd>{{ patient.gender ?? '—' }}</dd>
+        <dt>Mother's Full Name</dt>
+        <dd>{{ patient.mothersFullName ?? '—' }}</dd>
+        <dt>Document ID</dt>
+        <dd>{{ patient.documentId ?? '—' }}</dd>
+        <dt>Phone</dt>
+        <dd>{{ patient.phone ?? '—' }}</dd>
+        <dt>Email</dt>
+        <dd>{{ patient.email ?? '—' }}</dd>
+        <dt>Registered At</dt>
+        <dd class="tabular-nums">{{ patient.registeredAt }}</dd>
+      </dl>
+    </hc-card>
 
     <div class="patient-actions">
       @if (patient.status === 'Active') {
-        <button data-testid="patient-edit-btn" class="btn-secondary" (click)="toggleEdit()">
+        <button hc-button variant="ghost" data-testid="patient-edit-btn" (click)="toggleEdit()">
           {{ isEditMode() ? 'Cancel' : 'Edit' }}
         </button>
       }
 
       @if (isITAdmin && patient.status === 'Active') {
-        <button data-testid="patient-anonymize-btn" class="btn-danger" (click)="startAnonymize()">
+        <button hc-button variant="destructive" data-testid="patient-anonymize-btn" (click)="startAnonymize()">
           Anonymize
         </button>
       }
 
       @if (showAnonymizeConfirm()) {
-        <button data-testid="anonymize-confirm-btn" class="btn-danger-confirm" (click)="confirmAnonymize()">
+        <button hc-button variant="destructive" data-testid="anonymize-confirm-btn" (click)="confirmAnonymize()">
           Confirm anonymize
         </button>
       }

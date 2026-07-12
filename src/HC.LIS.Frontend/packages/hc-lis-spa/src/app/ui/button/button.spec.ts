@@ -10,6 +10,7 @@ import { HcButton } from './button';
       [variant]="variant()"
       [size]="size()"
       [loading]="loading()"
+      [disabled]="disabled()"
       data-testid="the-btn"
     >
       Save
@@ -20,6 +21,7 @@ class HostComponent {
   readonly variant = signal<'default' | 'cta' | 'ghost' | 'destructive'>('default');
   readonly size = signal<'sm' | 'md' | 'icon'>('md');
   readonly loading = signal(false);
+  readonly disabled = signal(false);
 }
 
 function render() {
@@ -62,6 +64,17 @@ describe('HcButton', () => {
     expect(button.disabled).toBe(true);
     expect(button.getAttribute('aria-busy')).toBe('true');
     expect(button.querySelector('.hc-btn__spinner')).not.toBeNull();
+  });
+
+  it('disables via the disabled input without marking aria-busy or a spinner', () => {
+    const { fixture, button } = render();
+
+    fixture.componentInstance.disabled.set(true);
+    fixture.detectChanges();
+
+    expect(button.disabled).toBe(true);
+    expect(button.getAttribute('aria-busy')).toBeNull();
+    expect(button.querySelector('.hc-btn__spinner')).toBeNull();
   });
 
   it('still projects its label text', () => {

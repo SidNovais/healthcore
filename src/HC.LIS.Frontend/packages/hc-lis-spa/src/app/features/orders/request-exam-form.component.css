@@ -1,0 +1,13 @@
+.exam-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mono-input {
+  font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+}
+
+.exam-form__submit {
+  align-self: flex-start;
+}

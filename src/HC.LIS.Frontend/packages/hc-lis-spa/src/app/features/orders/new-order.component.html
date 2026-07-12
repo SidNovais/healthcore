@@ -1,0 +1,51 @@
+<div class="new-order-page">
+  <h1 class="new-order-title">New Test Order</h1>
+
+  @if (!ordersService.order()) {
+    <hc-card class="order-create-section">
+      <form (ngSubmit)="createOrder()">
+        <hc-field>
+          <label hc-label>Patient</label>
+          <app-patient-picker (patientSelected)="selectedPatient.set($event)" />
+        </hc-field>
+
+        @if (createError(); as msg) {
+          <hc-alert variant="error">{{ msg }}</hc-alert>
+        }
+
+        <button
+          hc-button
+          variant="cta"
+          type="submit"
+          data-testid="create-order-submit-btn"
+          class="create-order-submit"
+          [loading]="creating()"
+          [disabled]="!selectedPatient() || creating()"
+        >
+          Create Order
+        </button>
+      </form>
+    </hc-card>
+  }
+
+  @if (ordersService.order(); as order) {
+    <section data-testid="exam-section" class="exam-section">
+      <div class="order-badge">
+        Order <span class="order-id">{{ order.orderId }}</span> created
+      </div>
+
+      <h2 class="section-title">Add Exam</h2>
+      <app-request-exam-form (examSubmitted)="onExamSubmit($event)" />
+
+      @if (lastExamAdded(); as exam) {
+        <hc-alert variant="success" data-testid="exam-added-confirmation">
+          Exam <strong>{{ exam }}</strong> added to order
+        </hc-alert>
+      }
+
+      @if (examError(); as msg) {
+        <hc-alert variant="error">{{ msg }}</hc-alert>
+      }
+    </section>
+  }
+</div>

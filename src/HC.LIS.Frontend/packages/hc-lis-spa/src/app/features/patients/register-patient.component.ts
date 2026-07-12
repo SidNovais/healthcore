@@ -3,11 +3,12 @@ import { Router } from '@angular/router';
 import { PatientFormComponent } from './patient-form.component';
 import { PatientsService } from '../../core/application/patients.service';
 import type { RegisterPatientParams } from '../../core/domain/register-patient-params';
+import { HcAlert } from '../../ui/alert/alert';
 
 @Component({
   selector: 'app-register-patient',
   standalone: true,
-  imports: [PatientFormComponent],
+  imports: [PatientFormComponent, HcAlert],
   templateUrl: './register-patient.component.html',
   styleUrl: './register-patient.component.css',
 })

@@ -8,6 +8,15 @@ export const MOTION = {
   slow: 0.3,
 } as const;
 
+/**
+ * Synchronous reduced-motion check for imperative animations driven from effects or
+ * event handlers that can't own a gsap.matchMedia (e.g. list-row staggers keyed off a
+ * reactive result set). For lifecycle-scoped animations prefer withMotion/useMotion.
+ */
+export function prefersReducedMotion(): boolean {
+  return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 export interface MotionContext {
   /** True when the user has prefers-reduced-motion: reduce — skip or zero-out animations. */
   reduceMotion: boolean;

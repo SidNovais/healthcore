@@ -1,0 +1,42 @@
+<div class="orders-page">
+  <div class="orders-header">
+    <h1 class="orders-title">Orders</h1>
+  </div>
+
+  <table hc-table data-testid="order-list-table" class="orders-table">
+    <thead>
+      <tr>
+        <th>Patient</th>
+        <th>Requested By</th>
+        <th>Priority</th>
+        <th>Requested At</th>
+        <th class="num-col">Items</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (ordersService.orderList().length === 0) {
+        <tr>
+          <td colspan="5" class="empty-cell">No orders found.</td>
+        </tr>
+      } @else {
+        @for (item of ordersService.orderList(); track item.orderId) {
+          <tr
+            data-testid="order-list-row"
+            [routerLink]="['/orders', item.orderId]"
+            class="order-row"
+          >
+            <td data-testid="patient-name-cell">{{ item.patientName ?? item.patientId }}</td>
+            <td>{{ item.requestedBy }}</td>
+            <td>
+              <hc-badge [variant]="item.orderPriority === 'Urgent' ? 'warning' : 'neutral'">
+                {{ item.orderPriority }}
+              </hc-badge>
+            </td>
+            <td class="tabular-nums">{{ item.requestedAt }}</td>
+            <td class="num-col tabular-nums">{{ item.itemCount }}</td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>

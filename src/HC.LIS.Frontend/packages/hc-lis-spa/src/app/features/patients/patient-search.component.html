@@ -2,16 +2,19 @@
   <div class="search-header">
     <h2>Patient Search</h2>
     <button
+      hc-button
+      variant="cta"
       data-testid="register-patient-btn"
-      class="btn-primary"
       (click)="onRegisterClick()"
     >
+      <hc-icon name="plus" [size]="16" />
       Register New Patient
     </button>
   </div>
 
   <div class="search-bar">
     <input
+      hc-input
       type="text"
       data-testid="patient-search-input"
       placeholder="Search by name or document ID..."
@@ -21,11 +24,13 @@
   </div>
 
   @if (service.searchResults().length === 0) {
-    <p data-testid="patient-search-empty-state" class="empty-state">
-      No patients found. Try a different search term or register a new patient.
-    </p>
+    <hc-empty
+      data-testid="patient-search-empty-state"
+      title="No patients found"
+      description="Try a different search term or register a new patient."
+    />
   } @else {
-    <table data-testid="patient-search-results" class="results-table">
+    <table hc-table data-testid="patient-search-results">
       <thead>
         <tr>
           <th>Full Name</th>
@@ -42,14 +47,12 @@
             (click)="onRowClick(patient.id)"
           >
             <td>{{ patient.fullName }}</td>
-            <td>{{ patient.dateOfBirth }}</td>
+            <td class="tabular-nums">{{ patient.dateOfBirth }}</td>
             <td>{{ patient.documentId ?? '—' }}</td>
             <td>
-              <span
-                class="status-badge"
-                [class.status-active]="patient.status === 'Active'"
-                [class.status-anonymized]="patient.status === 'Anonymized'"
-              >{{ patient.status }}</span>
+              <hc-badge [variant]="patient.status === 'Active' ? 'success' : 'neutral'">
+                {{ patient.status }}
+              </hc-badge>
             </td>
           </tr>
         }

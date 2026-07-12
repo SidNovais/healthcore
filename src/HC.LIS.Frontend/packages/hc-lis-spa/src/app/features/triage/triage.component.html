@@ -1,0 +1,85 @@
+<div class="triage-page">
+  <div class="triage-header">
+    <h1 data-testid="triage-title" class="triage-title">Triage</h1>
+    <button hc-button variant="ghost" size="sm" (click)="refresh()">
+      <hc-icon name="refresh" [size]="15" /> Refresh
+    </button>
+  </div>
+
+  <div class="filter-bar">
+    <button data-testid="filter-tab-all" class="tab" [class.tab-active]="activeFilter() === 'All'" (click)="setFilter('All')">
+      All <span class="count">{{ totalCount() }}</span>
+    </button>
+    <button data-testid="filter-tab-arrived" class="tab tab-arrived" [class.tab-active]="activeFilter() === 'Arrived'" (click)="setFilter('Arrived')">
+      Arrived <span class="count">{{ arrivedCount() }}</span>
+    </button>
+    <button data-testid="filter-tab-waiting" class="tab tab-waiting" [class.tab-active]="activeFilter() === 'Waiting'" (click)="setFilter('Waiting')">
+      Waiting <span class="count">{{ waitingCount() }}</span>
+    </button>
+    <button data-testid="filter-tab-called" class="tab tab-called" [class.tab-active]="activeFilter() === 'Called'" (click)="setFilter('Called')">
+      Called <span class="count">{{ calledCount() }}</span>
+    </button>
+  </div>
+
+  <div class="list">
+    @if (showArrived()) {
+      <div data-testid="arrived-group" class="group">
+        <div class="group-header">Arrived</div>
+        @if (service.arrived().length === 0) {
+          <div class="empty-state">No patients arriving.</div>
+        } @else {
+          @for (item of service.arrived(); track item.collectionRequestId) {
+            <app-patient-row [item]="item" (sendToWaiting)="onSendToWaiting($event)" />
+          }
+        }
+      </div>
+    }
+
+    @if (showWaiting()) {
+      <div data-testid="waiting-group" class="group">
+        <div class="group-header">Waiting</div>
+        @if (service.waiting().length === 0) {
+          <div class="empty-state">No patients waiting.</div>
+        } @else {
+          @for (item of service.waiting(); track item.collectionRequestId) {
+            <app-patient-row
+              [item]="item"
+              (printLabel)="onPrintLabel($event)"
+              (callPatient)="onCallPatient($event)"
+            />
+          }
+        }
+      </div>
+    }
+
+    @if (showCalled()) {
+      <div data-testid="called-group" class="group">
+        <div class="group-header">Called</div>
+        @if (service.called().length === 0) {
+          <div class="empty-state">No patients called.</div>
+        } @else {
+          @for (item of service.called(); track item.collectionRequestId) {
+            <app-patient-row
+              [item]="item"
+              [samples]="samplesMap().get(item.collectionRequestId) ?? null"
+              (loadSamplesRequested)="onLoadSamples($event)"
+              (sampleCollectRequested)="onCollectSample($event)"
+            />
+          }
+        }
+      </div>
+    }
+
+    @if (error(); as msg) {
+      <hc-alert variant="error">{{ msg }}</hc-alert>
+    }
+  </div>
+</div>
+
+@if (printModalRequest(); as req) {
+  <app-print-labels-modal
+    [collectionRequestId]="req.collectionRequestId"
+    [patientId]="req.patientId"
+    (closed)="printModalRequest.set(null)"
+  />
+}

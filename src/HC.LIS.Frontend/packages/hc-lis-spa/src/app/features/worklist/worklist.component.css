@@ -1,0 +1,44 @@
+.worklist-page {
+  padding: 2rem;
+}
+
+.worklist-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.worklist-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.worklist-layout {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.worklist-table-container {
+  flex: 1;
+  min-width: 0;
+}
+
+.worklist-table {
+  width: 100%;
+}
+
+.worklist-row {
+  cursor: pointer;
+}
+
+.worklist-row.selected {
+  background: var(--color-accent-light);
+}
+
+.mono {
+  font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+}
