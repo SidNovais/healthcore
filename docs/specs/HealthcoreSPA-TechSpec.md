@@ -102,6 +102,7 @@ The SPA follows Clean Architecture with four concentric layers. Framework depend
 | **Application** | `src/app/core/application/` | Domain only — injectable services + port interfaces |
 | **Infrastructure** | `src/app/core/infrastructure/` | Application + `@hc-lis/api-client` SDK — implements ports |
 | **Presentation** | `src/app/features/` + `src/app/core/shell/` + `src/app/core/guards/` | Application layer services + Angular framework |
+| **UI primitives** | `src/app/ui/` | Angular framework + design tokens only — no application/domain imports (see §2.5) |
 
 #### Rules
 
@@ -127,6 +128,31 @@ features/auth/       LoginComponent            injects AuthService; zero SDK imp
 - Swapping the SDK or HTTP transport requires changing only `core/infrastructure/`
 - Domain interfaces are portable and reusable in non-Angular contexts (SSR, web workers)
 - Mirrors the HC.LIS backend's own Clean Architecture/CQRS layering for conceptual consistency
+
+### 2.5 UI Component Library (`src/app/ui/`)
+
+A shadcn-blueprinted, hand-rolled set of standalone Angular primitives — **no Tailwind, no Angular
+Material, no third-party component kit**. Each primitive uses the `hc-` selector prefix, signal
+inputs, external `.html`/`.css`, styles **exclusively** from design tokens (`var(--color-*)` etc.),
+and passes through `data-testid`. Primitives never import application/domain services — they are pure
+presentation and are unit-tested with vitest.
+
+| Primitive | Notes |
+|---|---|
+| `button` | variants: default / cta / ghost / destructive; `loading`, `disabled`, `size="icon"` |
+| `input` + `label` + `field` | field wraps label + control + helper/error text; validate-on-blur |
+| `select` / `native-select` | token-styled form controls |
+| `badge` | role + status variants (shell role badge, order/worklist statuses) |
+| `card` | triage cards, detail panels, print-labels card |
+| `table` | sticky header, `tabular-nums`, `aria-sort`, dense mode |
+| `dialog` | focus trap, Esc-to-close, 40–60% scrim (print-labels modal) |
+| `combobox` | patient-picker typeahead |
+| `tabs` | patient-/order-detail sections |
+| `alert` + `toast` | sonner-style toaster, `aria-live="polite"`, 3–5s auto-dismiss |
+| `skeleton`, `spinner` | loading states (>300ms rule) |
+| `tooltip`, `separator`, `empty` | icon-only buttons, dividers, empty lists |
+| `icon` | consolidated inline SVGs, Lucide-style, 1.5px stroke |
+| `motion/` | GSAP helpers — see §10.4 |
 
 ---
 
@@ -408,9 +434,11 @@ All feature routes use lazy `loadComponent` for code-splitting. `pathMatch: 'ful
 
 ## 9. Testing
 
-### 9.1 Unit Tests — Jasmine + Karma (`hc-lis-spa`)
+### 9.1 Unit Tests — Vitest via `@angular/build:unit-test` (`hc-lis-spa`)
 
-Scope: individual services and guards in full isolation. SDK functions are replaced with Jasmine spies.
+Scope: individual services, guards, and every `ui/` primitive in full isolation. SDK functions are
+replaced with test doubles. All `ui/` primitives ship a co-located `*.spec.ts` (anatomy, variants,
+states, ARIA). Run once (no watch): `yarn workspace hc-lis-spa test --no-watch`.
 
 | Subject | Test Cases |
 |---|---|
@@ -450,20 +478,88 @@ Config: `playwright.config.ts` — `baseURL` from `E2E_BASE_URL` env var (defaul
 | `auth.spec.ts` | Login with valid credentials → redirected to role home screen | All |
 | `auth.spec.ts` | Login with invalid credentials → error message visible; stays on `/login` | All |
 | `orders.spec.ts` | Login as Receptionist → fill order form → add exam → submit → confirmation visible | Receptionist |
-| `waiting-room.spec.ts` | Login as LabTechnician → waiting room loads with queue → call patient → create barcode → record collection → patient removed from queue | LabTechnician |
+| `order-patient-picker.spec.ts` | New-order patient-picker combobox typeahead selects a patient | Receptionist |
+| `patients.spec.ts` | Patient search → register → detail | Receptionist |
+| `triage.spec.ts` | Login as LabTechnician → triage loads with queue → call patient → create barcode → record collection → patient removed from queue | LabTechnician |
 | `worklist.spec.ts` | Login as Physician → worklist loads → click Refresh → rows visible → click row → details panel opens → sign report | Physician |
 | `admin-users.spec.ts` | Login as ITAdmin → user list loads → create user form → submit → new user appears in list | ITAdmin |
-| `hipaa.spec.ts` | After login, page URL contains no patient names or DOBs; `localStorage` and `sessionStorage` contain no `ACCESS_TOKEN` | Any |
+| `nav.spec.ts` | Sidebar nav active-state indicator per role | Role-scoped |
+| `hipaa.spec.ts` | After login, page URL contains no patient names or DOBs; `localStorage`/`sessionStorage` contain no `ACCESS_TOKEN` | Any |
+
+**Design System v2 gates** (Phase 0 + Phase 4):
+
+| Spec file | Gate |
+|---|---|
+| `theme.spec.ts` | Toggle switches `data-theme` on `<html>`, persists across reload, label/icon swaps, works per role |
+| `a11y.spec.ts` | `@axe-core/playwright` scan of every static route with **no WCAG 2 A/AA violations**, in light **and** dark, at desktop (1280) **and** 375px (40 scans) |
+| `reduced-motion.spec.ts` | With `emulateMedia({ reducedMotion: 'reduce' })`, every GSAP entrance/crossfade/stagger is skipped and content settles at full opacity |
 
 Run: `yarn workspace hc-lis-spa e2e`
 
 ---
 
-## 10. Open Design Decisions
+## 10. Design System v2, Theming & Motion
+
+Archetype **"Accessible & Ethical"** — WCAG AA minimum, AAA where cheap; light and dark tuned
+independently. Anti-patterns: no neon, no purple/pink gradients, no motion-heavy choreography, no
+emoji icons.
+
+### 10.1 Identity
+
+- **Colors:** primary cyan `#0891B2` (accent), health-green `#059669` (CTA/confirm). Dark theme
+  lifts these to `#22D3EE` / `#34D399` for contrast on slate surfaces.
+- **Type:** Figtree (headings) + Noto Sans (body), JetBrains Mono for barcodes/mono data. A
+  `tabular-nums` utility (`font-variant-numeric: tabular-nums`) is used for data tables/timers.
+
+### 10.2 Token strategy — single seam
+
+All theming lives in **`src/styles.css`**: the `:root` block (light) and the `[data-theme="dark"]`
+block (dark, desaturated/lightened variants — never inverted). Token **names are stable**; the v2
+refactor changed **values** only and added new tokens (`--color-cta`, `--color-cta-bg`, `--motion-*`)
+plus dark overrides for semantic (`--color-error/warning/success` + `-bg`) and `--color-role-*`
+tokens. Components consume `var(--color-*)` exclusively — no raw hex in component CSS. Contrast for
+every fg/bg pair in both themes is computed, not eyeballed, and gated by `a11y.spec.ts` (§9.3).
+
+### 10.3 Theming mechanism
+
+| Seam | Owner |
+|---|---|
+| Storage + `data-theme` on `<html>` + `localStorage['hc-lis-theme']` | `core/application/theme.service.ts` |
+| Token overrides | `[data-theme="dark"]` block in `src/styles.css` |
+| Toggle UI (`theme-toggle-btn`, sidebar footer) | `core/shell/shell.component.*` |
+
+`ThemeService.init()` runs in the `App` constructor to prevent a flash-of-wrong-theme.
+
+### 10.4 Motion (`ui/motion/motion.ts`)
+
+GSAP, kept deliberately subtle. Tokens `--motion-fast: 150ms` / `--motion-normal: 200ms` /
+`--motion-slow: 300ms` (mirrored as `MOTION` in `motion.ts`). Rules, enforced across all call sites
+and by `reduced-motion.spec.ts`:
+
+- **transform/opacity only** (`autoAlpha`, `x`, `y`, `scale`) — never `width/height/top/left`.
+- micro-interactions 150–300ms; **exits ~60–70% of enter** (e.g. route crossfade 200ms in / 120ms out).
+- staggers 30–50ms/item; eases `power1/2.out`.
+- **everything behind `prefers-reduced-motion`** — via `gsap.matchMedia` in the `withMotion`/`useMotion`
+  Angular helpers (created after first render, `revert()` on destroy), a synchronous
+  `prefersReducedMotion()` guard for result-set-keyed staggers, and a global CSS
+  `@media (prefers-reduced-motion: reduce)` guard in `styles.css`.
+
+### 10.5 Viewport support — desktop-first
+
+HC.LIS is a clinical-workstation application; the shell is a **fixed desktop sidebar layout with no
+responsive breakpoints** (only `prefers-reduced-motion` and `print` media queries exist). Login and
+error pages center gracefully down to 375px, but authed shell routes are **not** designed for phone
+widths. The `a11y.spec.ts` 375px pass is retained as a contrast/label gate — it does not assert
+mobile layout. A responsive/off-canvas navigation is deferred (see §11).
+
+---
+
+## 11. Open Design Decisions
 
 | # | Decision | Options | Recommendation |
 |---|---|---|---|
 | 1 | Real-time worklist updates | WebSocket (SignalR / native WS) vs polling vs manual refresh | Manual refresh for v1; add WebSocket in the next iteration when backend event streaming is ready — Angular Signals integrate cleanly with Observable-based streams |
 | 2 | SDK `generated/` directory | Commit to git vs gitignore + regenerate in CI | Gitignore `src/generated/` — regenerate via `yarn workspace @hc-lis/api-client generate` in CI pipeline and `postinstall` script; avoids merge conflicts on API changes |
-| 3 | Error display strategy | Toast notifications vs inline error signals vs global error boundary | Inline error signals on each feature service for v1 (simplest); add a toast service in a future pass |
-| 4 | UI component library | No library (plain CSS), Angular Material, or PrimeNG | Unresolved — ship unstyled functional components for v1; evaluate Angular Material v17 (`@angular/material`) for v2 |
+| 3 | Error display strategy | Toast notifications vs inline error signals vs global error boundary | **Resolved** — sonner-style `ui/toast` toaster (`aria-live="polite"`) plus inline error signals on feature services |
+| 4 | UI component library | No library (plain CSS), Angular Material, or PrimeNG | **Resolved** — hand-rolled shadcn-blueprinted `src/app/ui/` primitives, tokens only (§2.5); no Tailwind/Material |
+| 5 | Responsive / mobile shell | Off-canvas hamburger nav vs desktop-only | Desktop-only for now (§10.5); revisit if a mobile/tablet clinical use-case emerges |
