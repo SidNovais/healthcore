@@ -48,7 +48,7 @@ import { RouterLink } from '@angular/router';
       line-height: 1;
     }
     .error-title {
-      font-family: 'Instrument Sans', sans-serif;
+      font-family: var(--font-heading);
       font-size: 1.25rem;
       font-weight: 600;
       color: var(--color-text);

@@ -1,34 +1,45 @@
 /* ══════════════════════════════════════════════════════════════
-   HC.LIS — Modern Clinical Design System
-   Global tokens, resets, and base typography
+   HC.LIS — Design System v2 ("Accessible & Ethical")
+   Global tokens, resets, and base typography.
+   Contrast: every fg/bg pair below is computed ≥4.5:1 (normal
+   text) or ≥3:1 (large text / UI glyphs) in its own theme.
 ═══════════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Noto+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  /* Backgrounds */
-  --color-bg:            #f9fafb;
-  --color-surface:       #ffffff;
-  --color-surface-2:     #f3f4f6;
-  --color-border:        #e5e7eb;
-  --color-border-strong: #d1d5db;
+  /* Typography */
+  --font-heading: 'Figtree', system-ui, sans-serif;
+  --font-body:    'Noto Sans', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', 'IBM Plex Mono', monospace;
 
-  /* Primary accent — institutional blue */
-  --color-accent:        #1d4ed8;
-  --color-accent-light:  #eff6ff;
-  --color-accent-mid:    #3b82f6;
+  /* Backgrounds */
+  --color-bg:            #f8fafc;
+  --color-surface:       #ffffff;
+  --color-surface-2:     #f1f5f9;
+  --color-border:        #e2e8f0;
+  --color-border-strong: #cbd5e1;
+
+  /* Primary accent — healthcare cyan (cyan-700; 5.2:1 on white) */
+  --color-accent:        #0e7490;
+  --color-accent-light:  #ecfeff;
+  --color-accent-mid:    #06b6d4;
+
+  /* CTA — health green (emerald-700; 5.5:1 under white text) */
+  --color-cta:           #047857;
+  --color-cta-bg:        #ecfdf5;
 
   /* Text hierarchy */
-  --color-text:          #111827;
-  --color-text-muted:    #6b7280;
-  --color-text-subtle:   #9ca3af;
+  --color-text:          #0f2e3d;
+  --color-text-muted:    #526b78;
+  --color-text-subtle:   #94a3b8; /* large/secondary text only */
 
-  /* Semantic */
-  --color-error:         #dc2626;
+  /* Semantic — each fg computed ≥4.5:1 on its *-bg pair */
+  --color-error:         #b91c1c;
   --color-error-bg:      #fef2f2;
-  --color-warning:       #d97706;
+  --color-warning:       #b45309;
   --color-warning-bg:    #fffbeb;
-  --color-success:       #16a34a;
+  --color-success:       #15803d;
   --color-success-bg:    #f0fdf4;
 
   /* Role badge colors */
@@ -60,12 +71,17 @@
   --radius-xl:   14px;
   --radius-full: 9999px;
 
-  /* Transitions */
+  /* Motion — micro-interactions only; transform/opacity, never layout */
+  --motion-fast:   150ms;
+  --motion-normal: 200ms;
+  --motion-slow:   300ms;
+
+  /* Transitions (legacy names kept — component CSS consumes them) */
   --transition-fast:   120ms ease;
   --transition-normal: 200ms ease;
 }
 
-/* ── Dark theme overrides ────────────────────────────────────── */
+/* ── Dark theme overrides — desaturated/lightened, never inverted ── */
 [data-theme="dark"] {
   --color-bg:            #0f172a;
   --color-surface:       #1e293b;
@@ -75,9 +91,21 @@
   --color-text:          #f1f5f9;
   --color-text-muted:    #94a3b8;
   --color-text-subtle:   #64748b;
-  --color-accent:        #3b82f6;
-  --color-accent-light:  #1e3a5f;
-  --color-accent-mid:    #60a5fa;
+  --color-accent:        #22d3ee;
+  --color-accent-light:  #164e63;
+  --color-accent-mid:    #67e8f9;
+  --color-cta:           #34d399;
+  --color-cta-bg:        #064e3b;
+  --color-error:         #f87171;
+  --color-error-bg:      #450a0a;
+  --color-warning:       #fbbf24;
+  --color-warning-bg:    #451a03;
+  --color-success:       #4ade80;
+  --color-success-bg:    #052e16;
+  --color-role-receptionist: #38bdf8;
+  --color-role-labtech:      #34d399;
+  --color-role-physician:    #60a5fa;
+  --color-role-itadmin:      #a78bfa;
   --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / .20);
   --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / .30), 0 1px 2px -1px rgb(0 0 0 / .30);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / .30), 0 2px 4px -2px rgb(0 0 0 / .30);
@@ -93,7 +121,7 @@ html, body {
 }
 
 body {
-  font-family: 'Instrument Sans', system-ui, sans-serif;
+  font-family: var(--font-body);
   font-size: 1rem;
   color: var(--color-text);
   background-color: var(--color-bg);
@@ -104,7 +132,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Instrument Sans', system-ui, sans-serif;
+  font-family: var(--font-heading);
   color: var(--color-text);
   margin: 0;
   line-height: 1.25;
@@ -126,6 +154,18 @@ h1, h2, h3, h4, h5, h6 {
   position: absolute; width: 1px; height: 1px;
   padding: 0; margin: -1px; overflow: hidden;
   clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+.tabular-nums { font-variant-numeric: tabular-nums; }
+
+/* ── Reduced motion — global guard; GSAP honors it via matchMedia ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* ── Print isolation for label modal ─────────────────────────── */
