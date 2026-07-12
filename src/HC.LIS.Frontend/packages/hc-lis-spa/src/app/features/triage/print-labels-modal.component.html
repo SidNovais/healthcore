@@ -1,0 +1,29 @@
+<div
+  data-testid="print-labels-modal"
+  class="overlay"
+  (click)="onOverlayClick($event)"
+>
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h2 class="modal-title">Print Labels</h2>
+        <p class="modal-sub mono">{{ patientId() }}</p>
+      </div>
+    </div>
+
+    @if (loading()) {
+      <p class="loading-text">Loading samples…</p>
+    } @else {
+      <app-print-labels-card [samples]="samples()" [showPrintButton]="false" />
+    }
+
+    <div class="modal-footer">
+      <button hc-button variant="ghost" size="sm" data-testid="print-modal-cancel-btn" (click)="closed.emit()">Cancel</button>
+      @if (!loading() && samples().length > 0) {
+        <button hc-button size="sm" data-testid="print-modal-print-btn" (click)="printLabels()">
+          <hc-icon name="printer" [size]="15" /> Print
+        </button>
+      }
+    </div>
+  </div>
+</div>

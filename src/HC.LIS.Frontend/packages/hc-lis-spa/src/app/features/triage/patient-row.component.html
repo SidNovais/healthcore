@@ -1,0 +1,66 @@
+<div
+  data-testid="patient-row"
+  [attr.data-cr-id]="item().collectionRequestId"
+  class="card"
+  [ngClass]="cardClass()"
+>
+  <div class="row">
+    <div class="info">
+      <span class="patient-id mono">{{ item().patientId | slice: 0 : 8 }}…</span>
+      <span class="meta">{{ timestampLabel() }} · {{ item().arrivedAt | slice: 11 : 16 }}</span>
+    </div>
+    <hc-badge [variant]="statusVariant()">{{ item().status }}</hc-badge>
+
+    <div class="kebab-wrapper">
+      <button
+        hc-button
+        variant="ghost"
+        size="icon"
+        data-testid="patient-row-menu-btn"
+        (click)="toggleMenu($event)"
+        [attr.aria-label]="'Actions for ' + item().patientId"
+      >⋮</button>
+
+      @if (menuOpen()) {
+        <div data-testid="patient-row-menu" class="kebab-menu">
+          @if (item().status === 'Arrived') {
+            <button data-testid="action-send-to-waiting" class="menu-item" (click)="onSendToWaiting()">
+              → Send to Waiting Room
+            </button>
+          }
+          @if (item().status === 'Waiting') {
+            <button data-testid="action-print-label" class="menu-item" (click)="onPrintLabel()">
+              <hc-icon name="printer" [size]="15" /> Print Label
+            </button>
+            <hr class="divider" />
+            <button data-testid="action-call-patient" class="menu-item" (click)="onCallPatient()">
+              <hc-icon name="user" [size]="15" /> Call Patient
+            </button>
+          }
+          @if (item().status === 'Called') {
+            <button data-testid="action-record-collection" class="menu-item" (click)="onRecordCollection()">
+              <hc-icon name="check" [size]="15" /> Record Collection
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (pendingSamples().length > 0) {
+    <div data-testid="sample-cards-panel" class="sample-cards">
+      @for (sample of pendingSamples(); track sample.id) {
+        <div data-testid="sample-card" class="sample-card">
+          <span class="mono">{{ sample.tubeType }}</span>
+          <span class="mono">{{ sample.barcode }}</span>
+          <button
+            hc-button
+            size="sm"
+            data-testid="sample-collect-btn"
+            (click)="onCollectSample(sample.id)"
+          >Collect</button>
+        </div>
+      }
+    </div>
+  }
+</div>

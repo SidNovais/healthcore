@@ -1,0 +1,14 @@
+<div data-testid="print-labels-section" class="print-labels-section">
+  @for (sample of samplesWithBarcode(); track sample.id) {
+    <div data-testid="barcode-label" class="label-item">
+      <span class="tube-type">{{ sample.tubeType }}</span>
+      <svg #barcodesvg class="barcode-svg"></svg>
+      <span class="barcode-text mono">{{ sample.barcode }}</span>
+    </div>
+  }
+  @if (samplesWithBarcode().length > 0 && showPrintButton()) {
+    <button hc-button size="sm" data-testid="print-labels-btn" class="print-labels-btn" (click)="print()">
+      Print Labels
+    </button>
+  }
+</div>
