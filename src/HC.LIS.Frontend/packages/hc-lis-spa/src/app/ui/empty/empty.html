@@ -1,0 +1,6 @@
+<ng-content select="hc-icon" />
+<p class="hc-empty__title">{{ title() }}</p>
+@if (description(); as text) {
+  <p class="hc-empty__description">{{ text }}</p>
+}
+<ng-content />

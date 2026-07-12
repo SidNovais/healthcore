@@ -1,0 +1,12 @@
+:host {
+  display: block;
+  background: var(--color-border);
+  height: 1px;
+  width: 100%;
+}
+
+:host(.hc-separator--vertical) {
+  height: auto;
+  align-self: stretch;
+  width: 1px;
+}

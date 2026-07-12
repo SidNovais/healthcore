@@ -1,0 +1,35 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+}
+
+/* Sections are projected content, outside this component's view encapsulation. */
+:host ::ng-deep .hc-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4) var(--space-5) 0;
+}
+
+:host ::ng-deep .hc-card__title {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+}
+
+:host ::ng-deep .hc-card__content {
+  padding: var(--space-4) var(--space-5);
+}
+
+:host ::ng-deep .hc-card__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-5) var(--space-4);
+}

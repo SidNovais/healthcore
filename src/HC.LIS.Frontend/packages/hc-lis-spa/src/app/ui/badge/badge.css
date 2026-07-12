@@ -1,0 +1,49 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+:host(.hc-badge--neutral) {
+  background: var(--color-surface-2);
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
+}
+
+:host(.hc-badge--accent) {
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+}
+
+:host(.hc-badge--success) {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+:host(.hc-badge--warning) {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+:host(.hc-badge--error) {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+}
+
+:host(.hc-badge--role) {
+  background: var(--color-surface-2);
+  border-color: currentcolor;
+}
+
+:host(.hc-badge--role[data-role="Receptionist"])  { color: var(--color-role-receptionist); }
+:host(.hc-badge--role[data-role="LabTechnician"]) { color: var(--color-role-labtech); }
+:host(.hc-badge--role[data-role="Physician"])     { color: var(--color-role-physician); }
+:host(.hc-badge--role[data-role="ITAdmin"])       { color: var(--color-role-itadmin); }
