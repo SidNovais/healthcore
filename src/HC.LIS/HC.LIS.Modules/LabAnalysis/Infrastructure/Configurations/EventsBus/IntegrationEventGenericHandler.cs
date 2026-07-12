@@ -24,7 +24,8 @@ internal class IntegrationEventGenericHandler<T> : IIntegrationEventListener<T>
         });
 
         string sql = @$"INSERT INTO ""lab_analysis"".""InboxMessages"" (""Id"", ""OccurredAt"", ""Type"", ""Data"", ""TraceContext"") " +
-                  "VALUES (@Id, @OccurredAt, @Type, @Data, @TraceContext)";
+                  "VALUES (@Id, @OccurredAt, @Type, @Data, @TraceContext) " +
+                  @"ON CONFLICT (""Id"") DO NOTHING";
 
         await connection.ExecuteScalarAsync(sql, new
         {
