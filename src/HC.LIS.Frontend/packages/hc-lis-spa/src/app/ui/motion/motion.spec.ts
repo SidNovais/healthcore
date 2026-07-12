@@ -37,9 +37,10 @@ describe('initMotionDefaults', () => {
   it('sets project-wide gsap defaults: 200ms, power2.out', () => {
     initMotionDefaults();
 
-    const defaults = gsap.defaults() as { duration?: number; ease?: string };
+    const defaults = gsap.defaults() as { duration?: number; ease?: gsap.EaseFunction };
     expect(defaults.duration).toBe(0.2);
-    expect(defaults.ease).toBe('power2.out');
+    // gsap stores the parsed ease function; parseEase returns the cached instance
+    expect(defaults.ease).toBe(gsap.parseEase('power2.out'));
   });
 });
 
