@@ -496,6 +496,17 @@ Config: `playwright.config.ts` — `baseURL` from `E2E_BASE_URL` env var (defaul
 
 Run: `yarn workspace hc-lis-spa e2e`
 
+**Known infra debt — full-suite cross-browser flakiness.** Running all three browsers
+back-to-back at `workers: 1` (306 tests), webkit (which runs last) intermittently starves —
+`getByLabel('Email')` / `waitForResponse` time out on ~12 `auth`/`hipaa` tests, while webkit's
+own `a11y`/`theme`/`reduced-motion` specs (which also log in) pass in the same run. The same 12
+specs pass 48/48 when run in isolation, so it is transient contention (dev-server recompilation
+and/or API request-latency spikes under sustained load), not a product defect. This is the milder
+residue of the historical `SqlConnectionFactory` pool-exhaustion hang, now that the leak is fixed
+(Postgres held steady at ~38 connections across the full run). Local runs use `retries: 0`; CI
+uses `retries: 2`, which absorbs it. Future hardening: enable a local retry, or run e2e against a
+production `ng build` served statically instead of `ng serve`.
+
 ---
 
 ## 10. Design System v2, Theming & Motion
