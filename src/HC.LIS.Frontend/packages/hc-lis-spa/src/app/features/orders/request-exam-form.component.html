@@ -1,0 +1,42 @@
+<form class="exam-form" (ngSubmit)="submit()">
+  <hc-field>
+    <label hc-label for="exam-mnemonic">Exam Mnemonic</label>
+    <input
+      hc-input
+      id="exam-mnemonic"
+      data-testid="exam-mnemonic-input"
+      type="text"
+      class="mono-input"
+      [(ngModel)]="examMnemonic"
+      name="examMnemonic"
+      required
+      placeholder="e.g. GLU, HBA1C"
+    />
+  </hc-field>
+
+  <hc-field>
+    <label hc-label for="container-type">Container Type</label>
+    <input
+      hc-input
+      id="container-type"
+      data-testid="container-type-input"
+      type="text"
+      class="mono-input"
+      [(ngModel)]="containerType"
+      name="containerType"
+      required
+      placeholder="e.g. RedTop, EDTA"
+    />
+  </hc-field>
+
+  <button
+    hc-button
+    variant="cta"
+    type="submit"
+    data-testid="request-exam-btn"
+    class="exam-form__submit"
+    [disabled]="!examMnemonic || !containerType"
+  >
+    Add Exam
+  </button>
+</form>

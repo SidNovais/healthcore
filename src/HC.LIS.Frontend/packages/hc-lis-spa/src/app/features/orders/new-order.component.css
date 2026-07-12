@@ -1,0 +1,47 @@
+.new-order-page {
+  max-width: 600px;
+  margin: 3rem auto;
+  padding: 0 1.5rem;
+}
+
+.new-order-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 2rem;
+}
+
+.order-create-section form,
+.exam-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.create-order-submit {
+  align-self: flex-start;
+}
+
+.order-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  align-self: flex-start;
+  padding: 0.4rem 0.75rem;
+  background: var(--color-cta-bg);
+  border-left: 3px solid var(--color-cta);
+  font-size: 0.8rem;
+  color: var(--color-text);
+}
+
+.order-id {
+  font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0.5rem 0;
+}
