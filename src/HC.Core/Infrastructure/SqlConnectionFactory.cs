@@ -13,17 +13,27 @@ public class SqlConnectionFactory(string connectionString) : ISqlConnectionFacto
     private bool _disposed = false;
     #pragma warning restore CA1805
 
+    // Returns a fresh, independent connection that the CALLER owns and must dispose
+    // (typically via `using`). Used where a separate physical connection is required —
+    // e.g. projectors running while Marten holds the scope-managed connection for an
+    // event write. Must NOT touch _connection, or it would orphan the scope-managed
+    // connection and leak it out of the pool.
     public IDbConnection CreateConnection()
     {
-        _connection = new NpgsqlConnection(_connectionString);
-        _connection.Open();
-        return _connection;
+        var connection = new NpgsqlConnection(_connectionString);
+        connection.Open();
+        return connection;
     }
 
+    // Returns the scope-managed connection, opening it on first use. Owned by this
+    // factory and released when the lifetime scope disposes it (see Dispose).
     public IDbConnection? GetConnection()
     {
         if (_connection is null || _connection.State != ConnectionState.Open)
-            CreateConnection();
+        {
+            _connection = new NpgsqlConnection(_connectionString);
+            _connection.Open();
+        }
         return _connection;
     }
 

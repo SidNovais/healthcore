@@ -49,12 +49,15 @@ test.describe('Patient Picker in New Order', () => {
       r.status() === 200,
     );
 
-    // Results dropdown visible with the patient row
+    // Results dropdown visible. The partial-name query matches every PickerPatient-*
+    // row (including any left by earlier runs), so target OUR patient by its full unique
+    // name rather than assuming it sorts first.
     await expect(page.getByTestId('patient-picker-results')).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByTestId('patient-picker-result-item').first()).toContainText(uniqueName, { timeout: 5_000 });
+    const ourResult = page.getByTestId('patient-picker-result-item').filter({ hasText: uniqueName });
+    await expect(ourResult).toBeVisible({ timeout: 5_000 });
 
     // Select the patient
-    await page.getByTestId('patient-picker-result-item').first().click();
+    await ourResult.click();
 
     // Dropdown gone; selection card appears with name and document ID
     await expect(page.getByTestId('patient-picker-results')).not.toBeVisible();

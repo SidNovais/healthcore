@@ -87,6 +87,7 @@
         "ASPNETCORE_HCLIS_JWT_ISSUER": "hclis",
         "ASPNETCORE_HCLIS_JWT_AUDIENCE": "hclis",
         "ASPNETCORE_HCLIS_JWT_SECRET_KEY": "change-me-in-production-min-32-chars!!",
+        "ASPNETCORE_HCLIS_EventBus__Type": "memory",
         "ASPNETCORE_HCLIS_EventBus__ConnectionString": "amqp://dev:dev@localhost:5672/",
         "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4317",
         "OTEL_EXPORTER_OTLP_PROTOCOL": "grpc"

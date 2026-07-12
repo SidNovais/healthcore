@@ -10,4 +10,13 @@
   <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructure\HC.Core.Infrastructure.csproj" />
+  </ItemGroup>
+  <PropertyGroup>
+    <!-- Referencing HC.Core.Infrastructure pulls in Polly, whose Polly.Timeout namespace
+         collides with the existing Probing/Timeout test helper (CA1724). Harmless in a
+         test project. -->
+    <NoWarn>$(NoWarn);CA1724</NoWarn>
+  </PropertyGroup>
 </Project>
