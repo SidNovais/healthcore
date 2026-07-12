@@ -150,7 +150,7 @@
 .login-footer {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.7rem;
-  color: var(--color-text-subtle);
+  color: var(--color-text-muted);
   text-align: center;
   max-width: 440px;
   line-height: 1.5;

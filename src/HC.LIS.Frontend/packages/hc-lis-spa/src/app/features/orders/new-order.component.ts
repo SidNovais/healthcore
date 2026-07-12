@@ -61,10 +61,10 @@ import type { PatientSearchResult } from '../../core/domain/patient-search-resul
   `,
   styles: [`
     .page { max-width: 600px; margin: 3rem auto; padding: 0 1.5rem; font-family: system-ui, sans-serif; }
-    .page-title { font-size: 1.5rem; font-weight: 600; color: #111; margin-bottom: 2rem; }
+    .page-title { font-size: 1.5rem; font-weight: 600; color: var(--color-text); margin-bottom: 2rem; }
     .order-create-section, .exam-section { display: flex; flex-direction: column; gap: 1.25rem; }
     .field { display: flex; flex-direction: column; gap: 0.25rem; }
-    label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #6b7280; }
+    label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-text-muted); }
     .btn-primary {
       align-self: flex-start;
       padding: 0.5rem 1.5rem;

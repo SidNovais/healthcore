@@ -100,7 +100,7 @@ interface PrintModalRequest {
   styles: [`
     .page { max-width: 900px; margin: 2rem auto; padding: 0 1.5rem; font-family: system-ui, sans-serif; }
     .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
-    .page-title { font-size: 1.5rem; font-weight: 600; color: #111; margin: 0; }
+    .page-title { font-size: 1.5rem; font-weight: 600; color: var(--color-text); margin: 0; }
     .btn-refresh { padding: 0.4rem 0.9rem; background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 2px; font-size: 0.8rem; cursor: pointer; color: #374151; }
     .btn-refresh:hover { background: #e5e7eb; }
 
@@ -115,8 +115,8 @@ interface PrintModalRequest {
 
     .list { display: flex; flex-direction: column; gap: 1.5rem; }
     .group { display: flex; flex-direction: column; gap: 0.5rem; }
-    .group-header { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #6b7280; margin-bottom: 0.2rem; }
-    .empty-state { padding: 1.5rem; text-align: center; color: #9ca3af; border: 1px dashed #d1d5db; font-size: 0.85rem; }
+    .group-header { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 0.2rem; }
+    .empty-state { padding: 1.5rem; text-align: center; color: var(--color-text-muted); border: 1px dashed var(--color-border-strong); font-size: 0.85rem; }
     .error-text { color: #b91c1c; font-size: 0.875rem; }
   `],
 })

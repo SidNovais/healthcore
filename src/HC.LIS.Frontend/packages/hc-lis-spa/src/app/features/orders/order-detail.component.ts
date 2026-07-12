@@ -107,14 +107,14 @@ import { OrdersService } from './orders.service';
   styles: [`
     .page { max-width: 1000px; margin: 2rem auto; padding: 0 1.5rem; font-family: system-ui, sans-serif; }
     .page-header { display: flex; align-items: baseline; gap: 1.5rem; margin-bottom: 1.5rem; }
-    .page-title { font-size: 1.5rem; font-weight: 600; color: #111; margin: 0; }
-    .back-link { font-size: 0.875rem; color: #2c7be5; text-decoration: none; }
+    .page-title { font-size: 1.5rem; font-weight: 600; color: var(--color-text); margin: 0; }
+    .back-link { font-size: 0.875rem; color: var(--color-accent); text-decoration: none; }
     .back-link:hover { text-decoration: underline; }
     .order-meta { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
     .order-meta p { margin: 0.25rem 0; font-size: 0.875rem; color: #374151; }
     .section-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.75rem; }
     .items-table { width: 100%; border-collapse: collapse; }
-    .items-table th { text-align: left; padding: 0.5rem 0.75rem; border-bottom: 2px solid #e5e7eb; font-size: 0.75rem; text-transform: uppercase; color: #6b7280; }
+    .items-table th { text-align: left; padding: 0.5rem 0.75rem; border-bottom: 2px solid var(--color-border); font-size: 0.75rem; text-transform: uppercase; color: var(--color-text-muted); }
     .items-table td { padding: 0.75rem; border-bottom: 1px solid #f3f4f6; font-size: 0.875rem; vertical-align: top; }
     .status-badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; background: #e5e7eb; color: #374151; }
     .actions-cell { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: flex-start; }
@@ -122,7 +122,7 @@ import { OrdersService } from './orders.service';
     .actions-cell button:hover { background: #f3f4f6; }
     .reason-form { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.5rem; min-width: 220px; }
     .reason-form input { padding: 0.35rem 0.6rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.8rem; }
-    .empty-cell { text-align: center; color: #9ca3af; padding: 2rem; }
+    .empty-cell { text-align: center; color: var(--color-text-muted); padding: 2rem; }
     .error-banner { margin-bottom: 1rem; padding: 0.75rem 1rem; border-radius: 6px; background: #fef2f2; border: 1px solid #fca5a5; color: #b91c1c; font-size: 0.875rem; }
   `],
 })

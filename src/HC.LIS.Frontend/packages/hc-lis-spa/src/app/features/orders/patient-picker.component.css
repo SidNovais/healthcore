@@ -5,12 +5,13 @@
 .picker-input {
   width: 100%;
   padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-border-strong);
   border-radius: 0;
   font-size: 0.875rem;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-body);
   box-sizing: border-box;
-  background: #fff;
+  background: var(--color-surface);
+  color: var(--color-text);
 }
 
 .picker-input:focus {
@@ -26,8 +27,8 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  background: #fff;
-  border: 1px solid #d1d5db;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
   border-top: none;
   max-height: 220px;
   overflow-y: auto;
@@ -42,7 +43,7 @@
   padding: 0.5rem 0.75rem;
   cursor: pointer;
   font-size: 0.875rem;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .result-item:last-child {
@@ -50,18 +51,18 @@
 }
 
 .result-item:hover {
-  background: #f0faf9;
+  background: var(--color-surface-2);
 }
 
 .result-name {
   flex: 1;
-  color: #111827;
+  color: var(--color-text);
   font-weight: 500;
 }
 
 .result-doc {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
 }
 
@@ -70,8 +71,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.6rem 0.75rem;
-  background: #e6f4f1;
-  border-left: 3px solid #00897B;
+  background: var(--color-accent-light);
+  border-left: 3px solid var(--color-accent);
 }
 
 .card-info {
@@ -83,19 +84,19 @@
 .patient-name {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text);
 }
 
 .patient-meta {
   font-size: 0.75rem;
-  color: #374151;
+  color: var(--color-text-muted);
 }
 
 .clear-btn {
   background: none;
   border: none;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 0.875rem;
   padding: 0.25rem 0.5rem;
   line-height: 1;
@@ -103,6 +104,6 @@
 }
 
 .clear-btn:hover {
-  color: #111827;
+  color: var(--color-text);
   background: rgba(0, 0, 0, 0.06);
 }

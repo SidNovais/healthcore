@@ -45,6 +45,7 @@ import type { UserRole } from '../../core/domain/user-session';
                 <td>
                   <select
                     [value]="user.role"
+                    [attr.aria-label]="'Role for ' + user.email"
                     (change)="onRoleChange(user.id, $event)"
                   >
                     <option value="Receptionist">Receptionist</option>
@@ -66,7 +67,7 @@ import type { UserRole } from '../../core/domain/user-session';
     .users-page { padding: 2rem; }
     .users-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
     .users-header h2 { margin: 0; }
-    .users-header button { padding: 0.4rem 0.9rem; background: #2c7be5; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    .users-header button { padding: 0.4rem 0.9rem; background: var(--color-accent); color: var(--color-surface); border: none; border-radius: 4px; cursor: pointer; }
     .form-wrapper { margin-bottom: 1.5rem; }
     .empty-state { color: var(--color-text-muted, #888); }
     .users-table { width: 100%; border-collapse: collapse; }

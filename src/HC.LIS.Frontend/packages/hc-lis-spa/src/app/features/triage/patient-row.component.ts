@@ -76,7 +76,8 @@ import type { SampleSummary } from '../../core/domain/sample-summary';
     .info { flex: 1; display: flex; flex-direction: column; gap: 0.1rem; }
     .patient-id { font-size: 0.875rem; font-weight: 700; color: #111; }
     .mono { font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace; }
-    .meta { font-size: 0.7rem; color: #9ca3af; }
+    /* cards keep hardcoded light backgrounds, so this gray must pass on #fafffe */
+    .meta { font-size: 0.7rem; color: #6b7280; }
     .badge { padding: 0.2rem 0.55rem; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; border-radius: 2px; white-space: nowrap; }
     .badge-arrived { background: #d1fae5; color: #065f46; }
     .badge-waiting  { background: #fef3c7; color: #92400e; }

@@ -87,7 +87,7 @@ import type { UserRole } from '../../core/domain/user-session';
     .form-row input, .form-row select { padding: 0.45rem 0.6rem; border: 1px solid #ccc; border-radius: 4px; font-size: 0.95rem; }
     .form-actions { display: flex; gap: 0.6rem; margin-top: 1rem; }
     .form-actions button { padding: 0.5rem 1.1rem; border: none; border-radius: 4px; cursor: pointer; }
-    .form-actions button:first-child { background: #2c7be5; color: #fff; }
+    .form-actions button:first-child { background: var(--color-accent); color: var(--color-surface); }
     .form-actions button:first-child:disabled { background: #9ab8e8; cursor: not-allowed; }
     .cancel-btn { background: #f0f0f0; color: #333; }
     .error { color: #c0392b; font-size: 0.9rem; }

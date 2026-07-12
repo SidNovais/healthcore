@@ -41,7 +41,7 @@
 
 .patient-fields dt {
   font-weight: 600;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .patient-actions {

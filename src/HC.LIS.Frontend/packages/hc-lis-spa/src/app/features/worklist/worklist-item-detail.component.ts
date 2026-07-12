@@ -84,7 +84,7 @@ import type { WorklistItemDetails } from '../../core/domain/worklist-item-detail
     .out-of-range td { color: #c0392b; font-weight: 600; }
     .sign-form { display: flex; flex-direction: column; gap: 0.5rem; max-width: 320px; margin-top: 1rem; }
     .sign-form input { padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; }
-    .sign-form button { padding: 0.5rem 1rem; background: #2c7be5; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    .sign-form button { padding: 0.5rem 1rem; background: var(--color-accent); color: var(--color-surface); border: none; border-radius: 4px; cursor: pointer; }
     .sign-form button:disabled { background: #9ab8e8; cursor: not-allowed; }
     .confirmation { padding: 0.75rem; background: #d4edda; border-radius: 4px; color: #155724; margin-top: 1rem; }
     .error { color: #c0392b; }

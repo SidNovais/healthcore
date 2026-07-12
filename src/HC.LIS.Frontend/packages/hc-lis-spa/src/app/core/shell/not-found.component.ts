@@ -28,7 +28,7 @@ import { RouterLink } from '@angular/router';
       font-family: 'JetBrains Mono', monospace;
       font-size: 5rem;
       font-weight: 700;
-      color: var(--color-text-subtle);
+      color: var(--color-text-muted);
       margin: 0;
       line-height: 1;
     }
