@@ -4,25 +4,18 @@ import { TriageService } from './triage.service';
 import type { SampleSummary } from '../../core/domain/sample-summary';
 import { HcButton } from '../../ui/button/button';
 import { HcIcon } from '../../ui/icon/icon';
-import { MOTION, useMotion } from '../../ui/motion/motion';
-import { gsap } from 'gsap';
+import { HcDialog } from '../../ui/dialog/dialog';
+import { HcSkeleton } from '../../ui/skeleton/skeleton';
 
 @Component({
   selector: 'app-print-labels-modal',
   standalone: true,
-  imports: [PrintLabelsCardComponent, HcButton, HcIcon],
+  imports: [PrintLabelsCardComponent, HcButton, HcIcon, HcDialog, HcSkeleton],
   templateUrl: './print-labels-modal.component.html',
   styleUrl: './print-labels-modal.component.css',
 })
 export class PrintLabelsModalComponent implements OnInit {
   private readonly triageService = inject(TriageService);
-
-  constructor() {
-    useMotion(ctx => {
-      if (ctx.reduceMotion) return;
-      gsap.from('.modal-box', { autoAlpha: 0, scale: 0.98, duration: MOTION.normal, ease: 'power2.out' });
-    });
-  }
 
   readonly collectionRequestId = input.required<string>();
   readonly patientId = input.required<string>();
@@ -30,6 +23,8 @@ export class PrintLabelsModalComponent implements OnInit {
 
   protected readonly samples = signal<SampleSummary[]>([]);
   protected readonly loading = signal(true);
+  /** Opens the native <dialog> immediately; flips false on Esc/backdrop so hc-dialog does not re-open it. */
+  protected readonly dialogOpen = signal(true);
 
   async ngOnInit(): Promise<void> {
     try {
@@ -40,9 +35,14 @@ export class PrintLabelsModalComponent implements OnInit {
     }
   }
 
-  protected onOverlayClick(event: MouseEvent): void {
-    if ((event.target as HTMLElement).classList.contains('overlay')) {
-      this.closed.emit();
+  protected close(): void {
+    this.dialogOpen.set(false);
+    this.closed.emit();
+  }
+
+  protected onDialogOpenChange(open: boolean): void {
+    if (!open) {
+      this.close();
     }
   }
 

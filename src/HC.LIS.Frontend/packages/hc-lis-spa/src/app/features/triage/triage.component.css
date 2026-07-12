@@ -19,48 +19,14 @@
 }
 
 .filter-bar {
-  display: flex;
-  gap: 0.5rem;
+  display: block;
   margin-bottom: 1.25rem;
-  flex-wrap: wrap;
 }
-
-.tab {
-  padding: 0.3rem 0.85rem;
-  border-radius: var(--radius-full);
-  font-size: 0.8rem;
-  font-weight: 500;
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  cursor: pointer;
-  color: var(--color-text);
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.tab:hover {
-  background: var(--color-surface-2);
-}
-
-.tab-active {
-  background: var(--color-accent) !important;
-  color: var(--color-surface) !important;
-  border-color: var(--color-accent) !important;
-}
-
-/* Dark accent is a bright cyan — flip the active label to dark, mirroring hc-button. */
-:host-context([data-theme='dark']) .tab-active {
-  color: #0f172a !important;
-}
-
-.tab-arrived { border-color: var(--color-success); }
-.tab-waiting { border-color: var(--color-warning); }
-.tab-called { border-color: var(--color-accent-mid); }
 
 .count {
   font-size: 0.7rem;
   opacity: 0.75;
+  margin-left: 0.15rem;
 }
 
 .list {
@@ -82,13 +48,4 @@
   text-transform: uppercase;
   color: var(--color-text-muted);
   margin-bottom: 0.2rem;
-}
-
-.empty-state {
-  padding: 1.5rem;
-  text-align: center;
-  color: var(--color-text-muted);
-  border: 1px dashed var(--color-border-strong);
-  border-radius: var(--radius-md);
-  font-size: 0.85rem;
 }

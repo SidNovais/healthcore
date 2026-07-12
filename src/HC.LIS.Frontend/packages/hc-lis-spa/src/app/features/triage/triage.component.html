@@ -6,27 +6,27 @@
     </button>
   </div>
 
-  <div class="filter-bar">
-    <button data-testid="filter-tab-all" class="tab" [class.tab-active]="activeFilter() === 'All'" (click)="setFilter('All')">
+  <hc-tabs class="filter-bar" [value]="activeFilter()" (valueChange)="setFilter($event)" aria-label="Filter patients by status">
+    <button hc-tab value="All" data-testid="filter-tab-all">
       All <span class="count">{{ totalCount() }}</span>
     </button>
-    <button data-testid="filter-tab-arrived" class="tab tab-arrived" [class.tab-active]="activeFilter() === 'Arrived'" (click)="setFilter('Arrived')">
+    <button hc-tab value="Arrived" data-testid="filter-tab-arrived">
       Arrived <span class="count">{{ arrivedCount() }}</span>
     </button>
-    <button data-testid="filter-tab-waiting" class="tab tab-waiting" [class.tab-active]="activeFilter() === 'Waiting'" (click)="setFilter('Waiting')">
+    <button hc-tab value="Waiting" data-testid="filter-tab-waiting">
       Waiting <span class="count">{{ waitingCount() }}</span>
     </button>
-    <button data-testid="filter-tab-called" class="tab tab-called" [class.tab-active]="activeFilter() === 'Called'" (click)="setFilter('Called')">
+    <button hc-tab value="Called" data-testid="filter-tab-called">
       Called <span class="count">{{ calledCount() }}</span>
     </button>
-  </div>
+  </hc-tabs>
 
   <div class="list">
     @if (showArrived()) {
       <div data-testid="arrived-group" class="group">
         <div class="group-header">Arrived</div>
         @if (service.arrived().length === 0) {
-          <div class="empty-state">No patients arriving.</div>
+          <hc-empty title="No patients arriving." />
         } @else {
           @for (item of service.arrived(); track item.collectionRequestId) {
             <app-patient-row [item]="item" (sendToWaiting)="onSendToWaiting($event)" />
@@ -39,7 +39,7 @@
       <div data-testid="waiting-group" class="group">
         <div class="group-header">Waiting</div>
         @if (service.waiting().length === 0) {
-          <div class="empty-state">No patients waiting.</div>
+          <hc-empty title="No patients waiting." />
         } @else {
           @for (item of service.waiting(); track item.collectionRequestId) {
             <app-patient-row
@@ -56,7 +56,7 @@
       <div data-testid="called-group" class="group">
         <div class="group-header">Called</div>
         @if (service.called().length === 0) {
-          <div class="empty-state">No patients called.</div>
+          <hc-empty title="No patients called." />
         } @else {
           @for (item of service.called(); track item.collectionRequestId) {
             <app-patient-row
