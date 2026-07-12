@@ -41,6 +41,18 @@ describe('ToastService', () => {
 
     expect(service.toasts()).toHaveLength(0);
   });
+
+  it('show() with a testId tags the toast and replaces an existing toast sharing that testId', () => {
+    const service = TestBed.inject(ToastService);
+
+    service.show('Exam GLU added to order', { variant: 'success', testId: 'exam-added-confirmation' });
+    service.show('Exam HGB added to order', { variant: 'success', testId: 'exam-added-confirmation' });
+
+    // Deduped by testId so at most one confirmation of a kind is visible at once.
+    expect(service.toasts()).toHaveLength(1);
+    expect(service.toasts()[0].testId).toBe('exam-added-confirmation');
+    expect(service.toasts()[0].message).toBe('Exam HGB added to order');
+  });
 });
 
 describe('HcToaster', () => {
@@ -59,5 +71,17 @@ describe('HcToaster', () => {
     const toast = host.querySelector('[data-testid="toast"]')!;
     expect(toast.textContent).toContain('Order created');
     expect(toast.classList).toContain('hc-toast--success');
+  });
+
+  it('renders a toast custom testId when one is provided', () => {
+    const fixture = TestBed.createComponent(HcToaster);
+    const service = TestBed.inject(ToastService);
+    fixture.detectChanges();
+
+    service.show('Exam GLU added to order', { variant: 'success', testId: 'exam-added-confirmation' });
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelector('[data-testid="exam-added-confirmation"]')).not.toBeNull();
   });
 });

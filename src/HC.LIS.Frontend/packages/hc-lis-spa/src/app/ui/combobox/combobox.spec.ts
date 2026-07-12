@@ -9,6 +9,9 @@ import { HcCombobox, type HcComboboxOption } from './combobox';
       [options]="options()"
       placeholder="Search patients"
       data-testid="patient-picker"
+      inputTestId="pp-input"
+      listboxTestId="pp-results"
+      optionTestId="pp-option"
       (queryChange)="lastQuery = $event"
       (selected)="lastSelected = $event"
     />
@@ -96,6 +99,21 @@ describe('HcCombobox', () => {
     fixture.detectChanges();
 
     expect(fixture.componentInstance.lastSelected).toEqual(PATIENTS[0]);
+  });
+
+  it('projects provided data-testids onto the input, listbox and options', () => {
+    const { fixture, host, input } = render();
+
+    expect(input.getAttribute('data-testid')).toBe('pp-input');
+
+    type(input, 'Mar');
+    fixture.componentInstance.options.set(PATIENTS);
+    fixture.detectChanges();
+
+    expect(host.querySelector('[role="listbox"]')!.getAttribute('data-testid')).toBe('pp-results');
+    const options = host.querySelectorAll<HTMLElement>('[role="option"]');
+    expect(options[0].getAttribute('data-testid')).toBe('pp-option');
+    expect(options[1].getAttribute('data-testid')).toBe('pp-option');
   });
 
   it('closes the listbox on Escape without selecting', () => {
