@@ -6,6 +6,7 @@ import { NewOrderComponent } from './new-order.component';
 import { PatientPickerComponent } from './patient-picker.component';
 import { OrdersService } from './orders.service';
 import { AuthService } from '../../core/application/auth.service';
+import { ToastService } from '../../ui/toast/toast.service';
 import type { OrderSummary } from '../../core/domain/order-summary';
 import type { UserSession } from '../../core/domain/user-session';
 import type { PatientSearchResult } from '../../core/domain/patient-search-result';
@@ -17,6 +18,7 @@ describe('NewOrderComponent (integration)', () => {
   let fixture: ComponentFixture<NewOrderComponent>;
   let mockOrdersService: Partial<OrdersService>;
   let mockAuthService: Partial<AuthService>;
+  let mockToastService: { show: ReturnType<typeof vi.fn> };
   let orderSignal: ReturnType<typeof signal<OrderSummary | null>>;
 
   const receptionist: UserSession = { userId: 'user-uuid-1', userName: 'rcpt@hclis.local', role: 'Receptionist' };
@@ -43,11 +45,14 @@ describe('NewOrderComponent (integration)', () => {
       currentUser: signal<UserSession | null>(receptionist),
     };
 
+    mockToastService = { show: vi.fn() };
+
     await TestBed.configureTestingModule({
       imports: [NewOrderComponent],
       providers: [
         { provide: OrdersService, useValue: mockOrdersService },
         { provide: AuthService, useValue: mockAuthService },
+        { provide: ToastService, useValue: mockToastService },
       ],
     })
       .overrideComponent(NewOrderComponent, {
@@ -142,7 +147,7 @@ describe('NewOrderComponent (integration)', () => {
     );
   });
 
-  it('confirmation element is visible after requestExam() resolves', async () => {
+  it('shows an exam-added confirmation toast after requestExam() resolves', async () => {
     vi.mocked(mockOrdersService.createOrder!).mockImplementation(async () => {
       orderSignal.set(createdOrder);
     });
@@ -166,6 +171,11 @@ describe('NewOrderComponent (integration)', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
-    expect(getElement('[data-testid="exam-added-confirmation"]')).not.toBeNull();
+    // Confirmation is now a global toast (rendered by the app-root toaster) tagged
+    // with the exam-added-confirmation testId so e2e can still target it.
+    expect(mockToastService.show).toHaveBeenCalledWith(
+      'Exam GLU added to order',
+      expect.objectContaining({ variant: 'success', testId: 'exam-added-confirmation' }),
+    );
   });
 });

@@ -11,6 +11,7 @@ import { HcButton } from '../../ui/button/button';
 import { HcCard } from '../../ui/card/card';
 import { HcField } from '../../ui/field/field';
 import { HcLabel } from '../../ui/input/label';
+import { ToastService } from '../../ui/toast/toast.service';
 
 @Component({
   selector: 'app-new-order',
@@ -22,12 +23,11 @@ import { HcLabel } from '../../ui/input/label';
 export class NewOrderComponent implements OnInit {
   protected readonly ordersService = inject(OrdersService);
   private readonly authService = inject(AuthService);
+  private readonly toast = inject(ToastService);
 
   protected selectedPatient = signal<PatientSearchResult | null>(null);
   protected creating = signal(false);
   protected createError = signal<string | null>(null);
-  protected lastExamAdded = signal<string | null>(null);
-  protected examError = signal<string | null>(null);
 
   ngOnInit(): void {
     this.ordersService.resetOrder();
@@ -51,14 +51,15 @@ export class NewOrderComponent implements OnInit {
   }
 
   protected async onExamSubmit(params: RequestExamParams): Promise<void> {
-    this.examError.set(null);
-    this.lastExamAdded.set(null);
     const orderId = this.ordersService.order()?.orderId ?? '';
     try {
       await this.ordersService.requestExam(orderId, params);
-      this.lastExamAdded.set(params.examMnemonic);
+      this.toast.show(`Exam ${params.examMnemonic} added to order`, {
+        variant: 'success',
+        testId: 'exam-added-confirmation',
+      });
     } catch (err) {
-      this.examError.set(err instanceof Error ? err.message : 'Failed to add exam');
+      this.toast.show(err instanceof Error ? err.message : 'Failed to add exam', { variant: 'error' });
     }
   }
 }

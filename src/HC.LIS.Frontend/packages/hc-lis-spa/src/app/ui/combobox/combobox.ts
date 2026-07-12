@@ -28,6 +28,11 @@ export class HcCombobox {
   readonly options = input<readonly HcComboboxOption[]>([]);
   readonly placeholder = input('');
 
+  /** Optional data-testid hooks so consumers can preserve their own e2e selectors. */
+  readonly inputTestId = input<string | null>(null);
+  readonly listboxTestId = input<string | null>(null);
+  readonly optionTestId = input<string | null>(null);
+
   readonly queryChange = output<string>();
   readonly selected = output<HcComboboxOption>();
 

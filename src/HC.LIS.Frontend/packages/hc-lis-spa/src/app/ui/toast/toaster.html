@@ -1,6 +1,6 @@
 <div class="hc-toaster" aria-live="polite">
   @for (toast of toastService.toasts(); track toast.id) {
-    <div class="hc-toast hc-toast--{{ toast.variant }}" data-testid="toast">
+    <div class="hc-toast hc-toast--{{ toast.variant }}" [attr.data-testid]="toast.testId ?? 'toast'">
       <span class="hc-toast__message">{{ toast.message }}</span>
       <button
         type="button"

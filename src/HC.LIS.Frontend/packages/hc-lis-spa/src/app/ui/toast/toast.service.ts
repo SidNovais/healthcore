@@ -6,12 +6,16 @@ export interface Toast {
   id: number;
   message: string;
   variant: ToastVariant;
+  /** Optional stable data-testid so a specific toast can be targeted in e2e. */
+  testId: string | null;
 }
 
 export interface ToastOptions {
   variant?: ToastVariant;
   /** Auto-dismiss delay in ms; keep within the 3-5s rule. */
   durationMs?: number;
+  /** Stable data-testid; a new toast with the same testId replaces the previous one. */
+  testId?: string;
 }
 
 const DEFAULT_DURATION_MS = 4000;
@@ -25,8 +29,13 @@ export class ToastService {
 
   show(message: string, options: ToastOptions = {}): number {
     const id = this.nextId++;
-    const toast: Toast = { id, message, variant: options.variant ?? 'info' };
-    this._toasts.update(list => [...list, toast]);
+    const testId = options.testId ?? null;
+    const toast: Toast = { id, message, variant: options.variant ?? 'info', testId };
+    // Dedupe by testId: a fresh confirmation of the same kind replaces the prior one.
+    this._toasts.update(list => [
+      ...(testId === null ? list : list.filter(t => t.testId !== testId)),
+      toast,
+    ]);
 
     setTimeout(() => this.dismiss(id), options.durationMs ?? DEFAULT_DURATION_MS);
     return id;
