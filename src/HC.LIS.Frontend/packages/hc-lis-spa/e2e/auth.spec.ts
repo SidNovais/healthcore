@@ -42,6 +42,16 @@ test.describe('Authentication', () => {
 
     await expect(page).toHaveURL('/login', { timeout: 10_000 });
   });
+
+  test('invalid email shows an inline field validation error on blur', async ({ page }) => {
+    await page.goto('/login');
+
+    const email = page.getByLabel('Email');
+    await email.fill('not-an-email');
+    await email.blur();
+
+    await expect(page.getByText(/valid email/i)).toBeVisible({ timeout: 5_000 });
+  });
 });
 
 test.describe('Shell Navigation', () => {
