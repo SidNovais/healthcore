@@ -24,7 +24,8 @@ internal class SampleDetailsProjector(
         await connection.ExecuteScalarAsync(
             @"INSERT INTO sample_collection.""SampleDetails""
               (""Id"", ""CollectionRequestId"", ""TubeType"", ""Status"")
-              VALUES (@SampleId, @CollectionRequestId, @TubeType, @Status)",
+              VALUES (@SampleId, @CollectionRequestId, @TubeType, @Status)
+              ON CONFLICT (""Id"") DO NOTHING",
             new
             {
                 e.SampleId,

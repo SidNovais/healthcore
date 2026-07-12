@@ -25,7 +25,8 @@ internal class SignedReportDetailsProjector(
         await connection.ExecuteScalarAsync(
             @"INSERT INTO lab_analysis.signed_report_details
               (id, worklist_item_id, order_id, order_item_id, signature, signed_by, status, created_at)
-              VALUES (@ReportId, @WorklistItemId, @OrderId, @OrderItemId, @Signature, @SignedBy, @Status, @CreatedAt)",
+              VALUES (@ReportId, @WorklistItemId, @OrderId, @OrderItemId, @Signature, @SignedBy, @Status, @CreatedAt)
+              ON CONFLICT DO NOTHING",
             new
             {
                 e.ReportId,

@@ -22,7 +22,8 @@ internal class OrderDetailsProjector(
         await connection.ExecuteScalarAsync(
           @$"INSERT INTO test_orders.""OrderDetails""
             (""Id"", ""PatientId"", ""Priority"" ,""RequestedBy"", ""RequestedAt"")
-            VALUES (@OrderId, @PatientId, @OrderPriority, @RequestedBy, @RequestedAt)",
+            VALUES (@OrderId, @PatientId, @OrderPriority, @RequestedBy, @RequestedAt)
+            ON CONFLICT (""Id"") DO NOTHING",
           new
           {
               orderCreated.OrderId,

@@ -26,7 +26,8 @@ internal class WorklistItemDetailsProjector(
         await connection.ExecuteScalarAsync(
             @"INSERT INTO lab_analysis.worklist_item_details
               (id, sample_id, sample_barcode, exam_code, patient_id, order_id, order_item_id, status, created_at)
-              VALUES (@WorklistItemId, @SampleId, @SampleBarcode, @ExamCode, @PatientId, @OrderId, @OrderItemId, @Status, @CreatedAt)",
+              VALUES (@WorklistItemId, @SampleId, @SampleBarcode, @ExamCode, @PatientId, @OrderId, @OrderItemId, @Status, @CreatedAt)
+              ON CONFLICT DO NOTHING",
             new
             {
                 e.WorklistItemId,
@@ -49,7 +50,8 @@ internal class WorklistItemDetailsProjector(
         await connection.ExecuteScalarAsync(
             @"INSERT INTO lab_analysis.worklist_item_analyte_results
               (id, worklist_item_id, analyte_code, result_value, result_unit, reference_range, is_out_of_range, performed_by_id, recorded_at)
-              VALUES (@Id, @WorklistItemId, @AnalyteCode, @ResultValue, @ResultUnit, @ReferenceRange, @IsOutOfRange, @PerformedById, @RecordedAt)",
+              VALUES (@Id, @WorklistItemId, @AnalyteCode, @ResultValue, @ResultUnit, @ReferenceRange, @IsOutOfRange, @PerformedById, @RecordedAt)
+              ON CONFLICT DO NOTHING",
             new
             {
                 Id = Guid.CreateVersion7(),

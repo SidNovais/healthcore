@@ -26,7 +26,8 @@ internal class OrderItemDetailsProjector(
             (""Id"", ""OrderId"", ""SpecimenMnemonic"" ,""MaterialType"", ""ContainerType"", ""Additive"", ""ProcessingType"",
             ""StorageCondition"", ""Status"", ""RequestedAt"")
             VALUES (@OrderItemId, @OrderId, @SpecimenMnemonic, @MaterialType, @ContainerType, @Additive, @ProcessingType,
-            @StorageCondition, @Status, @RequestedAt)",
+            @StorageCondition, @Status, @RequestedAt)
+            ON CONFLICT (""Id"") DO NOTHING",
           new
           {
               orderItemRequest.OrderItemId,

@@ -24,7 +24,8 @@ internal class CollectionRequestDetailsProjector(
         await connection.ExecuteScalarAsync(
             @"INSERT INTO sample_collection.""CollectionRequestDetails""
               (""Id"", ""PatientId"", ""Status"", ""ArrivedAt"")
-              VALUES (@CollectionRequestId, @PatientId, @Status, @ArrivedAt)",
+              VALUES (@CollectionRequestId, @PatientId, @Status, @ArrivedAt)
+              ON CONFLICT (""Id"") DO NOTHING",
             new
             {
                 e.CollectionRequestId,
