@@ -1,0 +1,74 @@
+<hc-card data-testid="create-user-form" class="create-form">
+  <h3>Create New User</h3>
+
+  <hc-field>
+    <label hc-label for="user-email">Email</label>
+    <input
+      hc-input
+      id="user-email"
+      data-testid="user-email-input"
+      type="email"
+      [(ngModel)]="email"
+      placeholder="user@hclis.local"
+    />
+  </hc-field>
+
+  <hc-field>
+    <label hc-label for="user-fullname">Full Name</label>
+    <input
+      hc-input
+      id="user-fullname"
+      data-testid="user-fullname-input"
+      type="text"
+      [(ngModel)]="fullName"
+      placeholder="First Last"
+    />
+  </hc-field>
+
+  <hc-field>
+    <label hc-label for="user-birthdate">Birthdate</label>
+    <input
+      hc-input
+      id="user-birthdate"
+      data-testid="user-birthdate-input"
+      type="date"
+      [(ngModel)]="birthdate"
+    />
+  </hc-field>
+
+  <hc-field>
+    <label hc-label for="user-gender">Gender</label>
+    <select hc-select id="user-gender" data-testid="user-gender-select" [(ngModel)]="gender">
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+      <option value="Other">Other</option>
+    </select>
+  </hc-field>
+
+  <hc-field>
+    <label hc-label for="user-role">Role</label>
+    <select hc-select id="user-role" data-testid="user-role-select" [(ngModel)]="role">
+      <option value="Receptionist">Receptionist</option>
+      <option value="LabTechnician">Lab Technician</option>
+      <option value="Physician">Physician</option>
+      <option value="ITAdmin">IT Admin</option>
+    </select>
+  </hc-field>
+
+  @if (error(); as msg) {
+    <hc-alert variant="error">{{ msg }}</hc-alert>
+  }
+
+  <div class="form-actions">
+    <button
+      hc-button
+      variant="cta"
+      data-testid="submit-create-user-btn"
+      (click)="onSubmit()"
+      [disabled]="!email.trim() || !fullName.trim() || !birthdate"
+    >
+      Create User
+    </button>
+    <button hc-button variant="ghost" (click)="close.emit()">Cancel</button>
+  </div>
+</hc-card>
