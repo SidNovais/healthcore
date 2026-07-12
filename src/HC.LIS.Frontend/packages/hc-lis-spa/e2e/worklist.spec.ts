@@ -1,15 +1,5 @@
 import { test, expect } from '@playwright/test';
-
-const PHYSICIAN_EMAIL = 'physician@hclis.local';
-const PHYSICIAN_PASSWORD = 'Admin1234!';
-
-async function loginAsPhysician(page: import('@playwright/test').Page) {
-  await page.goto('/login');
-  await page.getByLabel('Email').fill(PHYSICIAN_EMAIL);
-  await page.getByLabel('Password').fill(PHYSICIAN_PASSWORD);
-  await page.getByRole('button', { name: /sign in/i }).click();
-  await expect(page).toHaveURL('/worklist', { timeout: 10_000 });
-}
+import { loginAsPhysician } from './fixtures/auth';
 
 test.describe('Doctor Worklist', () => {
   test('Physician sees worklist on login', async ({ page }) => {

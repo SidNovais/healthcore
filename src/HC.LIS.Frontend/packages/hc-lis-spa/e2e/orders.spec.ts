@@ -1,16 +1,5 @@
 import { test, expect } from '@playwright/test';
-
-// Dev seed user — Receptionist role required for /orders/new
-const RECEPTIONIST_EMAIL = 'receptionist@hclis.local';
-const RECEPTIONIST_PASSWORD = 'Admin1234!';
-
-async function loginAsReceptionist(page: import('@playwright/test').Page) {
-  await page.goto('/login');
-  await page.getByLabel('Email').fill(RECEPTIONIST_EMAIL);
-  await page.getByLabel('Password').fill(RECEPTIONIST_PASSWORD);
-  await page.getByRole('button', { name: /sign in/i }).click();
-  await expect(page).toHaveURL('/orders/new', { timeout: 10_000 });
-}
+import { loginAsLabTechnician, loginAsReceptionist } from './fixtures/auth';
 
 // Mock the patient search endpoint and select a patient via the picker.
 // The fake patient ID is the well-known seed UUID accepted by the TestOrders module.
@@ -81,17 +70,6 @@ test.describe('Test Order Request', () => {
   });
 });
 
-const LAB_TECH_EMAIL = 'labtech@hclis.local';
-const LAB_TECH_PASSWORD = 'Admin1234!';
-
-async function loginAsLabTechnician(page: import('@playwright/test').Page) {
-  await page.goto('/login');
-  await page.getByLabel('Email').fill(LAB_TECH_EMAIL);
-  await page.getByLabel('Password').fill(LAB_TECH_PASSWORD);
-  await page.getByRole('button', { name: /sign in/i }).click();
-  await expect(page).toHaveURL('/triage', { timeout: 10_000 });
-}
-
 test.describe('Order List', () => {
   test.beforeEach(async ({ context }) => {
     await context.clearCookies();
@@ -159,17 +137,6 @@ test.describe('Order List', () => {
     await expect(page).toHaveURL('/unauthorized', { timeout: 5_000 });
   });
 });
-
-const PHYSICIAN_EMAIL = 'physician@hclis.local';
-const PHYSICIAN_PASSWORD = 'Admin1234!';
-
-async function loginAsPhysician(page: import('@playwright/test').Page) {
-  await page.goto('/login');
-  await page.getByLabel('Email').fill(PHYSICIAN_EMAIL);
-  await page.getByLabel('Password').fill(PHYSICIAN_PASSWORD);
-  await page.getByRole('button', { name: /sign in/i }).click();
-  await expect(page).toHaveURL('/worklist', { timeout: 10_000 });
-}
 
 test.describe('Order Detail', () => {
   test.beforeEach(async ({ context }) => {

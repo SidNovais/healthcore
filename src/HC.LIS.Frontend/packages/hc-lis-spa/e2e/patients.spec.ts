@@ -1,42 +1,10 @@
 import { test, expect } from '@playwright/test';
-
-const RECEPTIONIST_EMAIL = 'receptionist@hclis.local';
-const ITADMIN_EMAIL = 'root@hclis.local';
-const LABTECH_EMAIL = 'labtech@hclis.local';
-const PHYSICIAN_EMAIL = 'physician@hclis.local';
-const PASSWORD = 'Admin1234!';
-
-async function loginAsReceptionist(page: import('@playwright/test').Page) {
-  await page.goto('/login');
-  await page.getByLabel('Email').fill(RECEPTIONIST_EMAIL);
-  await page.getByLabel('Password').fill(PASSWORD);
-  await page.getByRole('button', { name: /sign in/i }).click();
-  await expect(page).toHaveURL('/orders/new', { timeout: 10_000 });
-}
-
-async function loginAsITAdmin(page: import('@playwright/test').Page) {
-  await page.goto('/login');
-  await page.getByLabel('Email').fill(ITADMIN_EMAIL);
-  await page.getByLabel('Password').fill(PASSWORD);
-  await page.getByRole('button', { name: /sign in/i }).click();
-  await expect(page).toHaveURL('/admin/users', { timeout: 10_000 });
-}
-
-async function loginAsLabTechnician(page: import('@playwright/test').Page) {
-  await page.goto('/login');
-  await page.getByLabel('Email').fill(LABTECH_EMAIL);
-  await page.getByLabel('Password').fill(PASSWORD);
-  await page.getByRole('button', { name: /sign in/i }).click();
-  await expect(page).toHaveURL('/triage', { timeout: 10_000 });
-}
-
-async function loginAsPhysician(page: import('@playwright/test').Page) {
-  await page.goto('/login');
-  await page.getByLabel('Email').fill(PHYSICIAN_EMAIL);
-  await page.getByLabel('Password').fill(PASSWORD);
-  await page.getByRole('button', { name: /sign in/i }).click();
-  await expect(page).toHaveURL('/worklist', { timeout: 10_000 });
-}
+import {
+  loginAsITAdmin,
+  loginAsLabTechnician,
+  loginAsPhysician,
+  loginAsReceptionist,
+} from './fixtures/auth';
 
 test.describe('Patient Management', () => {
   test.beforeEach(async ({ context }) => {

@@ -1,8 +1,12 @@
 import { test, expect } from '@playwright/test';
-
-// Dev seed user from UserAccessModule_SeedRootUser migration
-const ROOT_EMAIL = 'root@hclis.local';
-const ROOT_PASSWORD = 'Admin1234!';
+import {
+  ITADMIN_EMAIL,
+  PASSWORD,
+  loginAsITAdmin,
+  loginAsLabTechnician,
+  loginAsPhysician,
+  loginAsReceptionist,
+} from './fixtures/auth';
 
 test.describe('Authentication', () => {
   test.beforeEach(async ({ context }) => {
@@ -11,8 +15,8 @@ test.describe('Authentication', () => {
   test('ITAdmin login redirects to /admin/users', async ({ page }) => {
     await page.goto('/login');
 
-    await page.getByLabel('Email').fill(ROOT_EMAIL);
-    await page.getByLabel('Password').fill(ROOT_PASSWORD);
+    await page.getByLabel('Email').fill(ITADMIN_EMAIL);
+    await page.getByLabel('Password').fill(PASSWORD);
     await page.getByRole('button', { name: /sign in/i }).click();
 
     await expect(page).toHaveURL('/admin/users', { timeout: 10_000 });
@@ -39,42 +43,6 @@ test.describe('Authentication', () => {
     await expect(page).toHaveURL('/login', { timeout: 10_000 });
   });
 });
-
-const RECEPTIONIST_EMAIL = 'receptionist@hclis.local';
-const PHYSICIAN_EMAIL = 'physician@hclis.local';
-const LAB_TECH_EMAIL = 'labtech@hclis.local';
-
-async function loginAsReceptionist(page: import('@playwright/test').Page) {
-  await page.goto('/login');
-  await page.getByLabel('Email').fill(RECEPTIONIST_EMAIL);
-  await page.getByLabel('Password').fill(ROOT_PASSWORD);
-  await page.getByRole('button', { name: /sign in/i }).click();
-  await expect(page).toHaveURL('/orders/new', { timeout: 10_000 });
-}
-
-async function loginAsPhysician(page: import('@playwright/test').Page) {
-  await page.goto('/login');
-  await page.getByLabel('Email').fill(PHYSICIAN_EMAIL);
-  await page.getByLabel('Password').fill(ROOT_PASSWORD);
-  await page.getByRole('button', { name: /sign in/i }).click();
-  await expect(page).toHaveURL('/worklist', { timeout: 10_000 });
-}
-
-async function loginAsLabTechnician(page: import('@playwright/test').Page) {
-  await page.goto('/login');
-  await page.getByLabel('Email').fill(LAB_TECH_EMAIL);
-  await page.getByLabel('Password').fill(ROOT_PASSWORD);
-  await page.getByRole('button', { name: /sign in/i }).click();
-  await expect(page).toHaveURL('/triage', { timeout: 10_000 });
-}
-
-async function loginAsITAdmin(page: import('@playwright/test').Page) {
-  await page.goto('/login');
-  await page.getByLabel('Email').fill(ROOT_EMAIL);
-  await page.getByLabel('Password').fill(ROOT_PASSWORD);
-  await page.getByRole('button', { name: /sign in/i }).click();
-  await expect(page).toHaveURL('/admin/users', { timeout: 10_000 });
-}
 
 test.describe('Shell Navigation', () => {
   test.beforeEach(async ({ context }) => {

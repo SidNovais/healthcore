@@ -1,16 +1,6 @@
 // e2e/admin-users.spec.ts
 import { test, expect } from '@playwright/test';
-
-const ITADMIN_EMAIL = 'root@hclis.local';
-const ITADMIN_PASSWORD = 'Admin1234!';
-
-async function loginAsITAdmin(page: import('@playwright/test').Page) {
-  await page.goto('/login');
-  await page.getByLabel('Email').fill(ITADMIN_EMAIL);
-  await page.getByLabel('Password').fill(ITADMIN_PASSWORD);
-  await page.getByRole('button', { name: /sign in/i }).click();
-  await expect(page).toHaveURL('/admin/users', { timeout: 10_000 });
-}
+import { loginAsITAdmin } from './fixtures/auth';
 
 test.describe('User Management', () => {
   test('ITAdmin sees user list on login', async ({ page }) => {

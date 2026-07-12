@@ -1,18 +1,6 @@
 import { test, expect } from '@playwright/test';
-
 // Uses the root seed user (ITAdmin) — the only user guaranteed by the UserAccess migration.
-// Role-specific seed users (labtech, receptionist, etc.) require manual API setup and are
-// not available in all environments.
-const ROOT_EMAIL    = 'root@hclis.local';
-const ROOT_PASSWORD = 'Admin1234!';
-
-async function loginAsITAdmin(page: import('@playwright/test').Page) {
-  await page.goto('/login');
-  await page.getByLabel('Email').fill(ROOT_EMAIL);
-  await page.getByLabel('Password').fill(ROOT_PASSWORD);
-  await page.getByRole('button', { name: /sign in/i }).click();
-  await expect(page).toHaveURL('/admin/users', { timeout: 10_000 });
-}
+import { loginAsITAdmin } from './fixtures/auth';
 
 test.describe('HIPAA Compliance', () => {
 
