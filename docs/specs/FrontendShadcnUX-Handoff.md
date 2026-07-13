@@ -69,8 +69,8 @@ Legend: ✅ done · 🔀 merged to `main` · 🔜 next · ⬜ planned
 
 ### Track 2 — build the 2 missing primitives + upgrade the 4 tables · branch `feat/frontend-track-2` (off `main`)
 - ✅ **Phase 4 — build `hc-pagination`** (`ui/pagination/`). 1-based `page`/`pageCount` inputs, `pageChange` output, `testId` prefix for child testids (`{testId}-prev`/`-next`/`-page-{n}`/`-ellipsis`). `nav[aria-label]` landmark, active page `aria-current="page"`, prev/next disabled at bounds, ranges >7 collapse to `1 … c-1 c c+1 … n` with `aria-hidden` ellipsis, tabular-nums. Extended `hc-icon` with `chevron-left`/`chevron-right`. **6 Vitest specs; suite 164 green** (158→164); build clean.
-- 🔜 **Phase 5 — build `hc-dropdown-menu`** (`ui/dropdown-menu/`) — hardest a11y: `role=menu/menuitem`, roving tabindex, arrow/Esc, click-outside, focus return. Vitest-first. (Candidate to reconsider `@spartan-ng/brain` if hand-rolled menu a11y proves costly — default is hand-rolled.)
-- ⬜ **Phase 6 — Orders table**: pagination + sorting + row-action menu (96 testids — extreme care). Gate `orders.spec.ts`.
+- ✅ **Phase 5 — build `hc-dropdown-menu`** (`ui/dropdown-menu/`). Three parts: root `hc-dropdown-menu` (owns open state, click-outside via `document:click` + host `contains`, `document:keydown.escape`, focus return), `button[hc-dropdown-trigger]` (`aria-haspopup=menu`, `aria-expanded`, ArrowDown opens+focuses first), `button[hc-dropdown-item]` (`role=menuitem`, tabindex −1, click/Enter/Space activates → emits `select` + closes, Arrow up/down wrap focus). `testId` prefixes the menu container testid; GSAP fade-in behind `prefers-reduced-motion`. Hand-rolled (no spartan). **6 Vitest specs; suite 170 green** (164→170); build clean.
+- 🔜 **Phase 6 — Orders table**: pagination + sorting + row-action menu (96 testids — extreme care). Gate `orders.spec.ts`.
 - ⬜ **Phase 7 — Patients table**: pagination + row actions + search-input polish (clear button, debounce, skeleton). Gate `patients.spec.ts`.
 - ⬜ **Phase 8 — Worklist table**: pagination + sorting + row actions; keep inline detail (desktop-only). Gate `worklist.spec.ts`.
 - ⬜ **Phase 9 — Admin/users table**: raw per-row role `<select>` → dropdown-menu + `hc-dialog` confirm-on-role-change **(+ the deferred role-change toast lives here)**; pagination; create-user form → dialog/sheet. Gate `admin-users.spec.ts`.
@@ -98,6 +98,7 @@ Legend: ✅ done · 🔀 merged to `main` · 🔜 next · ⬜ planned
 - **Adopted** `hc-skeleton` in the 4 list tables (Phase 3b); added a loading signal per list service (`loadingList` / `loading` / `searching`).
 - **Built** `hc-pagination` (Phase 4): `page`/`pageCount`/`testId`/`ariaLabel` inputs, `pageChange` output, ellipsis-truncated windowed page list.
 - **Extended** `hc-icon` with `chevron-left` / `chevron-right`.
+- **Built** `hc-dropdown-menu` (Phase 5): `hc-dropdown-menu` root + `[hc-dropdown-trigger]` + `[hc-dropdown-item]` directives; `select` output per item; full menu-pattern a11y + GSAP fade behind reduced-motion.
 
 ## Open follow-ups / notes
 
