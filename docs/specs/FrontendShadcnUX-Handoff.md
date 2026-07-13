@@ -67,9 +67,9 @@ Legend: ✅ done · 🔀 merged to `main` · 🔜 next · ⬜ planned
 - ✅ **Phase 3b — Loading skeletons** · branch `feat/frontend-phase-3b-loading-skeletons`
   Added a loading signal per list service — `OrdersService.loadingList`, `WorklistService.loading`, `UsersService.loading`, `PatientsService.searching` (search only; detail load untouched) — each wrapping its fetch in `try/finally` so the signal always resets, even on reject. Wired `hc-skeleton` rows into all 4 list tables (order-list, worklist, patient-search, user-list) via a 3-branch template `@if(loading){skeleton} @else if(empty){empty} @else{rows}`. Skeleton rows carry **new** `*-skeleton-row` testids (no existing testid renamed); the live region is `aria-busy` while loading, `hc-skeleton` stays `aria-hidden`. New integration specs for order-list + user-list (neither had one); worklist + patient-search specs gained loading-signal mocks. Build clean (CSS budgets ok), **154 Vitest tests green** (132→154, +22). e2e not run (needs stack); gates: `orders` / `worklist` / `patients` / `admin-users` specs — all `waitForResponse`, so the transient skeleton is low-risk. Note: `listUsers` toggles `loading`, so create-user/role-change refreshes briefly flash the skeleton (acceptable — the table is genuinely reloading).
 
-### Track 2 — build the 2 missing primitives + upgrade the 4 tables
-- 🔜 **Phase 4 — build `hc-pagination`** (`ui/pagination/`, blueprint shadcn `pagination`; nav/prev/next/pages, tabular-nums). Vitest-first.
-- ⬜ **Phase 5 — build `hc-dropdown-menu`** (`ui/dropdown-menu/`) — hardest a11y: `role=menu/menuitem`, roving tabindex, arrow/Esc, click-outside, focus return. Vitest-first. (Candidate to reconsider `@spartan-ng/brain` if hand-rolled menu a11y proves costly — default is hand-rolled.)
+### Track 2 — build the 2 missing primitives + upgrade the 4 tables · branch `feat/frontend-track-2` (off `main`)
+- ✅ **Phase 4 — build `hc-pagination`** (`ui/pagination/`). 1-based `page`/`pageCount` inputs, `pageChange` output, `testId` prefix for child testids (`{testId}-prev`/`-next`/`-page-{n}`/`-ellipsis`). `nav[aria-label]` landmark, active page `aria-current="page"`, prev/next disabled at bounds, ranges >7 collapse to `1 … c-1 c c+1 … n` with `aria-hidden` ellipsis, tabular-nums. Extended `hc-icon` with `chevron-left`/`chevron-right`. **6 Vitest specs; suite 164 green** (158→164); build clean.
+- 🔜 **Phase 5 — build `hc-dropdown-menu`** (`ui/dropdown-menu/`) — hardest a11y: `role=menu/menuitem`, roving tabindex, arrow/Esc, click-outside, focus return. Vitest-first. (Candidate to reconsider `@spartan-ng/brain` if hand-rolled menu a11y proves costly — default is hand-rolled.)
 - ⬜ **Phase 6 — Orders table**: pagination + sorting + row-action menu (96 testids — extreme care). Gate `orders.spec.ts`.
 - ⬜ **Phase 7 — Patients table**: pagination + row actions + search-input polish (clear button, debounce, skeleton). Gate `patients.spec.ts`.
 - ⬜ **Phase 8 — Worklist table**: pagination + sorting + row actions; keep inline detail (desktop-only). Gate `worklist.spec.ts`.
@@ -96,6 +96,8 @@ Legend: ✅ done · 🔀 merged to `main` · 🔜 next · ⬜ planned
 - **Extended** `ToastService.show(msg, { testId })`: optional `testId` on `Toast`, dedupe by testId; `hc-toaster` renders `toast.testId ?? 'toast'`.
 - **Mounted** `hc-toaster` at the app root (`app.ts` / `app.html`).
 - **Adopted** `hc-skeleton` in the 4 list tables (Phase 3b); added a loading signal per list service (`loadingList` / `loading` / `searching`).
+- **Built** `hc-pagination` (Phase 4): `page`/`pageCount`/`testId`/`ariaLabel` inputs, `pageChange` output, ellipsis-truncated windowed page list.
+- **Extended** `hc-icon` with `chevron-left` / `chevron-right`.
 
 ## Open follow-ups / notes
 

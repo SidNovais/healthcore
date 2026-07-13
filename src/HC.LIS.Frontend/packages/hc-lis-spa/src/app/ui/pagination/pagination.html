@@ -1,0 +1,51 @@
+<ul class="hc-pagination__list">
+  <li>
+    <button
+      type="button"
+      class="hc-pagination__nav"
+      [attr.data-testid]="testId() + '-prev'"
+      [disabled]="onFirst()"
+      aria-label="Go to previous page"
+      (click)="go(page() - 1)"
+    >
+      <hc-icon name="chevron-left" [size]="18" />
+    </button>
+  </li>
+
+  @for (slot of slots(); track $index) {
+    <li>
+      @if (slot === 'ellipsis') {
+        <span
+          class="hc-pagination__ellipsis"
+          aria-hidden="true"
+          [attr.data-testid]="testId() + '-ellipsis'"
+          >&hellip;</span
+        >
+      } @else {
+        <button
+          type="button"
+          class="hc-pagination__page tabular-nums"
+          [attr.data-testid]="testId() + '-page-' + slot"
+          [attr.aria-current]="isCurrent(slot) ? 'page' : null"
+          [attr.aria-label]="'Go to page ' + slot"
+          (click)="go(slot)"
+        >
+          {{ slot }}
+        </button>
+      }
+    </li>
+  }
+
+  <li>
+    <button
+      type="button"
+      class="hc-pagination__nav"
+      [attr.data-testid]="testId() + '-next'"
+      [disabled]="onLast()"
+      aria-label="Go to next page"
+      (click)="go(page() + 1)"
+    >
+      <hc-icon name="chevron-right" [size]="18" />
+    </button>
+  </li>
+</ul>
