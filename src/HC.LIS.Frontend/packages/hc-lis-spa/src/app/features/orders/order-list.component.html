@@ -16,7 +16,9 @@
     <tbody>
       @if (ordersService.orderList().length === 0) {
         <tr>
-          <td colspan="5" class="empty-cell">No orders found.</td>
+          <td colspan="5" class="empty-cell">
+            <hc-empty title="No orders found." description="Orders you create will appear here." />
+          </td>
         </tr>
       } @else {
         @for (item of ordersService.orderList(); track item.orderId) {
