@@ -6,11 +6,11 @@
     </button>
   </div>
 
-  @if (showCreateForm()) {
-    <div class="form-wrapper">
+  <hc-dialog [(open)]="showCreateForm" data-testid="create-user-dialog">
+    @if (showCreateForm()) {
       <app-create-user-form (close)="showCreateForm.set(false)" />
-    </div>
-  }
+    }
+  </hc-dialog>
 
   @if (service.loading()) {
     <table hc-table class="users-table" aria-busy="true">
@@ -53,23 +53,32 @@
         </tr>
       </thead>
       <tbody>
-        @for (user of service.users(); track user.id) {
+        @for (user of pagedUsers(); track user.id) {
           <tr data-testid="user-row">
             <td>{{ user.email }}</td>
             <td>{{ user.fullName }}</td>
             <td>
-              <select
-                hc-select
-                class="role-select"
-                [value]="user.role"
-                [attr.aria-label]="'Role for ' + user.email"
-                (change)="onRoleChange(user.id, $event)"
-              >
-                <option value="Receptionist">Receptionist</option>
-                <option value="LabTechnician">Lab Technician</option>
-                <option value="Physician">Physician</option>
-                <option value="ITAdmin">IT Admin</option>
-              </select>
+              <hc-dropdown-menu testId="user-role" ariaLabel="Change role">
+                <button
+                  type="button"
+                  class="role-trigger"
+                  hc-dropdown-trigger
+                  data-testid="user-role-trigger"
+                  [attr.aria-label]="'Change role for ' + user.email"
+                >
+                  {{ roleLabel(user.role) }}
+                  <hc-icon name="chevron-down" [size]="14" />
+                </button>
+                @for (option of roles; track option.value) {
+                  <button
+                    hc-dropdown-item
+                    [attr.data-testid]="'user-role-option-' + option.value"
+                    (select)="requestRoleChange(user, option.value)"
+                  >
+                    {{ option.label }}
+                  </button>
+                }
+              </hc-dropdown-menu>
             </td>
             <td>
               <hc-badge [variant]="user.status === 'Active' ? 'success' : 'neutral'">{{ user.status }}</hc-badge>
@@ -79,5 +88,48 @@
         }
       </tbody>
     </table>
+
+    @if (pageCount() > 1) {
+      <div class="users-footer">
+        <hc-pagination
+          testId="users-pagination"
+          ariaLabel="User list pages"
+          [page]="displayPage()"
+          [pageCount]="pageCount()"
+          (pageChange)="page.set($event)"
+        />
+      </div>
+    }
   }
+
+  <hc-dialog [(open)]="roleDialogOpen" data-testid="role-change-dialog">
+    @if (pendingRoleChange(); as pending) {
+      <div class="role-dialog">
+        <h3 class="role-dialog__title">Change role</h3>
+        <p class="role-dialog__body">
+          Change the role for <strong>{{ pending.email }}</strong> from
+          {{ roleLabel(pending.currentRole) }} to
+          <strong>{{ roleLabel(pending.newRole) }}</strong>?
+        </p>
+        <div class="role-dialog__actions">
+          <button
+            hc-button
+            variant="ghost"
+            data-testid="cancel-role-change-btn"
+            (click)="cancelRoleChange()"
+          >
+            Cancel
+          </button>
+          <button
+            hc-button
+            variant="cta"
+            data-testid="confirm-role-change-btn"
+            (click)="confirmRoleChange()"
+          >
+            Change role
+          </button>
+        </div>
+      </div>
+    }
+  </hc-dialog>
 </div>
