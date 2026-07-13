@@ -11,6 +11,7 @@ describe('PatientSearchComponent (integration)', () => {
   let mockService: Partial<PatientsService>;
   let router: Router;
   let resultsSignal: ReturnType<typeof signal<PatientSearchResult[]>>;
+  let searchingSignal: ReturnType<typeof signal<boolean>>;
 
   const twoPatients: PatientSearchResult[] = [
     { id: 'p-1', fullName: 'Maria Silva', dateOfBirth: '1985-03-12', documentId: '12345', status: 'Active' },
@@ -19,9 +20,11 @@ describe('PatientSearchComponent (integration)', () => {
 
   beforeEach(async () => {
     resultsSignal = signal<PatientSearchResult[]>([]);
+    searchingSignal = signal(false);
 
     mockService = {
       searchResults: resultsSignal,
+      searching: searchingSignal,
       search: vi.fn().mockResolvedValue(undefined),
     };
 
@@ -57,6 +60,24 @@ describe('PatientSearchComponent (integration)', () => {
 
     const emptyState = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="patient-search-empty-state"]');
     expect(emptyState).not.toBeNull();
+  });
+
+  it('shows skeleton rows while searching, hiding the empty-state', () => {
+    searchingSignal.set(true);
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelectorAll('[data-testid="patient-search-skeleton-row"]').length).toBeGreaterThan(0);
+    expect(host.querySelector('[data-testid="patient-search-empty-state"]')).toBeNull();
+  });
+
+  it('does not show skeleton rows once the search completes', () => {
+    searchingSignal.set(false);
+    resultsSignal.set(twoPatients);
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelectorAll('[data-testid="patient-search-skeleton-row"]')).toHaveLength(0);
   });
 
   it('clicking register-patient-btn navigates to /patients/new', async () => {

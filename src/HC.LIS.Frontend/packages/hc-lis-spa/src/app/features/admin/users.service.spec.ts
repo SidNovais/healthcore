@@ -66,6 +66,30 @@ describe('UsersService', () => {
     expect(service.users()).toEqual([]);
   });
 
+  it('loading signal starts as false', () => {
+    expect(service.loading()).toBe(false);
+  });
+
+  it('listUsers() sets loading true while the request is in flight', async () => {
+    let resolve!: (users: UserSummary[]) => void;
+    vi.mocked(mockPort.listUsers).mockReturnValue(new Promise((r) => { resolve = r; }));
+
+    const pending = service.listUsers();
+    expect(service.loading()).toBe(true);
+
+    resolve(userList);
+    await pending;
+    expect(service.loading()).toBe(false);
+  });
+
+  it('listUsers() resets loading to false when the port rejects', async () => {
+    vi.mocked(mockPort.listUsers).mockRejectedValue(new Error('boom'));
+
+    await expect(service.listUsers()).rejects.toThrow('boom');
+
+    expect(service.loading()).toBe(false);
+  });
+
   it('createUser(data) calls port.createUser with supplied params', async () => {
     const params: CreateUserParams = {
       email: 'charlie@hclis.local',
