@@ -6,11 +6,57 @@
   <table hc-table data-testid="order-list-table" class="orders-table">
     <thead>
       <tr>
-        <th>Patient</th>
-        <th>Requested By</th>
-        <th>Priority</th>
-        <th>Requested At</th>
-        <th class="num-col">Items</th>
+        <th [attr.aria-sort]="ariaSort('patientName')">
+          <button
+            type="button"
+            class="sort-btn"
+            data-testid="order-list-sort-patient"
+            (click)="toggleSort('patientName')"
+          >
+            Patient
+          </button>
+        </th>
+        <th [attr.aria-sort]="ariaSort('requestedBy')">
+          <button
+            type="button"
+            class="sort-btn"
+            data-testid="order-list-sort-requested-by"
+            (click)="toggleSort('requestedBy')"
+          >
+            Requested By
+          </button>
+        </th>
+        <th [attr.aria-sort]="ariaSort('orderPriority')">
+          <button
+            type="button"
+            class="sort-btn"
+            data-testid="order-list-sort-priority"
+            (click)="toggleSort('orderPriority')"
+          >
+            Priority
+          </button>
+        </th>
+        <th [attr.aria-sort]="ariaSort('requestedAt')">
+          <button
+            type="button"
+            class="sort-btn"
+            data-testid="order-list-sort-requested-at"
+            (click)="toggleSort('requestedAt')"
+          >
+            Requested At
+          </button>
+        </th>
+        <th class="num-col" [attr.aria-sort]="ariaSort('itemCount')">
+          <button
+            type="button"
+            class="sort-btn sort-btn--num"
+            data-testid="order-list-sort-items"
+            (click)="toggleSort('itemCount')"
+          >
+            Items
+          </button>
+        </th>
+        <th class="actions-col"><span class="sr-only">Actions</span></th>
       </tr>
     </thead>
     <tbody [attr.aria-busy]="ordersService.loadingList()">
@@ -22,16 +68,17 @@
             <td><hc-skeleton /></td>
             <td><hc-skeleton /></td>
             <td class="num-col"><hc-skeleton /></td>
+            <td class="actions-col"><hc-skeleton /></td>
           </tr>
         }
       } @else if (ordersService.orderList().length === 0) {
         <tr>
-          <td colspan="5" class="empty-cell">
+          <td colspan="6" class="empty-cell">
             <hc-empty title="No orders found." description="Orders you create will appear here." />
           </td>
         </tr>
       } @else {
-        @for (item of ordersService.orderList(); track item.orderId) {
+        @for (item of pagedOrders(); track item.orderId) {
           <tr
             data-testid="order-list-row"
             [routerLink]="['/orders', item.orderId]"
@@ -46,9 +93,41 @@
             </td>
             <td class="tabular-nums">{{ item.requestedAt }}</td>
             <td class="num-col tabular-nums">{{ item.itemCount }}</td>
+            <td class="actions-col" (click)="$event.stopPropagation()">
+              <hc-dropdown-menu testId="order-actions" ariaLabel="Order actions">
+                <button
+                  type="button"
+                  class="row-action-trigger"
+                  hc-dropdown-trigger
+                  data-testid="order-actions-trigger"
+                  aria-label="Order actions"
+                >
+                  <hc-icon name="more-horizontal" />
+                </button>
+                <button
+                  hc-dropdown-item
+                  data-testid="order-action-view"
+                  (select)="viewOrder(item.orderId)"
+                >
+                  View order
+                </button>
+              </hc-dropdown-menu>
+            </td>
           </tr>
         }
       }
     </tbody>
   </table>
+
+  @if (pageCount() > 1) {
+    <div class="orders-footer">
+      <hc-pagination
+        testId="order-list-pagination"
+        ariaLabel="Orders pages"
+        [page]="displayPage()"
+        [pageCount]="pageCount()"
+        (pageChange)="page.set($event)"
+      />
+    </div>
+  }
 </div>
