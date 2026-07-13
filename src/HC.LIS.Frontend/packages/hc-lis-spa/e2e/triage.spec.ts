@@ -49,6 +49,18 @@ test.describe('Triage — Page Structure', () => {
     await expect(page.getByTestId('filter-tab-waiting')).toBeVisible({ timeout: 5_000 });
     await expect(page.getByTestId('filter-tab-called')).toBeVisible({ timeout: 5_000 });
   });
+
+  test('filter tabs expose accessible tablist semantics', async ({ page }) => {
+    await loginAsLabTechnician(page);
+    // Filter bar is now the hc-tabs primitive: a role=tablist wrapping role=tab buttons,
+    // with the active filter marked aria-selected.
+    await expect(page.getByRole('tablist')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('filter-tab-all')).toHaveRole('tab');
+    await expect(page.getByTestId('filter-tab-all')).toHaveAttribute('aria-selected', 'true');
+    await page.getByTestId('filter-tab-waiting').click();
+    await expect(page.getByTestId('filter-tab-waiting')).toHaveAttribute('aria-selected', 'true');
+    await expect(page.getByTestId('filter-tab-all')).toHaveAttribute('aria-selected', 'false');
+  });
 });
 
 test.describe('Triage — Full Workflow', () => {

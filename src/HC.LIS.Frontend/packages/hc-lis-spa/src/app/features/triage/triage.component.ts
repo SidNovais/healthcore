@@ -6,6 +6,8 @@ import type { SampleSummary } from '../../core/domain/sample-summary';
 import { HcAlert } from '../../ui/alert/alert';
 import { HcButton } from '../../ui/button/button';
 import { HcIcon } from '../../ui/icon/icon';
+import { HcEmpty } from '../../ui/empty/empty';
+import { HcTabs, HcTab } from '../../ui/tabs/tabs';
 
 type StatusFilter = 'All' | 'Arrived' | 'Waiting' | 'Called';
 
@@ -17,7 +19,7 @@ interface PrintModalRequest {
 @Component({
   selector: 'app-triage',
   standalone: true,
-  imports: [PatientRowComponent, PrintLabelsModalComponent, HcAlert, HcButton, HcIcon],
+  imports: [PatientRowComponent, PrintLabelsModalComponent, HcAlert, HcButton, HcIcon, HcEmpty, HcTabs, HcTab],
   templateUrl: './triage.component.html',
   styleUrl: './triage.component.css',
 })
@@ -42,8 +44,8 @@ export class TriageComponent implements OnInit {
     await this.refresh();
   }
 
-  protected setFilter(filter: StatusFilter): void {
-    this.activeFilter.set(filter);
+  protected setFilter(filter: string): void {
+    this.activeFilter.set(filter as StatusFilter);
   }
 
   protected async refresh(): Promise<void> {
