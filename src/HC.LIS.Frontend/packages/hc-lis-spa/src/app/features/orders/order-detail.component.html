@@ -101,7 +101,9 @@
           </tr>
         } @empty {
           <tr>
-            <td colspan="5" data-testid="empty-items" class="empty-cell">No exam items found.</td>
+            <td colspan="5" data-testid="empty-items" class="empty-cell">
+              <hc-empty title="No exam items found." description="Add an exam from the new-order screen." />
+            </td>
           </tr>
         }
       </tbody>

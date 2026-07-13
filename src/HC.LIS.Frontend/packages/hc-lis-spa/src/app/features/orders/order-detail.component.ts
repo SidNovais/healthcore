@@ -7,8 +7,10 @@ import { HcAlert } from '../../ui/alert/alert';
 import { HcBadge, type HcBadgeVariant } from '../../ui/badge/badge';
 import { HcButton } from '../../ui/button/button';
 import { HcCard } from '../../ui/card/card';
+import { HcEmpty } from '../../ui/empty/empty';
 import { HcInput } from '../../ui/input/input';
 import { HcTable } from '../../ui/table/table';
+import { ToastService } from '../../ui/toast/toast.service';
 import { MOTION, prefersReducedMotion } from '../../ui/motion/motion';
 
 const STATUS_VARIANTS: Record<string, HcBadgeVariant> = {
@@ -25,7 +27,7 @@ const STATUS_VARIANTS: Record<string, HcBadgeVariant> = {
 @Component({
   selector: 'app-order-detail',
   standalone: true,
-  imports: [FormsModule, RouterLink, HcAlert, HcBadge, HcButton, HcCard, HcInput, HcTable],
+  imports: [FormsModule, RouterLink, HcAlert, HcBadge, HcButton, HcCard, HcEmpty, HcInput, HcTable],
   templateUrl: './order-detail.component.html',
   styleUrl: './order-detail.component.css',
 })
@@ -33,6 +35,7 @@ export class OrderDetailComponent implements OnInit {
   protected readonly ordersService = inject(OrdersService);
   private readonly route = inject(ActivatedRoute);
   private readonly ngZone = inject(NgZone);
+  private readonly toast = inject(ToastService);
   private readonly host = inject(ElementRef).nativeElement as HTMLElement;
 
   protected readonly activeRejectItemId = signal<string | null>(null);
@@ -80,6 +83,7 @@ export class OrderDetailComponent implements OnInit {
     this.errorMessage.set(null);
     try {
       await this.ordersService.acceptExam(orderId, itemId);
+      this.toast.show('Exam accepted', { variant: 'success' });
       this.scheduleReload(orderId);
     } catch (err: unknown) {
       this.errorMessage.set(err instanceof Error ? err.message : 'Unexpected error.');
@@ -96,6 +100,7 @@ export class OrderDetailComponent implements OnInit {
     this.errorMessage.set(null);
     try {
       await this.ordersService.rejectExam(orderId, itemId, this.rejectReason.trim());
+      this.toast.show('Exam rejected', { variant: 'success' });
       this.activeRejectItemId.set(null);
       this.rejectReason = '';
       this.scheduleReload(orderId);
@@ -109,6 +114,7 @@ export class OrderDetailComponent implements OnInit {
     this.errorMessage.set(null);
     try {
       await this.ordersService.cancelExam(orderId, itemId);
+      this.toast.show('Exam canceled', { variant: 'success' });
       this.scheduleReload(orderId);
     } catch (err: unknown) {
       this.errorMessage.set(err instanceof Error ? err.message : 'Unexpected error.');
@@ -125,6 +131,7 @@ export class OrderDetailComponent implements OnInit {
     this.errorMessage.set(null);
     try {
       await this.ordersService.placeExamOnHold(orderId, itemId, this.onHoldReason.trim());
+      this.toast.show('Exam placed on hold', { variant: 'success' });
       this.activeOnHoldItemId.set(null);
       this.onHoldReason = '';
       this.scheduleReload(orderId);

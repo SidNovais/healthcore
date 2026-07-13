@@ -3,13 +3,14 @@ import { RouterLink } from '@angular/router';
 import { gsap } from 'gsap';
 import { OrdersService } from './orders.service';
 import { HcBadge } from '../../ui/badge/badge';
+import { HcEmpty } from '../../ui/empty/empty';
 import { HcTable } from '../../ui/table/table';
 import { MOTION, prefersReducedMotion } from '../../ui/motion/motion';
 
 @Component({
   selector: 'app-order-list',
   standalone: true,
-  imports: [RouterLink, HcBadge, HcTable],
+  imports: [RouterLink, HcBadge, HcEmpty, HcTable],
   templateUrl: './order-list.component.html',
   styleUrl: './order-list.component.css',
 })
