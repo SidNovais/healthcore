@@ -1,10 +1,12 @@
-import { Component, ElementRef, OnDestroy, ViewChild, inject, output, signal } from '@angular/core';
+import { Component, OnDestroy, computed, inject, output, signal } from '@angular/core';
 import { PATIENTS_PORT } from '../../core/application/i-patients-port';
 import type { PatientSearchResult } from '../../core/domain/patient-search-result';
+import { HcCombobox, type HcComboboxOption } from '../../ui/combobox/combobox';
 
 @Component({
   selector: 'app-patient-picker',
   standalone: true,
+  imports: [HcCombobox],
   templateUrl: './patient-picker.component.html',
   styleUrl: './patient-picker.component.css',
 })
@@ -16,7 +18,13 @@ export class PatientPickerComponent implements OnDestroy {
   protected readonly results = signal<PatientSearchResult[]>([]);
   protected readonly selectedPatient = signal<PatientSearchResult | null>(null);
 
-  @ViewChild('searchInput') private readonly searchInputRef?: ElementRef<HTMLInputElement>;
+  /** Adapt search results to combobox options; the document id disambiguates same-named patients. */
+  protected readonly options = computed<HcComboboxOption[]>(() =>
+    this.results().map(p => ({
+      value: p.id,
+      label: p.documentId ? `${p.fullName} · ${p.documentId}` : p.fullName,
+    })),
+  );
 
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -36,7 +44,14 @@ export class PatientPickerComponent implements OnDestroy {
     this.results.set(all.filter(p => p.status !== 'Anonymized'));
   }
 
-  protected selectPatient(patient: PatientSearchResult): void {
+  protected onOptionSelected(option: HcComboboxOption): void {
+    const patient = this.results().find(p => p.id === option.value);
+    if (patient) {
+      this.selectPatient(patient);
+    }
+  }
+
+  private selectPatient(patient: PatientSearchResult): void {
     this.selectedPatient.set(patient);
     this.results.set([]);
     this.patientSelected.emit(patient);
@@ -46,7 +61,6 @@ export class PatientPickerComponent implements OnDestroy {
     this.selectedPatient.set(null);
     this.results.set([]);
     this.patientSelected.emit(null);
-    setTimeout(() => this.searchInputRef?.nativeElement?.focus(), 0);
   }
 
   ngOnDestroy(): void {

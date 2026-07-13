@@ -36,16 +36,6 @@
 
       <h2 class="section-title">Add Exam</h2>
       <app-request-exam-form (examSubmitted)="onExamSubmit($event)" />
-
-      @if (lastExamAdded(); as exam) {
-        <hc-alert variant="success" data-testid="exam-added-confirmation">
-          Exam <strong>{{ exam }}</strong> added to order
-        </hc-alert>
-      }
-
-      @if (examError(); as msg) {
-        <hc-alert variant="error">{{ msg }}</hc-alert>
-      }
     </section>
   }
 </div>

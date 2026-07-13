@@ -17,32 +17,13 @@
     >✕</button>
   </div>
 } @else {
-  <div class="picker-wrap">
-    <input
-      #searchInput
-      type="text"
-      class="picker-input"
-      data-testid="patient-picker-input"
-      placeholder="Search by name or document ID..."
-      autocomplete="off"
-      (input)="onSearchInput($any($event.target).value)"
-    />
-    @if (results().length > 0) {
-      <ul class="results-dropdown" data-testid="patient-picker-results" role="listbox">
-        @for (patient of results(); track patient.id) {
-          <li
-            class="result-item"
-            data-testid="patient-picker-result-item"
-            role="option"
-            (click)="selectPatient(patient)"
-          >
-            <span class="result-name">{{ patient.fullName }}</span>
-            @if (patient.documentId) {
-              <span class="result-doc">{{ patient.documentId }}</span>
-            }
-          </li>
-        }
-      </ul>
-    }
-  </div>
+  <hc-combobox
+    [options]="options()"
+    placeholder="Search by name or document ID..."
+    inputTestId="patient-picker-input"
+    listboxTestId="patient-picker-results"
+    optionTestId="patient-picker-result-item"
+    (queryChange)="onSearchInput($event)"
+    (selected)="onOptionSelected($event)"
+  />
 }

@@ -39,6 +39,9 @@ test.describe('Patient Picker in New Order', () => {
     // Submit is disabled before a patient is selected
     await expect(page.getByTestId('create-order-submit-btn')).toBeDisabled();
 
+    // The picker input is now the hc-combobox primitive (role=combobox typeahead).
+    await expect(page.getByTestId('patient-picker-input')).toHaveRole('combobox');
+
     // Search by partial name in the picker
     await page.getByTestId('patient-picker-input').fill(uniqueName.slice(0, 12));
 
