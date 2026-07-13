@@ -42,3 +42,9 @@
 .mono {
   font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
 }
+
+.skeleton-row hc-skeleton {
+  display: block;
+  height: 0.9rem;
+  width: 70%;
+}

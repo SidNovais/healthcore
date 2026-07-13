@@ -12,6 +12,7 @@ describe('WorklistComponent (integration)', () => {
   let mockService: Partial<WorklistService>;
   let mockAuthService: Partial<AuthService>;
   let itemsSignal: ReturnType<typeof signal<WorklistItemSummary[]>>;
+  let loadingSignal: ReturnType<typeof signal<boolean>>;
 
   const physician: UserSession = { userId: 'physician-1', userName: 'physician@hclis.local', role: 'Physician' };
 
@@ -22,9 +23,11 @@ describe('WorklistComponent (integration)', () => {
 
   beforeEach(async () => {
     itemsSignal = signal<WorklistItemSummary[]>([]);
+    loadingSignal = signal(false);
 
     mockService = {
       items: itemsSignal,
+      loading: loadingSignal,
       selectedItem: signal(null),
       loadItems: vi.fn().mockResolvedValue(undefined),
       getItemDetails: vi.fn().mockResolvedValue(undefined),
@@ -67,6 +70,24 @@ describe('WorklistComponent (integration)', () => {
 
     const empty = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="empty-state"]');
     expect(empty).not.toBeNull();
+  });
+
+  it('shows skeleton rows while loading, hiding the empty-state', () => {
+    loadingSignal.set(true);
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelectorAll('[data-testid="worklist-skeleton-row"]').length).toBeGreaterThan(0);
+    expect(host.querySelector('[data-testid="empty-state"]')).toBeNull();
+  });
+
+  it('does not show skeleton rows once loading completes', () => {
+    loadingSignal.set(false);
+    itemsSignal.set(twoItems);
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelectorAll('[data-testid="worklist-skeleton-row"]')).toHaveLength(0);
   });
 
   it('does not show empty-state when items list has entries', () => {

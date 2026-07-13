@@ -12,6 +12,7 @@ export class OrdersService {
   readonly order = signal<OrderSummary | null>(null);
   readonly orderList = signal<OrderListItem[]>([]);
   readonly orderDetails = signal<OrderDetails | null>(null);
+  readonly loadingList = signal(false);
 
   async createOrder(params: CreateOrderParams): Promise<void> {
     const result = await this.port.createOrder(params);
@@ -23,8 +24,13 @@ export class OrdersService {
   }
 
   async loadOrderList(): Promise<void> {
-    const items = await this.port.getOrderList();
-    this.orderList.set(items);
+    this.loadingList.set(true);
+    try {
+      const items = await this.port.getOrderList();
+      this.orderList.set(items);
+    } finally {
+      this.loadingList.set(false);
+    }
   }
 
   async loadOrderDetails(orderId: string): Promise<void> {

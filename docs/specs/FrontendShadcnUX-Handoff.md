@@ -1,6 +1,6 @@
 # Frontend shadcn-UX Enhancement — Handoff & Progress Tracker
 
-_Last updated: 2026-07-12_
+_Last updated: 2026-07-13_
 
 Follow-on to `docs/specs/FrontendRefactor-Handoff.md` (Design System v2, Phases 0–4, already merged).
 
@@ -64,8 +64,8 @@ Legend: ✅ done (branch, not merged) · 🔜 next · ⬜ planned
   patient-picker → `hc-combobox` (extended it with `inputTestId`/`listboxTestId`/`optionTestId` to preserve the picker's testids); exam confirmation → `hc-toast`. **`ToastService.show` gained an optional `testId` + dedupe; `hc-toaster` is now mounted at the app root — it was never mounted before, so no toast could render.** Build + 135 tests green.
 - ✅ **Phase 3 — List-state consistency** · branch `feat/frontend-phase-3-list-states`
   order-list empty + order-detail empty-items → `hc-empty` (kept `empty-items` testid); order-detail Accept/Reject/Cancel/On-Hold → success toasts (error alert unchanged). Build + 133 tests green.
-- ⬜ **Phase 3b — Loading skeletons** (carved out of the original Phase 3)
-  Add a `loading` signal to OrdersService / patients / worklist / users services; show `hc-skeleton` rows while async tables/lists load (nothing uses skeletons today outside triage/modal). Deferred because it needs service changes and carries the most e2e-race risk — do it as its own focused phase. Gate each page's existing spec (they already `waitForResponse`).
+- ✅ **Phase 3b — Loading skeletons** · branch `feat/frontend-phase-3b-loading-skeletons`
+  Added a loading signal per list service — `OrdersService.loadingList`, `WorklistService.loading`, `UsersService.loading`, `PatientsService.searching` (search only; detail load untouched) — each wrapping its fetch in `try/finally` so the signal always resets, even on reject. Wired `hc-skeleton` rows into all 4 list tables (order-list, worklist, patient-search, user-list) via a 3-branch template `@if(loading){skeleton} @else if(empty){empty} @else{rows}`. Skeleton rows carry **new** `*-skeleton-row` testids (no existing testid renamed); the live region is `aria-busy` while loading, `hc-skeleton` stays `aria-hidden`. New integration specs for order-list + user-list (neither had one); worklist + patient-search specs gained loading-signal mocks. Build clean (CSS budgets ok), **154 Vitest tests green** (132→154, +22). e2e not run (needs stack); gates: `orders` / `worklist` / `patients` / `admin-users` specs — all `waitForResponse`, so the transient skeleton is low-risk. Note: `listUsers` toggles `loading`, so create-user/role-change refreshes briefly flash the skeleton (acceptable — the table is genuinely reloading).
 
 ### Track 2 — build the 2 missing primitives + upgrade the 4 tables
 - 🔜 **Phase 4 — build `hc-pagination`** (`ui/pagination/`, blueprint shadcn `pagination`; nav/prev/next/pages, tabular-nums). Vitest-first.
@@ -95,9 +95,11 @@ Legend: ✅ done (branch, not merged) · 🔜 next · ⬜ planned
 - **Extended** `hc-combobox`: optional `inputTestId` / `listboxTestId` / `optionTestId` inputs.
 - **Extended** `ToastService.show(msg, { testId })`: optional `testId` on `Toast`, dedupe by testId; `hc-toaster` renders `toast.testId ?? 'toast'`.
 - **Mounted** `hc-toaster` at the app root (`app.ts` / `app.html`).
+- **Adopted** `hc-skeleton` in the 4 list tables (Phase 3b); added a loading signal per list service (`loadingList` / `loading` / `searching`).
 
 ## Open follow-ups / notes
 
 - Full **e2e has not been run** during phase development (needs the API+DB+ng serve stack). Each phase is gated by build + the full Vitest suite + reasoning about the existing spec assertions; run `yarn e2e` per branch before merging.
-- Phases 1–3 are on separate un-merged branches off `main`. Decide merge order / whether to stack them.
+- Phases 1–3b are on separate un-merged branches off `main`. Decide merge order / whether to stack them.
+- This tracker lives only on the phase-3 branch (not on `main`), so Phase 3b's work is committed on `feat/frontend-phase-3b-loading-skeletons` while this ✅ update is committed on the phase-3 branch — reconcile when merging (ideally move the tracker to `main`).
 - Memory: `project_frontend_shadcn_ux.md` mirrors this status for cross-session continuity.

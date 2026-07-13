@@ -11,13 +11,17 @@ export class PatientsService {
   readonly searchResults = signal<PatientSearchResult[]>([]);
   readonly patient = signal<PatientDetails | null>(null);
   readonly error = signal<string | null>(null);
+  readonly searching = signal(false);
 
   async search(term: string): Promise<void> {
+    this.searching.set(true);
     try {
       const results = await this.port.search(term);
       this.searchResults.set(results);
     } catch (err) {
       this.error.set(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      this.searching.set(false);
     }
   }
 

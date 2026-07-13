@@ -8,18 +8,20 @@ import { HcButton } from '../../ui/button/button';
 import { HcEmpty } from '../../ui/empty/empty';
 import { HcIcon } from '../../ui/icon/icon';
 import { HcInput } from '../../ui/input/input';
+import { HcSkeleton } from '../../ui/skeleton/skeleton';
 import { HcTable } from '../../ui/table/table';
 import { MOTION, prefersReducedMotion } from '../../ui/motion/motion';
 
 @Component({
   selector: 'app-patient-search',
   standalone: true,
-  imports: [FormsModule, HcBadge, HcButton, HcEmpty, HcIcon, HcInput, HcTable],
+  imports: [FormsModule, HcBadge, HcButton, HcEmpty, HcIcon, HcInput, HcSkeleton, HcTable],
   templateUrl: './patient-search.component.html',
   styleUrl: './patient-search.component.css',
 })
 export class PatientSearchComponent implements OnDestroy {
   protected readonly service = inject(PatientsService);
+  protected readonly skeletonRows = Array.from({ length: 5 });
   private readonly router = inject(Router);
   private readonly host = inject(ElementRef).nativeElement as HTMLElement;
 

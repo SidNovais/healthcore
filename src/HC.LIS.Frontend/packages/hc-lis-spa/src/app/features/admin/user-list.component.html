@@ -12,7 +12,30 @@
     </div>
   }
 
-  @if (service.users().length === 0) {
+  @if (service.loading()) {
+    <table hc-table class="users-table" aria-busy="true">
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Full Name</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of skeletonRows; track $index) {
+          <tr data-testid="users-skeleton-row" class="skeleton-row">
+            <td><hc-skeleton /></td>
+            <td><hc-skeleton /></td>
+            <td><hc-skeleton /></td>
+            <td><hc-skeleton /></td>
+            <td><hc-skeleton /></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else if (service.users().length === 0) {
     <hc-empty
       data-testid="empty-state"
       title="No users found"

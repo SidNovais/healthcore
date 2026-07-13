@@ -4,18 +4,20 @@ import { gsap } from 'gsap';
 import { OrdersService } from './orders.service';
 import { HcBadge } from '../../ui/badge/badge';
 import { HcEmpty } from '../../ui/empty/empty';
+import { HcSkeleton } from '../../ui/skeleton/skeleton';
 import { HcTable } from '../../ui/table/table';
 import { MOTION, prefersReducedMotion } from '../../ui/motion/motion';
 
 @Component({
   selector: 'app-order-list',
   standalone: true,
-  imports: [RouterLink, HcBadge, HcEmpty, HcTable],
+  imports: [RouterLink, HcBadge, HcEmpty, HcSkeleton, HcTable],
   templateUrl: './order-list.component.html',
   styleUrl: './order-list.component.css',
 })
 export class OrderListComponent implements OnInit {
   protected readonly ordersService = inject(OrdersService);
+  protected readonly skeletonRows = Array.from({ length: 5 });
   private readonly host = inject(ElementRef).nativeElement as HTMLElement;
 
   constructor() {

@@ -8,7 +8,30 @@
 
   <div class="worklist-layout">
     <div class="worklist-table-container">
-      @if (service.items().length === 0) {
+      @if (service.loading()) {
+        <table hc-table class="worklist-table" aria-busy="true">
+          <thead>
+            <tr>
+              <th>Barcode</th>
+              <th>Exam</th>
+              <th>Patient</th>
+              <th>Status</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of skeletonRows; track $index) {
+              <tr data-testid="worklist-skeleton-row" class="skeleton-row">
+                <td><hc-skeleton /></td>
+                <td><hc-skeleton /></td>
+                <td><hc-skeleton /></td>
+                <td><hc-skeleton /></td>
+                <td><hc-skeleton /></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else if (service.items().length === 0) {
         <hc-empty
           data-testid="empty-state"
           title="No worklist items"

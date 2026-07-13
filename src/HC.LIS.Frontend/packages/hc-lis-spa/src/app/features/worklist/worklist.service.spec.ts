@@ -76,6 +76,30 @@ describe('WorklistService', () => {
     expect(service.items()).toEqual([]);
   });
 
+  it('loading signal starts as false', () => {
+    expect(service.loading()).toBe(false);
+  });
+
+  it('loadItems() sets loading true while the request is in flight', async () => {
+    let resolve!: (items: WorklistItemSummary[]) => void;
+    vi.mocked(mockPort.loadItems).mockReturnValue(new Promise((r) => { resolve = r; }));
+
+    const pending = service.loadItems();
+    expect(service.loading()).toBe(true);
+
+    resolve(summaryItems);
+    await pending;
+    expect(service.loading()).toBe(false);
+  });
+
+  it('loadItems() resets loading to false when the port rejects', async () => {
+    vi.mocked(mockPort.loadItems).mockRejectedValue(new Error('boom'));
+
+    await expect(service.loadItems()).rejects.toThrow('boom');
+
+    expect(service.loading()).toBe(false);
+  });
+
   it('getItemDetails(id) calls port.getItemDetails and sets selectedItem signal', async () => {
     vi.mocked(mockPort.getItemDetails).mockResolvedValue(itemDetails);
 

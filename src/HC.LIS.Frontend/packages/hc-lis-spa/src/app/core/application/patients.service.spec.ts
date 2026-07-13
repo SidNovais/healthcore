@@ -43,6 +43,30 @@ describe('PatientsService', () => {
     expect(service.searchResults()).toEqual(searchResults);
   });
 
+  it('searching signal starts as false', () => {
+    expect(service.searching()).toBe(false);
+  });
+
+  it('search() sets searching true while the request is in flight', async () => {
+    let resolve!: (results: PatientSearchResult[]) => void;
+    vi.mocked(mockPort.search).mockReturnValue(new Promise((r) => { resolve = r; }));
+
+    const pending = service.search('John');
+    expect(service.searching()).toBe(true);
+
+    resolve(searchResults);
+    await pending;
+    expect(service.searching()).toBe(false);
+  });
+
+  it('search() resets searching to false when the port rejects', async () => {
+    vi.mocked(mockPort.search).mockRejectedValue(new ApiError(400, 'Bad request'));
+
+    await service.search('fail');
+
+    expect(service.searching()).toBe(false);
+  });
+
   it('register() returns new patient id', async () => {
     vi.mocked(mockPort.register).mockResolvedValue('new-patient-id');
 

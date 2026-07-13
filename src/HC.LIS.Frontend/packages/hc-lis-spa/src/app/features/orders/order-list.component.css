@@ -32,3 +32,14 @@
   color: var(--color-text-muted);
   padding: 2rem;
 }
+
+.skeleton-row hc-skeleton {
+  display: block;
+  height: 0.9rem;
+  width: 70%;
+}
+
+.skeleton-row .num-col hc-skeleton {
+  margin-left: auto;
+  width: 2.5rem;
+}

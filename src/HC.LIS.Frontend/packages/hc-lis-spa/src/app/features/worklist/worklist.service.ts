@@ -10,10 +10,16 @@ export class WorklistService {
 
   readonly items = signal<WorklistItemSummary[]>([]);
   readonly selectedItem = signal<WorklistItemDetails | null>(null);
+  readonly loading = signal(false);
 
   async loadItems(): Promise<void> {
-    const items = await this.port.loadItems();
-    this.items.set(items);
+    this.loading.set(true);
+    try {
+      const items = await this.port.loadItems();
+      this.items.set(items);
+    } finally {
+      this.loading.set(false);
+    }
   }
 
   async getItemDetails(id: string): Promise<void> {

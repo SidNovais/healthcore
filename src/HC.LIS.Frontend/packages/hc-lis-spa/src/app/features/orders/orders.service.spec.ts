@@ -131,6 +131,30 @@ describe('OrdersService', () => {
     expect(service.orderList()).toEqual([sampleOrderListItem]);
   });
 
+  it('loadingList signal starts as false', () => {
+    expect(service.loadingList()).toBe(false);
+  });
+
+  it('loadOrderList() sets loadingList true while the request is in flight', async () => {
+    let resolve!: (items: OrderListItem[]) => void;
+    vi.mocked(mockPort.getOrderList).mockReturnValue(new Promise((r) => { resolve = r; }));
+
+    const pending = service.loadOrderList();
+    expect(service.loadingList()).toBe(true);
+
+    resolve([sampleOrderListItem]);
+    await pending;
+    expect(service.loadingList()).toBe(false);
+  });
+
+  it('loadOrderList() resets loadingList to false when the port rejects', async () => {
+    vi.mocked(mockPort.getOrderList).mockRejectedValue(new Error('boom'));
+
+    await expect(service.loadOrderList()).rejects.toThrow('boom');
+
+    expect(service.loadingList()).toBe(false);
+  });
+
   it('orderDetails signal starts as null', () => {
     expect(service.orderDetails()).toBeNull();
   });
