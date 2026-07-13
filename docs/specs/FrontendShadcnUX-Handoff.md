@@ -55,9 +55,9 @@ Run from `src/HC.LIS.Frontend/packages/hc-lis-spa`:
 
 ## Phase status
 
-Legend: ✅ done (branch, not merged) · 🔜 next · ⬜ planned
+Legend: ✅ done · 🔀 merged to `main` · 🔜 next · ⬜ planned
 
-### Track 1 — adopt already-built primitives
+### Track 1 — adopt already-built primitives 🔀 **merged to `main`** (merge commit `ee54cde`)
 - ✅ **Phase 1 — Triage** · branch `feat/frontend-phase-1-triage-adopt-primitives`
   Filter bar → `hc-tabs`; print-labels-modal → `hc-dialog` + `hc-skeleton`; empty divs → `hc-empty`. Build + 132 tests green.
 - ✅ **Phase 2 — New-order** · branch `feat/frontend-phase-2-order-combobox-toast`
@@ -100,6 +100,6 @@ Legend: ✅ done (branch, not merged) · 🔜 next · ⬜ planned
 ## Open follow-ups / notes
 
 - Full **e2e has not been run** during phase development (needs the API+DB+ng serve stack). Each phase is gated by build + the full Vitest suite + reasoning about the existing spec assertions; run `yarn e2e` per branch before merging.
-- Phases 1–3b are on separate un-merged branches off `main`. Decide merge order / whether to stack them.
-- This tracker lives only on the phase-3 branch (not on `main`), so Phase 3b's work is committed on `feat/frontend-phase-3b-loading-skeletons` while this ✅ update is committed on the phase-3 branch — reconcile when merging (ideally move the tracker to `main`).
+- **Track 1 (Phases 1–3b) merged to `main`** on 2026-07-13 via `--no-ff` per-phase merges (commits `b810a64` P1, `45f6842` P2, `20aef05` P3, `ee54cde` P3b). The Phase 3 ↔ 3b overlap on `order-list.component.*` was resolved to the union (skeleton branch + `hc-empty` empty branch). Post-merge baseline on `main`: **158 Vitest tests green**, build clean.
+- This tracker now lives on `main`; Track 2+ branches inherit it. **Track 2 develops on a single `feat/frontend-track-2` branch off `main`** (its phases stack: the 4 tables consume the Phase 4/5 primitives), one commit-pair per phase.
 - Memory: `project_frontend_shadcn_ux.md` mirrors this status for cross-session continuity.
