@@ -18,6 +18,22 @@ describe('PatientSearchComponent (integration)', () => {
     { id: 'p-2', fullName: 'João Souza', dateOfBirth: '1990-07-22', documentId: null, status: 'Active' },
   ];
 
+  function makePatients(n: number): PatientSearchResult[] {
+    return Array.from({ length: n }, (_, i) => ({
+      id: `p-${i + 1}`,
+      fullName: `Patient ${i + 1}`,
+      dateOfBirth: '1990-01-01',
+      documentId: `doc-${i + 1}`,
+      status: 'Active',
+    }));
+  }
+
+  function rows(): HTMLElement[] {
+    return Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll('[data-testid="patient-row"]'),
+    );
+  }
+
   beforeEach(async () => {
     resultsSignal = signal<PatientSearchResult[]>([]);
     searchingSignal = signal(false);
@@ -86,5 +102,61 @@ describe('PatientSearchComponent (integration)', () => {
     await fixture.whenStable();
 
     expect(router.navigate).toHaveBeenCalledWith(['/patients/new']);
+  });
+
+  it('paginates results, one page at a time', () => {
+    resultsSignal.set(makePatients(23));
+    fixture.detectChanges();
+
+    expect(rows()).toHaveLength(10);
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelector('[data-testid="patient-search-pagination"]')).not.toBeNull();
+
+    host.querySelector<HTMLButtonElement>('[data-testid="patient-search-pagination-next"]')!.click();
+    fixture.detectChanges();
+    expect(rows()).toHaveLength(10);
+    expect(rows()[0].textContent).toContain('Patient 11');
+  });
+
+  it('hides pagination when a single page of results fits', () => {
+    resultsSignal.set(twoPatients);
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelector('[data-testid="patient-search-pagination"]')).toBeNull();
+  });
+
+  it('exposes a per-row action menu whose View opens without navigating the row', () => {
+    resultsSignal.set(twoPatients);
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    const trigger = host.querySelector<HTMLButtonElement>('[data-testid="patient-actions-trigger"]')!;
+    expect(trigger.getAttribute('aria-haspopup')).toBe('menu');
+
+    trigger.click();
+    fixture.detectChanges();
+
+    expect(host.querySelector('[role="menu"]')).not.toBeNull();
+    expect(host.querySelector('[data-testid="patient-action-view"]')).not.toBeNull();
+    expect(rows()).toHaveLength(2);
+  });
+
+  it('shows a clear button once a term is typed and resets the search on click', () => {
+    const host = fixture.nativeElement as HTMLElement;
+    const input = host.querySelector<HTMLInputElement>('[data-testid="patient-search-input"]')!;
+
+    input.value = 'Mar';
+    input.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    const clear = host.querySelector<HTMLButtonElement>('[data-testid="patient-search-clear"]')!;
+    expect(clear).not.toBeNull();
+
+    clear.click();
+    fixture.detectChanges();
+
+    expect(input.value).toBe('');
+    expect(mockService.search).toHaveBeenCalledWith('');
   });
 });

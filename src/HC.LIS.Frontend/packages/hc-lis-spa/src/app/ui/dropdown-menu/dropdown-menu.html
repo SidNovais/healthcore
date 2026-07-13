@@ -1,0 +1,13 @@
+<ng-content select="[hc-dropdown-trigger]" />
+
+@if (open()) {
+  <div
+    #menuEl
+    class="hc-dropdown__menu"
+    role="menu"
+    [attr.data-testid]="testId() + '-menu'"
+    [attr.aria-label]="ariaLabel()"
+  >
+    <ng-content />
+  </div>
+}

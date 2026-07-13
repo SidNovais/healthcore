@@ -131,6 +131,43 @@ test.describe('Order List', () => {
     await expect(patientCell).not.toContainText(/^[0-9a-f]{8}-/i);
   });
 
+  test('Row action menu View navigates to the order detail', async ({ page }) => {
+    await loginAsReceptionist(page);
+
+    await page.route(/\/api\/v1\/orders(\?.*)?$/, async route => {
+      if (route.request().method() === 'GET') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify([{
+            orderId: '00000000-0000-0000-0000-0000000000aa',
+            patientId: '00000000-0000-0000-0000-000000000001',
+            patientName: 'Maria Silva',
+            requestedBy: '00000000-0000-0000-0000-000000000002',
+            orderPriority: 'Routine',
+            requestedAt: new Date().toISOString(),
+            itemCount: 1,
+          }]),
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    await page.goto('/orders');
+    await expect(page.getByTestId('order-list-table')).toBeVisible({ timeout: 5_000 });
+
+    // Opening the row action menu must not itself navigate the (clickable) row.
+    await page.getByTestId('order-actions-trigger').first().click();
+    await expect(page).toHaveURL(/\/orders$/);
+
+    await page.getByTestId('order-action-view').first().click();
+    await expect(page).toHaveURL(
+      /\/orders\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
+      { timeout: 5_000 }
+    );
+  });
+
   test('LabTechnician is redirected to /unauthorized when accessing /orders', async ({ page }) => {
     await loginAsLabTechnician(page);
     await page.goto('/orders');

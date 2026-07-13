@@ -13,14 +13,29 @@
   </div>
 
   <div class="search-bar">
-    <input
-      hc-input
-      type="text"
-      data-testid="patient-search-input"
-      placeholder="Search by name or document ID..."
-      [value]="searchTerm"
-      (input)="onSearchInput($any($event.target).value)"
-    />
+    <div class="search-field">
+      <hc-icon class="search-field__icon" name="search" [size]="16" />
+      <input
+        hc-input
+        type="text"
+        class="search-field__input"
+        data-testid="patient-search-input"
+        placeholder="Search by name or document ID..."
+        [value]="searchTerm"
+        (input)="onSearchInput($any($event.target).value)"
+      />
+      @if (searchTerm) {
+        <button
+          type="button"
+          class="search-field__clear"
+          data-testid="patient-search-clear"
+          aria-label="Clear search"
+          (click)="clearSearch()"
+        >
+          <hc-icon name="x" [size]="16" />
+        </button>
+      }
+    </div>
   </div>
 
   @if (service.searching()) {
@@ -31,6 +46,7 @@
           <th>Date of Birth</th>
           <th>Document ID</th>
           <th>Status</th>
+          <th class="actions-col"><span class="sr-only">Actions</span></th>
         </tr>
       </thead>
       <tbody>
@@ -40,6 +56,7 @@
             <td><hc-skeleton /></td>
             <td><hc-skeleton /></td>
             <td><hc-skeleton /></td>
+            <td class="actions-col"><hc-skeleton /></td>
           </tr>
         }
       </tbody>
@@ -58,10 +75,11 @@
           <th>Date of Birth</th>
           <th>Document ID</th>
           <th>Status</th>
+          <th class="actions-col"><span class="sr-only">Actions</span></th>
         </tr>
       </thead>
       <tbody>
-        @for (patient of service.searchResults(); track patient.id) {
+        @for (patient of pagedResults(); track patient.id) {
           <tr
             data-testid="patient-row"
             class="patient-row"
@@ -75,9 +93,41 @@
                 {{ patient.status }}
               </hc-badge>
             </td>
+            <td class="actions-col" (click)="$event.stopPropagation()">
+              <hc-dropdown-menu testId="patient-actions" ariaLabel="Patient actions">
+                <button
+                  type="button"
+                  class="row-action-trigger"
+                  hc-dropdown-trigger
+                  data-testid="patient-actions-trigger"
+                  aria-label="Patient actions"
+                >
+                  <hc-icon name="more-horizontal" />
+                </button>
+                <button
+                  hc-dropdown-item
+                  data-testid="patient-action-view"
+                  (select)="onRowClick(patient.id)"
+                >
+                  View patient
+                </button>
+              </hc-dropdown-menu>
+            </td>
           </tr>
         }
       </tbody>
     </table>
+
+    @if (pageCount() > 1) {
+      <div class="search-footer">
+        <hc-pagination
+          testId="patient-search-pagination"
+          ariaLabel="Patient results pages"
+          [page]="displayPage()"
+          [pageCount]="pageCount()"
+          (pageChange)="page.set($event)"
+        />
+      </div>
+    }
   }
 </div>

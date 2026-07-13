@@ -17,8 +17,75 @@
   margin-bottom: var(--space-6);
 }
 
-.search-bar .hc-input {
+.search-field {
+  position: relative;
   max-width: 480px;
+}
+
+.search-field__icon {
+  position: absolute;
+  left: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.search-field__input {
+  width: 100%;
+  padding-left: calc(var(--space-3) + 1.5rem);
+  padding-right: calc(var(--space-3) + 1.5rem);
+}
+
+.search-field__clear {
+  position: absolute;
+  right: var(--space-2);
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+}
+
+.search-field__clear:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text);
+}
+
+.actions-col {
+  width: 3rem;
+  text-align: right;
+}
+
+.row-action-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.row-action-trigger:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text);
+}
+
+.search-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-4);
 }
 
 .patient-row {
