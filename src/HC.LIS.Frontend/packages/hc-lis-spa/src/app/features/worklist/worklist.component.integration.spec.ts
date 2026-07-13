@@ -21,6 +21,27 @@ describe('WorklistComponent (integration)', () => {
     { id: 'wi-2', sampleBarcode: 'BC-002', examCode: 'WBC', patientId: 'p-2', patientName: 'João Lima', patientDateOfBirth: '1985-05-20', patientGender: 'Male', status: 'Completed', createdAt: '2026-05-05T09:00:00Z' },
   ];
 
+  function makeItems(n: number): WorklistItemSummary[] {
+    return Array.from({ length: n }, (_, i) => ({
+      ...twoItems[0],
+      id: `wi-${i + 1}`,
+      sampleBarcode: `BC-${String(i + 1).padStart(3, '0')}`,
+      patientName: `Patient ${i + 1}`,
+    }));
+  }
+
+  function rows(): HTMLElement[] {
+    return Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll('[data-testid="worklist-row"]'),
+    );
+  }
+
+  function patientNames(): string[] {
+    return rows().map(
+      r => r.querySelector('[data-testid="patient-name-cell"]')!.textContent!.trim(),
+    );
+  }
+
   beforeEach(async () => {
     itemsSignal = signal<WorklistItemSummary[]>([]);
     loadingSignal = signal(false);
@@ -106,6 +127,68 @@ describe('WorklistComponent (integration)', () => {
     firstRow!.click();
     fixture.detectChanges();
 
+    expect(mockService.getItemDetails).toHaveBeenCalledWith('wi-1');
+  });
+
+  it('paginates the worklist, one page at a time', () => {
+    itemsSignal.set(makeItems(23));
+    fixture.detectChanges();
+
+    expect(rows()).toHaveLength(10);
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelector('[data-testid="worklist-pagination"]')).not.toBeNull();
+
+    host.querySelector<HTMLButtonElement>('[data-testid="worklist-pagination-next"]')!.click();
+    fixture.detectChanges();
+    expect(rows()).toHaveLength(10);
+    expect(patientNames()[0]).toBe('Patient 11');
+  });
+
+  it('hides pagination when the worklist fits on one page', () => {
+    itemsSignal.set(twoItems);
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).querySelector('[data-testid="worklist-pagination"]')).toBeNull();
+  });
+
+  it('sorts by patient name and toggles direction on repeated header clicks', () => {
+    itemsSignal.set([
+      { ...twoItems[0], id: 'c', patientName: 'Cora' },
+      { ...twoItems[0], id: 'a', patientName: 'Ana' },
+      { ...twoItems[0], id: 'b', patientName: 'Bea' },
+    ]);
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    const header = host.querySelector<HTMLButtonElement>('[data-testid="worklist-sort-patient"]')!;
+    const th = header.closest('th')!;
+
+    header.click();
+    fixture.detectChanges();
+    expect(patientNames()).toEqual(['Ana', 'Bea', 'Cora']);
+    expect(th.getAttribute('aria-sort')).toBe('ascending');
+
+    header.click();
+    fixture.detectChanges();
+    expect(patientNames()).toEqual(['Cora', 'Bea', 'Ana']);
+    expect(th.getAttribute('aria-sort')).toBe('descending');
+  });
+
+  it('offers a per-row action menu whose View selects the item without the trigger selecting it', () => {
+    itemsSignal.set(twoItems);
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    const trigger = host.querySelector<HTMLButtonElement>('[data-testid="worklist-actions-trigger"]')!;
+    expect(trigger.getAttribute('aria-haspopup')).toBe('menu');
+
+    trigger.click();
+    fixture.detectChanges();
+    // Opening the menu must not itself select the row.
+    expect(mockService.getItemDetails).not.toHaveBeenCalled();
+
+    host.querySelector<HTMLButtonElement>('[data-testid="worklist-action-view"]')!.click();
+    fixture.detectChanges();
     expect(mockService.getItemDetails).toHaveBeenCalledWith('wi-1');
   });
 });

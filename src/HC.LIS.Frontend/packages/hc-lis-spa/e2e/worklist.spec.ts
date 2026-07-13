@@ -42,4 +42,19 @@ test.describe('Doctor Worklist', () => {
     // Confirmation element is visible
     await expect(page.getByTestId('sign-report-confirmation')).toBeVisible({ timeout: 5_000 });
   });
+
+  // Same seed-data dependency as the sign-report workflow above.
+  test.fixme('row action menu View opens the detail panel', async ({ page }) => {
+    await loginAsPhysician(page);
+
+    await page.getByTestId('refresh-btn').click();
+    await expect(page.getByTestId('worklist-row').first()).toBeVisible({ timeout: 10_000 });
+
+    // Opening the row action menu must not itself select the row's detail panel.
+    await page.getByTestId('worklist-actions-trigger').first().click();
+    await expect(page.getByTestId('worklist-item-detail')).toBeHidden();
+
+    await page.getByTestId('worklist-action-view').first().click();
+    await expect(page.getByTestId('worklist-item-detail')).toBeVisible({ timeout: 3_000 });
+  });
 });
