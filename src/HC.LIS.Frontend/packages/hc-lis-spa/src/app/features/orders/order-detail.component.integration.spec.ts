@@ -3,11 +3,13 @@ import { signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { OrderDetailComponent } from './order-detail.component';
 import { OrdersService } from './orders.service';
+import { ToastService } from '../../ui/toast/toast.service';
 import type { OrderDetails, ExamItem } from '../../core/domain/order-details';
 
 describe('OrderDetailComponent (integration)', () => {
   let fixture: ComponentFixture<OrderDetailComponent>;
   let mockService: Partial<OrdersService>;
+  let mockToast: { show: ReturnType<typeof vi.fn> };
   let detailsSignal: ReturnType<typeof signal<OrderDetails | null>>;
 
   const orderId = 'order-abc-123';
@@ -60,10 +62,13 @@ describe('OrderDetailComponent (integration)', () => {
       placeExamOnHold: vi.fn().mockResolvedValue(undefined),
     };
 
+    mockToast = { show: vi.fn() };
+
     await TestBed.configureTestingModule({
       imports: [OrderDetailComponent],
       providers: [
         { provide: OrdersService, useValue: mockService },
+        { provide: ToastService, useValue: mockToast },
         { provide: ActivatedRoute, useValue: { snapshot: { params: { id: orderId } } } },
       ],
     }).compileComponents();
@@ -99,12 +104,14 @@ describe('OrderDetailComponent (integration)', () => {
     expect(rows).toHaveLength(2);
   });
 
-  it('shows empty-items cell when items array is empty', () => {
+  it('shows an hc-empty in the empty-items cell when items array is empty', () => {
     detailsSignal.set({ ...baseOrder, items: [] });
     fixture.detectChanges();
 
     const empty = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="empty-items"]');
     expect(empty).not.toBeNull();
+    // The bare string is replaced by the hc-empty primitive for a consistent empty state.
+    expect(empty!.querySelector('hc-empty')).not.toBeNull();
   });
 
   it('shows Accept button for a Requested item', () => {
@@ -132,6 +139,16 @@ describe('OrderDetailComponent (integration)', () => {
     await fixture.whenStable();
 
     expect(mockService.acceptExam).toHaveBeenCalledWith(orderId, 'item-1');
+  });
+
+  it('clicking Accept shows a success confirmation toast', async () => {
+    detailsSignal.set({ ...baseOrder, items: [requestedItem] });
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('[data-testid="accept-btn"]')!.click();
+    await fixture.whenStable();
+
+    expect(mockToast.show).toHaveBeenCalledWith('Exam accepted', expect.objectContaining({ variant: 'success' }));
   });
 
   it('clicking Accept reloads order details', async () => {
