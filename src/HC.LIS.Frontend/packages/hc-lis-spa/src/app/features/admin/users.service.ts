@@ -9,10 +9,16 @@ export class UsersService {
   private readonly port = inject(USERS_PORT);
 
   readonly users = signal<UserSummary[]>([]);
+  readonly loading = signal(false);
 
   async listUsers(): Promise<void> {
-    const users = await this.port.listUsers();
-    this.users.set(users);
+    this.loading.set(true);
+    try {
+      const users = await this.port.listUsers();
+      this.users.set(users);
+    } finally {
+      this.loading.set(false);
+    }
   }
 
   async createUser(data: CreateUserParams): Promise<void> {

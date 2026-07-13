@@ -24,3 +24,13 @@
 .patient-row {
   cursor: pointer;
 }
+
+.skeleton-table {
+  width: 100%;
+}
+
+.skeleton-row hc-skeleton {
+  display: block;
+  height: 0.9rem;
+  width: 70%;
+}

@@ -23,7 +23,28 @@
     />
   </div>
 
-  @if (service.searchResults().length === 0) {
+  @if (service.searching()) {
+    <table hc-table class="skeleton-table" aria-busy="true">
+      <thead>
+        <tr>
+          <th>Full Name</th>
+          <th>Date of Birth</th>
+          <th>Document ID</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of skeletonRows; track $index) {
+          <tr data-testid="patient-search-skeleton-row" class="skeleton-row">
+            <td><hc-skeleton /></td>
+            <td><hc-skeleton /></td>
+            <td><hc-skeleton /></td>
+            <td><hc-skeleton /></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else if (service.searchResults().length === 0) {
     <hc-empty
       data-testid="patient-search-empty-state"
       title="No patients found"

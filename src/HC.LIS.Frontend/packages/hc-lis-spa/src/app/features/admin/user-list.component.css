@@ -27,3 +27,9 @@
 .role-select {
   min-width: 9rem;
 }
+
+.skeleton-row hc-skeleton {
+  display: block;
+  height: 0.9rem;
+  width: 70%;
+}

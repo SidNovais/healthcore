@@ -13,8 +13,18 @@
         <th class="num-col">Items</th>
       </tr>
     </thead>
-    <tbody>
-      @if (ordersService.orderList().length === 0) {
+    <tbody [attr.aria-busy]="ordersService.loadingList()">
+      @if (ordersService.loadingList()) {
+        @for (row of skeletonRows; track $index) {
+          <tr data-testid="order-list-skeleton-row" class="skeleton-row">
+            <td><hc-skeleton /></td>
+            <td><hc-skeleton /></td>
+            <td><hc-skeleton /></td>
+            <td><hc-skeleton /></td>
+            <td class="num-col"><hc-skeleton /></td>
+          </tr>
+        }
+      } @else if (ordersService.orderList().length === 0) {
         <tr>
           <td colspan="5" class="empty-cell">No orders found.</td>
         </tr>

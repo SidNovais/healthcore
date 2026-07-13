@@ -6,17 +6,19 @@ import { HcBadge } from '../../ui/badge/badge';
 import { HcButton } from '../../ui/button/button';
 import { HcEmpty } from '../../ui/empty/empty';
 import { HcIcon } from '../../ui/icon/icon';
+import { HcSkeleton } from '../../ui/skeleton/skeleton';
 import { HcTable } from '../../ui/table/table';
 
 @Component({
   selector: 'app-worklist',
   standalone: true,
-  imports: [WorklistItemDetailComponent, SlicePipe, HcBadge, HcButton, HcEmpty, HcIcon, HcTable],
+  imports: [WorklistItemDetailComponent, SlicePipe, HcBadge, HcButton, HcEmpty, HcIcon, HcSkeleton, HcTable],
   templateUrl: './worklist.component.html',
   styleUrl: './worklist.component.css',
 })
 export class WorklistComponent implements OnInit {
   protected readonly service = inject(WorklistService);
+  protected readonly skeletonRows = Array.from({ length: 5 });
 
   ngOnInit(): void {
     void this.service.loadItems();
