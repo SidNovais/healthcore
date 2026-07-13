@@ -17,6 +17,7 @@
               <th>Patient</th>
               <th>Status</th>
               <th>Created</th>
+              <th class="actions-col"><span class="sr-only">Actions</span></th>
             </tr>
           </thead>
           <tbody>
@@ -27,6 +28,7 @@
                 <td><hc-skeleton /></td>
                 <td><hc-skeleton /></td>
                 <td><hc-skeleton /></td>
+                <td class="actions-col"><hc-skeleton /></td>
               </tr>
             }
           </tbody>
@@ -41,15 +43,26 @@
         <table hc-table class="worklist-table">
           <thead>
             <tr>
-              <th>Barcode</th>
-              <th>Exam</th>
-              <th>Patient</th>
-              <th>Status</th>
-              <th>Created</th>
+              <th [attr.aria-sort]="ariaSort('sampleBarcode')">
+                <button type="button" class="sort-btn" data-testid="worklist-sort-barcode" (click)="toggleSort('sampleBarcode')">Barcode</button>
+              </th>
+              <th [attr.aria-sort]="ariaSort('examCode')">
+                <button type="button" class="sort-btn" data-testid="worklist-sort-exam" (click)="toggleSort('examCode')">Exam</button>
+              </th>
+              <th [attr.aria-sort]="ariaSort('patientName')">
+                <button type="button" class="sort-btn" data-testid="worklist-sort-patient" (click)="toggleSort('patientName')">Patient</button>
+              </th>
+              <th [attr.aria-sort]="ariaSort('status')">
+                <button type="button" class="sort-btn" data-testid="worklist-sort-status" (click)="toggleSort('status')">Status</button>
+              </th>
+              <th [attr.aria-sort]="ariaSort('createdAt')">
+                <button type="button" class="sort-btn" data-testid="worklist-sort-created" (click)="toggleSort('createdAt')">Created</button>
+              </th>
+              <th class="actions-col"><span class="sr-only">Actions</span></th>
             </tr>
           </thead>
           <tbody>
-            @for (item of service.items(); track item.id) {
+            @for (item of pagedItems(); track item.id) {
               <tr
                 data-testid="worklist-row"
                 class="worklist-row"
@@ -61,10 +74,42 @@
                 <td data-testid="patient-name-cell">{{ item.patientName ?? item.patientId }}</td>
                 <td><hc-badge variant="accent">{{ item.status }}</hc-badge></td>
                 <td class="tabular-nums">{{ item.createdAt | slice: 0 : 10 }}</td>
+                <td class="actions-col" (click)="$event.stopPropagation()">
+                  <hc-dropdown-menu testId="worklist-actions" ariaLabel="Worklist item actions">
+                    <button
+                      type="button"
+                      class="row-action-trigger"
+                      hc-dropdown-trigger
+                      data-testid="worklist-actions-trigger"
+                      aria-label="Worklist item actions"
+                    >
+                      <hc-icon name="more-horizontal" />
+                    </button>
+                    <button
+                      hc-dropdown-item
+                      data-testid="worklist-action-view"
+                      (select)="onRowClick(item.id)"
+                    >
+                      View details
+                    </button>
+                  </hc-dropdown-menu>
+                </td>
               </tr>
             }
           </tbody>
         </table>
+
+        @if (pageCount() > 1) {
+          <div class="worklist-footer">
+            <hc-pagination
+              testId="worklist-pagination"
+              ariaLabel="Worklist pages"
+              [page]="displayPage()"
+              [pageCount]="pageCount()"
+              (pageChange)="page.set($event)"
+            />
+          </div>
+        }
       }
     </div>
 
