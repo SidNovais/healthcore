@@ -72,6 +72,39 @@ test.describe('Patient Management', () => {
     await expect(page.getByText(updatedName)).toBeVisible({ timeout: 5_000 });
   });
 
+  test('Receptionist: row action menu View opens patient detail', async ({ page }) => {
+    await loginAsReceptionist(page);
+
+    const uniqueName = `RowActionPatient-${Date.now()}`;
+
+    // Register a patient so the search table has a row to act on
+    await page.goto('/patients/new');
+    await page.getByTestId('patient-full-name-input').fill(uniqueName);
+    await page.getByTestId('patient-dob-input').fill('1991-04-10');
+    await Promise.all([
+      page.waitForResponse(r =>
+        r.url().includes('/api/v1/patients') &&
+        r.request().method() === 'POST' &&
+        r.status() === 201),
+      page.getByTestId('patient-form-submit-btn').click(),
+    ]);
+    await expect(page.getByTestId('patient-status-badge')).toBeVisible({ timeout: 15_000 });
+
+    await page.goto('/patients');
+    await page.getByTestId('patient-search-input').fill(uniqueName);
+    await expect(page.getByTestId('patient-row').first()).toBeVisible({ timeout: 10_000 });
+
+    // Opening the row action menu must not navigate the (clickable) row.
+    await page.getByTestId('patient-actions-trigger').first().click();
+    await expect(page).toHaveURL(/\/patients$/);
+
+    await page.getByTestId('patient-action-view').first().click();
+    await expect(page).toHaveURL(
+      /\/patients\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
+      { timeout: 10_000 },
+    );
+  });
+
   test('ITAdmin: anonymize workflow', async ({ page }) => {
     await loginAsITAdmin(page);
 
