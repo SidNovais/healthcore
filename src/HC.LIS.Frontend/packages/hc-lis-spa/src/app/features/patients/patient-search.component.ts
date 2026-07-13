@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, effect, inject } from '@angular/core';
+import { Component, ElementRef, OnDestroy, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { gsap } from 'gsap';
@@ -8,14 +8,36 @@ import { HcButton } from '../../ui/button/button';
 import { HcEmpty } from '../../ui/empty/empty';
 import { HcIcon } from '../../ui/icon/icon';
 import { HcInput } from '../../ui/input/input';
+import { HcPagination } from '../../ui/pagination/pagination';
+import {
+  HcDropdownMenu,
+  HcDropdownMenuItem,
+  HcDropdownMenuTrigger,
+} from '../../ui/dropdown-menu/dropdown-menu';
 import { HcSkeleton } from '../../ui/skeleton/skeleton';
 import { HcTable } from '../../ui/table/table';
 import { MOTION, prefersReducedMotion } from '../../ui/motion/motion';
+import type { PatientSearchResult } from '../../core/domain/patient-search-result';
+
+const PAGE_SIZE = 10;
 
 @Component({
   selector: 'app-patient-search',
   standalone: true,
-  imports: [FormsModule, HcBadge, HcButton, HcEmpty, HcIcon, HcInput, HcSkeleton, HcTable],
+  imports: [
+    FormsModule,
+    HcBadge,
+    HcButton,
+    HcEmpty,
+    HcIcon,
+    HcInput,
+    HcPagination,
+    HcDropdownMenu,
+    HcDropdownMenuTrigger,
+    HcDropdownMenuItem,
+    HcSkeleton,
+    HcTable,
+  ],
   templateUrl: './patient-search.component.html',
   styleUrl: './patient-search.component.css',
 })
@@ -26,12 +48,25 @@ export class PatientSearchComponent implements OnDestroy {
   private readonly host = inject(ElementRef).nativeElement as HTMLElement;
 
   protected searchTerm = '';
+  protected readonly page = signal(1);
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
+  protected readonly pageCount = computed(() =>
+    Math.max(1, Math.ceil(this.service.searchResults().length / PAGE_SIZE)),
+  );
+
+  /** Current page clamped into range so a shrinking result set can't strand us. */
+  protected readonly displayPage = computed(() => Math.min(this.page(), this.pageCount()));
+
+  protected readonly pagedResults = computed<PatientSearchResult[]>(() => {
+    const start = (this.displayPage() - 1) * PAGE_SIZE;
+    return this.service.searchResults().slice(start, start + PAGE_SIZE);
+  });
+
   constructor() {
-    // Stagger rows in whenever a fresh (non-empty) result set renders.
+    // Stagger rows in whenever a fresh (non-empty) page renders.
     effect(() => {
-      const count = this.service.searchResults().length;
+      const count = this.pagedResults().length;
       if (count === 0 || prefersReducedMotion()) return;
       requestAnimationFrame(() => {
         const rows = this.host.querySelectorAll('[data-testid="patient-row"]');
@@ -43,12 +78,23 @@ export class PatientSearchComponent implements OnDestroy {
 
   protected onSearchInput(term: string): void {
     this.searchTerm = term;
+    this.page.set(1);
     if (this.debounceTimer !== null) {
       clearTimeout(this.debounceTimer);
     }
     this.debounceTimer = setTimeout(() => {
       void this.service.search(term);
     }, 300);
+  }
+
+  protected clearSearch(): void {
+    this.searchTerm = '';
+    this.page.set(1);
+    if (this.debounceTimer !== null) {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = null;
+    }
+    void this.service.search('');
   }
 
   protected onRowClick(id: string): void {
