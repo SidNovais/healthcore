@@ -7,11 +7,20 @@ import { HcAlert } from '../../ui/alert/alert';
 import { HcBadge, type HcBadgeVariant } from '../../ui/badge/badge';
 import { HcButton } from '../../ui/button/button';
 import { HcCard } from '../../ui/card/card';
+import { HcDialog } from '../../ui/dialog/dialog';
+import {
+  HcDropdownMenu,
+  HcDropdownMenuItem,
+  HcDropdownMenuTrigger,
+} from '../../ui/dropdown-menu/dropdown-menu';
 import { HcEmpty } from '../../ui/empty/empty';
+import { HcIcon } from '../../ui/icon/icon';
 import { HcInput } from '../../ui/input/input';
 import { HcTable } from '../../ui/table/table';
 import { ToastService } from '../../ui/toast/toast.service';
 import { MOTION, prefersReducedMotion } from '../../ui/motion/motion';
+
+const TERMINAL_STATUSES = new Set(['Canceled', 'Rejected', 'Completed', 'PartiallyCompleted']);
 
 const STATUS_VARIANTS: Record<string, HcBadgeVariant> = {
   Accepted: 'success',
@@ -27,7 +36,22 @@ const STATUS_VARIANTS: Record<string, HcBadgeVariant> = {
 @Component({
   selector: 'app-order-detail',
   standalone: true,
-  imports: [FormsModule, RouterLink, HcAlert, HcBadge, HcButton, HcCard, HcEmpty, HcInput, HcTable],
+  imports: [
+    FormsModule,
+    RouterLink,
+    HcAlert,
+    HcBadge,
+    HcButton,
+    HcCard,
+    HcDialog,
+    HcDropdownMenu,
+    HcDropdownMenuTrigger,
+    HcDropdownMenuItem,
+    HcEmpty,
+    HcIcon,
+    HcInput,
+    HcTable,
+  ],
   templateUrl: './order-detail.component.html',
   styleUrl: './order-detail.component.css',
 })
@@ -59,6 +83,11 @@ export class OrderDetailComponent implements OnInit {
 
   protected statusVariant(status: string): HcBadgeVariant {
     return STATUS_VARIANTS[status] ?? 'neutral';
+  }
+
+  /** An item exposes at least one action (Cancel) while it is not in a terminal state. */
+  protected hasActions(status: string): boolean {
+    return !TERMINAL_STATUSES.has(status);
   }
 
   ngOnInit(): void {
@@ -95,6 +124,14 @@ export class OrderDetailComponent implements OnInit {
     this.rejectReason = '';
   }
 
+  /** Reset the pending reject when the dialog is dismissed (Esc/backdrop/Cancel). */
+  protected onRejectDialogOpenChange(open: boolean): void {
+    if (!open) {
+      this.activeRejectItemId.set(null);
+      this.rejectReason = '';
+    }
+  }
+
   protected async onReject(itemId: string): Promise<void> {
     const orderId = this.route.snapshot.params['id'] as string;
     this.errorMessage.set(null);
@@ -124,6 +161,14 @@ export class OrderDetailComponent implements OnInit {
   protected startOnHold(itemId: string): void {
     this.activeOnHoldItemId.set(itemId);
     this.onHoldReason = '';
+  }
+
+  /** Reset the pending hold when the dialog is dismissed (Esc/backdrop/Cancel). */
+  protected onOnHoldDialogOpenChange(open: boolean): void {
+    if (!open) {
+      this.activeOnHoldItemId.set(null);
+      this.onHoldReason = '';
+    }
   }
 
   protected async onPlaceOnHold(itemId: string): Promise<void> {

@@ -38,64 +38,30 @@
               <hc-badge data-testid="item-status" [variant]="statusVariant(item.status)">{{ item.status }}</hc-badge>
             </td>
             <td>
-              <div class="actions-cell">
-                @if (item.status === 'Requested' || item.status === 'OnHold') {
-                  <button hc-button size="sm" data-testid="accept-btn" (click)="onAccept(item.orderItemId)">Accept</button>
-                }
-                @if (item.status === 'Requested') {
-                  <button hc-button variant="destructive" size="sm" data-testid="reject-btn" (click)="startReject(item.orderItemId)">Reject</button>
-                }
-                @if (item.status === 'Requested') {
-                  <button hc-button variant="ghost" size="sm" data-testid="on-hold-btn" (click)="startOnHold(item.orderItemId)">On Hold</button>
-                }
-                @if (item.status !== 'Canceled' && item.status !== 'Rejected' && item.status !== 'Completed' && item.status !== 'PartiallyCompleted') {
-                  <button hc-button variant="ghost" size="sm" data-testid="cancel-btn" (click)="onCancel(item.orderItemId)">Cancel</button>
-                }
-              </div>
-
-              @if (activeRejectItemId() === item.orderItemId) {
-                <div data-testid="reject-reason-form" class="reason-form">
-                  <input
-                    hc-input
-                    data-testid="reject-reason-input"
-                    type="text"
-                    [(ngModel)]="rejectReason"
-                    placeholder="Reason for rejection"
-                  />
-                  <div class="reason-actions">
-                    <button
-                      hc-button
-                      variant="destructive"
-                      size="sm"
-                      data-testid="confirm-reject-btn"
-                      (click)="onReject(item.orderItemId)"
-                      [disabled]="!rejectReason.trim()"
-                    >Confirm Reject</button>
-                    <button hc-button variant="ghost" size="sm" data-testid="cancel-reject-btn" (click)="activeRejectItemId.set(null)">Cancel</button>
-                  </div>
-                </div>
-              }
-
-              @if (activeOnHoldItemId() === item.orderItemId) {
-                <div data-testid="on-hold-reason-form" class="reason-form">
-                  <input
-                    hc-input
-                    data-testid="on-hold-reason-input"
-                    type="text"
-                    [(ngModel)]="onHoldReason"
-                    placeholder="Reason for hold"
-                  />
-                  <div class="reason-actions">
-                    <button
-                      hc-button
-                      size="sm"
-                      data-testid="confirm-on-hold-btn"
-                      (click)="onPlaceOnHold(item.orderItemId)"
-                      [disabled]="!onHoldReason.trim()"
-                    >Confirm On Hold</button>
-                    <button hc-button variant="ghost" size="sm" data-testid="cancel-on-hold-btn" (click)="activeOnHoldItemId.set(null)">Cancel</button>
-                  </div>
-                </div>
+              @if (hasActions(item.status)) {
+                <hc-dropdown-menu testId="exam-actions" ariaLabel="Exam item actions">
+                  <button
+                    type="button"
+                    class="row-action-trigger"
+                    hc-dropdown-trigger
+                    data-testid="exam-actions-trigger"
+                    aria-label="Exam item actions"
+                  >
+                    <hc-icon name="more-horizontal" />
+                  </button>
+                  @if (item.status === 'Requested' || item.status === 'OnHold') {
+                    <button hc-dropdown-item data-testid="accept-btn" (select)="onAccept(item.orderItemId)">Accept</button>
+                  }
+                  @if (item.status === 'Requested') {
+                    <button hc-dropdown-item class="hc-dropdown__item--destructive" data-testid="reject-btn" (select)="startReject(item.orderItemId)">Reject</button>
+                  }
+                  @if (item.status === 'Requested') {
+                    <button hc-dropdown-item data-testid="on-hold-btn" (select)="startOnHold(item.orderItemId)">On Hold</button>
+                  }
+                  @if (item.status !== 'Canceled' && item.status !== 'Rejected' && item.status !== 'Completed' && item.status !== 'PartiallyCompleted') {
+                    <button hc-dropdown-item data-testid="cancel-btn" (select)="onCancel(item.orderItemId)">Cancel</button>
+                  }
+                </hc-dropdown-menu>
               }
             </td>
           </tr>
@@ -108,5 +74,64 @@
         }
       </tbody>
     </table>
+
+    <hc-dialog
+      [open]="activeRejectItemId() !== null"
+      (openChange)="onRejectDialogOpenChange($event)"
+      data-testid="reject-dialog"
+    >
+      @if (activeRejectItemId(); as itemId) {
+        <div data-testid="reject-reason-form" class="reason-form">
+          <h3 class="reason-title">Reject exam item</h3>
+          <input
+            hc-input
+            data-testid="reject-reason-input"
+            type="text"
+            [(ngModel)]="rejectReason"
+            placeholder="Reason for rejection"
+          />
+          <div class="reason-actions">
+            <button
+              hc-button
+              variant="destructive"
+              size="sm"
+              data-testid="confirm-reject-btn"
+              (click)="onReject(itemId)"
+              [disabled]="!rejectReason.trim()"
+            >Confirm Reject</button>
+            <button hc-button variant="ghost" size="sm" data-testid="cancel-reject-btn" (click)="activeRejectItemId.set(null)">Cancel</button>
+          </div>
+        </div>
+      }
+    </hc-dialog>
+
+    <hc-dialog
+      [open]="activeOnHoldItemId() !== null"
+      (openChange)="onOnHoldDialogOpenChange($event)"
+      data-testid="on-hold-dialog"
+    >
+      @if (activeOnHoldItemId(); as itemId) {
+        <div data-testid="on-hold-reason-form" class="reason-form">
+          <h3 class="reason-title">Place exam item on hold</h3>
+          <input
+            hc-input
+            data-testid="on-hold-reason-input"
+            type="text"
+            [(ngModel)]="onHoldReason"
+            placeholder="Reason for hold"
+          />
+          <div class="reason-actions">
+            <button
+              hc-button
+              size="sm"
+              data-testid="confirm-on-hold-btn"
+              (click)="onPlaceOnHold(itemId)"
+              [disabled]="!onHoldReason.trim()"
+            >Confirm On Hold</button>
+            <button hc-button variant="ghost" size="sm" data-testid="cancel-on-hold-btn" (click)="activeOnHoldItemId.set(null)">Cancel</button>
+          </div>
+        </div>
+      }
+    </hc-dialog>
   }
 </div>
