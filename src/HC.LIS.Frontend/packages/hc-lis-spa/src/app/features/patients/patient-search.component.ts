@@ -14,9 +14,11 @@ import {
   HcDropdownMenuItem,
   HcDropdownMenuTrigger,
 } from '../../ui/dropdown-menu/dropdown-menu';
+import { HcSheet } from '../../ui/sheet/sheet';
 import { HcSkeleton } from '../../ui/skeleton/skeleton';
 import { HcTable } from '../../ui/table/table';
 import { MOTION, prefersReducedMotion } from '../../ui/motion/motion';
+import { PatientDetailComponent } from './patient-detail.component';
 import type { PatientSearchResult } from '../../core/domain/patient-search-result';
 
 const PAGE_SIZE = 10;
@@ -35,8 +37,10 @@ const PAGE_SIZE = 10;
     HcDropdownMenu,
     HcDropdownMenuTrigger,
     HcDropdownMenuItem,
+    HcSheet,
     HcSkeleton,
     HcTable,
+    PatientDetailComponent,
   ],
   templateUrl: './patient-search.component.html',
   styleUrl: './patient-search.component.css',
@@ -49,6 +53,9 @@ export class PatientSearchComponent implements OnDestroy {
 
   protected searchTerm = '';
   protected readonly page = signal(1);
+  /** Patient shown in the detail slide-over; null while the sheet is closed. */
+  protected readonly selectedPatientId = signal<string | null>(null);
+  protected readonly detailSheetOpen = signal(false);
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   protected readonly pageCount = computed(() =>
@@ -98,7 +105,8 @@ export class PatientSearchComponent implements OnDestroy {
   }
 
   protected onRowClick(id: string): void {
-    void this.router.navigate(['/patients', id]);
+    this.selectedPatientId.set(id);
+    this.detailSheetOpen.set(true);
   }
 
   protected onRegisterClick(): void {

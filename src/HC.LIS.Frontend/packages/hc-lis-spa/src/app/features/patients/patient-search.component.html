@@ -130,4 +130,10 @@
       </div>
     }
   }
+
+  <hc-sheet [(open)]="detailSheetOpen" ariaLabel="Patient detail" data-testid="patient-detail-sheet">
+    @if (selectedPatientId(); as id) {
+      <app-patient-detail [patientId]="id" />
+    }
+  </hc-sheet>
 </div>

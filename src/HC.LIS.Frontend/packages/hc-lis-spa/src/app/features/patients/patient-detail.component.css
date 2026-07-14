@@ -47,3 +47,26 @@ hc-alert {
   gap: var(--space-3);
   margin-bottom: var(--space-6);
 }
+
+.anonymize-dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.anonymize-dialog-title {
+  margin: 0;
+  font-size: var(--text-lg);
+}
+
+.anonymize-dialog-text {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.anonymize-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}

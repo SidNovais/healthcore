@@ -45,13 +45,26 @@
           Anonymize
         </button>
       }
-
-      @if (showAnonymizeConfirm()) {
-        <button hc-button variant="destructive" data-testid="anonymize-confirm-btn" (click)="confirmAnonymize()">
-          Confirm anonymize
-        </button>
-      }
     </div>
+
+    <hc-dialog [(open)]="showAnonymizeConfirm" data-testid="anonymize-dialog">
+      @if (showAnonymizeConfirm()) {
+        <div class="anonymize-dialog-body">
+          <h3 class="anonymize-dialog-title">Anonymize {{ patient.fullName }}?</h3>
+          <p class="anonymize-dialog-text">
+            This permanently removes the patient's identifying information and cannot be undone.
+          </p>
+          <div class="anonymize-dialog-actions">
+            <button hc-button variant="ghost" data-testid="cancel-anonymize-btn" (click)="showAnonymizeConfirm.set(false)">
+              Cancel
+            </button>
+            <button hc-button variant="destructive" data-testid="anonymize-confirm-btn" (click)="confirmAnonymize()">
+              Confirm anonymize
+            </button>
+          </div>
+        </div>
+      }
+    </hc-dialog>
 
     @if (isEditMode() && patient.status === 'Active') {
       <app-patient-form

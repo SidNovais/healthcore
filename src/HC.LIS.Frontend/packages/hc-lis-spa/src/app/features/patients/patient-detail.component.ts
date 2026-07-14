@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, effect, inject, input, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PatientFormComponent } from './patient-form.component';
 import { PatientsService } from '../../core/application/patients.service';
@@ -9,11 +9,12 @@ import { HcAlert } from '../../ui/alert/alert';
 import { HcBadge } from '../../ui/badge/badge';
 import { HcButton } from '../../ui/button/button';
 import { HcCard } from '../../ui/card/card';
+import { HcDialog } from '../../ui/dialog/dialog';
 
 @Component({
   selector: 'app-patient-detail',
   standalone: true,
-  imports: [PatientFormComponent, HcAlert, HcBadge, HcButton, HcCard],
+  imports: [PatientFormComponent, HcAlert, HcBadge, HcButton, HcCard, HcDialog],
   templateUrl: './patient-detail.component.html',
   styleUrl: './patient-detail.component.css',
 })
@@ -22,12 +23,28 @@ export class PatientDetailComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
 
+  /**
+   * When mounted inside the patient-search slide-over the id is supplied here;
+   * on the routed /patients/:id page it is absent and the route param is used.
+   */
+  readonly patientId = input<string | undefined>(undefined);
+
   protected readonly isEditMode = signal(false);
   protected readonly showAnonymizeConfirm = signal(false);
   protected readonly error = signal<string | null>(null);
 
-  protected get patientId(): string {
-    return this.route.snapshot.params['id'] as string;
+  constructor() {
+    // Slide-over mode: (re)load whenever the bound id changes. On the routed page
+    // patientId() is undefined so this is inert and ngOnInit drives the load.
+    effect(() => {
+      if (this.patientId()) {
+        void this.loadWithRetry();
+      }
+    });
+  }
+
+  private get effectivePatientId(): string {
+    return this.patientId() ?? (this.route.snapshot.params['id'] as string);
   }
 
   protected get isITAdmin(): boolean {
@@ -47,14 +64,17 @@ export class PatientDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    void this.loadWithRetry();
+    // Slide-over mode loads via the input-driven effect; avoid a double load here.
+    if (!this.patientId()) {
+      void this.loadWithRetry();
+    }
   }
 
   // The API may transiently return stale data immediately after a write
   // (read model settles asynchronously). Retry up to 10 × 1 s until fresh.
   private async loadWithRetry(validate?: (p: PatientDetails) => boolean): Promise<void> {
     for (let attempt = 0; attempt < 10; attempt++) {
-      await this.patientsService.loadDetails(this.patientId);
+      await this.patientsService.loadDetails(this.effectivePatientId);
       const p = this.patientsService.patient();
       if (p !== null && (!validate || validate(p))) return;
       await new Promise<void>(r => setTimeout(r, 1_000));
@@ -72,7 +92,7 @@ export class PatientDetailComponent implements OnInit {
   protected async confirmAnonymize(): Promise<void> {
     this.error.set(null);
     try {
-      await this.patientsService.anonymize(this.patientId);
+      await this.patientsService.anonymize(this.effectivePatientId);
       this.showAnonymizeConfirm.set(false);
       await this.loadWithRetry(p => p.status === 'Anonymized');
     } catch (err) {
@@ -83,7 +103,7 @@ export class PatientDetailComponent implements OnInit {
   protected async onFormSubmit(data: UpdatePatientParams): Promise<void> {
     this.error.set(null);
     try {
-      await this.patientsService.update(this.patientId, data);
+      await this.patientsService.update(this.effectivePatientId, data);
       this.isEditMode.set(false);
       await this.loadWithRetry(p => p.fullName === data.fullName && p.dateOfBirth === data.dateOfBirth);
     } catch (err) {
