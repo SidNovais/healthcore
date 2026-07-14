@@ -246,8 +246,10 @@ test.describe('Order Detail', () => {
     await page.goto(`/orders/${orderId}`);
 
     await expect(page.getByTestId('exam-items-table')).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByTestId('accept-btn').first()).toBeVisible({ timeout: 5_000 });
 
+    // Actions now live inside a per-row dropdown menu.
+    await page.getByTestId('exam-actions-trigger').first().click();
+    await expect(page.getByTestId('accept-btn').first()).toBeVisible({ timeout: 5_000 });
     await page.getByTestId('accept-btn').first().click();
 
     await expect(page.getByTestId('item-status').first()).toHaveText('Accepted', { timeout: 10_000 });
@@ -270,8 +272,10 @@ test.describe('Order Detail', () => {
     await page.goto(`/orders/${orderId}`);
 
     await expect(page.getByTestId('exam-items-table')).toBeVisible({ timeout: 5_000 });
+    await page.getByTestId('exam-actions-trigger').first().click();
     await page.getByTestId('reject-btn').first().click();
 
+    // Reason capture now happens in a dialog.
     await expect(page.getByTestId('reject-reason-form')).toBeVisible({ timeout: 5_000 });
     await page.getByTestId('reject-reason-input').fill('Hemolyzed sample');
     await page.getByTestId('confirm-reject-btn').click();
@@ -296,6 +300,7 @@ test.describe('Order Detail', () => {
     await page.goto(`/orders/${orderId}`);
     await expect(page.getByTestId('exam-items-table')).toBeVisible({ timeout: 5_000 });
 
+    await page.getByTestId('exam-actions-trigger').first().click();
     await expect(page.getByTestId('cancel-btn').first()).toBeVisible({ timeout: 5_000 });
     await page.getByTestId('cancel-btn').first().click();
     await expect(page.getByTestId('item-status').first()).toHaveText('Canceled', { timeout: 10_000 });
@@ -318,9 +323,11 @@ test.describe('Order Detail', () => {
     await page.goto(`/orders/${orderId}`);
     await expect(page.getByTestId('exam-items-table')).toBeVisible({ timeout: 5_000 });
 
+    await page.getByTestId('exam-actions-trigger').first().click();
     await expect(page.getByTestId('on-hold-btn').first()).toBeVisible({ timeout: 5_000 });
     await page.getByTestId('on-hold-btn').first().click();
 
+    // Reason capture now happens in a dialog.
     await expect(page.getByTestId('on-hold-reason-form')).toBeVisible({ timeout: 5_000 });
     await page.getByTestId('on-hold-reason-input').fill('Awaiting physician confirmation');
     await page.getByTestId('confirm-on-hold-btn').click();
@@ -353,6 +360,7 @@ test.describe('Order Detail', () => {
       })
     );
 
+    await page.getByTestId('exam-actions-trigger').first().click();
     await expect(page.getByTestId('accept-btn').first()).toBeVisible({ timeout: 5_000 });
     await page.getByTestId('accept-btn').first().click();
 

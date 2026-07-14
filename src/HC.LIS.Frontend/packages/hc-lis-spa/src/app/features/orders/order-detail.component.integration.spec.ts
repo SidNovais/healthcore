@@ -114,28 +114,52 @@ describe('OrderDetailComponent (integration)', () => {
     expect(empty!.querySelector('hc-empty')).not.toBeNull();
   });
 
-  it('shows Accept button for a Requested item', () => {
+  /** Opens the first exam item's row action menu (actions live inside it now). */
+  function openActionsMenu(): void {
+    (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>('[data-testid="exam-actions-trigger"]')!
+      .click();
+    fixture.detectChanges();
+  }
+
+  it('exposes the row actions inside a dropdown menu', () => {
     detailsSignal.set({ ...baseOrder, items: [requestedItem] });
     fixture.detectChanges();
 
-    const btn = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="accept-btn"]');
-    expect(btn).not.toBeNull();
+    const host = fixture.nativeElement as HTMLElement;
+    const trigger = host.querySelector<HTMLButtonElement>('[data-testid="exam-actions-trigger"]');
+    expect(trigger).not.toBeNull();
+    expect(trigger!.getAttribute('aria-haspopup')).toBe('menu');
+    // Items are only in the DOM once the menu opens.
+    expect(host.querySelector('[data-testid="accept-btn"]')).toBeNull();
+
+    openActionsMenu();
+    expect(host.querySelector('[role="menu"]')).not.toBeNull();
+    expect(host.querySelector('[data-testid="accept-btn"]')).not.toBeNull();
   });
 
-  it('does not show Accept button for an Accepted item', () => {
+  it('shows the Accept action for a Requested item', () => {
+    detailsSignal.set({ ...baseOrder, items: [requestedItem] });
+    fixture.detectChanges();
+    openActionsMenu();
+
+    expect((fixture.nativeElement as HTMLElement).querySelector('[data-testid="accept-btn"]')).not.toBeNull();
+  });
+
+  it('does not show the Accept action for an Accepted item', () => {
     detailsSignal.set({ ...baseOrder, items: [acceptedItem] });
     fixture.detectChanges();
+    openActionsMenu();
 
-    const btn = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="accept-btn"]');
-    expect(btn).toBeNull();
+    expect((fixture.nativeElement as HTMLElement).querySelector('[data-testid="accept-btn"]')).toBeNull();
   });
 
   it('clicking Accept calls ordersService.acceptExam with orderId and itemId', async () => {
     detailsSignal.set({ ...baseOrder, items: [requestedItem] });
     fixture.detectChanges();
+    openActionsMenu();
 
-    const btn = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('[data-testid="accept-btn"]');
-    btn!.click();
+    (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('[data-testid="accept-btn"]')!.click();
     await fixture.whenStable();
 
     expect(mockService.acceptExam).toHaveBeenCalledWith(orderId, 'item-1');
@@ -144,6 +168,7 @@ describe('OrderDetailComponent (integration)', () => {
   it('clicking Accept shows a success confirmation toast', async () => {
     detailsSignal.set({ ...baseOrder, items: [requestedItem] });
     fixture.detectChanges();
+    openActionsMenu();
 
     (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('[data-testid="accept-btn"]')!.click();
     await fixture.whenStable();
@@ -154,6 +179,7 @@ describe('OrderDetailComponent (integration)', () => {
   it('clicking Accept reloads order details', async () => {
     detailsSignal.set({ ...baseOrder, items: [requestedItem] });
     fixture.detectChanges();
+    openActionsMenu();
 
     (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('[data-testid="accept-btn"]')!.click();
     await fixture.whenStable();
@@ -161,20 +187,23 @@ describe('OrderDetailComponent (integration)', () => {
     expect(mockService.loadOrderDetails).toHaveBeenCalledTimes(2);
   });
 
-  it('clicking Reject button shows reject-reason-form inline', () => {
+  it('selecting Reject opens the reject-reason-form in a dialog', () => {
     detailsSignal.set({ ...baseOrder, items: [requestedItem] });
     fixture.detectChanges();
+    openActionsMenu();
 
     (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('[data-testid="reject-btn"]')!.click();
     fixture.detectChanges();
 
-    const form = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="reject-reason-form"]');
-    expect(form).not.toBeNull();
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelector('[data-testid="reject-dialog"]')).not.toBeNull();
+    expect(host.querySelector('[data-testid="reject-reason-form"]')).not.toBeNull();
   });
 
   it('clicking Confirm Reject calls ordersService.rejectExam with reason', async () => {
     detailsSignal.set({ ...baseOrder, items: [requestedItem] });
     fixture.detectChanges();
+    openActionsMenu();
 
     (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('[data-testid="reject-btn"]')!.click();
     fixture.detectChanges();
@@ -188,6 +217,19 @@ describe('OrderDetailComponent (integration)', () => {
     await fixture.whenStable();
 
     expect(mockService.rejectExam).toHaveBeenCalledWith(orderId, 'item-1', 'Hemolyzed sample');
+  });
+
+  it('selecting On Hold opens the on-hold-reason-form in a dialog', () => {
+    detailsSignal.set({ ...baseOrder, items: [requestedItem] });
+    fixture.detectChanges();
+    openActionsMenu();
+
+    (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('[data-testid="on-hold-btn"]')!.click();
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelector('[data-testid="on-hold-dialog"]')).not.toBeNull();
+    expect(host.querySelector('[data-testid="on-hold-reason-form"]')).not.toBeNull();
   });
 
 });
