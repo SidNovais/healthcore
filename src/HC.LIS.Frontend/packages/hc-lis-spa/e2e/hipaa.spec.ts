@@ -112,12 +112,11 @@ test.describe('HIPAA Compliance', () => {
     await page.getByTestId('patient-search-input').fill(uniqueName);
     await expect(page.getByTestId('patient-row').first()).toBeVisible({ timeout: 10_000 });
 
-    // Detail load — exercises the detail API call and component rendering
+    // Detail load — opens the slide-over (URL stays on /patients, so no patientId
+    // ever reaches the address bar), exercising the detail API call + rendering.
     await page.getByTestId('patient-row').first().click();
-    await expect(page).toHaveURL(
-      /\/patients\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
-      { timeout: 10_000 },
-    );
+    await expect(page.getByTestId('patient-detail-sheet')).toBeVisible({ timeout: 5_000 });
+    await expect(page).toHaveURL(/\/patients$/);
     await expect(page.getByTestId('patient-status-badge')).toBeVisible({ timeout: 15_000 });
 
     // Assert no PHI in any console message

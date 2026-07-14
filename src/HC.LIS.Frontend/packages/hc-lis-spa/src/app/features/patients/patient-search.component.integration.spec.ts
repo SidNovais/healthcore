@@ -1,10 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import { ComponentFixture } from '@angular/core/testing';
-import { Router, provideRouter } from '@angular/router';
+import { ActivatedRoute, Router, provideRouter } from '@angular/router';
 import { signal } from '@angular/core';
 import { PatientSearchComponent } from './patient-search.component';
 import { PatientsService } from '../../core/application/patients.service';
+import { AuthService } from '../../core/application/auth.service';
 import type { PatientSearchResult } from '../../core/domain/patient-search-result';
+import type { PatientDetails } from '../../core/domain/patient-details';
+import type { UserSession } from '../../core/domain/user-session';
 
 describe('PatientSearchComponent (integration)', () => {
   let fixture: ComponentFixture<PatientSearchComponent>;
@@ -42,12 +45,23 @@ describe('PatientSearchComponent (integration)', () => {
       searchResults: resultsSignal,
       searching: searchingSignal,
       search: vi.fn().mockResolvedValue(undefined),
+      // Needed by the patient-detail slide-over mounted inside the search page.
+      patient: signal<PatientDetails | null>(null),
+      loadDetails: vi.fn().mockResolvedValue(undefined),
+      anonymize: vi.fn().mockResolvedValue(undefined),
+      update: vi.fn().mockResolvedValue(undefined),
+    };
+
+    const mockAuth: Partial<AuthService> = {
+      currentUser: signal<UserSession | null>(null),
     };
 
     await TestBed.configureTestingModule({
       imports: [PatientSearchComponent],
       providers: [
         { provide: PatientsService, useValue: mockService },
+        { provide: AuthService, useValue: mockAuth },
+        { provide: ActivatedRoute, useValue: { snapshot: { params: {} } } },
         provideRouter([]),
       ],
     }).compileComponents();
@@ -158,5 +172,33 @@ describe('PatientSearchComponent (integration)', () => {
 
     expect(input.value).toBe('');
     expect(mockService.search).toHaveBeenCalledWith('');
+  });
+
+  it('opens the patient-detail slide-over on row click instead of navigating', () => {
+    resultsSignal.set(twoPatients);
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    host.querySelector<HTMLElement>('[data-testid="patient-row"]')!.click();
+    fixture.detectChanges();
+
+    expect(host.querySelector('[data-testid="patient-detail-sheet"]')).not.toBeNull();
+    expect(mockService.loadDetails).toHaveBeenCalledWith('p-1');
+    expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('opens the slide-over from the row action View, not a navigation', () => {
+    resultsSignal.set(twoPatients);
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    host.querySelector<HTMLButtonElement>('[data-testid="patient-actions-trigger"]')!.click();
+    fixture.detectChanges();
+    host.querySelector<HTMLButtonElement>('[data-testid="patient-action-view"]')!.click();
+    fixture.detectChanges();
+
+    expect(host.querySelector('[data-testid="patient-detail-sheet"]')).not.toBeNull();
+    expect(mockService.loadDetails).toHaveBeenCalledWith('p-1');
+    expect(router.navigate).not.toHaveBeenCalled();
   });
 });

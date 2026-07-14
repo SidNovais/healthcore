@@ -72,7 +72,7 @@ test.describe('Patient Management', () => {
     await expect(page.getByText(updatedName)).toBeVisible({ timeout: 5_000 });
   });
 
-  test('Receptionist: row action menu View opens patient detail', async ({ page }) => {
+  test('Receptionist: row action menu View opens patient detail slide-over', async ({ page }) => {
     await loginAsReceptionist(page);
 
     const uniqueName = `RowActionPatient-${Date.now()}`;
@@ -98,11 +98,12 @@ test.describe('Patient Management', () => {
     await page.getByTestId('patient-actions-trigger').first().click();
     await expect(page).toHaveURL(/\/patients$/);
 
+    // View opens the detail as a slide-over — the URL stays on /patients (no
+    // patientId exposed in the path) and the detail renders inside the sheet.
     await page.getByTestId('patient-action-view').first().click();
-    await expect(page).toHaveURL(
-      /\/patients\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
-      { timeout: 10_000 },
-    );
+    await expect(page.getByTestId('patient-detail-sheet')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('patient-status-badge')).toBeVisible({ timeout: 15_000 });
+    await expect(page).toHaveURL(/\/patients$/);
   });
 
   test('ITAdmin: anonymize workflow', async ({ page }) => {
@@ -130,20 +131,19 @@ test.describe('Patient Management', () => {
     // Confirm detail is loaded before navigating away — ensures patient row is committed
     await expect(page.getByTestId('patient-status-badge')).toBeVisible({ timeout: 15_000 });
 
-    // Navigate to search and find the patient by name
+    // Navigate to search and open the patient detail as a slide-over
     await page.goto('/patients');
     await page.getByTestId('patient-search-input').fill(uniqueName);
     // Generous timeout: debounce 300ms + API round-trip + Angular render
     await expect(page.getByTestId('patient-row').first()).toBeVisible({ timeout: 10_000 });
     await page.getByTestId('patient-row').first().click();
 
-    await expect(page).toHaveURL(
-      /\/patients\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
-      { timeout: 10_000 },
-    );
+    // Detail opens in the sheet; the URL stays on /patients (no patientId in path).
+    await expect(page.getByTestId('patient-detail-sheet')).toBeVisible({ timeout: 5_000 });
+    await expect(page).toHaveURL(/\/patients$/);
     await expect(page.getByTestId('patient-status-badge')).toBeVisible({ timeout: 15_000 });
 
-    // Two-step anonymize: click button then confirm
+    // Anonymize opens a confirm dialog: click button then confirm
     await page.getByTestId('patient-anonymize-btn').click();
     await expect(page.getByTestId('anonymize-confirm-btn')).toBeVisible({ timeout: 5_000 });
 

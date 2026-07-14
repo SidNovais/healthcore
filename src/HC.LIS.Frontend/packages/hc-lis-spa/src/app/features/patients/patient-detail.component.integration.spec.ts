@@ -130,4 +130,28 @@ describe('PatientDetailComponent (integration)', () => {
 
     expect(mockPatientsService.anonymize).toHaveBeenCalledWith(patientId);
   });
+
+  it('renders the anonymize confirmation inside a dialog when opened', () => {
+    currentUserSignal.set(itAdminUser);
+    patientSignal.set(activePatient);
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>('[data-testid="patient-anonymize-btn"]')!
+      .click();
+    fixture.detectChanges();
+
+    const dialog = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="anonymize-dialog"]');
+    expect(dialog).not.toBeNull();
+    expect(dialog!.textContent).toContain('Anonymize');
+  });
+
+  it('drives the detail load from the patientId input when provided (slide-over mode)', async () => {
+    const sheetFixture = TestBed.createComponent(PatientDetailComponent);
+    sheetFixture.componentRef.setInput('patientId', 'sheet-patient-777');
+    sheetFixture.detectChanges();
+    await sheetFixture.whenStable();
+
+    expect(mockPatientsService.loadDetails).toHaveBeenCalledWith('sheet-patient-777');
+  });
 });
