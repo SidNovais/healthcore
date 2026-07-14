@@ -78,7 +78,7 @@ Legend: ✅ done · 🔀 merged to `main` · 🔜 next · ⬜ planned
 **Track 2 complete & merged to `main`** (merge `d8f88f5`). 6 phases, one commit-pair each. Net: +2 primitives (`hc-pagination`, `hc-dropdown-menu`), +3 icons (`chevron-left/right`, `more-horizontal`), all 4 data tables upgraded. Vitest **132 → 187** (+55); post-merge on `main`: 187 green, build clean. Full `yarn e2e` still to be run against a live stack (per-page gates listed above) — not yet exercised.
 
 ### Track 3 — detail slide-overs + order-detail actions
-- ⬜ **Phase 10 — build `hc-sheet`** (extend `hc-dialog` focus-trap into a right-anchored slide-over).
+- ✅ **Phase 10 — build `hc-sheet`** (`ui/sheet/`). Right-anchored slide-over on the native `<dialog>` (reuses the browser focus-trap/Esc/top-layer like `hc-dialog`); `open` two-way model, optional `ariaLabel` on the panel, `inset:0 0 0 auto` + `margin-left:auto` pins it to the inline-end edge full-height, GSAP `xPercent:100` slide-in behind `prefers-reduced-motion`. 5 Vitest specs; suite **192 green** (187→192); build clean (sheet CSS well under budget).
 - ⬜ **Phase 11 — Patient detail** as slide-over from patients search; anonymize confirm → `hc-dialog`. Gate `patients.spec.ts`, `hipaa.spec.ts`.
 - ⬜ **Phase 12 — Order detail** reject/on-hold reason capture → `hc-dialog`; per-row action buttons → dropdown-menu. Gate `orders.spec.ts`.
 
