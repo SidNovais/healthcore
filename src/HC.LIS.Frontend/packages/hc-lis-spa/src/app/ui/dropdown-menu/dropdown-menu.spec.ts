@@ -96,6 +96,17 @@ describe('HcDropdownMenu', () => {
     expect(document.activeElement).toBe(trigger);
   });
 
+  // Menu items are declared in the *consumer's* template and content-projected, so under
+  // emulated encapsulation they carry the consumer's _ngcontent attribute — not this
+  // component's. Item styling must therefore pierce encapsulation to reach them.
+  it('styles content-projected menu items', () => {
+    const { items, open } = render();
+
+    open();
+
+    expect(getComputedStyle(items()[0]).display).toBe('flex');
+  });
+
   it('closes when a click lands outside the menu', () => {
     const { fixture, host, menu, open } = render();
 
