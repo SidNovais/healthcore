@@ -33,11 +33,14 @@ test.describe('Shell navigation', () => {
 
     const trigger = page.getByTestId('user-menu-trigger');
     await expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    await expect(page.getByTestId('user-menu-avatar')).toHaveText('IT', { timeout: 5_000 });
+    // loginAsITAdmin signs in as root@hclis.local — the only migration-guaranteed
+    // account (see fixtures/auth.ts). hc-avatar takes the first two characters of a
+    // single-token name, so the initials are RO, not IT.
+    await expect(page.getByTestId('user-menu-avatar')).toHaveText('RO', { timeout: 5_000 });
 
     await trigger.click();
     await expect(trigger).toHaveAttribute('aria-expanded', 'true');
-    await expect(page.getByTestId('user-menu-name')).toHaveText('itadmin@hclis.local');
+    await expect(page.getByTestId('user-menu-name')).toHaveText('root@hclis.local');
   });
 
   // Phase 14 — the order-detail breadcrumb replaces the ad-hoc "← Back to Orders" link.

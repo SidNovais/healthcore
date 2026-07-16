@@ -166,4 +166,27 @@ describe('HcCommand', () => {
 
     expect(active()?.textContent).toContain('Grace Hopper');
   });
+
+  // Regression (found by the first live e2e run — the arrow-key spec failed 3/5 runs).
+  // The reset above must key off the item CONTENT, not the array identity. The shell
+  // rebuilds paletteCommands into a fresh array whenever its debounced patient lookup
+  // runs (patientMatches.set([]) mints a new []), and that flush can land right after
+  // the user's ArrowDown — clobbering the selection back to the top. Same result set,
+  // new array: the selection must survive.
+  it('keeps the active option when the list is replaced by an equivalent set', () => {
+    const { open, key, component, fixture, active } = render();
+
+    open();
+    key('ArrowDown');
+    expect(active()?.textContent).toContain('Patients');
+
+    component.items.set([
+      { id: 'nav-orders', label: 'Orders', group: 'Navigation' },
+      { id: 'nav-patients', label: 'Patients', group: 'Navigation' },
+      { id: 'p-1', label: 'Ada Lovelace', group: 'Patients', hint: 'DOB 1815-12-10' },
+    ]);
+    fixture.detectChanges();
+
+    expect(active()?.textContent).toContain('Patients');
+  });
 });

@@ -3,6 +3,7 @@ import { ComponentFixture } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { UserListComponent } from './user-list.component';
 import { UsersService } from './users.service';
+import { ToastService } from '../../ui/toast/toast.service';
 import type { UserSummary } from '../../core/domain/user-summary';
 
 describe('UserListComponent (integration)', () => {
@@ -125,6 +126,30 @@ describe('UserListComponent (integration)', () => {
     await fixture.whenStable();
 
     expect(mockService.changeRole).toHaveBeenCalledWith('u-1', 'Physician');
+  });
+
+  // Regression (found by the first live e2e run): the API rejects a role change for a
+  // user who has not activated their account (409). confirmRoleChange awaited
+  // changeRole() with no catch, so the rejection escaped, the dialog closed and the
+  // user was told nothing at all — a failed change looked exactly like a successful one.
+  it('surfaces an error toast when the role change is rejected', async () => {
+    const reason = 'Cannot change the role of a user who has not yet activated their account';
+    mockService.changeRole = vi.fn().mockRejectedValue(new Error(reason));
+    usersSignal.set(twoUsers);
+    fixture.detectChanges();
+
+    host().querySelector<HTMLButtonElement>('[data-testid="user-role-trigger"]')!.click();
+    fixture.detectChanges();
+    host().querySelector<HTMLButtonElement>('[data-testid="user-role-option-Physician"]')!.click();
+    fixture.detectChanges();
+    host().querySelector<HTMLButtonElement>('[data-testid="confirm-role-change-btn"]')!.click();
+    await fixture.whenStable();
+
+    const toasts = TestBed.inject(ToastService).toasts();
+    expect(toasts.some(t => t.testId === 'role-change-error-toast')).toBe(true);
+    expect(toasts.find(t => t.testId === 'role-change-error-toast')?.variant).toBe('error');
+    // The success toast must not fire when the change did not happen.
+    expect(toasts.some(t => t.testId === 'role-change-toast')).toBe(false);
   });
 
   it('does not change a role when the confirm dialog is cancelled', async () => {

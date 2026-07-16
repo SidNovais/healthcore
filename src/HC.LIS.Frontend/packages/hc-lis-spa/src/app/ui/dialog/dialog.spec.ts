@@ -5,7 +5,7 @@ import { HcDialog } from './dialog';
 @Component({
   imports: [HcDialog],
   template: `
-    <hc-dialog [(open)]="open" data-testid="print-labels-modal">
+    <hc-dialog [(open)]="open" testId="print-labels-modal">
       <p>Print labels?</p>
     </hc-dialog>
   `,
@@ -22,6 +22,18 @@ function render() {
 }
 
 describe('HcDialog', () => {
+  // Regression (found by the first live e2e run, via hc-sheet): the testid must land on
+  // the <dialog>, not the <hc-dialog> host. The host is display:inline wrapping a
+  // position:fixed child, so its box is 0x0 and Playwright reports it hidden even while
+  // the dialog is plainly on screen.
+  it('puts the testId on the dialog panel rather than the zero-size host', () => {
+    const { fixture, dialog } = render();
+    const host = (fixture.nativeElement as HTMLElement).querySelector('hc-dialog')!;
+
+    expect(dialog.getAttribute('data-testid')).toBe('print-labels-modal');
+    expect(host.hasAttribute('data-testid')).toBe(false);
+  });
+
   it('renders projected content inside a native <dialog> with the hc class', () => {
     const { dialog } = render();
 

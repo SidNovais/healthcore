@@ -52,7 +52,12 @@ test.describe('User Management', () => {
     await expect(page.getByTestId('user-row').filter({ hasText: uniqueEmail })).toBeVisible({ timeout: 5_000 });
   });
 
-  test('change-role workflow: menu → confirm dialog → success toast', async ({ page }) => {
+  // A freshly created user has not activated their account, and the API enforces that a
+  // role cannot be changed until they have (409). This exercises that path end to end:
+  // the rejection must reach the user as an error toast rather than being swallowed.
+  test('change-role workflow: menu → confirm dialog → rejected with an error toast', async ({
+    page,
+  }) => {
     await loginAsITAdmin(page);
 
     // Create a throwaway user so we never mutate a seed account's role.
@@ -77,11 +82,14 @@ test.describe('User Management', () => {
     await page.getByTestId('user-role-option-Physician').click();
     await expect(page.getByTestId('confirm-role-change-btn')).toBeVisible({ timeout: 3_000 });
 
-    await Promise.all([
-      page.waitForResponse(resp => resp.url().includes('/role') && resp.request().method() === 'PUT'),
+    const [resp] = await Promise.all([
+      page.waitForResponse(r => r.url().includes('/role') && r.request().method() === 'PUT'),
       page.getByTestId('confirm-role-change-btn').click(),
     ]);
 
-    await expect(page.getByTestId('role-change-toast')).toBeVisible({ timeout: 5_000 });
+    // The account is not activated, so the API refuses the change.
+    expect(resp.status()).toBe(409);
+    await expect(page.getByTestId('role-change-error-toast')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByTestId('role-change-toast')).toBeHidden();
   });
 });

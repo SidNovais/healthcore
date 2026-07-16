@@ -46,8 +46,9 @@ test.describe('Patient Management', () => {
     // patient-status-badge is inside @if(patientsService.patient()) — only visible once GET resolves
     await expect(page.getByTestId('patient-status-badge')).toBeVisible({ timeout: 15_000 });
 
-    // Verify registered name is displayed
-    await expect(page.getByText(uniqueName)).toBeVisible({ timeout: 5_000 });
+    // Verify registered name is displayed. Scoped to the heading: Phase 14's breadcrumb
+    // trails "Patients / {name}", so a bare getByText matches both it and the h1.
+    await expect(page.getByRole('heading', { name: uniqueName })).toBeVisible({ timeout: 5_000 });
 
     // Open inline edit form
     await page.getByTestId('patient-edit-btn').click();
@@ -68,8 +69,8 @@ test.describe('Patient Management', () => {
     // onFormSubmit reloads details; wait for the badge to re-render with fresh data
     await expect(page.getByTestId('patient-status-badge')).toBeVisible({ timeout: 10_000 });
 
-    // Verify updated name is displayed
-    await expect(page.getByText(updatedName)).toBeVisible({ timeout: 5_000 });
+    // Verify updated name is displayed (heading-scoped, as above).
+    await expect(page.getByRole('heading', { name: updatedName })).toBeVisible({ timeout: 5_000 });
   });
 
   test('Receptionist: row action menu View opens patient detail slide-over', async ({ page }) => {
