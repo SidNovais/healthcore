@@ -232,4 +232,17 @@ describe('OrderDetailComponent (integration)', () => {
     expect(host.querySelector('[data-testid="on-hold-reason-form"]')).not.toBeNull();
   });
 
+  it('trails back to the orders list via a breadcrumb', () => {
+    const crumb = (fixture.nativeElement as HTMLElement).querySelector(
+      '[data-testid="order-breadcrumb"]',
+    );
+
+    expect(crumb).not.toBeNull();
+    expect(
+      crumb!.querySelector('[data-testid="order-breadcrumb-link-0"]')?.getAttribute('href'),
+    ).toBe('/orders');
+    expect(
+      crumb!.querySelector('[data-testid="order-breadcrumb-page"]')?.textContent?.trim(),
+    ).toBe('Order Detail');
+  });
 });

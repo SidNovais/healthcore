@@ -154,4 +154,32 @@ describe('PatientDetailComponent (integration)', () => {
 
     expect(mockPatientsService.loadDetails).toHaveBeenCalledWith('sheet-patient-777');
   });
+
+  it('trails the routed page back to the patient list, naming the patient', () => {
+    patientSignal.set(activePatient);
+    fixture.detectChanges();
+
+    const crumb = (fixture.nativeElement as HTMLElement).querySelector(
+      '[data-testid="patient-breadcrumb"]',
+    );
+    expect(crumb).not.toBeNull();
+    expect(
+      crumb!.querySelector('[data-testid="patient-breadcrumb-link-0"]')?.getAttribute('href'),
+    ).toBe('/patients');
+    expect(
+      crumb!.querySelector('[data-testid="patient-breadcrumb-page"]')?.textContent?.trim(),
+    ).toBe('Maria Silva');
+  });
+
+  it('omits the breadcrumb in slide-over mode — the overlay has no route to trail', async () => {
+    const sheetFixture = TestBed.createComponent(PatientDetailComponent);
+    sheetFixture.componentRef.setInput('patientId', patientId);
+    patientSignal.set(activePatient);
+    sheetFixture.detectChanges();
+    await sheetFixture.whenStable();
+
+    expect(
+      (sheetFixture.nativeElement as HTMLElement).querySelector('[data-testid="patient-breadcrumb"]'),
+    ).toBeNull();
+  });
 });

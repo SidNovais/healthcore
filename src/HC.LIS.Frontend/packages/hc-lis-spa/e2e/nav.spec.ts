@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { loginAsITAdmin } from './fixtures/auth';
+import { loginAsITAdmin, loginAsReceptionist } from './fixtures/auth';
 
 // Shell navigation — active-state indicator + role badge. Existing nav visibility/role-guard
 // assertions live in auth.spec.ts and triage.spec.ts; this spec covers the Phase 2 active
@@ -38,5 +38,24 @@ test.describe('Shell navigation', () => {
     await trigger.click();
     await expect(trigger).toHaveAttribute('aria-expanded', 'true');
     await expect(page.getByTestId('user-menu-name')).toHaveText('itadmin@hclis.local');
+  });
+
+  // Phase 14 — the order-detail breadcrumb replaces the ad-hoc "← Back to Orders" link.
+  test('order-detail breadcrumb trails back to the orders list', async ({ page }) => {
+    await loginAsReceptionist(page);
+    await page.getByTestId('nav-orders-link').click();
+    await expect(page).toHaveURL(/\/orders$/, { timeout: 10_000 });
+
+    const firstRow = page.getByTestId('order-list-row').first();
+    if ((await firstRow.count()) === 0) {
+      test.skip(true, 'No seeded orders to open a detail page for.');
+    }
+    await firstRow.click();
+    await expect(page).toHaveURL(/\/orders\/[^/]+$/, { timeout: 10_000 });
+
+    await expect(page.getByTestId('order-breadcrumb-page')).toHaveText('Order Detail');
+    await page.getByTestId('order-breadcrumb-link-0').click();
+
+    await expect(page).toHaveURL(/\/orders$/, { timeout: 10_000 });
   });
 });
