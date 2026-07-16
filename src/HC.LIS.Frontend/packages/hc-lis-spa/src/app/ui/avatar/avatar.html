@@ -1,0 +1,5 @@
+@if (showImage()) {
+  <img class="hc-avatar__img" [src]="src()" [alt]="name()" (error)="onError()" />
+} @else {
+  <span class="hc-avatar__fallback" aria-hidden="true">{{ initials() }}</span>
+}

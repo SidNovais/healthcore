@@ -21,10 +21,14 @@ import { gsap } from 'gsap';
 import { AuthService } from '../application/auth.service';
 import { ThemeService } from '../application/theme.service';
 import type { UserRole } from '../domain/user-session';
+import { HcAvatar } from '../../ui/avatar/avatar';
 import { HcBadge } from '../../ui/badge/badge';
-import { HcButton } from '../../ui/button/button';
+import {
+  HcDropdownMenu,
+  HcDropdownMenuItem,
+  HcDropdownMenuTrigger,
+} from '../../ui/dropdown-menu/dropdown-menu';
 import { HcIcon, type HcIconName } from '../../ui/icon/icon';
-import { HcTooltip } from '../../ui/tooltip/tooltip';
 import { MOTION } from '../../ui/motion/motion';
 
 interface NavItem {
@@ -60,7 +64,17 @@ const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, HcBadge, HcButton, HcIcon, HcTooltip],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    HcAvatar,
+    HcBadge,
+    HcDropdownMenu,
+    HcDropdownMenuTrigger,
+    HcDropdownMenuItem,
+    HcIcon,
+  ],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.css',
 })
@@ -76,6 +90,11 @@ export class ShellComponent {
     const role = this.user()?.role;
     return role ? (NAV_BY_ROLE[role] ?? []) : [];
   });
+
+  /** Names the theme the item switches *to* — it is both the label and the a11y name. */
+  protected readonly themeLabel = computed(() =>
+    this.themeService.theme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode',
+  );
 
   private readonly outletWrapper = viewChild.required<ElementRef<HTMLElement>>('outletWrapper');
 
