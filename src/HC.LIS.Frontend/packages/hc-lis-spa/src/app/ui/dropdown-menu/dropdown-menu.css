@@ -19,7 +19,10 @@
   gap: 1px;
 }
 
-.hc-dropdown__item {
+/* Items are declared in the consumer's template and content-projected, so they carry the
+   consumer's _ngcontent attribute rather than this component's. Scoped selectors can never
+   match them — pierce encapsulation, as card/table do for their projected parts. */
+:host ::ng-deep .hc-dropdown__item {
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -36,12 +39,12 @@
   cursor: pointer;
 }
 
-.hc-dropdown__item:hover,
-.hc-dropdown__item:focus-visible {
+:host ::ng-deep .hc-dropdown__item:hover,
+:host ::ng-deep .hc-dropdown__item:focus-visible {
   background: var(--color-surface-2);
   outline: none;
 }
 
-.hc-dropdown__item--destructive {
+:host ::ng-deep .hc-dropdown__item--destructive {
   color: var(--color-error);
 }
