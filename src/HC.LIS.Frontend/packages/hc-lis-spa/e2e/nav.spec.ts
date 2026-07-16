@@ -19,9 +19,24 @@ test.describe('Shell navigation', () => {
     await expect(page.getByTestId('nav-users-link')).not.toHaveAttribute('aria-current', 'page');
   });
 
-  test('role badge shows the signed-in user role', async ({ page }) => {
+  test('role badge shows the signed-in user role inside the user menu', async ({ page }) => {
     await loginAsITAdmin(page);
 
+    // Phase 13 moved the role badge into the avatar-triggered user menu.
+    await page.getByTestId('user-menu-trigger').click();
+
     await expect(page.getByTestId('shell-role-badge')).toHaveText('ITAdmin', { timeout: 5_000 });
+  });
+
+  test('user menu trigger shows the signed-in user identity', async ({ page }) => {
+    await loginAsITAdmin(page);
+
+    const trigger = page.getByTestId('user-menu-trigger');
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await expect(page.getByTestId('user-menu-avatar')).toHaveText('IT', { timeout: 5_000 });
+
+    await trigger.click();
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.getByTestId('user-menu-name')).toHaveText('itadmin@hclis.local');
   });
 });
