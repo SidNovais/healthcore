@@ -38,7 +38,7 @@ The Phase-0–4 refactor left **6 primitives built but never wired up**, and pag
 
 Run from `src/HC.LIS.Frontend/packages/hc-lis-spa`:
 - `yarn build` — type-checks templates + enforces CSS budgets. **Baseline: clean** (one pre-existing jsbarcode CommonJS warning, unrelated).
-- `yarn test --watch=false` — Vitest. **Baseline on main after Track 4: 243 tests** (was 132 pre-Track-1).
+- `yarn test --watch=false` — Vitest. **Baseline on main after Track 5: 264 tests** (was 132 pre-Track-1).
 - `yarn e2e` — Playwright; **needs `ng serve` + API + DB up** (not run during phase dev; each phase notes which spec is its gate).
 
 ## shadcn MCP workflow per phase
@@ -92,7 +92,9 @@ Legend: ✅ done · 🔀 merged to `main` · 🔜 next · ⬜ planned
 **Track 4 complete** (committed straight to `main`, one `test:`+`feat:` pair per phase). Net: +3 primitives (`hc-avatar`, `hc-breadcrumb`, `hc-command`), +1 service method (`quickSearch`). Vitest **198 → 243** (+45). Build clean each phase. Full `yarn e2e` still to be run against a live stack (gates: `nav`/`theme`/`command-palette`).
 
 ### Track 5 — forms
-- ⬜ **Phase 16 — Register/patient form**: section grouping with `hc-separator`; build `hc-date-picker` for DOB; consistent `hc-select`. Gate `patients.spec.ts`.
+- ✅ **Phase 16 — build `hc-date-picker` + regroup the patient form**. `hc-date-picker` (`ui/date-picker/`) blueprinted from the shadcn **date-picker-with-input** anatomy: the text input stays the primary control and the calendar is an affordance beside it. **This split was the phase's main design call** — a calendar-only trigger makes a birthdate slow to enter (paging month-by-month through decades) and would have broken all six e2e `.fill('YYYY-MM-DD')` call sites; keeping the input means `patient-dob-input` keeps its id + testid and every existing caller drives it unchanged. Value is an ISO `YYYY-MM-DD` string exposed via **ControlValueAccessor**, so consumers just bind `formControlName`. The popover leads with **month + year selects** (year descending, 120-year span) for the same birthdate reason; `max` disables later days. **All date math runs on Y/M/D parts, never an instant** — `new Date('1990-01-01')` parses as UTC midnight and reads back as Dec 31 in any negative-offset zone (this dev box is UTC−3, so the regression test has teeth here; `TZ` is unset, so it would be vacuous on a UTC CI box). a11y = dialog-plus-grid with focus on the container and `aria-activedescendant` tracking the active day, so the highlight is painted explicitly (as `hc-command` does); arrows move, Enter selects, Esc/click-outside close. Added the `calendar` icon. Patient form split into **Demographics + Contact `<fieldset>`s** (real accessible group names, chrome reset) divided by an `hc-separator`; DOB → `hc-date-picker` bounded at today. **Gender was already on `hc-select`** — that third of the phase needed no change, and a characterization spec now pins it. No testid renamed. Suite **243 → 264** (+21); build clean. New e2e calendar-pick flow in `patients.spec.ts`; gate `patients.spec.ts`.
+
+**Track 5 complete** (committed straight to `main`). Net: +1 primitive (`hc-date-picker`), +1 icon (`calendar`). Vitest **243 → 264** (+21). Build clean. **All 5 tracks of the plan are now done.**
 
 ---
 
@@ -122,6 +124,9 @@ Legend: ✅ done · 🔀 merged to `main` · 🔜 next · ⬜ planned
 - **Built** `hc-command` (Phase 15): `open`/`query` models, `items`/`placeholder`/`emptyMessage`/`ariaLabel`/`testId` inputs, `select` output; native `<dialog>`, combobox + `aria-activedescendant` listbox, groups, no internal filtering.
 - **Adopted** `hc-command` in the shell (Phase 15): Ctrl/Cmd-K palette over role-aware nav destinations + debounced patient matches.
 - **Extended** `PatientsService` with `quickSearch(term)` (Phase 15) — returns results without touching the page-level `searchResults`/`searching` signals.
+- **Built** `hc-date-picker` (Phase 16): `testId`/`inputId`/`inputTestId`/`max`/`invalid`/`placeholder`/`ariaLabel` inputs; ISO `YYYY-MM-DD` value via ControlValueAccessor; text-input-primary with a month/year-led calendar popover; part-based date math (no UTC drift).
+- **Extended** `hc-icon` with `calendar` (Phase 16).
+- **Adopted** `hc-date-picker` + `hc-separator` in the patient form (Phase 16); fields grouped into Demographics + Contact fieldsets, DOB bounded at today.
 
 ## Content projection gotcha (bug found & fixed in Track 4)
 
@@ -133,7 +138,9 @@ Nothing caught it: Vitest asserts roles/behaviour rather than computed style, ax
 
 ## Open follow-ups / notes
 
-- Full **e2e has not been run** during phase development (needs the API+DB+ng serve stack). Each phase is gated by build + the full Vitest suite + reasoning about the existing spec assertions; run `yarn e2e` per branch before merging. **This is what let the dropdown-styling bug above survive five phases** — worth running the suite against a live stack before Track 5.
+- Full **e2e has still not been run** — it needs the API+DB+`ng serve` stack, and Docker Desktop was down during Track 5, so the stack could not be brought up. **This remains the single biggest gap: it is what let the dropdown-styling bug above survive five phases.** Every phase to date is gated only by build + the full Vitest suite + reasoning about the existing spec assertions. Accumulated unrun gates: `orders`, `patients`, `worklist`, `admin-users`, `hipaa`, `nav`, `theme`, `command-palette`, `a11y`, `reduced-motion`. **Run `yarn e2e` against a live stack before trusting any of Tracks 1–5 in production.**
+- Phase 16's styling was checked against the Track-4 gotcha *without* a live stack, by grepping the built CSS: `.hc-date-picker__*` rules emit as `.hc-date-picker__day[_ngcontent-%COMP%]` and every element they target is authored in `date-picker.html` (nothing is projected), so they match; `.hc-input`/`.hc-select` emit from the global `ui.css` bundle with **no** content attribute, so they style the picker's own input/selects. This rules out that specific bug class but is **not** a substitute for seeing it render.
+- The date-picker's timezone regression test is only meaningful in a negative-offset zone. `TZ` is unset in the Vitest config, so it passes vacuously on a UTC CI box — **pin `TZ` in the test config** if the suite ever runs in CI.
 - The **shadcn MCP server was not connected** during Track 4; the three primitives were blueprinted from the documented shadcn anatomy/a11y contracts instead (the same contracts the MCP returns). Re-run `mcp__shadcn__get_audit_checklist` against `avatar`/`breadcrumb`/`command` if the server comes back.
 - **Phase 15 scope call:** the plan's "jump-to-order by ID" was left out — orders are identified by UUID, which nobody types, and the orders list is itself a palette destination. Patient jump was kept (it is the "unify the scattered search inputs" value). Revisit if orders gain a human-readable accession number.
 - **Track 1 (Phases 1–3b) merged to `main`** on 2026-07-13 via `--no-ff` per-phase merges (commits `b810a64` P1, `45f6842` P2, `20aef05` P3, `ee54cde` P3b). The Phase 3 ↔ 3b overlap on `order-list.component.*` was resolved to the union (skeleton branch + `hc-empty` empty branch). Post-merge baseline on `main`: **158 Vitest tests green**, build clean.
