@@ -5,6 +5,29 @@
   max-width: 480px;
 }
 
+/* <fieldset> carries the grouping semantics; its default chrome is reset so the
+   hc-separator between sections is the only visible division. */
+.patient-form__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.patient-form__legend {
+  padding: 0;
+  margin-bottom: var(--space-4);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
 .required {
   color: var(--color-error);
 }

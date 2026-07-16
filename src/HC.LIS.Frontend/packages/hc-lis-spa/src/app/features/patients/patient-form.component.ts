@@ -3,21 +3,45 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import type { RegisterPatientParams } from '../../core/domain/register-patient-params';
 import { HcButton } from '../../ui/button/button';
+import { HcDatePicker } from '../../ui/date-picker/date-picker';
 import { HcField } from '../../ui/field/field';
 import { HcInput } from '../../ui/input/input';
 import { HcLabel } from '../../ui/input/label';
 import { HcSelect } from '../../ui/select/select';
+import { HcSeparator } from '../../ui/separator/separator';
+
+/** Local calendar date as ISO — never toISOString(), which shifts to UTC. */
+function todayIso(): string {
+  const now = new Date();
+  return [
+    String(now.getFullYear()).padStart(4, '0'),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    String(now.getDate()).padStart(2, '0'),
+  ].join('-');
+}
 
 @Component({
   selector: 'app-patient-form',
   standalone: true,
-  imports: [ReactiveFormsModule, HcButton, HcField, HcInput, HcLabel, HcSelect],
+  imports: [
+    ReactiveFormsModule,
+    HcButton,
+    HcDatePicker,
+    HcField,
+    HcInput,
+    HcLabel,
+    HcSelect,
+    HcSeparator,
+  ],
   templateUrl: './patient-form.component.html',
   styleUrl: './patient-form.component.css',
 })
 export class PatientFormComponent implements OnChanges {
   @Input() initialValues: RegisterPatientParams | null = null;
   @Output() readonly formSubmit = new EventEmitter<RegisterPatientParams>();
+
+  /** Nobody is born tomorrow. */
+  protected readonly today = todayIso();
 
   protected readonly form = inject(FormBuilder).nonNullable.group({
     fullName: ['', Validators.required],
