@@ -1,0 +1,128 @@
+<div class="hc-date-picker">
+  <input
+    class="hc-input hc-date-picker__input"
+    type="text"
+    inputmode="numeric"
+    autocomplete="off"
+    [id]="inputId()"
+    [attr.data-testid]="resolvedInputTestId()"
+    [attr.placeholder]="placeholder()"
+    [attr.aria-invalid]="invalid() ? 'true' : null"
+    [value]="value()"
+    [disabled]="disabled()"
+    (input)="onInput($any($event.target).value)"
+    (blur)="onBlur()"
+  />
+
+  <button
+    #trigger
+    class="hc-date-picker__trigger"
+    type="button"
+    [attr.data-testid]="testId() + '-trigger'"
+    [attr.aria-label]="ariaLabel()"
+    [attr.aria-expanded]="open()"
+    [disabled]="disabled()"
+    aria-haspopup="dialog"
+    (click)="toggle()"
+  >
+    <hc-icon name="calendar" />
+  </button>
+
+  @if (open()) {
+    <section
+      #calendar
+      class="hc-date-picker__calendar"
+      role="dialog"
+      tabindex="-1"
+      [attr.data-testid]="testId() + '-calendar'"
+      [attr.aria-label]="ariaLabel()"
+      [attr.aria-activedescendant]="activeId()"
+      (keydown)="onCalendarKeydown($event)"
+    >
+      <header class="hc-date-picker__header">
+        <button
+          class="hc-date-picker__nav"
+          type="button"
+          [attr.data-testid]="testId() + '-prev-month'"
+          aria-label="Previous month"
+          (click)="shiftMonth(-1)"
+        >
+          <hc-icon name="chevron-left" />
+        </button>
+
+        <div class="hc-date-picker__selects">
+          <select
+            class="hc-select hc-date-picker__select"
+            [attr.data-testid]="testId() + '-month'"
+            aria-label="Month"
+            [value]="viewMonth()"
+            (change)="onMonthChange($any($event.target).value)"
+          >
+            @for (month of months; track month; let i = $index) {
+              <option [value]="i + 1" [selected]="viewMonth() === i + 1">{{ month }}</option>
+            }
+          </select>
+
+          <select
+            class="hc-select hc-date-picker__select"
+            [attr.data-testid]="testId() + '-year'"
+            aria-label="Year"
+            [value]="viewYear()"
+            (change)="onYearChange($any($event.target).value)"
+          >
+            @for (year of years(); track year) {
+              <option [value]="year" [selected]="viewYear() === year">{{ year }}</option>
+            }
+          </select>
+        </div>
+
+        <button
+          class="hc-date-picker__nav"
+          type="button"
+          [attr.data-testid]="testId() + '-next-month'"
+          aria-label="Next month"
+          (click)="shiftMonth(1)"
+        >
+          <hc-icon name="chevron-right" />
+        </button>
+      </header>
+
+      <div class="hc-date-picker__grid" role="grid" [attr.aria-label]="monthLabel()">
+        <div class="hc-date-picker__weekdays" role="row">
+          @for (weekday of weekdays; track weekday.abbr) {
+            <span class="hc-date-picker__weekday" role="columnheader" [attr.aria-label]="weekday.abbr">
+              {{ weekday.short }}
+            </span>
+          }
+        </div>
+
+        <div class="hc-date-picker__days" role="row">
+          @for (blank of leadingBlanks(); track blank) {
+            <span class="hc-date-picker__blank" aria-hidden="true"></span>
+          }
+          @for (day of days(); track day.d) {
+            <button
+              class="hc-date-picker__day"
+              type="button"
+              role="gridcell"
+              tabindex="-1"
+              data-hc-day
+              [id]="dayId(day)"
+              [attr.data-testid]="dayTestId(day)"
+              [attr.aria-label]="dayLabel(day)"
+              [attr.aria-selected]="isSelected(day)"
+              [attr.aria-current]="isToday(day) ? 'date' : null"
+              [class.hc-date-picker__day--selected]="isSelected(day)"
+              [class.hc-date-picker__day--active]="isActive(day)"
+              [class.hc-date-picker__day--today]="isToday(day)"
+              [disabled]="isDisabled(day)"
+              (click)="select(day)"
+            >
+              {{ day.d }}
+            </button>
+          }
+        </div>
+      </div>
+    </section>
+  }
+</div>
