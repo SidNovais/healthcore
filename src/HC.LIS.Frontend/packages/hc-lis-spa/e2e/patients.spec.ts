@@ -172,6 +172,41 @@ test.describe('Patient Management', () => {
     await expect(page.getByText(/full name is required/i)).toBeVisible({ timeout: 5_000 });
   });
 
+  test('Receptionist: registers a patient with a date of birth picked from the calendar', async ({
+    page,
+  }) => {
+    await loginAsReceptionist(page);
+
+    const uniqueName = `CalendarPatient-${Date.now()}`;
+
+    await page.goto('/patients/new');
+    await page.getByTestId('patient-full-name-input').fill(uniqueName);
+
+    // Seed the month, then pick a different day from the popover so the assertion
+    // proves the calendar wrote the value rather than the typed text.
+    await page.getByTestId('patient-dob-input').fill('1985-03-12');
+    await page.getByTestId('patient-dob-trigger').click();
+    await expect(page.getByTestId('patient-dob-calendar')).toBeVisible({ timeout: 5_000 });
+
+    await page.getByTestId('patient-dob-day-1985-03-20').click();
+    await expect(page.getByTestId('patient-dob-calendar')).toBeHidden({ timeout: 5_000 });
+    await expect(page.getByTestId('patient-dob-input')).toHaveValue('1985-03-20');
+
+    await Promise.all([
+      page.waitForResponse(r =>
+        r.url().includes('/api/v1/patients') &&
+        r.request().method() === 'POST' &&
+        r.status() === 201),
+      page.getByTestId('patient-form-submit-btn').click(),
+    ]);
+
+    await expect(page).toHaveURL(
+      /\/patients\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
+      { timeout: 10_000 },
+    );
+    await expect(page.getByTestId('patient-status-badge')).toBeVisible({ timeout: 15_000 });
+  });
+
   test('LabTechnician is redirected to /unauthorized when accessing /patients', async ({ page }) => {
     await loginAsLabTechnician(page);
     await page.goto('/patients');
