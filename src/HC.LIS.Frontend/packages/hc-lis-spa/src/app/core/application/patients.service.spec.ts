@@ -34,6 +34,19 @@ describe('PatientsService', () => {
     service = TestBed.inject(PatientsService);
   });
 
+  it('quickSearch() returns matches without touching the page-level search state', async () => {
+    vi.mocked(mockPort.search).mockResolvedValue(searchResults);
+    service.searchResults.set([]);
+
+    const results = await service.quickSearch('John');
+
+    expect(results).toEqual(searchResults);
+    // The command palette shares this service with the /patients page — its results
+    // must never overwrite the list the page is rendering behind the palette.
+    expect(service.searchResults()).toEqual([]);
+    expect(service.searching()).toBe(false);
+  });
+
   it('search() updates searchResults signal', async () => {
     vi.mocked(mockPort.search).mockResolvedValue(searchResults);
 
