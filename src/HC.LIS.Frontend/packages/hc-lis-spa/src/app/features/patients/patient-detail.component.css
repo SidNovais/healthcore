@@ -4,6 +4,10 @@
   padding: 0 var(--space-4);
 }
 
+hc-breadcrumb {
+  margin-bottom: var(--space-3);
+}
+
 .patient-header {
   display: flex;
   align-items: center;

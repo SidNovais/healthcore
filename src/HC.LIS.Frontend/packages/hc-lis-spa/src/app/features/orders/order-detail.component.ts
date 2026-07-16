@@ -1,10 +1,11 @@
 import { Component, ElementRef, NgZone, OnInit, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { gsap } from 'gsap';
 import { OrdersService } from './orders.service';
 import { HcAlert } from '../../ui/alert/alert';
 import { HcBadge, type HcBadgeVariant } from '../../ui/badge/badge';
+import { HcBreadcrumb, type HcBreadcrumbItem } from '../../ui/breadcrumb/breadcrumb';
 import { HcButton } from '../../ui/button/button';
 import { HcCard } from '../../ui/card/card';
 import { HcDialog } from '../../ui/dialog/dialog';
@@ -38,9 +39,9 @@ const STATUS_VARIANTS: Record<string, HcBadgeVariant> = {
   standalone: true,
   imports: [
     FormsModule,
-    RouterLink,
     HcAlert,
     HcBadge,
+    HcBreadcrumb,
     HcButton,
     HcCard,
     HcDialog,
@@ -61,6 +62,11 @@ export class OrderDetailComponent implements OnInit {
   private readonly ngZone = inject(NgZone);
   private readonly toast = inject(ToastService);
   private readonly host = inject(ElementRef).nativeElement as HTMLElement;
+
+  protected readonly breadcrumbs: HcBreadcrumbItem[] = [
+    { label: 'Orders', route: '/orders' },
+    { label: 'Order Detail' },
+  ];
 
   protected readonly activeRejectItemId = signal<string | null>(null);
   protected readonly activeOnHoldItemId = signal<string | null>(null);

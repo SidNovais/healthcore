@@ -1,4 +1,4 @@
-import { Component, OnInit, effect, inject, input, signal } from '@angular/core';
+import { Component, OnInit, computed, effect, inject, input, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PatientFormComponent } from './patient-form.component';
 import { PatientsService } from '../../core/application/patients.service';
@@ -7,6 +7,7 @@ import type { PatientDetails } from '../../core/domain/patient-details';
 import type { RegisterPatientParams, UpdatePatientParams } from '../../core/domain/register-patient-params';
 import { HcAlert } from '../../ui/alert/alert';
 import { HcBadge } from '../../ui/badge/badge';
+import { HcBreadcrumb, type HcBreadcrumbItem } from '../../ui/breadcrumb/breadcrumb';
 import { HcButton } from '../../ui/button/button';
 import { HcCard } from '../../ui/card/card';
 import { HcDialog } from '../../ui/dialog/dialog';
@@ -14,7 +15,7 @@ import { HcDialog } from '../../ui/dialog/dialog';
 @Component({
   selector: 'app-patient-detail',
   standalone: true,
-  imports: [PatientFormComponent, HcAlert, HcBadge, HcButton, HcCard, HcDialog],
+  imports: [PatientFormComponent, HcAlert, HcBadge, HcBreadcrumb, HcButton, HcCard, HcDialog],
   templateUrl: './patient-detail.component.html',
   styleUrl: './patient-detail.component.css',
 })
@@ -32,6 +33,18 @@ export class PatientDetailComponent implements OnInit {
   protected readonly isEditMode = signal(false);
   protected readonly showAnonymizeConfirm = signal(false);
   protected readonly error = signal<string | null>(null);
+
+  /**
+   * Null in slide-over mode: the sheet sits on top of /patients, so there is no route
+   * hierarchy to trail — the list is still behind it.
+   */
+  protected readonly breadcrumbs = computed<HcBreadcrumbItem[] | null>(() => {
+    if (this.patientId()) {
+      return null;
+    }
+    const patient = this.patientsService.patient();
+    return [{ label: 'Patients', route: '/patients' }, { label: patient?.fullName ?? 'Patient' }];
+  });
 
   constructor() {
     // Slide-over mode: (re)load whenever the bound id changes. On the routed page

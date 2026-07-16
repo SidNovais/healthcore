@@ -1,0 +1,27 @@
+<ol class="hc-breadcrumb__list">
+  @for (item of items(); track item.label; let last = $last, i = $index) {
+    <li class="hc-breadcrumb__item">
+      @if (item.route && !last) {
+        <a
+          class="hc-breadcrumb__link"
+          [routerLink]="item.route"
+          [attr.data-testid]="testId() + '-link-' + i"
+          >{{ item.label }}</a
+        >
+      } @else {
+        <span
+          class="hc-breadcrumb__page"
+          [attr.aria-current]="last ? 'page' : null"
+          [attr.data-testid]="last ? testId() + '-page' : null"
+          >{{ item.label }}</span
+        >
+      }
+    </li>
+
+    @if (!last) {
+      <li class="hc-breadcrumb__separator" aria-hidden="true">
+        <hc-icon name="chevron-right" [size]="14" />
+      </li>
+    }
+  }
+</ol>

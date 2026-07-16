@@ -1,5 +1,9 @@
 <div class="patient-detail-page">
   @if (patientsService.patient(); as patient) {
+    @if (breadcrumbs(); as trail) {
+      <hc-breadcrumb [items]="trail" testId="patient-breadcrumb" />
+    }
+
     <div class="patient-header">
       <h1 class="patient-name">{{ patient.fullName }}</h1>
       <hc-badge

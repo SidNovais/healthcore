@@ -28,7 +28,7 @@ async function render() {
     component: fixture.componentInstance,
     nav: () => host.querySelector<HTMLElement>('[data-testid="order-breadcrumb"]')!,
     items: () => Array.from(host.querySelectorAll('ol > li:not([aria-hidden])')),
-    separators: () => Array.from(host.querySelectorAll('[aria-hidden="true"]')),
+    separators: () => Array.from(host.querySelectorAll('ol > li.hc-breadcrumb__separator')),
     links: () => Array.from(host.querySelectorAll<HTMLAnchorElement>('a')),
     page: () => host.querySelector<HTMLElement>('[data-testid="order-breadcrumb-page"]'),
   };
@@ -67,6 +67,7 @@ describe('HcBreadcrumb', () => {
 
     // One separator between the two crumbs — decorative only.
     expect(separators()).toHaveLength(1);
+    expect(separators()[0].getAttribute('aria-hidden')).toBe('true');
   });
 
   it('never links the final crumb even when it carries a route', async () => {
