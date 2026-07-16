@@ -76,3 +76,13 @@
     </div>
   </main>
 </div>
+
+<hc-command
+  [(open)]="paletteOpen"
+  [(query)]="paletteQuery"
+  [items]="paletteCommands()"
+  testId="command-palette"
+  placeholder="Search pages and patients…"
+  ariaLabel="Command palette"
+  (select)="onPaletteSelect($event)"
+/>

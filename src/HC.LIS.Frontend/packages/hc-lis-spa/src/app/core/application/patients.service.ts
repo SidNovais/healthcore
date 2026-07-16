@@ -25,6 +25,15 @@ export class PatientsService {
     }
   }
 
+  /**
+   * Lookup for transient callers (the command palette). Returns matches directly rather
+   * than publishing them: searchResults/searching belong to the /patients page, which may
+   * be rendering behind the caller — writing them would clobber the list under it.
+   */
+  async quickSearch(term: string): Promise<PatientSearchResult[]> {
+    return this.port.search(term);
+  }
+
   async loadDetails(id: string): Promise<void> {
     this.patient.set(null);
     try {

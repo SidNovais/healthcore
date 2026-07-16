@@ -1,0 +1,99 @@
+/* Anchored near the top of the viewport rather than centred — the palette grows
+   downward as results arrive, and a centred panel would shift under the cursor. */
+.hc-command {
+  width: min(36rem, calc(100vw - 2rem));
+  max-width: none;
+  margin: 12vh auto auto;
+  padding: 0;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.hc-command::backdrop {
+  background: rgb(15 23 42 / 0.5);
+}
+
+.hc-command__field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.hc-command__search-icon {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+}
+
+.hc-command__input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: none;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  color: var(--color-text);
+}
+
+.hc-command__input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.hc-command__list {
+  max-height: 20rem;
+  overflow-y: auto;
+  padding: var(--space-2);
+}
+
+.hc-command__group + .hc-command__group {
+  margin-top: var(--space-2);
+}
+
+.hc-command__group-heading {
+  padding: var(--space-2) var(--space-2) var(--space-1);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.hc-command__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+/* Active option is driven by aria-activedescendant, not focus — focus stays in the
+   input — so the highlight has to be painted explicitly. */
+.hc-command__item--active {
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+}
+
+.hc-command__hint {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.hc-command__empty {
+  margin: 0;
+  padding: var(--space-6) var(--space-3);
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}

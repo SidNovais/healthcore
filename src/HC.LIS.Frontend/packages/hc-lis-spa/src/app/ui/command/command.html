@@ -1,0 +1,68 @@
+<dialog
+  #dlg
+  class="hc-command"
+  [attr.aria-label]="ariaLabel()"
+  [attr.data-testid]="testId()"
+  (close)="onNativeClose()"
+>
+  <!-- Gated on open(): a closed native <dialog> still exposes its content in test DOMs,
+       and it keeps the input out of the tab order while the palette is dismissed. -->
+  @if (open()) {
+    <div class="hc-command__field">
+      <hc-icon class="hc-command__search-icon" name="search" [size]="16" />
+      <input
+        #input
+        class="hc-command__input"
+        type="text"
+        role="combobox"
+        aria-expanded="true"
+        aria-autocomplete="list"
+        autocomplete="off"
+        [attr.aria-controls]="listId"
+        [attr.aria-activedescendant]="activeId()"
+        [attr.aria-label]="ariaLabel()"
+        [attr.data-testid]="testId() + '-input'"
+        [placeholder]="placeholder()"
+        [value]="query()"
+        (input)="onInput($any($event.target).value)"
+        (keydown)="onKeydown($event)"
+      />
+    </div>
+
+    <div
+      [id]="listId"
+      class="hc-command__list"
+      role="listbox"
+      [attr.aria-label]="ariaLabel()"
+      [attr.data-testid]="testId() + '-list'"
+    >
+      @for (group of groups(); track group.name) {
+        <div class="hc-command__group" role="group" [attr.aria-label]="group.name">
+          @if (group.name) {
+            <div class="hc-command__group-heading" aria-hidden="true">{{ group.name }}</div>
+          }
+          @for (item of group.items; track item.id) {
+            <div
+              class="hc-command__item"
+              role="option"
+              [id]="optionId(item)"
+              [attr.aria-selected]="isActive(item)"
+              [class.hc-command__item--active]="isActive(item)"
+              [attr.data-testid]="testId() + '-item-' + item.id"
+              (click)="choose(item)"
+            >
+              <span class="hc-command__label">{{ item.label }}</span>
+              @if (item.hint) {
+                <span class="hc-command__hint">{{ item.hint }}</span>
+              }
+            </div>
+          }
+        </div>
+      } @empty {
+        <p class="hc-command__empty" [attr.data-testid]="testId() + '-empty'">
+          {{ emptyMessage() }}
+        </p>
+      }
+    </div>
+  }
+</dialog>

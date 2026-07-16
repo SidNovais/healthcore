@@ -244,8 +244,10 @@ describe('ShellComponent palette patient search (integration)', () => {
     fixture.detectChanges();
   }
 
+  // Advance just past the debounce window rather than draining every timer — gsap's
+  // ticker reschedules itself forever under fake timers.
   async function settleDebounce(): Promise<void> {
-    await vi.runAllTimersAsync();
+    await vi.advanceTimersByTimeAsync(250);
     fixture.detectChanges();
   }
 
