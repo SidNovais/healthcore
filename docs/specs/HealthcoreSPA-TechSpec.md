@@ -145,14 +145,24 @@ presentation and are unit-tested with vitest.
 | `badge` | role + status variants (shell role badge, order/worklist statuses) |
 | `card` | triage cards, detail panels, print-labels card |
 | `table` | sticky header, `tabular-nums`, `aria-sort`, dense mode |
-| `dialog` | focus trap, Esc-to-close, 40–60% scrim (print-labels modal) |
+| `dialog` | focus trap, Esc-to-close, 40–60% scrim (print-labels modal, reason capture, confirms) |
+| `sheet` | right-anchored slide-over on native `<dialog>` (patient detail from search) |
 | `combobox` | patient-picker typeahead |
 | `tabs` | patient-/order-detail sections |
 | `alert` + `toast` | sonner-style toaster, `aria-live="polite"`, 3–5s auto-dismiss |
 | `skeleton`, `spinner` | loading states (>300ms rule) |
+| `pagination` | 1-based `page`/`pageCount`, windowed page list, `nav[aria-label]` landmark |
+| `dropdown-menu` | root + `[hc-dropdown-trigger]` + `[hc-dropdown-item]`; roving menu a11y (row actions, user menu) |
+| `avatar` | initials fallback + optional image; shell user menu |
+| `breadcrumb` | `items`-driven trail; last crumb is `aria-current="page"` (`/orders/:id`, `/patients/:id`) |
+| `command` | Ctrl/Cmd-K palette; combobox + `aria-activedescendant` listbox; renders what it is given (consumer filters) |
 | `tooltip`, `separator`, `empty` | icon-only buttons, dividers, empty lists |
 | `icon` | consolidated inline SVGs, Lucide-style, 1.5px stroke |
 | `motion/` | GSAP helpers — see §10.4 |
+
+> **Content projection gotcha:** a primitive that projects consumer-authored elements
+> (`dropdown-menu`, `card`, `table`) cannot style them with plain scoped selectors — projected
+> nodes carry the *consumer's* `_ngcontent` attribute. Style those parts via `:host ::ng-deep`.
 
 ---
 

@@ -1,6 +1,6 @@
 # Frontend shadcn-UX Enhancement — Handoff & Progress Tracker
 
-_Last updated: 2026-07-13_
+_Last updated: 2026-07-15_
 
 Follow-on to `docs/specs/FrontendRefactor-Handoff.md` (Design System v2, Phases 0–4, already merged).
 
@@ -38,7 +38,7 @@ The Phase-0–4 refactor left **6 primitives built but never wired up**, and pag
 
 Run from `src/HC.LIS.Frontend/packages/hc-lis-spa`:
 - `yarn build` — type-checks templates + enforces CSS budgets. **Baseline: clean** (one pre-existing jsbarcode CommonJS warning, unrelated).
-- `yarn test --watch=false` — Vitest. **Baseline on main: 132 tests.**
+- `yarn test --watch=false` — Vitest. **Baseline on main after Track 4: 243 tests** (was 132 pre-Track-1).
 - `yarn e2e` — Playwright; **needs `ng serve` + API + DB up** (not run during phase dev; each phase notes which spec is its gate).
 
 ## shadcn MCP workflow per phase
@@ -85,9 +85,11 @@ Legend: ✅ done · 🔀 merged to `main` · 🔜 next · ⬜ planned
 **Track 3 complete** (committed straight to `main`, one `test:`+`feat:` pair per phase). Net: +1 primitive (`hc-sheet`); patient detail now opens as a slide-over from search (no patientId in URL); anonymize + order-item reject/on-hold reasons captured in dialogs; order-item actions in a dropdown. Vitest **187 → 198** (+11). Build clean each phase. Full `yarn e2e` still to be run against a live stack (gates: `patients`/`hipaa`/`orders`).
 
 ### Track 4 — shell
-- ⬜ **Phase 13 — build `hc-avatar` + shell user menu** (consolidate theme/logout/role into an avatar dropdown). Gate `nav.spec.ts`, `theme.spec.ts`.
-- ⬜ **Phase 14 — build `hc-breadcrumb`** + wire `/orders/:id`, `/patients/:id`. Gate `nav.spec.ts`.
-- ⬜ **Phase 15 — command palette** (`ui/command/`, Ctrl/Cmd-K, jump-to-patient/order). New `e2e/command-palette.spec.ts`.
+- ✅ **Phase 13 — build `hc-avatar` + shell user menu**. `hc-avatar` (`ui/avatar/`) blueprinted from the shadcn avatar anatomy: `name` → initials (first+last for multi-word; **first two chars for a single token**, since `userName` is an email → `itadmin@hclis.local` = "IT"), optional `src` renders an `<img alt=name>` and falls back to initials on error (failure tracked *by src value*, so a new src retries without an effect), `size` → `--hc-avatar-size` custom property the fallback's font-size tracks, fallback `aria-hidden` (decorative — the trigger is named). Shell footer's three loose controls (theme toggle, sign out, role badge) collapsed into one `hc-dropdown-menu` triggered by avatar + user name + caret; identity block is the shadcn `DropdownMenuLabel` slot marked `role="presentation"` so it stays out of the menu's owned-children contract; menu **opens upward** (`bottom: 100%`) since the footer is the last thing in the sidebar. `HcButton`/`HcTooltip` dropped from the shell's imports. **No testid renamed** — `theme-toggle-btn`/`shell-role-badge` keep their ids and just live inside the menu; new `user-menu-trigger`/`user-menu-avatar`/`user-menu-name`/`logout-btn` (sign-out never had one). e2e updated: `theme.spec.ts` opens the menu before each toggle (activating an item closes the menu, so each toggle re-opens); `nav.spec.ts` asserts the badge inside the menu + a new trigger/avatar test. Suite **198 → 211**. Gates `nav.spec.ts`, `theme.spec.ts`.
+- ✅ **Phase 14 — build `hc-breadcrumb`** (`ui/breadcrumb/`). Blueprinted from the shadcn breadcrumb contract: `nav[aria-label="Breadcrumb"]` landmark **on the host** (as `hc-pagination` does) wrapping an `<ol>`; last crumb is `aria-current="page"` and **never linked even when it carries a route**, so callers pass a uniform trail without special-casing the tail; separators are decorative `<li aria-hidden>`. **Data-driven `items` input rather than composed sub-components** — these trails are short/static, so consumers stay a single element. Wired: order-detail (replaces the ad-hoc `← Back to Orders`; `RouterLink` dropped from its imports; header now stacks breadcrumb-above-title) and patient-detail (`Patients / {name}` **routed page only** — in slide-over mode `breadcrumbs()` is null because the sheet sits on top of `/patients`, so there's no hierarchy to trail). testids `order-breadcrumb`/`patient-breadcrumb` + `{testId}-link-{i}`/`{testId}-page`. Suite **211 → 220**. Gate `nav.spec.ts`.
+- ✅ **Phase 15 — command palette** (`ui/command/`). Blueprinted from the shadcn command anatomy (dialog + input + grouped list), built on the **native `<dialog>` like `hc-sheet`** (browser gives focus trap / Esc / top-layer). a11y = combobox-with-listbox-popup: focus stays in the input, `aria-activedescendant` tracks the active option (so the highlight is **painted explicitly**, not via `:focus`); arrows wrap, Enter selects, changed result set re-activates the top match; GSAP fade behind reduced-motion; content `@if`-gated on `open()` per the jsdom gotcha. **The primitive deliberately does not filter** — consumers mix sync + async matches and a server lookup can match on fields the component never sees (`documentId`), so label-filtering here would silently drop results. Shell: Ctrl-K **and** Cmd-K (either OS may drive), role-aware nav destinations filtered client-side + debounced (200 ms, min 2 chars) patient matches; **patient lookup gated on the role's nav including `/patients`** — the route guard would bounce anyone else, so offering records would leak PHI. Selection routes via each command's own `target` (no id parsing). Added **`PatientsService.quickSearch()`** returning matches directly instead of publishing to `searchResults`/`searching` — those belong to the `/patients` page, which may be rendering *behind* the palette. Also swapped the shell's route-crossfade from raw `window.matchMedia` to the guarded `prefersReducedMotion()` (identical in a browser; the raw call threw in the test DOM). New `e2e/command-palette.spec.ts`. Suite **220 → 243**.
+
+**Track 4 complete** (committed straight to `main`, one `test:`+`feat:` pair per phase). Net: +3 primitives (`hc-avatar`, `hc-breadcrumb`, `hc-command`), +1 service method (`quickSearch`). Vitest **198 → 243** (+45). Build clean each phase. Full `yarn e2e` still to be run against a live stack (gates: `nav`/`theme`/`command-palette`).
 
 ### Track 5 — forms
 - ⬜ **Phase 16 — Register/patient form**: section grouping with `hc-separator`; build `hc-date-picker` for DOB; consistent `hc-select`. Gate `patients.spec.ts`.
@@ -112,10 +114,28 @@ Legend: ✅ done · 🔀 merged to `main` · 🔜 next · ⬜ planned
 - **Extended** `PatientDetailComponent` with an optional `patientId` input (Phase 11) so it can render inside the search slide-over; anonymize confirm → `hc-dialog`.
 - **Adopted** `hc-sheet` in the patients search page (Phase 11): row-click / row-action View open the detail without navigating (URL stays `/patients`).
 - **Adopted** `hc-dropdown-menu` + `hc-dialog` in the order-detail exam-item actions (Phase 12): row actions in a dropdown, reject/on-hold reason capture in dialogs.
+- **Fixed** `hc-dropdown-menu` styling (pre-existing, Phase 5 regression): item rules moved behind `:host ::ng-deep` — see "Content projection gotcha" below.
+- **Built** `hc-avatar` (Phase 13): `name`/`src`/`size`/`testId`; initials fallback, image-error fallback tracked by src value.
+- **Adopted** `hc-avatar` + `hc-dropdown-menu` in the shell footer (Phase 13): theme toggle, sign out and role badge consolidated into one user menu.
+- **Built** `hc-breadcrumb` (Phase 14): `items`/`testId`/`ariaLabel`; `nav[aria-label]` host landmark, last crumb `aria-current="page"` and never linked.
+- **Adopted** `hc-breadcrumb` in order-detail + patient-detail (Phase 14); routed page only for patients (sheet mode has no trail).
+- **Built** `hc-command` (Phase 15): `open`/`query` models, `items`/`placeholder`/`emptyMessage`/`ariaLabel`/`testId` inputs, `select` output; native `<dialog>`, combobox + `aria-activedescendant` listbox, groups, no internal filtering.
+- **Adopted** `hc-command` in the shell (Phase 15): Ctrl/Cmd-K palette over role-aware nav destinations + debounced patient matches.
+- **Extended** `PatientsService` with `quickSearch(term)` (Phase 15) — returns results without touching the page-level `searchResults`/`searching` signals.
+
+## Content projection gotcha (bug found & fixed in Track 4)
+
+A primitive **cannot style consumer-authored elements it projects** with plain scoped selectors. Under emulated encapsulation, projected nodes carry the **consumer's** `_ngcontent-*` attribute, so `dropdown-menu.css`'s `.hc-dropdown__item` emitted as `.hc-dropdown__item[_ngcontent-<dropdown>]` and **never matched** — every row-action menu from Phases 6/7/8/9/12 was rendering as **unstyled native buttons**.
+
+Nothing caught it: Vitest asserts roles/behaviour rather than computed style, axe passes unstyled buttons, and full e2e has never run against a live stack. Confirmed by grepping the built CSS (`card.css`, which already uses `:host ::ng-deep` for its projected parts, emits **without** a content attribute).
+
+**Rule:** style projected parts via `:host ::ng-deep .part` (as `card.css`/`table.css` do). A class declared in the *consumer's* own template (e.g. the shell's `.logout-item`) is already in the consumer's scope and needs no `::ng-deep`. Regression test: `dropdown-menu.spec.ts` → "styles content-projected menu items" asserts `display:flex` (a non-token property jsdom can resolve).
 
 ## Open follow-ups / notes
 
-- Full **e2e has not been run** during phase development (needs the API+DB+ng serve stack). Each phase is gated by build + the full Vitest suite + reasoning about the existing spec assertions; run `yarn e2e` per branch before merging.
+- Full **e2e has not been run** during phase development (needs the API+DB+ng serve stack). Each phase is gated by build + the full Vitest suite + reasoning about the existing spec assertions; run `yarn e2e` per branch before merging. **This is what let the dropdown-styling bug above survive five phases** — worth running the suite against a live stack before Track 5.
+- The **shadcn MCP server was not connected** during Track 4; the three primitives were blueprinted from the documented shadcn anatomy/a11y contracts instead (the same contracts the MCP returns). Re-run `mcp__shadcn__get_audit_checklist` against `avatar`/`breadcrumb`/`command` if the server comes back.
+- **Phase 15 scope call:** the plan's "jump-to-order by ID" was left out — orders are identified by UUID, which nobody types, and the orders list is itself a palette destination. Patient jump was kept (it is the "unify the scattered search inputs" value). Revisit if orders gain a human-readable accession number.
 - **Track 1 (Phases 1–3b) merged to `main`** on 2026-07-13 via `--no-ff` per-phase merges (commits `b810a64` P1, `45f6842` P2, `20aef05` P3, `ee54cde` P3b). The Phase 3 ↔ 3b overlap on `order-list.component.*` was resolved to the union (skeleton branch + `hc-empty` empty branch). Post-merge baseline on `main`: **158 Vitest tests green**, build clean.
 - This tracker now lives on `main`; Track 2+ branches inherit it. **Track 2 develops on a single `feat/frontend-track-2` branch off `main`** (its phases stack: the 4 tables consume the Phase 4/5 primitives), one commit-pair per phase.
 - Memory: `project_frontend_shadcn_ux.md` mirrors this status for cross-session continuity.
