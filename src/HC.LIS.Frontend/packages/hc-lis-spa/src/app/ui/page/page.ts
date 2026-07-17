@@ -40,4 +40,13 @@ export class HcPage {
     const id = this.testId();
     return id ? `${id}-breadcrumb` : 'breadcrumb';
   }
+
+  /**
+   * Pages that already had a title testid keep it here — `worklist-title` and
+   * `users-title` are part of the e2e regression net and are never renamed.
+   */
+  protected titleTestId(): string | null {
+    const id = this.testId();
+    return id ? `${id}-title` : null;
+  }
 }

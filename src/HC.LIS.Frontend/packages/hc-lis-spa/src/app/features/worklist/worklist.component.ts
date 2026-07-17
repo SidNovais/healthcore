@@ -6,6 +6,7 @@ import { HcBadge } from '../../ui/badge/badge';
 import { HcButton } from '../../ui/button/button';
 import { HcEmpty } from '../../ui/empty/empty';
 import { HcIcon } from '../../ui/icon/icon';
+import { HcPage } from '../../ui/page/page';
 import { HcPagination } from '../../ui/pagination/pagination';
 import {
   HcDropdownMenu,
@@ -31,6 +32,7 @@ const PAGE_SIZE = 10;
     HcButton,
     HcEmpty,
     HcIcon,
+    HcPage,
     HcPagination,
     HcDropdownMenu,
     HcDropdownMenuTrigger,

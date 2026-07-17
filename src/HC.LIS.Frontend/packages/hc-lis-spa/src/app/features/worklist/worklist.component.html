@@ -1,10 +1,14 @@
-<div class="worklist-page">
-  <div class="worklist-header">
-    <h2 data-testid="worklist-title">Doctor Worklist</h2>
-    <button hc-button variant="ghost" size="sm" data-testid="refresh-btn" (click)="refresh()">
-      <hc-icon name="refresh" [size]="15" /> Refresh
-    </button>
-  </div>
+<hc-page title="Doctor Worklist" width="full" testId="worklist">
+  <button
+    hc-page-actions
+    hc-button
+    variant="ghost"
+    size="sm"
+    data-testid="refresh-btn"
+    (click)="refresh()"
+  >
+    <hc-icon name="refresh" [size]="15" /> Refresh
+  </button>
 
   <div class="worklist-layout">
     <div class="worklist-table-container">
@@ -117,4 +121,4 @@
       <app-worklist-item-detail [item]="detail" />
     }
   </div>
-</div>
+</hc-page>

@@ -15,6 +15,7 @@ import {
 } from '../../ui/dropdown-menu/dropdown-menu';
 import { HcEmpty } from '../../ui/empty/empty';
 import { HcIcon } from '../../ui/icon/icon';
+import { HcPage } from '../../ui/page/page';
 import { HcPagination } from '../../ui/pagination/pagination';
 import { HcSkeleton } from '../../ui/skeleton/skeleton';
 import { HcTable } from '../../ui/table/table';
@@ -48,6 +49,7 @@ const PAGE_SIZE = 10;
     HcDropdownMenuItem,
     HcEmpty,
     HcIcon,
+    HcPage,
     HcPagination,
     HcSkeleton,
     HcTable,

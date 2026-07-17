@@ -1,20 +1,4 @@
-.worklist-page {
-  padding: 2rem;
-}
-
-.worklist-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.worklist-header h2 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--color-text);
-}
+/* The page frame (container, centring, header) belongs to hc-page. */
 
 .worklist-layout {
   display: flex;

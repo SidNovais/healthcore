@@ -6,7 +6,7 @@
 
     <div class="hc-page__bar">
       <div class="hc-page__titles">
-        <h1 class="hc-page__title">{{ title() }}</h1>
+        <h1 class="hc-page__title" [attr.data-testid]="titleTestId()">{{ title() }}</h1>
         @if (subtitle(); as sub) {
           <p class="hc-page__subtitle">{{ sub }}</p>
         }

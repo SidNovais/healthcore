@@ -1,10 +1,13 @@
-<div class="users-page">
-  <div class="users-header">
-    <h2 data-testid="users-title">User Management</h2>
-    <button hc-button variant="cta" data-testid="create-user-btn" (click)="showCreateForm.set(true)">
-      <hc-icon name="plus" [size]="16" /> Create User
-    </button>
-  </div>
+<hc-page title="User Management" width="wide" testId="users">
+  <button
+    hc-page-actions
+    hc-button
+    variant="cta"
+    data-testid="create-user-btn"
+    (click)="showCreateForm.set(true)"
+  >
+    <hc-icon name="plus" [size]="16" /> Create User
+  </button>
 
   <hc-dialog [(open)]="showCreateForm" testId="create-user-dialog">
     @if (showCreateForm()) {
@@ -132,4 +135,4 @@
       </div>
     }
   </hc-dialog>
-</div>
+</hc-page>
