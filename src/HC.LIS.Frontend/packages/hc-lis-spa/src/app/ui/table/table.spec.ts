@@ -7,10 +7,18 @@ import { HcTable } from './table';
   template: `
     <table hc-table [dense]="dense()" data-testid="order-table">
       <thead>
-        <tr><th aria-sort="ascending">Patient</th></tr>
+        <tr>
+          <th aria-sort="ascending"><button class="sort-btn" type="button">Patient</button></th>
+          <th class="actions-col"></th>
+        </tr>
       </thead>
       <tbody>
-        <tr><td>Maria Silva</td></tr>
+        <tr>
+          <td>Maria Silva</td>
+          <td><button class="row-action-trigger" type="button">…</button></td>
+        </tr>
+        <tr class="skeleton-row"><td colspan="2"><span class="ph"></span></td></tr>
+        <tr><td class="empty-cell" colspan="2">No orders</td></tr>
       </tbody>
     </table>
   `,
@@ -22,8 +30,10 @@ class HostComponent {
 function render() {
   const fixture = TestBed.createComponent(HostComponent);
   fixture.detectChanges();
-  const table = (fixture.nativeElement as HTMLElement).querySelector('table')!;
-  return { fixture, table };
+  const el = fixture.nativeElement as HTMLElement;
+  const table = el.querySelector('table')!;
+  const find = (sel: string) => el.querySelector<HTMLElement>(sel)!;
+  return { fixture, table, find };
 }
 
 describe('HcTable', () => {
@@ -43,5 +53,36 @@ describe('HcTable', () => {
     fixture.detectChanges();
 
     expect(table.classList).toContain('hc-table--dense');
+  });
+
+  // These row parts were copy-pasted verbatim into every table that has them —
+  // .row-action-trigger into 4 components, .actions-col into 3, .sort-btn into 2 —
+  // so they now live here. They are CONSUMER-authored and merely projected, which is
+  // why table.css must reach them with :host ::ng-deep: a plain scoped selector emits
+  // the consumer's _ngcontent attribute and silently never matches. That exact bug
+  // left every row-action menu unstyled for five phases. Assert non-token properties
+  // jsdom can resolve.
+  it('styles the projected row-action trigger', () => {
+    const { find } = render();
+
+    expect(getComputedStyle(find('.row-action-trigger')).display).toBe('inline-flex');
+  });
+
+  it('styles the projected sort button', () => {
+    const { find } = render();
+
+    expect(getComputedStyle(find('.sort-btn')).display).toBe('inline-flex');
+  });
+
+  it('right-aligns the projected actions column', () => {
+    const { find } = render();
+
+    expect(getComputedStyle(find('.actions-col')).textAlign).toBe('right');
+  });
+
+  it('centres the projected empty cell', () => {
+    const { find } = render();
+
+    expect(getComputedStyle(find('.empty-cell')).textAlign).toBe('center');
   });
 });
