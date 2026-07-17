@@ -5,9 +5,11 @@ _Last updated: 2026-07-16_
 ## ⚠️ The e2e gap is closed — and it found five real defects
 
 **`yarn e2e` ran against a live stack for the first time on 2026-07-16** (Docker + migrator +
-API + `ng serve`). Result on chromium: **102 passed, 7 failed, 5 skipped**. The 7 failures were
-**five distinct root causes** — every one of them written blind during Tracks 1–5 and never
-executed. This is the concrete cost of the gap flagged below, and it is now paid down.
+API + `ng serve`). First result on chromium: **102 passed, 7 failed, 5 skipped**. The 7 failures
+were **six distinct root causes** — every one written blind during Tracks 1–5 and never executed.
+
+**Final result: `110 passed, 0 failed, 4 skipped` (chromium, 4.4m). The baseline is green.**
+Vitest **264 → 271**, build clean.
 
 | # | Symptom | Root cause | Verdict |
 |---|---|---|---|
@@ -16,6 +18,7 @@ executed. This is the concrete cost of the gap flagged below, and it is now paid
 | **C** | Palette ArrowDown doesn't move the selection | **`gsap.from(dialog, { autoAlpha: 0 })`.** `autoAlpha:0` also sets `visibility:hidden`, and `gsap.from()` applies its start state **immediately** — so it blurred the input focused a line above. Browser trace: `29ms focusin → input`, `32ms focusout ← input` + `visibility:hidden`, `42ms visibility restored, focus not`. ArrowDown then went to `<body>`. | **Real a11y bug — the palette was dead to the keyboard.** Flaky (3/5 then 2/5 failing) only because a keypress landing before ~32ms beat the blur; always passed under reduced-motion, where the tween is skipped. Now fades with `opacity` → **8/8**. |
 | **D** | Avatar expected `IT`, got `RO` | `loginAsITAdmin` signs in as **`root@hclis.local`** (the only migration-guaranteed account), not `itadmin@`. | **Test bug.** The avatar was correct. |
 | **E** | `getByText(name)` strict-mode violation | Phase 14's breadcrumb trails `Patients / {name}`, so the name matches twice. | **Test bug.** Assertions scoped to the heading. |
+| **F** | change-role e2e times out behind its siblings | The heaviest test in the suite (~22s) against Playwright's **30s default**, on a cold API. The file runs in 11s once warm; it always passed in isolation. | **Test budget, not a product failure.** `test.setTimeout(60_000)` on that one test. |
 
 **Root cause C spread further than the one failing test.** `hc-dropdown-menu` (ArrowDown-to-open
 focuses `items()[0]`) and `hc-date-picker` (focuses the calendar grid that owns
