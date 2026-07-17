@@ -75,6 +75,29 @@ The Phase-0–4 refactor left **6 primitives built but never wired up**, and pag
 - **CSS budget:** 4kB warn / 8kB error per component; tokens only, no new hex without an axe-verified contrast check.
 - **Boundaries:** components never import `@hc-lis/api-client` directly.
 
+## Follow-on: the page-layout standard (`hc-page`)
+
+Tracks 1–5 upgraded **components** but never the **page frame** — all 12 routed pages
+hand-rolled their own, giving seven hard-coded max-widths, three different places for the
+header actions, and h1/h2 drift. That work is tracked in
+`C:\Users\sidne\.claude\plans\ok-let-s-create-a-lively-sloth.md` and memory
+`project_frontend_page_layout`; Phase 0 of it is the e2e run recorded above.
+
+**New primitive:** `hc-page` (`ui/page/`) — `title` (required; always an `h1`, an input
+rather than a slot precisely so the level can't drift), `subtitle`, `breadcrumbs`, `width`
+(`wide` 75rem / `narrow` 40rem / `full`), `testId`, plus `titleTestId`/`breadcrumbTestId`
+overrides. Header is title-left, actions-right, always. New tokens: `--container-narrow`,
+`--container-wide`, `--text-xs..2xl` (which finally defines the phantom `--text-lg`).
+
+**Not on `hc-page`, deliberately:** login and the error pages (full-bleed dead ends outside
+the shell), and **patient-detail** — it renders both as a route and inside
+patient-search's `hc-sheet`, and its header is a composite (title + inline status badge).
+It takes the shared measure instead.
+
+**Defects this turned up:** three cards rendering flush to their border (`new-order`,
+`order-detail`, `.error-card`) because `hc-card` puts padding on its section directives,
+not `:host`; and the 404 page having **no `h1`** at all (its code was a `<p>`).
+
 ## Verification
 
 Run from `src/HC.LIS.Frontend/packages/hc-lis-spa`:
