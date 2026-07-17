@@ -6,6 +6,7 @@ import { HcBadge } from '../../ui/badge/badge';
 import { HcEmpty } from '../../ui/empty/empty';
 import { HcSkeleton } from '../../ui/skeleton/skeleton';
 import { HcTable } from '../../ui/table/table';
+import { HcPage } from '../../ui/page/page';
 import { HcPagination } from '../../ui/pagination/pagination';
 import {
   HcDropdownMenu,
@@ -28,6 +29,7 @@ const PAGE_SIZE = 10;
     RouterLink,
     HcBadge,
     HcEmpty,
+    HcPage,
     HcSkeleton,
     HcTable,
     HcPagination,

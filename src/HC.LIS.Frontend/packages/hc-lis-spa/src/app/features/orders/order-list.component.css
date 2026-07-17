@@ -1,19 +1,4 @@
-.orders-page {
-  max-width: 960px;
-  margin: 2rem auto;
-  padding: 0 1.5rem;
-}
-
-.orders-header {
-  margin-bottom: 1.5rem;
-}
-
-.orders-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--color-text);
-  margin: 0;
-}
+/* The page frame (container, centring, header) belongs to hc-page. */
 
 .orders-table {
   width: 100%;

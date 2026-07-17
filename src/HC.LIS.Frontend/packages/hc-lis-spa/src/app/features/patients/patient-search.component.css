@@ -1,17 +1,4 @@
-.patient-search-page {
-  padding: var(--space-8);
-}
-
-.search-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--space-6);
-}
-
-.search-header h2 {
-  margin: 0;
-}
+/* The page frame (container, centring, header) belongs to hc-page. */
 
 .search-bar {
   margin-bottom: var(--space-6);

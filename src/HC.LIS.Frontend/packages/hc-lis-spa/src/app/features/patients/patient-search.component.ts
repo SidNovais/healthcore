@@ -8,6 +8,7 @@ import { HcButton } from '../../ui/button/button';
 import { HcEmpty } from '../../ui/empty/empty';
 import { HcIcon } from '../../ui/icon/icon';
 import { HcInput } from '../../ui/input/input';
+import { HcPage } from '../../ui/page/page';
 import { HcPagination } from '../../ui/pagination/pagination';
 import {
   HcDropdownMenu,
@@ -33,6 +34,7 @@ const PAGE_SIZE = 10;
     HcEmpty,
     HcIcon,
     HcInput,
+    HcPage,
     HcPagination,
     HcDropdownMenu,
     HcDropdownMenuTrigger,

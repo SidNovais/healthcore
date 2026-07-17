@@ -1,16 +1,14 @@
-<div class="patient-search-page">
-  <div class="search-header">
-    <h2>Patient Search</h2>
-    <button
-      hc-button
-      variant="cta"
-      data-testid="register-patient-btn"
-      (click)="onRegisterClick()"
-    >
-      <hc-icon name="plus" [size]="16" />
-      Register New Patient
-    </button>
-  </div>
+<hc-page title="Patient Search" width="wide">
+  <button
+    hc-page-actions
+    hc-button
+    variant="cta"
+    data-testid="register-patient-btn"
+    (click)="onRegisterClick()"
+  >
+    <hc-icon name="plus" [size]="16" />
+    Register New Patient
+  </button>
 
   <div class="search-bar">
     <div class="search-field">
@@ -136,4 +134,4 @@
       <app-patient-detail [patientId]="id" />
     }
   </hc-sheet>
-</div>
+</hc-page>
