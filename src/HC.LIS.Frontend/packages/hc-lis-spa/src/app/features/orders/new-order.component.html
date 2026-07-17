@@ -1,4 +1,4 @@
-<hc-page title="New Test Order" width="narrow" testId="new-order">
+<hc-page title="New Test Order" width="wide" testId="new-order">
   @if (!ordersService.order()) {
     <hc-card class="order-create-section">
       <form hc-card-content (ngSubmit)="createOrder()">
