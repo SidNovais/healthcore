@@ -58,6 +58,10 @@ test.describe('User Management', () => {
   test('change-role workflow: menu → confirm dialog → rejected with an error toast', async ({
     page,
   }) => {
+    // The heaviest test in the suite: a login, a full create-user round trip, then the
+    // role change and its 409. It measures ~22s alone, which leaves nothing against the
+    // 30s default and times out when run behind its siblings.
+    test.setTimeout(60_000);
     await loginAsITAdmin(page);
 
     // Create a throwaway user so we never mutate a seed account's role.

@@ -13,13 +13,29 @@ executed. This is the concrete cost of the gap flagged below, and it is now paid
 |---|---|---|---|
 | **A** | `patient-detail-sheet` "hidden" (3 tests: patients ×2, hipaa) | `hc-sheet`/`hc-dialog` put the testid on the **host**, which is `display:inline` wrapping a `position:fixed` child → box is **0×0**. Measured live: the panel itself renders 448×557. | **Primitive contract bug.** Feature worked; it was untestable. `hc-command` already bound `testId` to its `<dialog>` — sheet/dialog now match. |
 | **B** | `role-change-toast` never appears | `PUT /role` returns **409 "Cannot change the role of a user who has not yet activated their account."** The test created a fresh user and immediately reassigned it. | **Invalid test + real product bug.** `confirmRoleChange` awaited with no `catch`, so the rejection escaped and **the user was told nothing at all**. Now surfaces `role-change-error-toast`. |
-| **C** | Palette ArrowDown doesn't move the selection | `effect(() => { this.items(); this.activeIndex.set(0); })` reset on **array identity**. The shell mints a fresh `paletteCommands` whenever its debounced lookup settles; that flush can land right after the keypress. | **Race — flaky, 3 failed / 2 passed over 5 identical runs.** Reset now keys off item **content** (`itemsKey`). |
+| **C** | Palette ArrowDown doesn't move the selection | **`gsap.from(dialog, { autoAlpha: 0 })`.** `autoAlpha:0` also sets `visibility:hidden`, and `gsap.from()` applies its start state **immediately** — so it blurred the input focused a line above. Browser trace: `29ms focusin → input`, `32ms focusout ← input` + `visibility:hidden`, `42ms visibility restored, focus not`. ArrowDown then went to `<body>`. | **Real a11y bug — the palette was dead to the keyboard.** Flaky (3/5 then 2/5 failing) only because a keypress landing before ~32ms beat the blur; always passed under reduced-motion, where the tween is skipped. Now fades with `opacity` → **8/8**. |
 | **D** | Avatar expected `IT`, got `RO` | `loginAsITAdmin` signs in as **`root@hclis.local`** (the only migration-guaranteed account), not `itadmin@`. | **Test bug.** The avatar was correct. |
 | **E** | `getByText(name)` strict-mode violation | Phase 14's breadcrumb trails `Patients / {name}`, so the name matches twice. | **Test bug.** Assertions scoped to the heading. |
 
-**Lesson, now evidenced twice:** Vitest asserts roles/structure (`.not.toBeNull()`), axe passes
-unstyled and zero-size elements, and neither can see a 0×0 box or a race. Only a live browser
-can. The Track-4 `::ng-deep` bug and root cause **A** are the same failure mode.
+**Root cause C spread further than the one failing test.** `hc-dropdown-menu` (ArrowDown-to-open
+focuses `items()[0]`) and `hc-date-picker` (focuses the calendar grid that owns
+`aria-activedescendant`) had the **identical focus-then-`autoAlpha`** ordering — both keyboard
+paths, neither with e2e coverage, so nothing was failing to reveal them. All three now fade with
+`opacity`. **Rule: an entrance tween on anything that takes focus must use `opacity`, never
+`autoAlpha`.** The remaining `autoAlpha` tweens (row staggers, route crossfade, login/error
+cards) focus nothing and are fine.
+
+**A wrong turn worth recording:** `hc-command`'s reset was first blamed on array identity
+(`effect(() => { items(); activeIndex.set(0); })` firing when the shell mints a fresh
+`paletteCommands`). That fix — reset keyed on item **content** via `itemsKey` — is retained
+because it is correct on its own merits and is pinned by a test, but **it was not the cause**;
+the spec stayed flaky after it. The cause was only found by tracing focus events in a real
+browser. Instrument before theorising.
+
+**Lesson, now evidenced three times:** Vitest asserts roles/structure (`.not.toBeNull()`), axe
+passes unstyled and zero-size elements, and none of it can see a 0×0 box, a blur, or a race.
+Only a live browser can. The Track-4 `::ng-deep` bug, root cause **A**, and root cause **C** are
+all the same failure mode.
 
 Post-fix: **Vitest 264 → 268**, build clean, chromium e2e re-run as the Phase 0 gate for the
 `hc-page` layout work (plan: `C:\Users\sidne\.claude\plans\ok-let-s-create-a-lively-sloth.md`).
