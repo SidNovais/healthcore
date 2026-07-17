@@ -33,19 +33,37 @@ export class HcPage {
   /** Ancestor trail for deep pages. Omit on top-level pages — there is nothing to trail. */
   readonly breadcrumbs = input<HcBreadcrumbItem[] | undefined>(undefined);
   readonly width = input<HcPageWidth>('wide');
-  /** Rendered on the page container; also prefixes the breadcrumb's child testids. */
+  /** Rendered on the page container; also the prefix the child testids derive from. */
   readonly testId = input<string | undefined>(undefined);
+  /**
+   * Overrides for pages whose ids predate this primitive and do not follow the derived
+   * pattern — register-patient's heading is `register-patient-heading`, and
+   * order-detail's breadcrumb is `order-breadcrumb` while its container is
+   * `order-detail`. Those ids are the e2e regression net, so pages override here rather
+   * than get renamed.
+   */
+  readonly titleTestId = input<string | undefined>(undefined);
+  readonly breadcrumbTestId = input<string | undefined>(undefined);
 
-  protected breadcrumbTestId(): string {
+  protected resolvedBreadcrumbTestId(): string {
+    const override = this.breadcrumbTestId();
+    if (override) {
+      return override;
+    }
     const id = this.testId();
     return id ? `${id}-breadcrumb` : 'breadcrumb';
   }
 
   /**
-   * Pages that already had a title testid keep it here — `worklist-title` and
-   * `users-title` are part of the e2e regression net and are never renamed.
+   * Pages that already had a title testid keep it here — `worklist-title`,
+   * `users-title` and `triage-title` all fall out of the derivation; only
+   * `register-patient-heading` needs the override.
    */
-  protected titleTestId(): string | null {
+  protected resolvedTitleTestId(): string | null {
+    const override = this.titleTestId();
+    if (override) {
+      return override;
+    }
     const id = this.testId();
     return id ? `${id}-title` : null;
   }

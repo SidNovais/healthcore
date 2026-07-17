@@ -1,8 +1,9 @@
+/* No max-width here: the page owns the measure (hc-page width="narrow"). This used to
+   cap at 480px nested inside register-patient's own 600px — two caps, neither named. */
 .patient-form {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
-  max-width: 480px;
 }
 
 /* <fieldset> carries the grouping semantics; its default chrome is reset so the

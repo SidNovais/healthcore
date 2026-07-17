@@ -1,15 +1,20 @@
-<div class="order-detail-page" data-testid="order-detail">
-  <div class="detail-header">
-    <hc-breadcrumb [items]="breadcrumbs" testId="order-breadcrumb" />
-    <h1 class="detail-title">Order Detail</h1>
-  </div>
-
+<hc-page
+  title="Order Detail"
+  width="wide"
+  testId="order-detail"
+  breadcrumbTestId="order-breadcrumb"
+  [breadcrumbs]="breadcrumbs"
+>
   @if (ordersService.orderDetails(); as details) {
     <hc-card class="order-meta" data-testid="order-meta">
-      <p>Patient: <span data-testid="patient-id">{{ details.patientId }}</span></p>
-      <p>Requested By: <span data-testid="requested-by">{{ details.requestedBy }}</span></p>
-      <p>Priority: <span data-testid="order-priority">{{ details.orderPriority }}</span></p>
-      <p>Requested At: <span data-testid="order-requested-at">{{ details.requestedAt }}</span></p>
+      <div hc-card-content>
+        <p>Patient: <span data-testid="patient-id">{{ details.patientId }}</span></p>
+        <p>Requested By: <span data-testid="requested-by">{{ details.requestedBy }}</span></p>
+        <p>Priority: <span data-testid="order-priority">{{ details.orderPriority }}</span></p>
+        <p>
+          Requested At: <span data-testid="order-requested-at">{{ details.requestedAt }}</span>
+        </p>
+      </div>
     </hc-card>
 
     @if (errorMessage(); as msg) {
@@ -134,4 +139,4 @@
       }
     </hc-dialog>
   }
-</div>
+</hc-page>

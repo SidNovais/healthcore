@@ -1,9 +1,12 @@
-<div class="register-patient-page">
-  <h1 data-testid="register-patient-heading">Register New Patient</h1>
-
+<hc-page
+  title="Register New Patient"
+  width="narrow"
+  testId="register-patient"
+  titleTestId="register-patient-heading"
+>
   @if (error(); as message) {
     <hc-alert variant="error" data-testid="register-patient-error">{{ message }}</hc-alert>
   }
 
   <app-patient-form (formSubmit)="onFormSubmit($event)" />
-</div>
+</hc-page>

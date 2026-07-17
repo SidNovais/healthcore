@@ -1,10 +1,7 @@
-<div class="triage-page">
-  <div class="triage-header">
-    <h1 data-testid="triage-title" class="triage-title">Triage</h1>
-    <button hc-button variant="ghost" size="sm" (click)="refresh()">
-      <hc-icon name="refresh" [size]="15" /> Refresh
-    </button>
-  </div>
+<hc-page title="Triage" width="wide" testId="triage">
+  <button hc-page-actions hc-button variant="ghost" size="sm" (click)="refresh()">
+    <hc-icon name="refresh" [size]="15" /> Refresh
+  </button>
 
   <hc-tabs class="filter-bar" [value]="activeFilter()" (valueChange)="setFilter($event)" aria-label="Filter patients by status">
     <button hc-tab value="All" data-testid="filter-tab-all">
@@ -74,7 +71,7 @@
       <hc-alert variant="error">{{ msg }}</hc-alert>
     }
   </div>
-</div>
+</hc-page>
 
 @if (printModalRequest(); as req) {
   <app-print-labels-modal

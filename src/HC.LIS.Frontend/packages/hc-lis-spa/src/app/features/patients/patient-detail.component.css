@@ -1,5 +1,14 @@
+/* The one in-shell page that deliberately does NOT use hc-page, for two reasons:
+   it renders in two modes (this routed page AND inside patient-search's hc-sheet,
+   which brings its own frame), and its header is a composite — the title carries an
+   inline status badge, which hc-page's plain-string title does not model. Forcing it
+   in would mean conditional wrapping plus a title-adornment slot, i.e. bending the
+   primitive for one caller. It takes the shared measure instead, so it still lines up
+   with every narrow page; only the header is its own.
+   Padding stays inline (space-4) rather than hc-page's space-8: in sheet mode the
+   sheet supplies the padding. */
 .patient-detail-page {
-  max-width: 700px;
+  max-width: var(--container-narrow);
   margin: var(--space-8) auto;
   padding: 0 var(--space-4);
 }
@@ -17,6 +26,10 @@ hc-breadcrumb {
 
 .patient-name {
   margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  color: var(--color-text);
 }
 
 hc-alert {

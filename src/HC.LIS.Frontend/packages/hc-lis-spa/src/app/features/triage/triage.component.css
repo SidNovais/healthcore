@@ -1,22 +1,4 @@
-.triage-page {
-  max-width: 900px;
-  margin: 2rem auto;
-  padding: 0 1.5rem;
-}
-
-.triage-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
-
-.triage-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--color-text);
-  margin: 0;
-}
+/* The page frame (container, centring, header) belongs to hc-page. */
 
 .filter-bar {
   display: block;

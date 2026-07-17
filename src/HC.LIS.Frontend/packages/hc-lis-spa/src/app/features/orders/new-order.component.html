@@ -1,9 +1,7 @@
-<div class="new-order-page">
-  <h1 class="new-order-title">New Test Order</h1>
-
+<hc-page title="New Test Order" width="narrow" testId="new-order">
   @if (!ordersService.order()) {
     <hc-card class="order-create-section">
-      <form (ngSubmit)="createOrder()">
+      <form hc-card-content (ngSubmit)="createOrder()">
         <hc-field>
           <label hc-label>Patient</label>
           <app-patient-picker (patientSelected)="selectedPatient.set($event)" />
@@ -38,4 +36,4 @@
       <app-request-exam-form (examSubmitted)="onExamSubmit($event)" />
     </section>
   }
-</div>
+</hc-page>

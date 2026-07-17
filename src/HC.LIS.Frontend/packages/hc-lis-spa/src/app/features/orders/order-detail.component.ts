@@ -5,9 +5,10 @@ import { gsap } from 'gsap';
 import { OrdersService } from './orders.service';
 import { HcAlert } from '../../ui/alert/alert';
 import { HcBadge, type HcBadgeVariant } from '../../ui/badge/badge';
-import { HcBreadcrumb, type HcBreadcrumbItem } from '../../ui/breadcrumb/breadcrumb';
+import { type HcBreadcrumbItem } from '../../ui/breadcrumb/breadcrumb';
 import { HcButton } from '../../ui/button/button';
-import { HcCard } from '../../ui/card/card';
+import { HcCard, HcCardContent } from '../../ui/card/card';
+import { HcPage } from '../../ui/page/page';
 import { HcDialog } from '../../ui/dialog/dialog';
 import {
   HcDropdownMenu,
@@ -41,9 +42,9 @@ const STATUS_VARIANTS: Record<string, HcBadgeVariant> = {
     FormsModule,
     HcAlert,
     HcBadge,
-    HcBreadcrumb,
     HcButton,
     HcCard,
+    HcCardContent,
     HcDialog,
     HcDropdownMenu,
     HcDropdownMenuTrigger,
@@ -51,6 +52,7 @@ const STATUS_VARIANTS: Record<string, HcBadgeVariant> = {
     HcEmpty,
     HcIcon,
     HcInput,
+    HcPage,
     HcTable,
   ],
   templateUrl: './order-detail.component.html',

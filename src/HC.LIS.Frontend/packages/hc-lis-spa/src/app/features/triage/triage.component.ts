@@ -7,6 +7,7 @@ import { HcAlert } from '../../ui/alert/alert';
 import { HcButton } from '../../ui/button/button';
 import { HcIcon } from '../../ui/icon/icon';
 import { HcEmpty } from '../../ui/empty/empty';
+import { HcPage } from '../../ui/page/page';
 import { HcTabs, HcTab } from '../../ui/tabs/tabs';
 
 type StatusFilter = 'All' | 'Arrived' | 'Waiting' | 'Called';
@@ -19,7 +20,17 @@ interface PrintModalRequest {
 @Component({
   selector: 'app-triage',
   standalone: true,
-  imports: [PatientRowComponent, PrintLabelsModalComponent, HcAlert, HcButton, HcIcon, HcEmpty, HcTabs, HcTab],
+  imports: [
+    PatientRowComponent,
+    PrintLabelsModalComponent,
+    HcAlert,
+    HcButton,
+    HcIcon,
+    HcEmpty,
+    HcPage,
+    HcTabs,
+    HcTab,
+  ],
   templateUrl: './triage.component.html',
   styleUrl: './triage.component.css',
 })

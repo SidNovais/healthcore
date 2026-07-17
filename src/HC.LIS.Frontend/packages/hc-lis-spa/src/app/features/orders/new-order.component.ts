@@ -8,15 +8,27 @@ import type { RequestExamParams } from '../../core/application/i-orders-port';
 import type { PatientSearchResult } from '../../core/domain/patient-search-result';
 import { HcAlert } from '../../ui/alert/alert';
 import { HcButton } from '../../ui/button/button';
-import { HcCard } from '../../ui/card/card';
+import { HcCard, HcCardContent } from '../../ui/card/card';
 import { HcField } from '../../ui/field/field';
 import { HcLabel } from '../../ui/input/label';
+import { HcPage } from '../../ui/page/page';
 import { ToastService } from '../../ui/toast/toast.service';
 
 @Component({
   selector: 'app-new-order',
   standalone: true,
-  imports: [FormsModule, RequestExamFormComponent, PatientPickerComponent, HcAlert, HcButton, HcCard, HcField, HcLabel],
+  imports: [
+    FormsModule,
+    RequestExamFormComponent,
+    PatientPickerComponent,
+    HcAlert,
+    HcButton,
+    HcCard,
+    HcCardContent,
+    HcField,
+    HcLabel,
+    HcPage,
+  ],
   templateUrl: './new-order.component.html',
   styleUrl: './new-order.component.css',
 })

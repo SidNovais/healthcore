@@ -1,24 +1,5 @@
-.order-detail-page {
-  max-width: 1000px;
-  margin: 2rem auto;
-  padding: 0 1.5rem;
-}
-
-/* The breadcrumb stacks above the title — it is context for the page, not a peer of it. */
-.detail-header {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-2);
-  margin-bottom: 1.5rem;
-}
-
-.detail-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--color-text);
-  margin: 0;
-}
+/* The page frame (container, centring, breadcrumb-above-title header) belongs to
+   hc-page. */
 
 .order-meta {
   margin-bottom: 1.5rem;
