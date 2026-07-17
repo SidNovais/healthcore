@@ -135,4 +135,30 @@ describe('HcPage', () => {
 
     expect(container().getAttribute('data-testid')).toBe('orders');
   });
+
+  // Pages that already had a title testid (worklist-title, users-title) must keep it
+  // on the heading when they move onto hc-page — those ids are the e2e regression net
+  // and are never renamed. Derived as {testId}-title, as the breadcrumb slot is.
+  it('derives the heading testId from the page testId', () => {
+    const { heading } = render();
+
+    expect(heading()!.getAttribute('data-testid')).toBe('orders-title');
+  });
+
+  it('leaves the heading untagged when the page has no testId', () => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({ providers: [provideRouter([])] });
+
+    @Component({
+      imports: [HcPage],
+      template: `<hc-page title="Orders"><p>body</p></hc-page>`,
+    })
+    class Bare {}
+
+    const fixture = TestBed.createComponent(Bare);
+    fixture.detectChanges();
+    const h1 = (fixture.nativeElement as HTMLElement).querySelector('h1')!;
+
+    expect(h1.hasAttribute('data-testid')).toBe(false);
+  });
 });
