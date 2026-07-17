@@ -57,10 +57,13 @@ export class HcDropdownMenu {
     });
 
     // Fade the panel in on open; skipped under prefers-reduced-motion.
+    // opacity, NOT autoAlpha: autoAlpha:0 also sets visibility:hidden, and gsap.from()
+    // applies its start state immediately — hiding the menu blurs the item focused by
+    // the effect above (the ArrowDown path), leaving the menu dead to the keyboard.
     afterRenderEffect(() => {
       const el = this.menuEl()?.nativeElement;
       if (this.open() && el && !prefersReducedMotion()) {
-        gsap.from(el, { autoAlpha: 0, y: -4, duration: MOTION.fast, overwrite: true });
+        gsap.from(el, { opacity: 0, y: -4, duration: MOTION.fast, overwrite: true });
       }
     });
   }

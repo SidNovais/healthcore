@@ -266,7 +266,10 @@ export class HcDatePicker implements ControlValueAccessor {
       const calendar = this.calendarRef()?.nativeElement;
       calendar?.focus();
       if (calendar && !prefersReducedMotion()) {
-        gsap.from(calendar, { autoAlpha: 0, y: -4, duration: MOTION.fast, overwrite: true });
+        // opacity, NOT autoAlpha: autoAlpha:0 also sets visibility:hidden, and
+        // gsap.from() applies its start state immediately — hiding the grid blurs the
+        // focus set a line above, breaking arrow-key navigation across the days.
+        gsap.from(calendar, { opacity: 0, y: -4, duration: MOTION.fast, overwrite: true });
       }
     });
   }
