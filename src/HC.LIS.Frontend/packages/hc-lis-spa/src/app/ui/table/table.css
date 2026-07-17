@@ -38,3 +38,83 @@
 :host(.hc-table--dense) ::ng-deep tbody td {
   padding: var(--space-1) var(--space-3);
 }
+
+/* ── Shared row parts ──────────────────────────────────────────────────────────
+   These were copy-pasted byte-for-byte into every table that needed them:
+   .row-action-trigger into 4 components, .actions-col into 3, .sort-btn into 2,
+   .skeleton-row and .empty-cell into several more. They are consumer-authored and
+   projected, so ::ng-deep is required — a plain scoped selector would carry this
+   component's _ngcontent attribute and never match them. The :host prefix still
+   confines every rule to descendants of an hc-table. */
+
+/* Icon-only trigger for a row's action menu. */
+:host ::ng-deep .row-action-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+:host ::ng-deep .row-action-trigger:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text);
+}
+
+/* The narrow trailing column the trigger sits in. */
+:host ::ng-deep .actions-col {
+  width: 3rem;
+  text-align: right;
+}
+
+/* Sortable column header. The caret is painted from the th's aria-sort, so the
+   accessible state and the visible state cannot drift apart. */
+:host ::ng-deep .sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+:host ::ng-deep .sort-btn--num {
+  margin-left: auto;
+}
+
+:host ::ng-deep .sort-btn:hover {
+  color: var(--color-accent);
+}
+
+:host ::ng-deep th[aria-sort='ascending'] .sort-btn::after {
+  content: '▲';
+  font-size: 0.6em;
+}
+
+:host ::ng-deep th[aria-sort='descending'] .sort-btn::after {
+  content: '▼';
+  font-size: 0.6em;
+}
+
+/* Loading placeholder bar inside a skeleton row. */
+:host ::ng-deep .skeleton-row hc-skeleton {
+  display: block;
+  height: var(--text-sm);
+  width: 70%;
+}
+
+/* Full-width cell carrying an empty-state message. */
+:host ::ng-deep .empty-cell {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: var(--space-8);
+}

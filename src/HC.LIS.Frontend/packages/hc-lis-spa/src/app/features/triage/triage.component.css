@@ -2,7 +2,7 @@
 
 .filter-bar {
   display: block;
-  margin-bottom: 1.25rem;
+  margin-bottom: var(--space-5);
 }
 
 .count {
@@ -14,13 +14,13 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--space-6);
 }
 
 .group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .group-header {

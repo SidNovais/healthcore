@@ -1,5 +1,5 @@
 .detail-panel {
-  padding: 1.5rem;
+  padding: var(--space-6);
   border-left: 1px solid var(--color-border);
   min-width: 320px;
   flex: 1;
@@ -18,7 +18,7 @@
 .status-line {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .mono {
@@ -27,7 +27,7 @@
 
 .analyte-table {
   width: 100%;
-  margin: 1rem 0;
+  margin: var(--space-4) 0;
 }
 
 .out-of-range td {
@@ -38,9 +38,9 @@
 .sign-form {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-3);
   max-width: 320px;
-  margin-top: 1rem;
+  margin-top: var(--space-4);
 }
 
 .sign-form__submit {

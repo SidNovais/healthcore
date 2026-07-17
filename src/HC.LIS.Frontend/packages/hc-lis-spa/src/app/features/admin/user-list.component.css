@@ -1,7 +1,7 @@
 /* The page frame (container, centring, header) belongs to hc-page. */
 
 .form-wrapper {
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-6);
 }
 
 .users-table {
@@ -34,7 +34,7 @@
 .users-footer {
   display: flex;
   justify-content: flex-end;
-  margin-top: 1rem;
+  margin-top: var(--space-4);
 }
 
 .role-dialog {
@@ -56,10 +56,4 @@
   display: flex;
   justify-content: flex-end;
   gap: var(--space-3);
-}
-
-.skeleton-row hc-skeleton {
-  display: block;
-  height: 0.9rem;
-  width: 70%;
 }

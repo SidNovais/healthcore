@@ -46,29 +46,6 @@
   color: var(--color-text);
 }
 
-.actions-col {
-  width: 3rem;
-  text-align: right;
-}
-
-.row-action-trigger {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  color: var(--color-text-muted);
-  background: none;
-  border: none;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-}
-
-.row-action-trigger:hover {
-  background: var(--color-surface-2);
-  color: var(--color-text);
-}
-
 .search-footer {
   display: flex;
   justify-content: flex-end;
@@ -81,10 +58,4 @@
 
 .skeleton-table {
   width: 100%;
-}
-
-.skeleton-row hc-skeleton {
-  display: block;
-  height: 0.9rem;
-  width: 70%;
 }
