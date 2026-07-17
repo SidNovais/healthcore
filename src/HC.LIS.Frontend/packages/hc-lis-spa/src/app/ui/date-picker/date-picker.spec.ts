@@ -230,4 +230,19 @@ describe('HcDatePicker', () => {
 
     expect(day('1990-01-01')!.getAttribute('aria-selected')).toBe('true');
   });
+
+  // Regression: gsap.from() renders its start state immediately, and autoAlpha:0 sets
+  // visibility:hidden — which blurs the calendar it had just focused a line earlier,
+  // breaking arrow-key date navigation (the grid owns focus + aria-activedescendant).
+  // Traced in a real browser on hc-command; this primitive had the identical ordering.
+  // The entrance may fade (opacity) but must never hide. jsdom does not blur on
+  // visibility:hidden, so assert the invariant that causes it.
+  it('does not hide the calendar while animating in (hiding it blurs the grid)', async () => {
+    const { fixture, calendar, open } = render();
+
+    open();
+    await fixture.whenStable();
+
+    expect(calendar()!.style.visibility).not.toBe('hidden');
+  });
 });

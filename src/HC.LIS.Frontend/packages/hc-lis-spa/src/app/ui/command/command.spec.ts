@@ -173,6 +173,26 @@ describe('HcCommand', () => {
   // runs (patientMatches.set([]) mints a new []), and that flush can land right after
   // the user's ArrowDown — clobbering the selection back to the top. Same result set,
   // new array: the selection must survive.
+  // Regression (root cause of the flaky arrow-key e2e spec, traced in a real browser):
+  //   29ms focusin  -> command-palette-input
+  //   32ms focusout <- command-palette-input   <- gsap autoAlpha:0 start-state
+  //   32ms visibility=hidden, active=BODY
+  // gsap.from() renders its start state immediately, and autoAlpha:0 sets
+  // visibility:hidden — which blurs the focused input. The tween restores visibility
+  // 10ms later but never restores focus, so ArrowDown went to <body> and the palette
+  // was dead to the keyboard. The entrance may fade (opacity) but must never hide.
+  // jsdom does not blur on visibility:hidden, so assert the invariant that causes it.
+  it('does not hide the panel while animating in (hiding it blurs the input)', async () => {
+    const { fixture, open } = render();
+    const host = fixture.nativeElement as HTMLElement;
+
+    open();
+    await fixture.whenStable();
+
+    const dialog = host.querySelector<HTMLElement>('dialog')!;
+    expect(dialog.style.visibility).not.toBe('hidden');
+  });
+
   it('keeps the active option when the list is replaced by an equivalent set', () => {
     const { open, key, component, fixture, active } = render();
 

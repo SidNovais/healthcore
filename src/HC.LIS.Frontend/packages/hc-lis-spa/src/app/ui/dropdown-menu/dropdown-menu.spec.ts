@@ -116,4 +116,20 @@ describe('HcDropdownMenu', () => {
 
     expect(menu()).toBeNull();
   });
+
+  // Regression: gsap.from() renders its start state immediately, and autoAlpha:0 sets
+  // visibility:hidden — which blurs whatever the menu just focused. openAndFocusFirst()
+  // (the ArrowDown path) focuses items()[0], then the entrance tween hid the panel and
+  // dropped focus to <body>, leaving the menu unusable by keyboard. Traced in a real
+  // browser on hc-command; this primitive had the identical ordering. The entrance may
+  // fade (opacity) but must never hide. jsdom does not blur on visibility:hidden, so
+  // assert the invariant that causes it.
+  it('does not hide the menu while animating in (hiding it blurs the focused item)', async () => {
+    const { fixture, menu, open } = render();
+
+    open();
+    await fixture.whenStable();
+
+    expect(menu()!.style.visibility).not.toBe('hidden');
+  });
 });
