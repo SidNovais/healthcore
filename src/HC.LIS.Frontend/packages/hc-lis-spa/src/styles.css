@@ -54,6 +54,22 @@
   --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / .10), 0 1px 2px -1px rgb(0 0 0 / .10);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / .10), 0 2px 4px -2px rgb(0 0 0 / .10);
 
+  /* Type scale (12 14 16 18 20 24). Derived from what the app already uses —
+     0.875rem (21 call sites), 0.75rem (10), 1.5rem (7), 1rem (5) — so adopting it
+     is a rename, not a redesign. --text-lg was referenced by order-detail and
+     patient-detail while defined NOWHERE: both rules silently inherited. */
+  --text-xs:   0.75rem;   /* 12px — table meta, hints, badges */
+  --text-sm:   0.875rem;  /* 14px — the app's workhorse size */
+  --text-base: 1rem;      /* 16px — body */
+  --text-lg:   1.125rem;  /* 18px — sub-headings */
+  --text-xl:   1.25rem;   /* 20px */
+  --text-2xl:  1.5rem;    /* 24px — page titles */
+
+  /* Container measures. Pages pick a measure; they never centre themselves.
+     `full` is the absence of a cap, so it needs no token. */
+  --container-narrow: 40rem;  /* 640px — forms, detail; keeps prose near 65-75ch */
+  --container-wide:   75rem;  /* 1200px — tables, lists */
+
   /* Spacing (4px base) */
   --space-1:  0.25rem;
   --space-2:  0.5rem;

@@ -1,0 +1,76 @@
+/* One centred container. The measure is the only thing a page chooses. */
+.hc-page {
+  margin-inline: auto;
+  padding: var(--space-8);
+}
+
+.hc-page--wide {
+  max-width: var(--container-wide);
+}
+
+.hc-page--narrow {
+  max-width: var(--container-narrow);
+}
+
+/* `full` opts out of the cap (master/detail layouts that own their own width) but
+   keeps the shared gutter, so it still lines up with every other page. */
+.hc-page--full {
+  max-width: none;
+}
+
+.hc-page__header {
+  margin-bottom: var(--space-6);
+}
+
+.hc-page__breadcrumb {
+  display: block;
+  margin-bottom: var(--space-3);
+}
+
+/* Title left, actions right — always. */
+.hc-page__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.hc-page__titles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0; /* let a long title truncate rather than shove the actions off */
+}
+
+.hc-page__title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.hc-page__subtitle {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* The wrapper is authored in THIS component's template, so it carries this
+   component's _ngcontent attribute and a plain scoped selector matches. No ::ng-deep:
+   that would emit the rule globally for no reason. (::ng-deep is only needed to style
+   nodes the CONSUMER authored and we merely project — the buttons inside this div.
+   Those are the consumer's to style; we only lay them out.) */
+.hc-page__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+/* An empty slot must not claim space or the title block sits off-centre.
+   :empty ignores element children only — the projected buttons count, whitespace
+   in the consumer's template does not. */
+.hc-page__actions:empty {
+  display: none;
+}

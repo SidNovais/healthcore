@@ -1,0 +1,22 @@
+<div class="hc-page hc-page--{{ width() }}" [attr.data-testid]="testId()">
+  <header class="hc-page__header">
+    @if (breadcrumbs(); as trail) {
+      <hc-breadcrumb class="hc-page__breadcrumb" [items]="trail" [testId]="breadcrumbTestId()" />
+    }
+
+    <div class="hc-page__bar">
+      <div class="hc-page__titles">
+        <h1 class="hc-page__title">{{ title() }}</h1>
+        @if (subtitle(); as sub) {
+          <p class="hc-page__subtitle">{{ sub }}</p>
+        }
+      </div>
+
+      <div class="hc-page__actions">
+        <ng-content select="[hc-page-actions]" />
+      </div>
+    </div>
+  </header>
+
+  <ng-content />
+</div>
