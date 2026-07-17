@@ -145,6 +145,57 @@ describe('HcPage', () => {
     expect(heading()!.getAttribute('data-testid')).toBe('orders-title');
   });
 
+  // Derivation is the default, but some pages carry ids that predate this primitive and
+  // do not follow the pattern: register-patient's heading is register-patient-heading,
+  // and order-detail's breadcrumb is order-breadcrumb while its container is
+  // order-detail. Those ids are the e2e net, so the page overrides rather than renames.
+  it('lets a page override the derived heading testId', () => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({ providers: [provideRouter([])] });
+
+    @Component({
+      imports: [HcPage],
+      template: `
+        <hc-page title="Register New Patient" testId="register-patient" titleTestId="register-patient-heading">
+          <p>body</p>
+        </hc-page>
+      `,
+    })
+    class Overridden {}
+
+    const fixture = TestBed.createComponent(Overridden);
+    fixture.detectChanges();
+    const h1 = (fixture.nativeElement as HTMLElement).querySelector('h1')!;
+
+    expect(h1.getAttribute('data-testid')).toBe('register-patient-heading');
+  });
+
+  it('lets a page override the derived breadcrumb testId', () => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({ providers: [provideRouter([])] });
+
+    @Component({
+      imports: [HcPage],
+      template: `
+        <hc-page
+          title="Order Detail"
+          testId="order-detail"
+          breadcrumbTestId="order-breadcrumb"
+          [breadcrumbs]="[{ label: 'Orders', route: '/orders' }, { label: 'ORD-1' }]"
+        >
+          <p>body</p>
+        </hc-page>
+      `,
+    })
+    class Overridden {}
+
+    const fixture = TestBed.createComponent(Overridden);
+    fixture.detectChanges();
+    const crumb = (fixture.nativeElement as HTMLElement).querySelector('hc-breadcrumb')!;
+
+    expect(crumb.getAttribute('data-testid')).toBe('order-breadcrumb');
+  });
+
   it('leaves the heading untagged when the page has no testId', () => {
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({ providers: [provideRouter([])] });
