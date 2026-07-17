@@ -1,23 +1,22 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { HcButton } from '../../ui/button/button';
-import { HcCard } from '../../ui/card/card';
-import { HcIcon } from '../../ui/icon/icon';
-import { MOTION, useMotion } from '../../ui/motion/motion';
-import { gsap } from 'gsap';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ErrorPageComponent } from './error-page.component';
 
+/** Routed inside the app shell, so the card fills the outlet rather than the viewport. */
 @Component({
   selector: 'app-unauthorized',
   standalone: true,
-  imports: [RouterLink, HcButton, HcCard, HcIcon],
-  templateUrl: './unauthorized.component.html',
-  styleUrl: './unauthorized.component.css',
+  imports: [ErrorPageComponent],
+  template: `
+    <app-error-page
+      code="403"
+      heading="Access Denied"
+      message="You don't have permission to view this page."
+      icon="lock"
+      tone="error"
+      fill="main"
+      testId="error-card"
+    />
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UnauthorizedComponent {
-  constructor() {
-    useMotion(ctx => {
-      if (ctx.reduceMotion) return;
-      gsap.from('.error-card', { autoAlpha: 0, y: 10, duration: MOTION.slow });
-    });
-  }
-}
+export class UnauthorizedComponent {}
