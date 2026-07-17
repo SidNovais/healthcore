@@ -1,6 +1,28 @@
 # Frontend shadcn-UX Enhancement — Handoff & Progress Tracker
 
-_Last updated: 2026-07-15_
+_Last updated: 2026-07-16_
+
+## ⚠️ The e2e gap is closed — and it found five real defects
+
+**`yarn e2e` ran against a live stack for the first time on 2026-07-16** (Docker + migrator +
+API + `ng serve`). Result on chromium: **102 passed, 7 failed, 5 skipped**. The 7 failures were
+**five distinct root causes** — every one of them written blind during Tracks 1–5 and never
+executed. This is the concrete cost of the gap flagged below, and it is now paid down.
+
+| # | Symptom | Root cause | Verdict |
+|---|---|---|---|
+| **A** | `patient-detail-sheet` "hidden" (3 tests: patients ×2, hipaa) | `hc-sheet`/`hc-dialog` put the testid on the **host**, which is `display:inline` wrapping a `position:fixed` child → box is **0×0**. Measured live: the panel itself renders 448×557. | **Primitive contract bug.** Feature worked; it was untestable. `hc-command` already bound `testId` to its `<dialog>` — sheet/dialog now match. |
+| **B** | `role-change-toast` never appears | `PUT /role` returns **409 "Cannot change the role of a user who has not yet activated their account."** The test created a fresh user and immediately reassigned it. | **Invalid test + real product bug.** `confirmRoleChange` awaited with no `catch`, so the rejection escaped and **the user was told nothing at all**. Now surfaces `role-change-error-toast`. |
+| **C** | Palette ArrowDown doesn't move the selection | `effect(() => { this.items(); this.activeIndex.set(0); })` reset on **array identity**. The shell mints a fresh `paletteCommands` whenever its debounced lookup settles; that flush can land right after the keypress. | **Race — flaky, 3 failed / 2 passed over 5 identical runs.** Reset now keys off item **content** (`itemsKey`). |
+| **D** | Avatar expected `IT`, got `RO` | `loginAsITAdmin` signs in as **`root@hclis.local`** (the only migration-guaranteed account), not `itadmin@`. | **Test bug.** The avatar was correct. |
+| **E** | `getByText(name)` strict-mode violation | Phase 14's breadcrumb trails `Patients / {name}`, so the name matches twice. | **Test bug.** Assertions scoped to the heading. |
+
+**Lesson, now evidenced twice:** Vitest asserts roles/structure (`.not.toBeNull()`), axe passes
+unstyled and zero-size elements, and neither can see a 0×0 box or a race. Only a live browser
+can. The Track-4 `::ng-deep` bug and root cause **A** are the same failure mode.
+
+Post-fix: **Vitest 264 → 268**, build clean, chromium e2e re-run as the Phase 0 gate for the
+`hc-page` layout work (plan: `C:\Users\sidne\.claude\plans\ok-let-s-create-a-lively-sloth.md`).
 
 Follow-on to `docs/specs/FrontendRefactor-Handoff.md` (Design System v2, Phases 0–4, already merged).
 
@@ -124,6 +146,9 @@ Legend: ✅ done · 🔀 merged to `main` · 🔜 next · ⬜ planned
 - **Built** `hc-command` (Phase 15): `open`/`query` models, `items`/`placeholder`/`emptyMessage`/`ariaLabel`/`testId` inputs, `select` output; native `<dialog>`, combobox + `aria-activedescendant` listbox, groups, no internal filtering.
 - **Adopted** `hc-command` in the shell (Phase 15): Ctrl/Cmd-K palette over role-aware nav destinations + debounced patient matches.
 - **Extended** `PatientsService` with `quickSearch(term)` (Phase 15) — returns results without touching the page-level `searchResults`/`searching` signals.
+- **Extended** `hc-sheet` + `hc-dialog` with a `testId` input bound to the **`<dialog>`** (2026-07-16): the host box is 0×0, so a testid there is never visible to a browser-driven test. Consumers pass `testId="…"` instead of `data-testid="…"` — **same values, no testid renamed** (`patient-detail-sheet`, `create-user-dialog`, `role-change-dialog`, `anonymize-dialog`, `reject-dialog`, `on-hold-dialog`).
+- **Fixed** `hc-command` (2026-07-16): the top-match reset keys off item **content**, not array identity — an equivalent result set no longer clobbers the user's arrow-key selection.
+- **Fixed** `UserListComponent.confirmRoleChange` (2026-07-16): catches the API rejection and shows `role-change-error-toast` naming the reason. Previously the 409 was swallowed silently.
 - **Built** `hc-date-picker` (Phase 16): `testId`/`inputId`/`inputTestId`/`max`/`invalid`/`placeholder`/`ariaLabel` inputs; ISO `YYYY-MM-DD` value via ControlValueAccessor; text-input-primary with a month/year-led calendar popover; part-based date math (no UTC drift).
 - **Extended** `hc-icon` with `calendar` (Phase 16).
 - **Adopted** `hc-date-picker` + `hc-separator` in the patient form (Phase 16); fields grouped into Demographics + Contact fieldsets, DOB bounded at today.
@@ -138,7 +163,10 @@ Nothing caught it: Vitest asserts roles/behaviour rather than computed style, ax
 
 ## Open follow-ups / notes
 
-- Full **e2e has still not been run** — it needs the API+DB+`ng serve` stack, and Docker Desktop was down during Track 5, so the stack could not be brought up. **This remains the single biggest gap: it is what let the dropdown-styling bug above survive five phases.** Every phase to date is gated only by build + the full Vitest suite + reasoning about the existing spec assertions. Accumulated unrun gates: `orders`, `patients`, `worklist`, `admin-users`, `hipaa`, `nav`, `theme`, `command-palette`, `a11y`, `reduced-motion`. **Run `yarn e2e` against a live stack before trusting any of Tracks 1–5 in production.**
+- ~~Full **e2e has still not been run**~~ — **RESOLVED 2026-07-16.** The stack came up (Docker was available again) and the suite ran on chromium: 102 passed / 7 failed / 5 skipped, five root causes, all fixed — see the table at the top. Remaining e2e caveats:
+  - **Only chromium has been run.** `firefox` and `webkit` are still unexercised; `playwright.config.ts` defines all three. The cookie `Secure` flag fix (memory `project_e2e_infra`) exists specifically for WebKit, so that path deserves a run.
+  - `reporter: 'html'` auto-opens a browser and blocks a non-interactive run — pass `--reporter=line` when running from a script/agent.
+  - 5 tests remain **skipped** (seed-data-gated: the worklist sign-report and triage full-pipeline flows need cross-module events to have flowed).
 - Phase 16's styling was checked against the Track-4 gotcha *without* a live stack, by grepping the built CSS: `.hc-date-picker__*` rules emit as `.hc-date-picker__day[_ngcontent-%COMP%]` and every element they target is authored in `date-picker.html` (nothing is projected), so they match; `.hc-input`/`.hc-select` emit from the global `ui.css` bundle with **no** content attribute, so they style the picker's own input/selects. This rules out that specific bug class but is **not** a substitute for seeing it render.
 - The date-picker's timezone regression test is only meaningful in a negative-offset zone. `TZ` is unset in the Vitest config, so it passes vacuously on a UTC CI box — **pin `TZ` in the test config** if the suite ever runs in CI.
 - The **shadcn MCP server was not connected** during Track 4; the three primitives were blueprinted from the documented shadcn anatomy/a11y contracts instead (the same contracts the MCP returns). Re-run `mcp__shadcn__get_audit_checklist` against `avatar`/`breadcrumb`/`command` if the server comes back.

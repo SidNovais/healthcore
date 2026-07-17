@@ -78,7 +78,7 @@
     <hc-dialog
       [open]="activeRejectItemId() !== null"
       (openChange)="onRejectDialogOpenChange($event)"
-      data-testid="reject-dialog"
+      testId="reject-dialog"
     >
       @if (activeRejectItemId(); as itemId) {
         <div data-testid="reject-reason-form" class="reason-form">
@@ -108,7 +108,7 @@
     <hc-dialog
       [open]="activeOnHoldItemId() !== null"
       (openChange)="onOnHoldDialogOpenChange($event)"
-      data-testid="on-hold-dialog"
+      testId="on-hold-dialog"
     >
       @if (activeOnHoldItemId(); as itemId) {
         <div data-testid="on-hold-reason-form" class="reason-form">

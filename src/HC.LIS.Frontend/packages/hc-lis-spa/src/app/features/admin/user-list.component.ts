@@ -112,11 +112,30 @@ export class UserListComponent implements OnInit {
       return;
     }
     this.pendingRoleChange.set(null);
-    await this.service.changeRole(pending.userId, pending.newRole);
+
+    // The API refuses some changes outright — a user who has not activated their
+    // account cannot be reassigned. Without this catch the rejection escaped, the
+    // dialog closed, and a failed change looked exactly like a successful one.
+    try {
+      await this.service.changeRole(pending.userId, pending.newRole);
+    } catch (error) {
+      this.toast.show(`Could not change the role. ${this.reasonFor(error)}`, {
+        variant: 'error',
+        testId: 'role-change-error-toast',
+      });
+      return;
+    }
+
     this.toast.show(`Role updated to ${this.roleLabel(pending.newRole)}.`, {
       variant: 'success',
       testId: 'role-change-toast',
     });
+  }
+
+  /** The server's explanation when it sent one, so the toast says how to move forward. */
+  private reasonFor(error: unknown): string {
+    const message = error instanceof Error ? error.message.trim() : '';
+    return message.length > 0 ? message : 'Please try again.';
   }
 
   protected cancelRoleChange(): void {

@@ -51,7 +51,7 @@
       }
     </div>
 
-    <hc-dialog [(open)]="showAnonymizeConfirm" data-testid="anonymize-dialog">
+    <hc-dialog [(open)]="showAnonymizeConfirm" testId="anonymize-dialog">
       @if (showAnonymizeConfirm()) {
         <div class="anonymize-dialog-body">
           <h3 class="anonymize-dialog-title">Anonymize {{ patient.fullName }}?</h3>

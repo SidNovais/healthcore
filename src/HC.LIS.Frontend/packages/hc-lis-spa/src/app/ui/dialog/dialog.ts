@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   afterRenderEffect,
+  input,
   model,
   viewChild,
 } from '@angular/core';
@@ -19,6 +20,12 @@ import {
 })
 export class HcDialog {
   readonly open = model(false);
+  /**
+   * Rendered on the <dialog> panel, not the host. The host box is 0x0 — it is
+   * display:inline and its only child is position:fixed — so a testid there is
+   * never "visible" to a browser-driven test even when the dialog is on screen.
+   */
+  readonly testId = input<string | undefined>(undefined);
 
   private readonly dialogRef = viewChild.required<ElementRef<HTMLDialogElement>>('dlg');
 

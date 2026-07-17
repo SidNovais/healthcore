@@ -1,3 +1,9 @@
-<dialog #dlg class="hc-sheet" [attr.aria-label]="ariaLabel()" (close)="onNativeClose()">
+<dialog
+  #dlg
+  class="hc-sheet"
+  [attr.aria-label]="ariaLabel()"
+  [attr.data-testid]="testId()"
+  (close)="onNativeClose()"
+>
   <ng-content />
 </dialog>

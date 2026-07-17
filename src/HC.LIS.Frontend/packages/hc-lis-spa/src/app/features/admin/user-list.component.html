@@ -6,7 +6,7 @@
     </button>
   </div>
 
-  <hc-dialog [(open)]="showCreateForm" data-testid="create-user-dialog">
+  <hc-dialog [(open)]="showCreateForm" testId="create-user-dialog">
     @if (showCreateForm()) {
       <app-create-user-form (close)="showCreateForm.set(false)" />
     }
@@ -102,7 +102,7 @@
     }
   }
 
-  <hc-dialog [(open)]="roleDialogOpen" data-testid="role-change-dialog">
+  <hc-dialog [(open)]="roleDialogOpen" testId="role-change-dialog">
     @if (pendingRoleChange(); as pending) {
       <div class="role-dialog">
         <h3 class="role-dialog__title">Change role</h3>
