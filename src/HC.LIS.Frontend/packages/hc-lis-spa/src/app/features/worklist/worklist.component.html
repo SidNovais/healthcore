@@ -77,7 +77,7 @@
                 <td>{{ item.examCode }}</td>
                 <td data-testid="patient-name-cell">{{ item.patientName ?? item.patientId }}</td>
                 <td><hc-badge variant="accent">{{ item.status }}</hc-badge></td>
-                <td class="tabular-nums">{{ item.createdAt | slice: 0 : 10 }}</td>
+                <td class="tabular-nums">{{ item.createdAt | hcDateTime }}</td>
                 <td class="actions-col" (click)="$event.stopPropagation()">
                   <hc-dropdown-menu testId="worklist-actions" ariaLabel="Worklist item actions">
                     <button

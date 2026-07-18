@@ -1,9 +1,9 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { SlicePipe } from '@angular/common';
 import { WorklistService } from './worklist.service';
 import { WorklistItemDetailComponent } from './worklist-item-detail.component';
 import { HcBadge } from '../../ui/badge/badge';
 import { HcButton } from '../../ui/button/button';
+import { HcDateTimePipe } from '../../ui/date/hc-datetime.pipe';
 import { HcEmpty } from '../../ui/empty/empty';
 import { HcIcon } from '../../ui/icon/icon';
 import { HcPage } from '../../ui/page/page';
@@ -27,9 +27,9 @@ const PAGE_SIZE = 10;
   standalone: true,
   imports: [
     WorklistItemDetailComponent,
-    SlicePipe,
     HcBadge,
     HcButton,
+    HcDateTimePipe,
     HcEmpty,
     HcIcon,
     HcPage,

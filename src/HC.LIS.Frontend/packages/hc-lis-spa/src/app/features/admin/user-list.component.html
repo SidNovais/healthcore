@@ -86,7 +86,7 @@
             <td>
               <hc-badge [variant]="user.status === 'Active' ? 'success' : 'neutral'">{{ user.status }}</hc-badge>
             </td>
-            <td class="tabular-nums">{{ user.createdAt | slice: 0 : 10 }}</td>
+            <td class="tabular-nums">{{ user.createdAt | hcDateTime }}</td>
           </tr>
         }
       </tbody>

@@ -5,6 +5,7 @@ import { gsap } from 'gsap';
 import { PatientsService } from '../../core/application/patients.service';
 import { HcBadge } from '../../ui/badge/badge';
 import { HcButton } from '../../ui/button/button';
+import { HcDatePipe } from '../../ui/date/hc-date.pipe';
 import { HcEmpty } from '../../ui/empty/empty';
 import { HcIcon } from '../../ui/icon/icon';
 import { HcInput } from '../../ui/input/input';
@@ -31,6 +32,7 @@ const PAGE_SIZE = 10;
     FormsModule,
     HcBadge,
     HcButton,
+    HcDatePipe,
     HcEmpty,
     HcIcon,
     HcInput,

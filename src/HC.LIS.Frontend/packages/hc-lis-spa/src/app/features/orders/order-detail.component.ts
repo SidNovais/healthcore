@@ -8,6 +8,7 @@ import { HcBadge, type HcBadgeVariant } from '../../ui/badge/badge';
 import { type HcBreadcrumbItem } from '../../ui/breadcrumb/breadcrumb';
 import { HcButton } from '../../ui/button/button';
 import { HcCard, HcCardContent } from '../../ui/card/card';
+import { HcDateTimePipe } from '../../ui/date/hc-datetime.pipe';
 import { HcPage } from '../../ui/page/page';
 import { HcDialog } from '../../ui/dialog/dialog';
 import {
@@ -45,6 +46,7 @@ const STATUS_VARIANTS: Record<string, HcBadgeVariant> = {
     HcButton,
     HcCard,
     HcCardContent,
+    HcDateTimePipe,
     HcDialog,
     HcDropdownMenu,
     HcDropdownMenuTrigger,

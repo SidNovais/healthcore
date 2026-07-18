@@ -3,7 +3,7 @@
     <div class="card-info">
       <span class="patient-name">{{ patient.fullName }}</span>
       <span class="patient-meta">
-        {{ patient.dateOfBirth }}
+        {{ patient.dateOfBirth | hcDate }}
         @if (patient.documentId) {
           · {{ patient.documentId }}
         }

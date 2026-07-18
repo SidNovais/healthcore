@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { gsap } from 'gsap';
 import { OrdersService } from './orders.service';
 import { HcBadge } from '../../ui/badge/badge';
+import { HcDateTimePipe } from '../../ui/date/hc-datetime.pipe';
 import { HcEmpty } from '../../ui/empty/empty';
 import { HcSkeleton } from '../../ui/skeleton/skeleton';
 import { HcTable } from '../../ui/table/table';
@@ -28,6 +29,7 @@ const PAGE_SIZE = 10;
   imports: [
     RouterLink,
     HcBadge,
+    HcDateTimePipe,
     HcEmpty,
     HcPage,
     HcSkeleton,

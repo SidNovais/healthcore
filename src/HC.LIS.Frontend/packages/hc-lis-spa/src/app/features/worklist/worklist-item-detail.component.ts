@@ -1,5 +1,4 @@
 import { Component, Input, inject, signal } from '@angular/core';
-import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { WorklistService } from './worklist.service';
 import { AuthService } from '../../core/application/auth.service';
@@ -7,6 +6,7 @@ import type { WorklistItemDetails } from '../../core/domain/worklist-item-detail
 import { HcAlert } from '../../ui/alert/alert';
 import { HcBadge } from '../../ui/badge/badge';
 import { HcButton } from '../../ui/button/button';
+import { HcDatePipe } from '../../ui/date/hc-date.pipe';
 import { HcField } from '../../ui/field/field';
 import { HcInput } from '../../ui/input/input';
 import { HcLabel } from '../../ui/input/label';
@@ -15,7 +15,7 @@ import { HcTable } from '../../ui/table/table';
 @Component({
   selector: 'app-worklist-item-detail',
   standalone: true,
-  imports: [FormsModule, DatePipe, HcAlert, HcBadge, HcButton, HcField, HcInput, HcLabel, HcTable],
+  imports: [FormsModule, HcAlert, HcBadge, HcButton, HcDatePipe, HcField, HcInput, HcLabel, HcTable],
   templateUrl: './worklist-item-detail.component.html',
   styleUrl: './worklist-item-detail.component.css',
 })

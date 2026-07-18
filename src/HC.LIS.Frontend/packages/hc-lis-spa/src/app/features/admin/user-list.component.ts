@@ -1,12 +1,12 @@
 // src/app/features/admin/user-list.component.ts
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { SlicePipe } from '@angular/common';
 import { UsersService } from './users.service';
 import { CreateUserFormComponent } from './create-user-form.component';
 import type { UserSummary } from '../../core/domain/user-summary';
 import type { UserRole } from '../../core/domain/user-session';
 import { HcBadge } from '../../ui/badge/badge';
 import { HcButton } from '../../ui/button/button';
+import { HcDateTimePipe } from '../../ui/date/hc-datetime.pipe';
 import { HcDialog } from '../../ui/dialog/dialog';
 import {
   HcDropdownMenu,
@@ -40,9 +40,9 @@ const PAGE_SIZE = 10;
   standalone: true,
   imports: [
     CreateUserFormComponent,
-    SlicePipe,
     HcBadge,
     HcButton,
+    HcDateTimePipe,
     HcDialog,
     HcDropdownMenu,
     HcDropdownMenuTrigger,

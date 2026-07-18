@@ -87,7 +87,7 @@
                 {{ item.orderPriority }}
               </hc-badge>
             </td>
-            <td class="tabular-nums">{{ item.requestedAt }}</td>
+            <td class="tabular-nums">{{ item.requestedAt | hcDateTime }}</td>
             <td class="num-col tabular-nums">{{ item.itemCount }}</td>
             <td class="actions-col" (click)="$event.stopPropagation()">
               <hc-dropdown-menu testId="order-actions" ariaLabel="Order actions">

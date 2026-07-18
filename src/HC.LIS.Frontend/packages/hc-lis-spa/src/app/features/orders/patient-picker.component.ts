@@ -2,11 +2,12 @@ import { Component, OnDestroy, computed, inject, output, signal } from '@angular
 import { PATIENTS_PORT } from '../../core/application/i-patients-port';
 import type { PatientSearchResult } from '../../core/domain/patient-search-result';
 import { HcCombobox, type HcComboboxOption } from '../../ui/combobox/combobox';
+import { HcDatePipe } from '../../ui/date/hc-date.pipe';
 
 @Component({
   selector: 'app-patient-picker',
   standalone: true,
-  imports: [HcCombobox],
+  imports: [HcCombobox, HcDatePipe],
   templateUrl: './patient-picker.component.html',
   styleUrl: './patient-picker.component.css',
 })

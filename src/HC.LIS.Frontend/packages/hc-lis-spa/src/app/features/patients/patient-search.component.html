@@ -84,7 +84,7 @@
             (click)="onRowClick(patient.id)"
           >
             <td>{{ patient.fullName }}</td>
-            <td class="tabular-nums">{{ patient.dateOfBirth }}</td>
+            <td class="tabular-nums">{{ patient.dateOfBirth | hcDate }}</td>
             <td>{{ patient.documentId ?? '—' }}</td>
             <td>
               <hc-badge [variant]="patient.status === 'Active' ? 'success' : 'neutral'">

@@ -7,7 +7,7 @@
   <div class="row">
     <div class="info">
       <span class="patient-id mono">{{ item().patientId | slice: 0 : 8 }}…</span>
-      <span class="meta">{{ timestampLabel() }} · {{ item().arrivedAt | slice: 11 : 16 }}</span>
+      <span class="meta">{{ timestampLabel() }} · {{ item().arrivedAt | hcDateTime }}</span>
     </div>
     <hc-badge [variant]="statusVariant()">{{ item().status }}</hc-badge>
 

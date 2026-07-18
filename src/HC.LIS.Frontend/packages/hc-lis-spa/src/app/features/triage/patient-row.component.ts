@@ -4,6 +4,7 @@ import type { CollectionRequestSummary } from '../../core/domain/collection-requ
 import type { SampleSummary } from '../../core/domain/sample-summary';
 import { HcBadge, type HcBadgeVariant } from '../../ui/badge/badge';
 import { HcButton } from '../../ui/button/button';
+import { HcDateTimePipe } from '../../ui/date/hc-datetime.pipe';
 import { HcIcon } from '../../ui/icon/icon';
 
 const STATUS_VARIANTS: Record<string, HcBadgeVariant> = {
@@ -15,7 +16,7 @@ const STATUS_VARIANTS: Record<string, HcBadgeVariant> = {
 @Component({
   selector: 'app-patient-row',
   standalone: true,
-  imports: [SlicePipe, NgClass, HcBadge, HcButton, HcIcon],
+  imports: [SlicePipe, NgClass, HcBadge, HcButton, HcDateTimePipe, HcIcon],
   templateUrl: './patient-row.component.html',
   styleUrl: './patient-row.component.css',
 })

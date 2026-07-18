@@ -10,12 +10,14 @@ import { HcBadge } from '../../ui/badge/badge';
 import { HcBreadcrumb, type HcBreadcrumbItem } from '../../ui/breadcrumb/breadcrumb';
 import { HcButton } from '../../ui/button/button';
 import { HcCard } from '../../ui/card/card';
+import { HcDatePipe } from '../../ui/date/hc-date.pipe';
+import { HcDateTimePipe } from '../../ui/date/hc-datetime.pipe';
 import { HcDialog } from '../../ui/dialog/dialog';
 
 @Component({
   selector: 'app-patient-detail',
   standalone: true,
-  imports: [PatientFormComponent, HcAlert, HcBadge, HcBreadcrumb, HcButton, HcCard, HcDialog],
+  imports: [PatientFormComponent, HcAlert, HcBadge, HcBreadcrumb, HcButton, HcCard, HcDatePipe, HcDateTimePipe, HcDialog],
   templateUrl: './patient-detail.component.html',
   styleUrl: './patient-detail.component.css',
 })

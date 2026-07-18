@@ -21,7 +21,7 @@
     <hc-card class="patient-card">
       <dl class="patient-fields">
         <dt>Date of Birth</dt>
-        <dd class="tabular-nums">{{ patient.dateOfBirth }}</dd>
+        <dd class="tabular-nums">{{ patient.dateOfBirth | hcDate }}</dd>
         <dt>Gender</dt>
         <dd>{{ patient.gender ?? '—' }}</dd>
         <dt>Mother's Full Name</dt>
@@ -33,7 +33,7 @@
         <dt>Email</dt>
         <dd>{{ patient.email ?? '—' }}</dd>
         <dt>Registered At</dt>
-        <dd class="tabular-nums">{{ patient.registeredAt }}</dd>
+        <dd class="tabular-nums">{{ patient.registeredAt | hcDateTime }}</dd>
       </dl>
     </hc-card>
 
