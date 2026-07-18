@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { OrdersService } from './orders.service';
 import { ORDERS_PORT, IOrdersPort } from '../../core/application/i-orders-port';
+import { RealtimeClient } from '../../core/infrastructure/realtime/realtime-client';
 import type { OrderSummary } from '../../core/domain/order-summary';
 import type { OrderListItem } from '../../core/domain/order-list-item';
 import type { OrderDetails } from '../../core/domain/order-details';
@@ -8,6 +9,7 @@ import type { OrderDetails } from '../../core/domain/order-details';
 describe('OrdersService', () => {
   let service: OrdersService;
   let mockPort: IOrdersPort;
+  let ordersHandler: (payload: unknown) => void;
 
   const createdOrder: OrderSummary = { orderId: 'order-uuid-1', patientId: 'patient-uuid-1' };
 
@@ -42,8 +44,19 @@ describe('OrdersService', () => {
       placeExamOnHold: vi.fn(),
     };
 
+    const realtimeStub = {
+      on: vi.fn((topic: string, handler: (p: unknown) => void) => {
+        if (topic === 'orders') ordersHandler = handler;
+        return () => undefined;
+      }),
+    };
+
     TestBed.configureTestingModule({
-      providers: [OrdersService, { provide: ORDERS_PORT, useValue: mockPort }],
+      providers: [
+        OrdersService,
+        { provide: ORDERS_PORT, useValue: mockPort },
+        { provide: RealtimeClient, useValue: realtimeStub },
+      ],
     });
 
     service = TestBed.inject(OrdersService);
@@ -198,6 +211,98 @@ describe('OrdersService', () => {
     await service.placeExamOnHold('order-uuid-1', 'item-uuid-1', 'Awaiting reagent');
 
     expect(mockPort.placeExamOnHold).toHaveBeenCalledWith('order-uuid-1', 'item-uuid-1', 'Awaiting reagent');
+  });
+
+  it('subscribes to the orders topic on construction', () => {
+    expect(ordersHandler).toBeDefined();
+  });
+
+  it('applyExamStatus patches the matching exam item in place', () => {
+    service.orderDetails.set({
+      ...sampleOrderDetails,
+      items: [
+        { orderItemId: 'oi-1', specimenMnemonic: 'SER', materialType: 'Serum', containerType: 'Tube', additive: '', processingType: '', storageCondition: '', reasonForRejection: null, status: 'Requested', requestedAt: '2026-05-11T00:00:00Z', canceledAt: null, onHoldAt: null, acceptedAt: null, rejectedAt: null, inProgressAt: null, partiallyCompletedAt: null, completedAt: null },
+        { orderItemId: 'oi-2', specimenMnemonic: 'SER', materialType: 'Serum', containerType: 'Tube', additive: '', processingType: '', storageCondition: '', reasonForRejection: null, status: 'Requested', requestedAt: '2026-05-11T00:00:00Z', canceledAt: null, onHoldAt: null, acceptedAt: null, rejectedAt: null, inProgressAt: null, partiallyCompletedAt: null, completedAt: null },
+      ],
+    });
+
+    service.applyExamStatus('oi-2', 'Canceled');
+
+    const items = service.orderDetails()!.items;
+    expect(items.find((i) => i.orderItemId === 'oi-2')!.status).toBe('Canceled');
+    expect(items.find((i) => i.orderItemId === 'oi-1')!.status).toBe('Requested');
+  });
+
+  it('applyExamStatus is a no-op when no order detail is loaded', () => {
+    service.applyExamStatus('oi-1', 'Canceled');
+    expect(service.orderDetails()).toBeNull();
+  });
+
+  it('applies a status frame pushed over the live feed', () => {
+    service.orderDetails.set({
+      ...sampleOrderDetails,
+      items: [
+        { orderItemId: 'oi-1', specimenMnemonic: 'SER', materialType: 'Serum', containerType: 'Tube', additive: '', processingType: '', storageCondition: '', reasonForRejection: null, status: 'Requested', requestedAt: '2026-05-11T00:00:00Z', canceledAt: null, onHoldAt: null, acceptedAt: null, rejectedAt: null, inProgressAt: null, partiallyCompletedAt: null, completedAt: null },
+      ],
+    });
+
+    ordersHandler({ op: 'status', scope: 'exam', orderItemId: 'oi-1', status: 'Accepted' });
+
+    expect(service.orderDetails()!.items[0].status).toBe('Accepted');
+  });
+
+  it('ignores live frames it does not understand', () => {
+    service.orderDetails.set({
+      ...sampleOrderDetails,
+      items: [
+        { orderItemId: 'oi-1', specimenMnemonic: 'SER', materialType: 'Serum', containerType: 'Tube', additive: '', processingType: '', storageCondition: '', reasonForRejection: null, status: 'Requested', requestedAt: '2026-05-11T00:00:00Z', canceledAt: null, onHoldAt: null, acceptedAt: null, rejectedAt: null, inProgressAt: null, partiallyCompletedAt: null, completedAt: null },
+      ],
+    });
+
+    ordersHandler({ op: 'noise' });
+
+    expect(service.orderDetails()!.items[0].status).toBe('Requested');
+  });
+
+  it('add (order) prepends a newly created order to the list', () => {
+    service.orderList.set([sampleOrderListItem]);
+    const newRow = { ...sampleOrderListItem, orderId: 'order-uuid-2', itemCount: 0 };
+
+    ordersHandler({ op: 'add', scope: 'order', entity: newRow });
+
+    expect(service.orderList().map((o) => o.orderId)).toEqual(['order-uuid-2', 'order-uuid-1']);
+  });
+
+  it('add (order) does not duplicate an order already in the list', () => {
+    service.orderList.set([sampleOrderListItem]);
+
+    ordersHandler({ op: 'add', scope: 'order', entity: sampleOrderListItem });
+
+    expect(service.orderList()).toHaveLength(1);
+  });
+
+  it('item-added increments the item count on the matching order-list row', () => {
+    service.orderList.set([sampleOrderListItem]); // itemCount starts at 2
+
+    ordersHandler({
+      op: 'item-added',
+      orderId: 'order-uuid-1',
+      item: { orderItemId: 'oi-9', specimenMnemonic: 'SER', materialType: 'Serum', containerType: 'Tube', additive: '', processingType: '', storageCondition: '', reasonForRejection: null, status: 'Requested', requestedAt: '2026-05-11T00:00:00Z', canceledAt: null, onHoldAt: null, acceptedAt: null, rejectedAt: null, inProgressAt: null, partiallyCompletedAt: null, completedAt: null },
+    });
+
+    expect(service.orderList()[0].itemCount).toBe(3);
+  });
+
+  it('item-added appends the exam item when its order detail is open', () => {
+    service.orderDetails.set({ ...sampleOrderDetails, items: [] });
+
+    ordersHandler({
+      op: 'item-added',
+      orderId: 'order-uuid-1',
+      item: { orderItemId: 'oi-9', specimenMnemonic: 'SER', materialType: 'Serum', containerType: 'Tube', additive: '', processingType: '', storageCondition: '', reasonForRejection: null, status: 'Requested', requestedAt: '2026-05-11T00:00:00Z', canceledAt: null, onHoldAt: null, acceptedAt: null, rejectedAt: null, inProgressAt: null, partiallyCompletedAt: null, completedAt: null },
+    });
+
+    expect(service.orderDetails()!.items.map((i) => i.orderItemId)).toEqual(['oi-9']);
   });
 
 });

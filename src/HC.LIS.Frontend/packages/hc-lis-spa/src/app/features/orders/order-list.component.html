@@ -77,6 +77,7 @@
         @for (item of pagedOrders(); track item.orderId) {
           <tr
             data-testid="order-list-row"
+            [attr.data-order-id]="item.orderId"
             [routerLink]="['/orders', item.orderId]"
             class="order-row"
           >

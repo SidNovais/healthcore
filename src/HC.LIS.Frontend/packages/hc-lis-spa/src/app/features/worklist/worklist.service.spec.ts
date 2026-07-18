@@ -1,12 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { WorklistService } from './worklist.service';
 import { WORKLIST_PORT, IWorklistPort } from '../../core/application/i-worklist-port';
+import { RealtimeClient } from '../../core/infrastructure/realtime/realtime-client';
 import type { WorklistItemSummary } from '../../core/domain/worklist-item-summary';
 import type { WorklistItemDetails } from '../../core/domain/worklist-item-details';
 
 describe('WorklistService', () => {
   let service: WorklistService;
   let mockPort: IWorklistPort;
+  let worklistHandler: (payload: unknown) => void;
 
   const summaryItems: WorklistItemSummary[] = [
     { id: 'wi-1', sampleBarcode: 'BC-001', examCode: 'HGB', patientId: 'p-1', patientName: 'Ana Souza', patientDateOfBirth: '1990-01-01', patientGender: 'Female', status: 'InProgress', createdAt: '2026-05-05T08:00:00Z' },
@@ -39,14 +41,48 @@ describe('WorklistService', () => {
       signReport: vi.fn(),
     };
 
+    const realtimeStub = {
+      on: vi.fn((topic: string, handler: (p: unknown) => void) => {
+        if (topic === 'worklist') worklistHandler = handler;
+        return () => undefined;
+      }),
+    };
+
     TestBed.configureTestingModule({
       providers: [
         WorklistService,
         { provide: WORKLIST_PORT, useValue: mockPort },
+        { provide: RealtimeClient, useValue: realtimeStub },
       ],
     });
 
     service = TestBed.inject(WorklistService);
+  });
+
+  it('subscribes to the worklist topic on construction', () => {
+    expect(worklistHandler).toBeDefined();
+  });
+
+  it('add inserts a new item pushed over the live feed', () => {
+    worklistHandler({ op: 'add', entity: summaryItems[0] });
+
+    expect(service.items().map((i) => i.id)).toEqual(['wi-1']);
+  });
+
+  it('update patches the status of a loaded item', () => {
+    service.items.set([summaryItems[0]]);
+
+    worklistHandler({ op: 'update', id: 'wi-1', status: 'Completed' });
+
+    expect(service.items()[0].status).toBe('Completed');
+  });
+
+  it('remove drops a loaded item', () => {
+    service.items.set([...summaryItems]);
+
+    worklistHandler({ op: 'remove', id: 'wi-1' });
+
+    expect(service.items().map((i) => i.id)).toEqual(['wi-2']);
   });
 
   it('items signal starts as empty array', () => {

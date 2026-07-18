@@ -28,3 +28,22 @@ for (const name of ['localStorage', 'sessionStorage'] as const) {
     });
   }
 }
+
+// The DOM environment has no EventSource; RealtimeClient's default factory constructs one
+// whenever a component that brings up the live feed (e.g. the shell) is rendered under test.
+// A no-op stub keeps those component tests from crashing. Specs that assert on the live feed
+// inject their own EVENT_SOURCE_FACTORY and never hit this.
+if (typeof (globalThis as Record<string, unknown>)['EventSource'] === 'undefined') {
+  class StubEventSource {
+    onopen: (() => void) | null = null;
+    onerror: (() => void) | null = null;
+    addEventListener(): void {}
+    removeEventListener(): void {}
+    close(): void {}
+  }
+  Object.defineProperty(globalThis, 'EventSource', {
+    value: StubEventSource,
+    writable: true,
+    configurable: true,
+  });
+}

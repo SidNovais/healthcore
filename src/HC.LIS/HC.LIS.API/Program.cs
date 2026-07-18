@@ -26,6 +26,8 @@ using HC.LIS.API.Modules.UserAccess.AuditLog;
 using HC.LIS.API.Modules.UserAccess.Users;
 using HC.LIS.Modules.UserAccess.Infrastructure.Configurations;
 using HC.LIS.API.Configuration.EventBus;
+using HC.LIS.API.Configuration.RealTime;
+using HC.Core.Infrastructure.RealTime;
 using HC.LIS.API.Modules.PatientManagement;
 using HC.LIS.API.Modules.PatientManagement.Patients;
 using HC.LIS.Modules.PatientManagement.Infrastructure.Configurations;
@@ -106,6 +108,7 @@ try
     // ─── Services ──────────────────────────────────────────────────────────
     builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
     builder.Services.AddSingleton<IExecutionContextAccessor, ExecutionContextAccessor>();
+    builder.Services.AddSingleton<IUiNotificationHub, UiNotificationHub>();
 
     builder.Services.AddHcLisJwtCookieAuthentication(builder.Configuration);
     builder.Services.AddAuthorization(options =>
@@ -161,6 +164,10 @@ try
     UserAccessStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: busProvider.UserAccess);
     PatientManagementStartup.Initialize(connectionString, executionContext, Log.Logger, eventBus: busProvider.PatientManagement);
 
+    // Relay integration events to connected browsers over SSE. Must be wired before StartConsuming().
+    UiNotificationTranslator.Subscribe(
+        busProvider.UiNotifications, app.Services.GetRequiredService<IUiNotificationHub>());
+
     busProvider.StartConsuming();
 
     // ─── Middleware pipeline ────────────────────────────────────────────────
@@ -199,6 +206,7 @@ try
     v1.MapGroup("users").MapUsersEndpoints();
     v1.MapGroup("audit-log").MapAuditLogEndpoints();
     v1.MapGroup("patients").MapPatientsEndpoints();
+    v1.MapGroup("events").MapEventStreamEndpoints();
 
     await app.RunAsync().ConfigureAwait(false);
 }

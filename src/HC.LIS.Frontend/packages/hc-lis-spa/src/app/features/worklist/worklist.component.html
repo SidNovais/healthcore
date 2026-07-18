@@ -1,15 +1,4 @@
 <hc-page title="Doctor Worklist" width="full" testId="worklist">
-  <button
-    hc-page-actions
-    hc-button
-    variant="ghost"
-    size="sm"
-    data-testid="refresh-btn"
-    (click)="refresh()"
-  >
-    <hc-icon name="refresh" [size]="15" /> Refresh
-  </button>
-
   <div class="worklist-layout">
     <div class="worklist-table-container">
       @if (service.loading()) {
@@ -41,7 +30,7 @@
         <hc-empty
           data-testid="empty-state"
           title="No worklist items"
-          description="No worklist items found. Try refreshing."
+          description="No worklist items yet. New items appear here as samples are analyzed."
         />
       } @else {
         <table hc-table class="worklist-table">

@@ -1,0 +1,139 @@
+using System.Text.Json;
+using HC.Core.Infrastructure.EventBus;
+using HC.Core.Infrastructure.RealTime;
+using HC.LIS.Modules.LabAnalysis.IntegrationEvents;
+using HC.LIS.Modules.SampleCollection.IntegrationEvents;
+using HC.LIS.Modules.TestOrders.IntegrationEvents;
+
+namespace HC.LIS.API.Configuration.RealTime;
+
+/// <summary>
+/// Maps integration events into browser-ready <see cref="UiNotification"/>s and wires the UI
+/// consumer bus to relay them. Each mapping emits the minimal op the client needs (see the SSE
+/// contract): a status transition patches only the badge; a creation carries the full row.
+/// </summary>
+internal static class UiNotificationTranslator
+{
+    private static readonly JsonSerializerOptions s_json = new(JsonSerializerDefaults.Web);
+
+    internal static void Subscribe(IEventsBus bus, IUiNotificationHub hub)
+    {
+        ArgumentNullException.ThrowIfNull(bus);
+        ArgumentNullException.ThrowIfNull(hub);
+
+        // ── Orders: a new order joins the list; a requested exam bumps its count / detail ─────
+        Relay<OrderCreatedIntegrationEvent>(bus, hub, OrderAdded);
+        Relay<OrderItemRequestedIntegrationEvent>(bus, hub, OrderItemAdded);
+
+        // ── Orders: exam-item status transitions patch the order-detail row's badge ──────────
+        Relay<OrderItemAcceptedIntegrationEvent>(bus, hub, e => ExamStatus(e.OrderItemId, "Accepted"));
+        Relay<OrderItemCanceledIntegrationEvent>(bus, hub, e => ExamStatus(e.OrderItemId, "Canceled"));
+        Relay<OrderItemRejectedIntegrationEvent>(bus, hub, e => ExamStatus(e.OrderItemId, "Rejected"));
+        Relay<OrderItemPlacedOnHoldIntegrationEvent>(bus, hub, e => ExamStatus(e.OrderItemId, "OnHold"));
+        Relay<OrderItemPlacedInProgressIntegrationEvent>(bus, hub, e => ExamStatus(e.OrderItemId, "InProgress"));
+        Relay<OrderItemCompletedIntegrationEvent>(bus, hub, e => ExamStatus(e.OrderItemId, "Completed"));
+        Relay<OrderItemPartiallyCompletedIntegrationEvent>(bus, hub, e => ExamStatus(e.OrderItemId, "PartiallyCompleted"));
+
+        // ── Triage: collection-request queue transitions (arrived → waiting → called → done) ──
+        Relay<PatientArrivedIntegrationEvent>(bus, hub, e => TriageAdd(e.CollectionRequestId, e.PatientId, e.OccurredAt));
+        Relay<PatientWaitingIntegrationEvent>(bus, hub, e => TriageMove(e.CollectionRequestId, "waiting", "Waiting"));
+        Relay<PatientCalledIntegrationEvent>(bus, hub, e => TriageMove(e.CollectionRequestId, "called", "Called"));
+        Relay<SampleCollectedIntegrationEvent>(bus, hub, e => TriageRemove(e.CollectionRequestId));
+
+        // ── Worklist: a new item appears, then progresses through its status lifecycle ────────
+        Relay<WorklistItemCreatedIntegrationEvent>(bus, hub, WorklistAdd);
+        Relay<WorklistItemResultRecordedIntegrationEvent>(bus, hub, e => WorklistStatus(e.WorklistItemId, "ResultReceived"));
+        Relay<WorklistItemReportGeneratedIntegrationEvent>(bus, hub, e => WorklistStatus(e.WorklistItemId, "ReportGenerated"));
+        Relay<WorklistItemCompletedIntegrationEvent>(bus, hub, e => WorklistStatus(e.WorklistItemId, "Completed"));
+    }
+
+    private static void Relay<TEvent>(IEventsBus bus, IUiNotificationHub hub, Func<TEvent, UiNotification?> map)
+        where TEvent : IntegrationEvent =>
+        bus.Subscribe(new UiNotificationListener<TEvent>(hub, map));
+
+    // ── Payload builders ─────────────────────────────────────────────────────────────────────
+
+    internal static UiNotification ExamStatus(Guid orderItemId, string status) =>
+        new(UiTopics.Orders, Serialize(new { op = "status", scope = "exam", orderItemId, status }));
+
+    internal static UiNotification OrderAdded(OrderCreatedIntegrationEvent e) =>
+        new(UiTopics.Orders, Serialize(new
+        {
+            op = "add",
+            scope = "order",
+            entity = new
+            {
+                orderId = e.OrderId,
+                patientId = e.PatientId,
+                patientName = e.PatientName,
+                requestedBy = e.RequestedBy,
+                orderPriority = e.OrderPriority,
+                requestedAt = e.RequestedAt,
+                itemCount = 0,
+            },
+        }));
+
+    internal static UiNotification OrderItemAdded(OrderItemRequestedIntegrationEvent e) =>
+        new(UiTopics.Orders, Serialize(new
+        {
+            op = "item-added",
+            orderId = e.OrderId,
+            item = new
+            {
+                orderItemId = e.OrderItemId,
+                specimenMnemonic = e.SpecimenMnemonic,
+                materialType = e.MaterialType,
+                containerType = e.ContainerType,
+                additive = e.Additive,
+                processingType = e.ProcessingType,
+                storageCondition = e.StorageCondition,
+                reasonForRejection = (string?)null,
+                status = "Requested",
+                requestedAt = e.RequestedAt,
+                canceledAt = (DateTime?)null,
+                onHoldAt = (DateTime?)null,
+                acceptedAt = (DateTime?)null,
+                rejectedAt = (DateTime?)null,
+                inProgressAt = (DateTime?)null,
+                partiallyCompletedAt = (DateTime?)null,
+                completedAt = (DateTime?)null,
+            },
+        }));
+
+    internal static UiNotification TriageAdd(Guid collectionRequestId, Guid patientId, DateTime arrivedAt) =>
+        new(UiTopics.Triage, Serialize(new
+        {
+            op = "add",
+            queue = "arrived",
+            entity = new { collectionRequestId, patientId, status = "Arrived", arrivedAt },
+        }));
+
+    internal static UiNotification TriageMove(Guid collectionRequestId, string queue, string status) =>
+        new(UiTopics.Triage, Serialize(new { op = "move", queue, collectionRequestId, status }));
+
+    internal static UiNotification TriageRemove(Guid collectionRequestId) =>
+        new(UiTopics.Triage, Serialize(new { op = "remove", collectionRequestId }));
+
+    internal static UiNotification WorklistAdd(WorklistItemCreatedIntegrationEvent e) =>
+        new(UiTopics.Worklist, Serialize(new
+        {
+            op = "add",
+            entity = new
+            {
+                id = e.WorklistItemId,
+                sampleBarcode = e.SampleBarcode,
+                examCode = e.ExamCode,
+                patientId = e.PatientId,
+                patientName = e.PatientName,
+                patientDateOfBirth = e.PatientDateOfBirth,
+                patientGender = e.PatientGender,
+                status = "Pending",
+                createdAt = e.OccurredAt,
+            },
+        }));
+
+    internal static UiNotification WorklistStatus(Guid worklistItemId, string status) =>
+        new(UiTopics.Worklist, Serialize(new { op = "update", id = worklistItemId, status }));
+
+    private static string Serialize(object payload) => JsonSerializer.Serialize(payload, s_json);
+}

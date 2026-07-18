@@ -9,6 +9,19 @@ internal class PatientSnapshotRepository(ISqlConnectionFactory sqlConnectionFact
 {
     private readonly ISqlConnectionFactory _sqlConnectionFactory = sqlConnectionFactory;
 
+    public async Task<PatientSnapshotView?> GetByIdAsync(Guid patientId)
+    {
+        IDbConnection connection = _sqlConnectionFactory.GetConnection()
+            ?? throw new InvalidOperationException("Must exist connection to read patient snapshot");
+        const string sql = """
+            SELECT "FullName", "DateOfBirth", "Gender"
+            FROM "lab_analysis"."PatientSnapshotDetails"
+            WHERE "Id" = @PatientId
+            """;
+        return await connection.QuerySingleOrDefaultAsync<PatientSnapshotView>(
+            sql, new { PatientId = patientId }).ConfigureAwait(false);
+    }
+
     public async Task StoreAsync(
         Guid patientId,
         string fullName,

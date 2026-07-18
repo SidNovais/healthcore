@@ -19,8 +19,8 @@ test.describe('Doctor Worklist', () => {
   test.fixme('full sign-report workflow: refresh → row visible → click row → detail panel → sign report → confirmation', async ({ page }) => {
     await loginAsPhysician(page);
 
-    // Refresh to load items (requires seed data with a completed worklist item)
-    await page.getByTestId('refresh-btn').click();
+    // The list loads on navigation and updates live; reload to pull seeded items.
+    await page.reload();
     await expect(page.getByTestId('worklist-row').first()).toBeVisible({ timeout: 10_000 });
 
     // Assert patient name is not displayed as UUID

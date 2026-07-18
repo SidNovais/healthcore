@@ -4,8 +4,6 @@ import { PatientRowComponent } from './patient-row.component';
 import { PrintLabelsModalComponent } from './print-labels-modal.component';
 import type { SampleSummary } from '../../core/domain/sample-summary';
 import { HcAlert } from '../../ui/alert/alert';
-import { HcButton } from '../../ui/button/button';
-import { HcIcon } from '../../ui/icon/icon';
 import { HcEmpty } from '../../ui/empty/empty';
 import { HcPage } from '../../ui/page/page';
 import { HcTabs, HcTab } from '../../ui/tabs/tabs';
@@ -24,8 +22,6 @@ interface PrintModalRequest {
     PatientRowComponent,
     PrintLabelsModalComponent,
     HcAlert,
-    HcButton,
-    HcIcon,
     HcEmpty,
     HcPage,
     HcTabs,
@@ -71,7 +67,7 @@ export class TriageComponent implements OnInit {
     this.error.set(null);
     try {
       await this.service.moveToWaiting(id);
-      await Promise.all([this.service.loadArrived(), this.service.loadWaiting()]);
+      this.service.applyTriageChange({ op: 'move', queue: 'waiting', collectionRequestId: id, status: 'Waiting' });
     } catch {
       this.error.set('Failed to send patient to waiting room.');
     }
@@ -89,7 +85,7 @@ export class TriageComponent implements OnInit {
     this.error.set(null);
     try {
       await this.service.callPatient(id);
-      await Promise.all([this.service.loadWaiting(), this.service.loadCalled()]);
+      this.service.applyTriageChange({ op: 'move', queue: 'called', collectionRequestId: id, status: 'Called' });
     } catch {
       this.error.set('Failed to call patient.');
     }
@@ -109,7 +105,7 @@ export class TriageComponent implements OnInit {
     this.error.set(null);
     try {
       await this.service.recordCollection(collectionRequestId, { sampleId });
-      await this.service.loadCalled();
+      this.service.applyTriageChange({ op: 'remove', collectionRequestId });
     } catch {
       this.error.set('Failed to record collection.');
     }
