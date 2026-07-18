@@ -4,10 +4,13 @@ using System.Threading.Tasks;
 using HC.Core.Infrastructure.EventBus;
 using HC.LIS.Modules.TestOrders.Application.Orders.CancelExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.CompleteExam;
+using HC.LIS.Modules.TestOrders.Application.Orders.CreateOrder;
 using HC.LIS.Modules.TestOrders.Application.Orders.PartiallyCompleteExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.PlaceExamInProgress;
 using HC.LIS.Modules.TestOrders.Application.Orders.PlaceExamOnHold;
 using HC.LIS.Modules.TestOrders.Application.Orders.RejectExam;
+using HC.LIS.Modules.TestOrders.Application.Orders.RequestExam;
+using HC.LIS.Modules.TestOrders.Application.Patients;
 using HC.LIS.Modules.TestOrders.Domain.Orders.Events;
 using HC.LIS.Modules.TestOrders.IntegrationEvents;
 using NSubstitute;
@@ -18,6 +21,41 @@ public sealed class OrdersPublishEventHandlersTests
 {
     private readonly IEventsBus _bus = Substitute.For<IEventsBus>();
     private readonly Guid _itemId = Guid.NewGuid();
+    private readonly Guid _orderId = Guid.NewGuid();
+
+    [Fact]
+    public async Task CreatedHandlerEnrichesTheEventWithThePatientName()
+    {
+        var patients = Substitute.For<IPatientSnapshotRepository>();
+        var patientId = Guid.NewGuid();
+        patients.GetFullNameByIdAsync(patientId).Returns("Maria Silva");
+        var sut = new OrderCreatedPublishEventNotificationHandler(_bus, patients);
+
+        await sut.Handle(
+            new OrderCreatedNotification(
+                new OrderCreatedDomainEvent(_orderId, patientId, Guid.NewGuid(), "Routine", DateTime.UtcNow), Guid.NewGuid()),
+            CancellationToken.None).ConfigureAwait(true);
+
+        await _bus.Received(1).Publish(Arg.Is<OrderCreatedIntegrationEvent>(
+            e => e.OrderId == _orderId && e.PatientName == "Maria Silva" && e.OrderPriority == "Routine"))
+            .ConfigureAwait(true);
+    }
+
+    [Fact]
+    public async Task RequestedHandlerPublishesIntegrationEventWithOrderAndItem()
+    {
+        var sut = new ExamRequestedPublishEventNotificationHandler(_bus);
+
+        await sut.Handle(
+            new ExamRequestedNotification(
+                new OrderItemRequestedDomainEvent(
+                    _itemId, _orderId, "GLU", "SER", "Serum", "RedTop", "None", "Centrifuge", "RoomTemp", DateTime.UtcNow),
+                Guid.NewGuid()),
+            CancellationToken.None).ConfigureAwait(true);
+
+        await _bus.Received(1).Publish(Arg.Is<OrderItemRequestedIntegrationEvent>(
+            e => e.OrderId == _orderId && e.OrderItemId == _itemId)).ConfigureAwait(true);
+    }
 
     [Fact]
     public async Task CanceledHandlerPublishesIntegrationEventWithOrderItemId()
