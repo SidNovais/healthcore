@@ -1,8 +1,4 @@
 <hc-page title="Triage" width="wide" testId="triage">
-  <button hc-page-actions hc-button variant="ghost" size="sm" (click)="refresh()">
-    <hc-icon name="refresh" [size]="15" /> Refresh
-  </button>
-
   <hc-tabs class="filter-bar" [value]="activeFilter()" (valueChange)="setFilter($event)" aria-label="Filter patients by status">
     <button hc-tab value="All" data-testid="filter-tab-all">
       All <span class="count">{{ totalCount() }}</span>
