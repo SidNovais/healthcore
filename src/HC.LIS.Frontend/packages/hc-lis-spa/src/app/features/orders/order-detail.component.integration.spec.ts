@@ -60,6 +60,7 @@ describe('OrderDetailComponent (integration)', () => {
       cancelExam: vi.fn().mockResolvedValue(undefined),
       rejectExam: vi.fn().mockResolvedValue(undefined),
       placeExamOnHold: vi.fn().mockResolvedValue(undefined),
+      applyExamStatus: vi.fn(),
     };
 
     mockToast = { show: vi.fn() };
@@ -176,7 +177,7 @@ describe('OrderDetailComponent (integration)', () => {
     expect(mockToast.show).toHaveBeenCalledWith('Exam accepted', expect.objectContaining({ variant: 'success' }));
   });
 
-  it('clicking Accept reloads order details', async () => {
+  it('clicking Accept optimistically patches the item status without a reload', async () => {
     detailsSignal.set({ ...baseOrder, items: [requestedItem] });
     fixture.detectChanges();
     openActionsMenu();
@@ -184,7 +185,9 @@ describe('OrderDetailComponent (integration)', () => {
     (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('[data-testid="accept-btn"]')!.click();
     await fixture.whenStable();
 
-    expect(mockService.loadOrderDetails).toHaveBeenCalledTimes(2);
+    expect(mockService.applyExamStatus).toHaveBeenCalledWith('item-1', 'Accepted');
+    // Init-only load; the live feed carries subsequent changes, so no post-action re-fetch.
+    expect(mockService.loadOrderDetails).toHaveBeenCalledTimes(1);
   });
 
   it('selecting Reject opens the reject-reason-form in a dialog', () => {
