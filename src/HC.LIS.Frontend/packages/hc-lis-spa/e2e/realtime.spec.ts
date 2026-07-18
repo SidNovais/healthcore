@@ -110,4 +110,40 @@ test.describe('Real-time feed — cross-session updates', () => {
       await actorContext.close();
     }
   });
+
+  test('a new order and its item count appear live in the orders list', async ({ browser }) => {
+    const watcherContext = await browser.newContext();
+    const actorContext = await browser.newContext();
+    const watcher = await watcherContext.newPage();
+    const actor = await actorContext.newPage();
+
+    try {
+      await loginAsReceptionist(actor);
+      await loginAsReceptionist(watcher);
+
+      // Watcher observes the orders list with a live feed.
+      await watcher.goto('/orders');
+      await expect(watcher.getByTestId('order-list-table')).toBeVisible({ timeout: 5_000 });
+      await expect(watcher.getByTestId('live-indicator'))
+        .toHaveAttribute('data-status', 'live', { timeout: 10_000 });
+
+      // Actor creates an order and requests one exam.
+      await pickSeedPatient(actor);
+      await actor.getByTestId('create-order-submit-btn').click();
+      await expect(actor.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
+      const orderId = (await actor.locator('.order-id').textContent())!.trim();
+      await actor.getByTestId('exam-mnemonic-input').fill('GLU');
+      await actor.getByTestId('container-type-input').fill('RedTop');
+      await actor.getByTestId('request-exam-btn').click();
+      await expect(actor.getByTestId('exam-added-confirmation')).toBeVisible({ timeout: 5_000 });
+
+      // The new order appears in the watcher's list live, with its item count — no refresh.
+      const newRow = watcher.locator(`[data-testid="order-list-row"][data-order-id="${orderId}"]`);
+      await expect(newRow).toBeVisible({ timeout: 15_000 });
+      await expect(newRow.locator('.num-col')).toHaveText('1', { timeout: 15_000 });
+    } finally {
+      await watcherContext.close();
+      await actorContext.close();
+    }
+  });
 });
