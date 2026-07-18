@@ -2,6 +2,9 @@ namespace HC.LIS.Modules.TestOrders.Application.Patients;
 
 public interface IPatientSnapshotRepository
 {
+    /// <summary>Returns the patient's full name, or <c>null</c> if no snapshot is stored yet.</summary>
+    Task<string?> GetFullNameByIdAsync(Guid patientId);
+
     Task StoreAsync(
         Guid patientId,
         string fullName,

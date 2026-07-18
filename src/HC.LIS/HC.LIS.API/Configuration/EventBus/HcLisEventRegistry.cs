@@ -11,6 +11,7 @@ internal static class HcLisEventRegistry
 {
     internal static EventRegistry Build() =>
         new EventRegistry.RegistryBuilder()
+            .Register<OrderCreatedIntegrationEvent>("orders.events", "order.created")
             .Register<OrderItemAcceptedIntegrationEvent>("orders.events", "order_item.accepted")
             .Register<OrderItemRequestedIntegrationEvent>("orders.events", "order_item.requested")
             .Register<OrderItemCanceledIntegrationEvent>("orders.events", "order_item.cancelled")

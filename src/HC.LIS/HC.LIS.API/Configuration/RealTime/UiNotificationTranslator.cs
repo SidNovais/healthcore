@@ -21,6 +21,10 @@ internal static class UiNotificationTranslator
         ArgumentNullException.ThrowIfNull(bus);
         ArgumentNullException.ThrowIfNull(hub);
 
+        // ── Orders: a new order joins the list; a requested exam bumps its count / detail ─────
+        Relay<OrderCreatedIntegrationEvent>(bus, hub, OrderAdded);
+        Relay<OrderItemRequestedIntegrationEvent>(bus, hub, OrderItemAdded);
+
         // ── Orders: exam-item status transitions patch the order-detail row's badge ──────────
         Relay<OrderItemAcceptedIntegrationEvent>(bus, hub, e => ExamStatus(e.OrderItemId, "Accepted"));
         Relay<OrderItemCanceledIntegrationEvent>(bus, hub, e => ExamStatus(e.OrderItemId, "Canceled"));
@@ -51,6 +55,50 @@ internal static class UiNotificationTranslator
 
     internal static UiNotification ExamStatus(Guid orderItemId, string status) =>
         new(UiTopics.Orders, Serialize(new { op = "status", scope = "exam", orderItemId, status }));
+
+    internal static UiNotification OrderAdded(OrderCreatedIntegrationEvent e) =>
+        new(UiTopics.Orders, Serialize(new
+        {
+            op = "add",
+            scope = "order",
+            entity = new
+            {
+                orderId = e.OrderId,
+                patientId = e.PatientId,
+                patientName = e.PatientName,
+                requestedBy = e.RequestedBy,
+                orderPriority = e.OrderPriority,
+                requestedAt = e.RequestedAt,
+                itemCount = 0,
+            },
+        }));
+
+    internal static UiNotification OrderItemAdded(OrderItemRequestedIntegrationEvent e) =>
+        new(UiTopics.Orders, Serialize(new
+        {
+            op = "item-added",
+            orderId = e.OrderId,
+            item = new
+            {
+                orderItemId = e.OrderItemId,
+                specimenMnemonic = e.SpecimenMnemonic,
+                materialType = e.MaterialType,
+                containerType = e.ContainerType,
+                additive = e.Additive,
+                processingType = e.ProcessingType,
+                storageCondition = e.StorageCondition,
+                reasonForRejection = (string?)null,
+                status = "Requested",
+                requestedAt = e.RequestedAt,
+                canceledAt = (DateTime?)null,
+                onHoldAt = (DateTime?)null,
+                acceptedAt = (DateTime?)null,
+                rejectedAt = (DateTime?)null,
+                inProgressAt = (DateTime?)null,
+                partiallyCompletedAt = (DateTime?)null,
+                completedAt = (DateTime?)null,
+            },
+        }));
 
     internal static UiNotification TriageAdd(Guid collectionRequestId, Guid patientId, DateTime arrivedAt) =>
         new(UiTopics.Triage, Serialize(new
