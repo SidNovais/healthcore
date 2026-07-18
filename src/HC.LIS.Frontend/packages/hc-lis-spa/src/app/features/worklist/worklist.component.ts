@@ -2,7 +2,6 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { WorklistService } from './worklist.service';
 import { WorklistItemDetailComponent } from './worklist-item-detail.component';
 import { HcBadge } from '../../ui/badge/badge';
-import { HcButton } from '../../ui/button/button';
 import { HcDateTimePipe } from '../../ui/date/hc-datetime.pipe';
 import { HcEmpty } from '../../ui/empty/empty';
 import { HcIcon } from '../../ui/icon/icon';
@@ -28,7 +27,6 @@ const PAGE_SIZE = 10;
   imports: [
     WorklistItemDetailComponent,
     HcBadge,
-    HcButton,
     HcDateTimePipe,
     HcEmpty,
     HcIcon,
@@ -73,10 +71,6 @@ export class WorklistComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    void this.service.loadItems();
-  }
-
-  protected refresh(): void {
     void this.service.loadItems();
   }
 

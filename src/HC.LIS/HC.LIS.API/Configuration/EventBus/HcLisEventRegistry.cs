@@ -25,6 +25,8 @@ internal static class HcLisEventRegistry
             .Register<PatientCalledIntegrationEvent>("sample_collection.events", "patient.called")
             .Register<ExamResultReceivedIntegrationEvent>("analyzer.events", "exam_result.received")
             .Register<WorklistItemCreatedIntegrationEvent>("lab_analysis.events", "worklist_item.created")
+            .Register<WorklistItemResultRecordedIntegrationEvent>("lab_analysis.events", "worklist_item.result_recorded")
+            .Register<WorklistItemReportGeneratedIntegrationEvent>("lab_analysis.events", "worklist_item.report_generated")
             .Register<WorklistItemCompletedIntegrationEvent>("lab_analysis.events", "worklist_item.completed")
             .Register<PatientRegisteredIntegrationEvent>("patient_management.events", "patient.registered")
             .Register<PatientUpdatedIntegrationEvent>("patient_management.events", "patient.updated")

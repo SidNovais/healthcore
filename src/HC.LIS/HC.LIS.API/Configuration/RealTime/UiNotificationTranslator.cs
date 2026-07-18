@@ -1,6 +1,7 @@
 using System.Text.Json;
 using HC.Core.Infrastructure.EventBus;
 using HC.Core.Infrastructure.RealTime;
+using HC.LIS.Modules.LabAnalysis.IntegrationEvents;
 using HC.LIS.Modules.SampleCollection.IntegrationEvents;
 using HC.LIS.Modules.TestOrders.IntegrationEvents;
 
@@ -34,6 +35,12 @@ internal static class UiNotificationTranslator
         Relay<PatientWaitingIntegrationEvent>(bus, hub, e => TriageMove(e.CollectionRequestId, "waiting", "Waiting"));
         Relay<PatientCalledIntegrationEvent>(bus, hub, e => TriageMove(e.CollectionRequestId, "called", "Called"));
         Relay<SampleCollectedIntegrationEvent>(bus, hub, e => TriageRemove(e.CollectionRequestId));
+
+        // ── Worklist: a new item appears, then progresses through its status lifecycle ────────
+        Relay<WorklistItemCreatedIntegrationEvent>(bus, hub, WorklistAdd);
+        Relay<WorklistItemResultRecordedIntegrationEvent>(bus, hub, e => WorklistStatus(e.WorklistItemId, "ResultReceived"));
+        Relay<WorklistItemReportGeneratedIntegrationEvent>(bus, hub, e => WorklistStatus(e.WorklistItemId, "ReportGenerated"));
+        Relay<WorklistItemCompletedIntegrationEvent>(bus, hub, e => WorklistStatus(e.WorklistItemId, "Completed"));
     }
 
     private static void Relay<TEvent>(IEventsBus bus, IUiNotificationHub hub, Func<TEvent, UiNotification?> map)
@@ -58,6 +65,27 @@ internal static class UiNotificationTranslator
 
     internal static UiNotification TriageRemove(Guid collectionRequestId) =>
         new(UiTopics.Triage, Serialize(new { op = "remove", collectionRequestId }));
+
+    internal static UiNotification WorklistAdd(WorklistItemCreatedIntegrationEvent e) =>
+        new(UiTopics.Worklist, Serialize(new
+        {
+            op = "add",
+            entity = new
+            {
+                id = e.WorklistItemId,
+                sampleBarcode = e.SampleBarcode,
+                examCode = e.ExamCode,
+                patientId = e.PatientId,
+                patientName = e.PatientName,
+                patientDateOfBirth = e.PatientDateOfBirth,
+                patientGender = e.PatientGender,
+                status = "Pending",
+                createdAt = e.OccurredAt,
+            },
+        }));
+
+    internal static UiNotification WorklistStatus(Guid worklistItemId, string status) =>
+        new(UiTopics.Worklist, Serialize(new { op = "update", id = worklistItemId, status }));
 
     private static string Serialize(object payload) => JsonSerializer.Serialize(payload, s_json);
 }
