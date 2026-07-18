@@ -23,6 +23,10 @@ internal static class UiNotificationTranslator
         Relay<OrderItemAcceptedIntegrationEvent>(bus, hub, e => ExamStatus(e.OrderItemId, "Accepted"));
         Relay<OrderItemCanceledIntegrationEvent>(bus, hub, e => ExamStatus(e.OrderItemId, "Canceled"));
         Relay<OrderItemRejectedIntegrationEvent>(bus, hub, e => ExamStatus(e.OrderItemId, "Rejected"));
+        Relay<OrderItemPlacedOnHoldIntegrationEvent>(bus, hub, e => ExamStatus(e.OrderItemId, "OnHold"));
+        Relay<OrderItemPlacedInProgressIntegrationEvent>(bus, hub, e => ExamStatus(e.OrderItemId, "InProgress"));
+        Relay<OrderItemCompletedIntegrationEvent>(bus, hub, e => ExamStatus(e.OrderItemId, "Completed"));
+        Relay<OrderItemPartiallyCompletedIntegrationEvent>(bus, hub, e => ExamStatus(e.OrderItemId, "PartiallyCompleted"));
     }
 
     private static void Relay<TEvent>(IEventsBus bus, IUiNotificationHub hub, Func<TEvent, UiNotification?> map)

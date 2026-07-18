@@ -1,0 +1,15 @@
+using System;
+using HC.Core.Infrastructure.EventBus;
+
+namespace HC.LIS.Modules.TestOrders.IntegrationEvents;
+
+public class OrderItemPlacedOnHoldIntegrationEvent(
+    Guid id,
+    DateTime occurredAt,
+    Guid orderItemId,
+    string reason
+) : IntegrationEvent(id, occurredAt)
+{
+    public Guid OrderItemId { get; } = orderItemId;
+    public string Reason { get; } = reason;
+}
