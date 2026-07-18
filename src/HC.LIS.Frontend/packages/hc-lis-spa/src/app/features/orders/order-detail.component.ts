@@ -1,4 +1,4 @@
-import { Component, ElementRef, NgZone, OnInit, effect, inject, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { gsap } from 'gsap';
@@ -63,7 +63,6 @@ const STATUS_VARIANTS: Record<string, HcBadgeVariant> = {
 export class OrderDetailComponent implements OnInit {
   protected readonly ordersService = inject(OrdersService);
   private readonly route = inject(ActivatedRoute);
-  private readonly ngZone = inject(NgZone);
   private readonly toast = inject(ToastService);
   private readonly host = inject(ElementRef).nativeElement as HTMLElement;
 
@@ -101,20 +100,7 @@ export class OrderDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.scheduleReload(this.route.snapshot.params['id'] as string);
-  }
-
-  // Fires an immediate reload and retries after 3 s outside Angular's zone so that
-  // the outbox-driven projection (Quartz every 2 s) has time to commit before the
-  // second GET fires. Running outside the zone prevents TestBed.whenStable() from
-  // blocking on the timer in integration tests.
-  private scheduleReload(orderId: string): void {
-    void this.ordersService.loadOrderDetails(orderId);
-    this.ngZone.runOutsideAngular(() => {
-      setTimeout(() => {
-        this.ngZone.run(() => void this.ordersService.loadOrderDetails(orderId));
-      }, 3000);
-    });
+    void this.ordersService.loadOrderDetails(this.route.snapshot.params['id'] as string);
   }
 
   protected async onAccept(itemId: string): Promise<void> {
@@ -123,7 +109,7 @@ export class OrderDetailComponent implements OnInit {
     try {
       await this.ordersService.acceptExam(orderId, itemId);
       this.toast.show('Exam accepted', { variant: 'success' });
-      this.scheduleReload(orderId);
+      this.ordersService.applyExamStatus(itemId, 'Accepted');
     } catch (err: unknown) {
       this.errorMessage.set(err instanceof Error ? err.message : 'Unexpected error.');
     }
@@ -150,7 +136,7 @@ export class OrderDetailComponent implements OnInit {
       this.toast.show('Exam rejected', { variant: 'success' });
       this.activeRejectItemId.set(null);
       this.rejectReason = '';
-      this.scheduleReload(orderId);
+      this.ordersService.applyExamStatus(itemId, 'Rejected');
     } catch (err: unknown) {
       this.errorMessage.set(err instanceof Error ? err.message : 'Unexpected error.');
     }
@@ -162,7 +148,7 @@ export class OrderDetailComponent implements OnInit {
     try {
       await this.ordersService.cancelExam(orderId, itemId);
       this.toast.show('Exam canceled', { variant: 'success' });
-      this.scheduleReload(orderId);
+      this.ordersService.applyExamStatus(itemId, 'Canceled');
     } catch (err: unknown) {
       this.errorMessage.set(err instanceof Error ? err.message : 'Unexpected error.');
     }
@@ -189,7 +175,7 @@ export class OrderDetailComponent implements OnInit {
       this.toast.show('Exam placed on hold', { variant: 'success' });
       this.activeOnHoldItemId.set(null);
       this.onHoldReason = '';
-      this.scheduleReload(orderId);
+      this.ordersService.applyExamStatus(itemId, 'OnHold');
     } catch (err: unknown) {
       this.errorMessage.set(err instanceof Error ? err.message : 'Unexpected error.');
     }

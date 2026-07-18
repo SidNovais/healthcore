@@ -34,6 +34,7 @@ import {
 } from '../../ui/dropdown-menu/dropdown-menu';
 import { HcIcon, type HcIconName } from '../../ui/icon/icon';
 import { MOTION, prefersReducedMotion } from '../../ui/motion/motion';
+import { LiveIndicatorComponent } from './live-indicator.component';
 
 interface NavItem {
   label: string;
@@ -92,6 +93,7 @@ const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
     HcDropdownMenuTrigger,
     HcDropdownMenuItem,
     HcIcon,
+    LiveIndicatorComponent,
   ],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.css',
