@@ -31,6 +31,18 @@ async function pickSeedPatient(page: Page): Promise<void> {
   await expect(page.getByTestId('patient-picker-selected-card')).toBeVisible({ timeout: 5_000 });
 }
 
+// Opens an order's detail and waits for the exam row, retrying the navigation until the
+// outbox-driven exam projection (Quartz, ~2s) has committed.
+async function openOrderWithExam(page: Page, orderId: string): Promise<void> {
+  for (let attempt = 0; attempt < 8; attempt++) {
+    await page.goto(`/orders/${orderId}`);
+    const visible = await page.getByTestId('exam-item-row').first()
+      .isVisible({ timeout: 4_000 }).catch(() => false);
+    if (visible) return;
+  }
+  await expect(page.getByTestId('exam-item-row').first()).toBeVisible({ timeout: 5_000 });
+}
+
 test.describe('Real-time feed — connection', () => {
   test.beforeEach(async ({ context }) => {
     await context.clearCookies();
@@ -54,8 +66,9 @@ test.describe('Real-time feed — connection', () => {
 test.describe('Real-time feed — cross-session updates', () => {
   // Seeds its own order, so it does not depend on pre-existing data. Requires the full stack
   // (API + RabbitMQ + database), because the change reaches the second session through the
-  // outbox → integration event → SSE pipeline.
-  test('a canceled exam appears live in another session without a refresh', async ({ browser }) => {
+  // outbox → integration event → SSE pipeline. Uses Accept — every exam status transition
+  // travels this same path, so one proves the pipeline for all of them.
+  test('an exam status change appears live in another session without a refresh', async ({ browser }) => {
     const watcherContext = await browser.newContext();
     const actorContext = await browser.newContext();
     const watcher = await watcherContext.newPage();
@@ -70,33 +83,28 @@ test.describe('Real-time feed — cross-session updates', () => {
       await actor.getByTestId('create-order-submit-btn').click();
       await expect(actor.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
       const orderId = (await actor.locator('.order-id').textContent())!.trim();
-      await actor.getByTestId('exam-mnemonic-input').fill('GLU');
+      await actor.getByTestId('exam-mnemonic-input').fill('ACC');
       await actor.getByTestId('container-type-input').fill('RedTop');
       await actor.getByTestId('request-exam-btn').click();
       await expect(actor.getByTestId('exam-added-confirmation')).toBeVisible({ timeout: 5_000 });
 
-      // Both sessions open the same order detail (via /orders so the projection commits first).
-      await actor.goto('/orders');
-      await actor.goto(`/orders/${orderId}`);
-      await expect(actor.getByTestId('exam-items-table')).toBeVisible({ timeout: 5_000 });
-
-      await watcher.goto('/orders');
-      await watcher.goto(`/orders/${orderId}`);
-      await expect(watcher.getByTestId('exam-item-row').first()).toBeVisible({ timeout: 10_000 });
+      // Both sessions open the same order detail once the exam projection has committed.
+      await openOrderWithExam(actor, orderId);
+      await openOrderWithExam(watcher, orderId);
 
       // The watcher's feed must be live before the actor acts.
       await expect(watcher.getByTestId('live-indicator'))
         .toHaveAttribute('data-status', 'live', { timeout: 10_000 });
 
-      // Actor cancels the exam.
+      // Actor accepts the exam.
       await actor.getByTestId('exam-actions-trigger').first().click();
-      await expect(actor.getByTestId('cancel-btn').first()).toBeVisible({ timeout: 5_000 });
-      await actor.getByTestId('cancel-btn').first().click();
-      await expect(actor.getByTestId('item-status').first()).toHaveText('Canceled', { timeout: 10_000 });
+      await expect(actor.getByTestId('accept-btn').first()).toBeVisible({ timeout: 5_000 });
+      await actor.getByTestId('accept-btn').first().click();
+      await expect(actor.getByTestId('item-status').first()).toHaveText('Accepted', { timeout: 10_000 });
 
       // The watcher updates live — no navigation or refresh on its side.
       await expect(watcher.getByTestId('item-status').first())
-        .toHaveText('Canceled', { timeout: 15_000 });
+        .toHaveText('Accepted', { timeout: 15_000 });
     } finally {
       await watcherContext.close();
       await actorContext.close();
