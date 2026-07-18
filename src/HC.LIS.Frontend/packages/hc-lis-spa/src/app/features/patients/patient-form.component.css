@@ -1,4 +1,4 @@
-/* No max-width here: the page owns the measure (hc-page width="narrow"). This used to
+/* No max-width here: the page owns the measure (hc-page width="wide"). This used to
    cap at 480px nested inside register-patient's own 600px — two caps, neither named. */
 .patient-form {
   display: flex;
@@ -7,18 +7,29 @@
 }
 
 /* <fieldset> carries the grouping semantics; its default chrome is reset so the
-   hc-separator between sections is the only visible division. */
+   hc-separator between sections is the only visible division. Fields sit two per row to
+   spend the wide measure horizontally and keep the form short. */
 .patient-form__section {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-5);
-  min-width: 0;
   margin: 0;
   padding: 0;
   border: none;
 }
 
+/* Grid items must be allowed to shrink or a wide control (date-picker) forces overflow. */
+.patient-form__section > hc-field {
+  min-width: 0;
+}
+
+/* The primary field takes the whole row above the paired fields. */
+.patient-form__field--full {
+  grid-column: 1 / -1;
+}
+
 .patient-form__legend {
+  grid-column: 1 / -1;
   padding: 0;
   margin-bottom: var(--space-4);
   font-family: var(--font-body);

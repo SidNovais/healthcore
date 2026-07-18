@@ -2,7 +2,7 @@
   <fieldset class="patient-form__section" data-testid="patient-form-demographics-section">
     <legend class="patient-form__legend">Demographics</legend>
 
-    <hc-field [error]="fullNameError()">
+    <hc-field class="patient-form__field--full" [error]="fullNameError()">
       <label hc-label for="patient-full-name">Full Name <span class="required">*</span></label>
       <input
         hc-input
