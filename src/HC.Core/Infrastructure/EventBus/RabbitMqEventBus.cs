@@ -51,7 +51,8 @@ public sealed class RabbitMqEventBus : IEventsBus
         string publisherExchange,
         string consumerQueue,
         EventRegistry registry,
-        ILogger logger)
+        ILogger logger,
+        IReadOnlyDictionary<string, object?>? additionalQueueArguments = null)
     {
         ArgumentNullException.ThrowIfNull(connection);
         ArgumentException.ThrowIfNullOrEmpty(publisherExchange);
@@ -81,6 +82,12 @@ public sealed class RabbitMqEventBus : IEventsBus
         {
             ["x-dead-letter-exchange"] = DeadLetterExchangeName,
         };
+
+        if (additionalQueueArguments is not null)
+        {
+            foreach (KeyValuePair<string, object?> argument in additionalQueueArguments)
+                queueArguments[argument.Key] = argument.Value;
+        }
 
         await consumeChannel.QueueDeclareAsync(
             queue: consumerQueue,

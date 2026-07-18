@@ -14,7 +14,17 @@ internal sealed class RabbitMqModuleBusProvider : IModuleBusProvider
     private readonly RabbitMqEventBus _labAnalysis;
     private readonly RabbitMqEventBus _userAccess;
     private readonly RabbitMqEventBus _patientManagement;
+    private readonly RabbitMqEventBus _uiNotifications;
     private bool _disposed;
+
+    // The UI feed is disposable state — cap it and drop the oldest / expire quickly so it can
+    // never grow unbounded while the API is offline; a reconnecting browser re-fetches anyway.
+    private static readonly Dictionary<string, object?> s_uiQueueArguments = new()
+    {
+        ["x-max-length"] = 1000,
+        ["x-overflow"] = "drop-head",
+        ["x-message-ttl"] = 60_000,
+    };
 
     public IEventsBus TestOrders => _testOrders;
     public IEventsBus SampleCollection => _sampleCollection;
@@ -22,6 +32,7 @@ internal sealed class RabbitMqModuleBusProvider : IModuleBusProvider
     public IEventsBus LabAnalysis => _labAnalysis;
     public IEventsBus UserAccess => _userAccess;
     public IEventsBus PatientManagement => _patientManagement;
+    public IEventsBus UiNotifications => _uiNotifications;
 
     private RabbitMqModuleBusProvider(
         IConnection connection,
@@ -30,7 +41,8 @@ internal sealed class RabbitMqModuleBusProvider : IModuleBusProvider
         RabbitMqEventBus analyzer,
         RabbitMqEventBus labAnalysis,
         RabbitMqEventBus userAccess,
-        RabbitMqEventBus patientManagement)
+        RabbitMqEventBus patientManagement,
+        RabbitMqEventBus uiNotifications)
     {
         _connection = connection;
         _testOrders = testOrders;
@@ -39,6 +51,7 @@ internal sealed class RabbitMqModuleBusProvider : IModuleBusProvider
         _labAnalysis = labAnalysis;
         _userAccess = userAccess;
         _patientManagement = patientManagement;
+        _uiNotifications = uiNotifications;
     }
 
     internal static async Task<RabbitMqModuleBusProvider> CreateAsync(
@@ -80,8 +93,14 @@ internal sealed class RabbitMqModuleBusProvider : IModuleBusProvider
         var patientManagement = await RabbitMqEventBus.CreateAsync(
             connection, "patient_management.events", "hclis.patient_management", registry, logger).ConfigureAwait(false);
 
+        // Consume-only bus for the SSE feed; its publisher exchange is declared but never used.
+        var uiNotifications = await RabbitMqEventBus.CreateAsync(
+            connection, "hclis.ui_notifications", "hclis.ui_notifications", registry, logger,
+            s_uiQueueArguments).ConfigureAwait(false);
+
         return new RabbitMqModuleBusProvider(
-            connection, testOrders, sampleCollection, analyzer, labAnalysis, userAccess, patientManagement);
+            connection, testOrders, sampleCollection, analyzer, labAnalysis, userAccess, patientManagement,
+            uiNotifications);
     }
 
     public void StartConsuming()
@@ -92,6 +111,7 @@ internal sealed class RabbitMqModuleBusProvider : IModuleBusProvider
         _labAnalysis.StartConsuming();
         _userAccess.StartConsuming();
         _patientManagement.StartConsuming();
+        _uiNotifications.StartConsuming();
     }
 
     public void Dispose()
@@ -104,6 +124,7 @@ internal sealed class RabbitMqModuleBusProvider : IModuleBusProvider
         _labAnalysis.Dispose();
         _userAccess.Dispose();
         _patientManagement.Dispose();
+        _uiNotifications.Dispose();
         _connection.Dispose();
     }
 }

@@ -10,6 +10,7 @@ internal sealed class MemoryModuleBusProvider : IModuleBusProvider
     public IEventsBus LabAnalysis { get; }
     public IEventsBus UserAccess { get; }
     public IEventsBus PatientManagement { get; }
+    public IEventsBus UiNotifications { get; }
 
     internal MemoryModuleBusProvider(Serilog.ILogger logger)
     {
@@ -19,6 +20,10 @@ internal sealed class MemoryModuleBusProvider : IModuleBusProvider
         LabAnalysis = new InMemoryEventBusClient(logger);
         UserAccess = new InMemoryEventBusClient(logger);
         PatientManagement = new InMemoryEventBusClient(logger);
+
+        // Shares the process-wide InMemoryEventBus.Instance, so subscribing here receives
+        // every module's published events by type — no broker required.
+        UiNotifications = new InMemoryEventBusClient(logger);
     }
 
     public void StartConsuming() { }
@@ -31,5 +36,6 @@ internal sealed class MemoryModuleBusProvider : IModuleBusProvider
         LabAnalysis.Dispose();
         UserAccess.Dispose();
         PatientManagement.Dispose();
+        UiNotifications.Dispose();
     }
 }
