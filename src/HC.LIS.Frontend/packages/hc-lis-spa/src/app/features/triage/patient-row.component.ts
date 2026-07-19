@@ -1,5 +1,5 @@
 import { Component, input, output, signal, computed, HostListener } from '@angular/core';
-import { SlicePipe, NgClass } from '@angular/common';
+import { NgClass } from '@angular/common';
 import type { CollectionRequestSummary } from '../../core/domain/collection-request-summary';
 import type { SampleSummary } from '../../core/domain/sample-summary';
 import { HcBadge, type HcBadgeVariant } from '../../ui/badge/badge';
@@ -16,12 +16,14 @@ const STATUS_VARIANTS: Record<string, HcBadgeVariant> = {
 @Component({
   selector: 'app-patient-row',
   standalone: true,
-  imports: [SlicePipe, NgClass, HcBadge, HcButton, HcDateTimePipe, HcIcon],
+  imports: [NgClass, HcBadge, HcButton, HcDateTimePipe, HcIcon],
   templateUrl: './patient-row.component.html',
   styleUrl: './patient-row.component.css',
 })
 export class PatientRowComponent {
   readonly item = input.required<CollectionRequestSummary>();
+  /** Resolved patient name; null while the container is still looking it up. */
+  readonly patientName = input<string | null>(null);
   readonly samples = input<SampleSummary[] | null>(null);
   readonly pendingSamples = computed(() =>
     (this.samples() ?? []).filter(s => s.status !== 'Collected' && s.barcode !== null)

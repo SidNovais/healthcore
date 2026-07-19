@@ -1,5 +1,6 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, effect, inject, OnInit, signal, computed } from '@angular/core';
 import { TriageService } from './triage.service';
+import { PATIENTS_PORT } from '../../core/application/i-patients-port';
 import { PatientRowComponent } from './patient-row.component';
 import { PrintLabelsModalComponent } from './print-labels-modal.component';
 import type { SampleSummary } from '../../core/domain/sample-summary';
@@ -32,6 +33,11 @@ interface PrintModalRequest {
 })
 export class TriageComponent implements OnInit {
   protected readonly service = inject(TriageService);
+  private readonly patientsPort = inject(PATIENTS_PORT);
+
+  /** patientId → resolved patient name, so cards show a name instead of a raw id. */
+  private readonly patientNames = signal<Map<string, string>>(new Map());
+  private readonly resolvingPatients = new Set<string>();
 
   protected readonly error = signal<string | null>(null);
   protected readonly activeFilter = signal<StatusFilter>('All');
@@ -46,6 +52,38 @@ export class TriageComponent implements OnInit {
   protected readonly showArrived = computed(() => this.activeFilter() === 'All' || this.activeFilter() === 'Arrived');
   protected readonly showWaiting  = computed(() => this.activeFilter() === 'All' || this.activeFilter() === 'Waiting');
   protected readonly showCalled   = computed(() => this.activeFilter() === 'All' || this.activeFilter() === 'Called');
+
+  constructor() {
+    // Resolve a display name for every patient currently on the board (initial load and
+    // live arrivals alike), so a raw patient id is never shown.
+    effect(() => {
+      const ids = new Set<string>();
+      for (const row of [...this.service.arrived(), ...this.service.waiting(), ...this.service.called()]) {
+        ids.add(row.patientId);
+      }
+      for (const id of ids) {
+        if (this.patientNames().has(id) || this.resolvingPatients.has(id)) continue;
+        this.resolvingPatients.add(id);
+        void this.resolvePatientName(id);
+      }
+    });
+  }
+
+  /** Reads the resolved name for a patient; null until the lookup completes. */
+  protected patientNameFor(patientId: string): string | null {
+    return this.patientNames().get(patientId) ?? null;
+  }
+
+  private async resolvePatientName(patientId: string): Promise<void> {
+    try {
+      const patient = await this.patientsPort.getDetails(patientId);
+      this.patientNames.update(m => new Map(m).set(patientId, patient.fullName));
+    } catch {
+      // Leave unresolved; the row shows the friendly placeholder.
+    } finally {
+      this.resolvingPatients.delete(patientId);
+    }
+  }
 
   async ngOnInit(): Promise<void> {
     await this.refresh();

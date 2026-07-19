@@ -50,6 +50,19 @@ test.describe('Triage — Page Structure', () => {
     await expect(page.getByTestId('filter-tab-called')).toBeVisible({ timeout: 5_000 });
   });
 
+  test('patient rows show a patient name, never a raw id', async ({ page }) => {
+    await loginAsLabTechnician(page);
+    await page.goto('/triage');
+
+    const firstRow = page.getByTestId('patient-row').first();
+    const hasRow = await firstRow.isVisible({ timeout: 5_000 }).catch(() => false);
+    if (!hasRow) {
+      test.skip(true, 'No triage rows seeded — seed collection data first');
+    }
+
+    await expect(firstRow.getByTestId('patient-name')).not.toContainText(/^[0-9a-f]{8}-[0-9a-f]{4}-/i);
+  });
+
   test('filter tabs expose accessible tablist semantics', async ({ page }) => {
     await loginAsLabTechnician(page);
     // Filter bar is now the hc-tabs primitive: a role=tablist wrapping role=tab buttons,

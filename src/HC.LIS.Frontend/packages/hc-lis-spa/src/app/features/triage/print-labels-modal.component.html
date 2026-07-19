@@ -3,7 +3,7 @@
     <div class="modal-header">
       <div>
         <h2 class="modal-title">Print Labels</h2>
-        <p class="modal-sub mono">{{ patientId() }}</p>
+        <p class="modal-sub" data-testid="print-modal-patient-name">{{ patientName() ?? 'Unknown patient' }}</p>
       </div>
     </div>
 

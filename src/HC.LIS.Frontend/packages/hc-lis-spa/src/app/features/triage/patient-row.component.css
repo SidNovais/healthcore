@@ -22,7 +22,7 @@
   gap: 0.1rem;
 }
 
-.patient-id {
+.patient-name {
   font-size: 0.875rem;
   font-weight: 700;
   color: var(--color-text);

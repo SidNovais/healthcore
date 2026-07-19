@@ -18,7 +18,8 @@ export class PrintLabelsModalComponent implements OnInit {
   private readonly triageService = inject(TriageService);
 
   readonly collectionRequestId = input.required<string>();
-  readonly patientId = input.required<string>();
+  /** Resolved patient name for the modal header; null falls back to a placeholder. */
+  readonly patientName = input<string | null>(null);
   readonly closed = output<void>();
 
   protected readonly samples = signal<SampleSummary[]>([]);

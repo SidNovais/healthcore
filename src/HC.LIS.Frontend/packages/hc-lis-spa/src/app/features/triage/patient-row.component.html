@@ -6,7 +6,7 @@
 >
   <div class="row">
     <div class="info">
-      <span class="patient-id mono">{{ item().patientId | slice: 0 : 8 }}…</span>
+      <span class="patient-name" data-testid="patient-name">{{ patientName() ?? 'Unknown patient' }}</span>
       <span class="meta">{{ timestampLabel() }} · {{ item().arrivedAt | hcDateTime }}</span>
     </div>
     <hc-badge [variant]="statusVariant()">{{ item().status }}</hc-badge>
@@ -18,7 +18,7 @@
         size="icon"
         data-testid="patient-row-menu-btn"
         (click)="toggleMenu($event)"
-        [attr.aria-label]="'Actions for ' + item().patientId"
+        [attr.aria-label]="'Actions for ' + (patientName() ?? 'patient')"
       >⋮</button>
 
       @if (menuOpen()) {

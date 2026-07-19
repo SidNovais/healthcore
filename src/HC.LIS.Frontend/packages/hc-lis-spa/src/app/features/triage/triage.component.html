@@ -22,7 +22,11 @@
           <hc-empty title="No patients arriving." />
         } @else {
           @for (item of service.arrived(); track item.collectionRequestId) {
-            <app-patient-row [item]="item" (sendToWaiting)="onSendToWaiting($event)" />
+            <app-patient-row
+              [item]="item"
+              [patientName]="patientNameFor(item.patientId)"
+              (sendToWaiting)="onSendToWaiting($event)"
+            />
           }
         }
       </div>
@@ -37,6 +41,7 @@
           @for (item of service.waiting(); track item.collectionRequestId) {
             <app-patient-row
               [item]="item"
+              [patientName]="patientNameFor(item.patientId)"
               (printLabel)="onPrintLabel($event)"
               (callPatient)="onCallPatient($event)"
             />
@@ -54,6 +59,7 @@
           @for (item of service.called(); track item.collectionRequestId) {
             <app-patient-row
               [item]="item"
+              [patientName]="patientNameFor(item.patientId)"
               [samples]="samplesMap().get(item.collectionRequestId) ?? null"
               (loadSamplesRequested)="onLoadSamples($event)"
               (sampleCollectRequested)="onCollectSample($event)"
@@ -72,7 +78,7 @@
 @if (printModalRequest(); as req) {
   <app-print-labels-modal
     [collectionRequestId]="req.collectionRequestId"
-    [patientId]="req.patientId"
+    [patientName]="patientNameFor(req.patientId)"
     (closed)="printModalRequest.set(null)"
   />
 }
