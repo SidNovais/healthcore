@@ -1,6 +1,6 @@
 <div data-testid="worklist-item-detail" class="detail-panel">
   <h3>{{ item.examCode }} — <span class="mono">{{ item.sampleBarcode }}</span></h3>
-  <p data-testid="patient-name">Patient: {{ item.patientName ?? item.patientId }}</p>
+  <p data-testid="patient-name">Patient: {{ item.patientName ?? 'Unknown patient' }}</p>
   @if (item.patientDateOfBirth) {
     <p data-testid="patient-dob">Date of birth: {{ item.patientDateOfBirth | hcDate }}</p>
   }

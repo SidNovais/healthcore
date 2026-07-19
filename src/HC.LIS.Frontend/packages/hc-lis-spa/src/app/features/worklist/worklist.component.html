@@ -64,7 +64,7 @@
               >
                 <td class="mono">{{ item.sampleBarcode }}</td>
                 <td>{{ item.examCode }}</td>
-                <td data-testid="patient-name-cell">{{ item.patientName ?? item.patientId }}</td>
+                <td data-testid="patient-name-cell">{{ item.patientName ?? 'Unknown patient' }}</td>
                 <td><hc-badge variant="accent">{{ item.status }}</hc-badge></td>
                 <td class="tabular-nums">{{ item.createdAt | hcDateTime }}</td>
                 <td class="actions-col" (click)="$event.stopPropagation()">
