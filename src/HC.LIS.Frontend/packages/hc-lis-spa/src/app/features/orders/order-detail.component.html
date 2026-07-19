@@ -8,8 +8,7 @@
   @if (ordersService.orderDetails(); as details) {
     <hc-card class="order-meta" data-testid="order-meta">
       <div hc-card-content>
-        <p>Patient: <span data-testid="patient-id">{{ details.patientId }}</span></p>
-        <p>Requested By: <span data-testid="requested-by">{{ details.requestedBy }}</span></p>
+        <p>Patient: <span data-testid="patient-name">{{ patientName() ?? 'Unknown patient' }}</span></p>
         <p>Priority: <span data-testid="order-priority">{{ details.orderPriority }}</span></p>
         <p>
           Requested At: <span data-testid="order-requested-at">{{ details.requestedAt | hcDateTime }}</span>

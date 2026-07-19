@@ -28,8 +28,8 @@
 
   @if (ordersService.order(); as order) {
     <section data-testid="exam-section" class="exam-section">
-      <div class="order-badge">
-        Order <span class="order-id">{{ order.orderId }}</span> created
+      <div class="order-badge" data-testid="order-created" [attr.data-order-id]="order.orderId">
+        Order created
       </div>
 
       <h2 class="section-title">Add Exam</h2>

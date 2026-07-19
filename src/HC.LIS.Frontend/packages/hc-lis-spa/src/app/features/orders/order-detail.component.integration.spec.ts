@@ -4,13 +4,31 @@ import { ActivatedRoute } from '@angular/router';
 import { OrderDetailComponent } from './order-detail.component';
 import { OrdersService } from './orders.service';
 import { ToastService } from '../../ui/toast/toast.service';
+import { PATIENTS_PORT } from '../../core/application/i-patients-port';
+import type { IPatientsPort } from '../../core/application/i-patients-port';
 import type { OrderDetails, ExamItem } from '../../core/domain/order-details';
+import type { PatientDetails } from '../../core/domain/patient-details';
 
 describe('OrderDetailComponent (integration)', () => {
   let fixture: ComponentFixture<OrderDetailComponent>;
   let mockService: Partial<OrdersService>;
   let mockToast: { show: ReturnType<typeof vi.fn> };
+  let mockPatientsPort: { getDetails: ReturnType<typeof vi.fn> };
   let detailsSignal: ReturnType<typeof signal<OrderDetails | null>>;
+
+  const patient: PatientDetails = {
+    id: 'patient-1',
+    fullName: 'Maria Silva',
+    dateOfBirth: '1990-01-01',
+    gender: 'Female',
+    mothersFullName: null,
+    documentId: null,
+    phone: null,
+    email: null,
+    status: 'Active',
+    registeredAt: '2026-01-01T00:00:00Z',
+    anonymizedAt: null,
+  };
 
   const orderId = 'order-abc-123';
 
@@ -64,12 +82,14 @@ describe('OrderDetailComponent (integration)', () => {
     };
 
     mockToast = { show: vi.fn() };
+    mockPatientsPort = { getDetails: vi.fn().mockResolvedValue(patient) };
 
     await TestBed.configureTestingModule({
       imports: [OrderDetailComponent],
       providers: [
         { provide: OrdersService, useValue: mockService },
         { provide: ToastService, useValue: mockToast },
+        { provide: PATIENTS_PORT, useValue: mockPatientsPort as unknown as IPatientsPort },
         { provide: ActivatedRoute, useValue: { snapshot: { params: { id: orderId } } } },
       ],
     }).compileComponents();
@@ -103,6 +123,35 @@ describe('OrderDetailComponent (integration)', () => {
 
     const rows = (fixture.nativeElement as HTMLElement).querySelectorAll('[data-testid="exam-item-row"]');
     expect(rows).toHaveLength(2);
+  });
+
+  it('resolves and displays the patient name instead of the raw patient id', async () => {
+    detailsSignal.set(baseOrder);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const el = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="patient-name"]');
+    expect(mockPatientsPort.getDetails).toHaveBeenCalledWith('patient-1');
+    expect(el?.textContent?.trim()).toBe('Maria Silva');
+  });
+
+  it('shows a friendly placeholder when the patient lookup fails', async () => {
+    mockPatientsPort.getDetails.mockRejectedValueOnce(new Error('lookup failed'));
+    detailsSignal.set({ ...baseOrder, patientId: 'patient-x' });
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const el = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="patient-name"]');
+    expect(el?.textContent?.trim()).toBe('Unknown patient');
+  });
+
+  it('no longer renders the raw requested-by user id', () => {
+    detailsSignal.set(baseOrder);
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).querySelector('[data-testid="requested-by"]')).toBeNull();
   });
 
   it('shows an hc-empty in the empty-items cell when items array is empty', () => {

@@ -82,7 +82,7 @@ test.describe('Real-time feed — cross-session updates', () => {
       await pickSeedPatient(actor);
       await actor.getByTestId('create-order-submit-btn').click();
       await expect(actor.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
-      const orderId = (await actor.locator('.order-id').textContent())!.trim();
+      const orderId = (await actor.getByTestId('order-created').getAttribute('data-order-id'))!;
       await actor.getByTestId('exam-mnemonic-input').fill('ACC');
       await actor.getByTestId('container-type-input').fill('RedTop');
       await actor.getByTestId('request-exam-btn').click();
@@ -131,7 +131,7 @@ test.describe('Real-time feed — cross-session updates', () => {
       await pickSeedPatient(actor);
       await actor.getByTestId('create-order-submit-btn').click();
       await expect(actor.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
-      const orderId = (await actor.locator('.order-id').textContent())!.trim();
+      const orderId = (await actor.getByTestId('order-created').getAttribute('data-order-id'))!;
       await actor.getByTestId('exam-mnemonic-input').fill('GLU');
       await actor.getByTestId('container-type-input').fill('RedTop');
       await actor.getByTestId('request-exam-btn').click();

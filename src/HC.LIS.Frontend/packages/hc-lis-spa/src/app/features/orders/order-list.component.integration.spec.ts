@@ -67,6 +67,13 @@ describe('OrderListComponent (integration)', () => {
     );
   }
 
+  it('does not render a Requested By column (raw user id removed)', () => {
+    orderListSignal.set(twoOrders);
+    fixture.detectChanges();
+
+    expect(host().querySelector('[data-testid="order-list-sort-requested-by"]')).toBeNull();
+  });
+
   it('shows skeleton rows while the list is loading', () => {
     loadingSignal.set(true);
     fixture.detectChanges();

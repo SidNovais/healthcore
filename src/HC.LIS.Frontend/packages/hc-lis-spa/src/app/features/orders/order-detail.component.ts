@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { gsap } from 'gsap';
 import { OrdersService } from './orders.service';
+import { PATIENTS_PORT } from '../../core/application/i-patients-port';
 import { HcAlert } from '../../ui/alert/alert';
 import { HcBadge, type HcBadgeVariant } from '../../ui/badge/badge';
 import { type HcBreadcrumbItem } from '../../ui/breadcrumb/breadcrumb';
@@ -62,9 +63,14 @@ const STATUS_VARIANTS: Record<string, HcBadgeVariant> = {
 })
 export class OrderDetailComponent implements OnInit {
   protected readonly ordersService = inject(OrdersService);
+  private readonly patientsPort = inject(PATIENTS_PORT);
   private readonly route = inject(ActivatedRoute);
   private readonly toast = inject(ToastService);
   private readonly host = inject(ElementRef).nativeElement as HTMLElement;
+
+  /** Resolved patient name for the order; null until the lookup completes (template shows a placeholder). */
+  protected readonly patientName = signal<string | null>(null);
+  private resolvedPatientId: string | null = null;
 
   protected readonly breadcrumbs: HcBreadcrumbItem[] = [
     { label: 'Orders', route: '/orders' },
@@ -78,6 +84,14 @@ export class OrderDetailComponent implements OnInit {
   protected onHoldReason = '';
 
   constructor() {
+    // Resolve the patient's name for display so the UI never shows a raw patient id.
+    effect(() => {
+      const patientId = this.ordersService.orderDetails()?.patientId;
+      if (!patientId || patientId === this.resolvedPatientId) return;
+      this.resolvedPatientId = patientId;
+      void this.resolvePatientName(patientId);
+    });
+
     // Stagger exam-item rows in whenever a fresh set renders.
     effect(() => {
       const count = this.ordersService.orderDetails()?.items.length ?? 0;
@@ -88,6 +102,16 @@ export class OrderDetailComponent implements OnInit {
         gsap.from(rows, { autoAlpha: 0, y: 8, duration: MOTION.fast, stagger: 0.03, overwrite: true });
       });
     });
+  }
+
+  /** Looks up the patient's display name; leaves the placeholder in place if the lookup fails. */
+  private async resolvePatientName(patientId: string): Promise<void> {
+    try {
+      const patient = await this.patientsPort.getDetails(patientId);
+      this.patientName.set(patient.fullName);
+    } catch {
+      this.patientName.set(null);
+    }
   }
 
   protected statusVariant(status: string): HcBadgeVariant {

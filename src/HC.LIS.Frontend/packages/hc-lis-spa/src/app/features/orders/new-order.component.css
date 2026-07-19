@@ -23,11 +23,6 @@
   color: var(--color-text);
 }
 
-.order-id {
-  font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
-  font-size: 0.75rem;
-}
-
 .section-title {
   font-size: 1rem;
   font-weight: 600;

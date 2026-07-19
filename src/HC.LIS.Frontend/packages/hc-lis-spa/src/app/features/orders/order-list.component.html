@@ -12,16 +12,6 @@
             Patient
           </button>
         </th>
-        <th [attr.aria-sort]="ariaSort('requestedBy')">
-          <button
-            type="button"
-            class="sort-btn"
-            data-testid="order-list-sort-requested-by"
-            (click)="toggleSort('requestedBy')"
-          >
-            Requested By
-          </button>
-        </th>
         <th [attr.aria-sort]="ariaSort('orderPriority')">
           <button
             type="button"
@@ -62,14 +52,13 @@
             <td><hc-skeleton /></td>
             <td><hc-skeleton /></td>
             <td><hc-skeleton /></td>
-            <td><hc-skeleton /></td>
             <td class="num-col"><hc-skeleton /></td>
             <td class="actions-col"><hc-skeleton /></td>
           </tr>
         }
       } @else if (ordersService.orderList().length === 0) {
         <tr>
-          <td colspan="6" class="empty-cell">
+          <td colspan="5" class="empty-cell">
             <hc-empty title="No orders found." description="Orders you create will appear here." />
           </td>
         </tr>
@@ -81,8 +70,7 @@
             [routerLink]="['/orders', item.orderId]"
             class="order-row"
           >
-            <td data-testid="patient-name-cell">{{ item.patientName ?? item.patientId }}</td>
-            <td>{{ item.requestedBy }}</td>
+            <td data-testid="patient-name-cell">{{ item.patientName ?? 'Unknown patient' }}</td>
             <td>
               <hc-badge [variant]="item.orderPriority === 'Urgent' ? 'warning' : 'neutral'">
                 {{ item.orderPriority }}
