@@ -146,6 +146,25 @@ The public API of each module is a single facade class (e.g., `TestOrdersModule`
 - 4 spaces indentation
 - Private fields: `_camelCase`, static fields: `s_camelCase`, constants: `PascalCase`
 
+### Loading & Feedback (Frontend)
+
+The SPA gives **uniform** feedback while the system is working. Pick the affordance by the **kind of operation**, not by page:
+
+| Affordance | Use when | Primitive |
+|---|---|---|
+| **Skeleton** | A view's primary data is rendering — lists *and* detail pages (first paint / full re-fetch). Mirror the final layout shape. | `HcSkeleton` (`ui/skeleton/skeleton.ts`) |
+| **Spinner** | A regular, short, indeterminate operation — button submits, inline secondary fetches inside an already-rendered view. | `HcButton [loading]` for submit buttons; `HcSpinner` for inline non-table loads |
+| **Progress bar** | A heavy, determinate job — bulk-processing many rows, uploading a large file. | `HcProgress` (`ui/progress/progress.ts`) |
+
+Cross-cutting rules (keep behaviour identical across features):
+
+1. **Every service read that backs a view** toggles a `loading`/`loadingDetails` signal in `try/finally` (reference: `OrdersService.loadOrderList`). Detail loads follow the same rule (`loadOrderDetails`, `PatientsService.loadDetails`, `TriageService.refreshAll`).
+2. The skeleton container carries `[attr.aria-busy]="loading()"`; render order is always **skeleton → `hc-empty` → data**.
+3. Use the shared `SKELETON_ROWS` constant (exported from `ui/skeleton/skeleton.ts`) for placeholder row counts — never re-declare `Array.from({ length: 5 })` per component.
+4. **Every async submit** owns a pending signal set in `try/finally`, bound as `[loading]="pending()"` **and** included in `[disabled]` on its `HcButton`. A form that emits to a parent takes a `pending` input the parent drives (e.g. `PatientFormComponent`, `RequestExamFormComponent`).
+5. `HcSpinner` fades in only after 300 ms (anti-flash), so prefer it for inline indeterminate waits; skeletons appear immediately.
+6. All loading animations must degrade under the global `prefers-reduced-motion` guard in `src/styles.css`.
+
 ### Clock
 
 Always use `SystemClock.Now` (from `HC.Core.Domain`) instead of `DateTime.UtcNow` or `DateTime.Now` throughout all application and API code. Tests use `SystemClock.Set(DateTime)` to freeze time and `SystemClock.Clear()` to reset it.
