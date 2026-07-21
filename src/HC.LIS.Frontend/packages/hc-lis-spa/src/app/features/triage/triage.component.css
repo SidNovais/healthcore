@@ -31,3 +31,13 @@
   color: var(--color-text-muted);
   margin-bottom: 0.2rem;
 }
+
+/* Placeholder card matching a patient row's height while the board loads. */
+.row-skeleton {
+  height: 3.5rem;
+}
+
+.row-skeleton hc-skeleton {
+  height: 100%;
+  border-radius: var(--radius-md);
+}

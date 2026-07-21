@@ -7,6 +7,7 @@ import type { SampleSummary } from '../../core/domain/sample-summary';
 import { HcAlert } from '../../ui/alert/alert';
 import { HcEmpty } from '../../ui/empty/empty';
 import { HcPage } from '../../ui/page/page';
+import { HcSkeleton, SKELETON_ROWS } from '../../ui/skeleton/skeleton';
 import { HcTabs, HcTab } from '../../ui/tabs/tabs';
 
 type StatusFilter = 'All' | 'Arrived' | 'Waiting' | 'Called';
@@ -25,6 +26,7 @@ interface PrintModalRequest {
     HcAlert,
     HcEmpty,
     HcPage,
+    HcSkeleton,
     HcTabs,
     HcTab,
   ],
@@ -38,6 +40,9 @@ export class TriageComponent implements OnInit {
   /** patientId → resolved patient name, so cards show a name instead of a raw id. */
   private readonly patientNames = signal<Map<string, string>>(new Map());
   private readonly resolvingPatients = new Set<string>();
+
+  /** A few placeholder cards per queue while the board first loads. */
+  protected readonly skeletonRows = SKELETON_ROWS.slice(0, 3);
 
   protected readonly error = signal<string | null>(null);
   protected readonly activeFilter = signal<StatusFilter>('All');
@@ -94,11 +99,7 @@ export class TriageComponent implements OnInit {
   }
 
   protected async refresh(): Promise<void> {
-    await Promise.all([
-      this.service.loadArrived(),
-      this.service.loadWaiting(),
-      this.service.loadCalled(),
-    ]);
+    await this.service.refreshAll();
   }
 
   protected async onSendToWaiting(id: string): Promise<void> {

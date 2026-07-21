@@ -24,9 +24,20 @@ export class TriageService {
   readonly arrived = signal<CollectionRequestSummary[]>([]);
   readonly waiting = signal<CollectionRequestSummary[]>([]);
   readonly called  = signal<CollectionRequestSummary[]>([]);
+  readonly loading = signal(false);
 
   constructor() {
     this.realtime.on('triage', (payload) => this.applyTriageChange(payload));
+  }
+
+  /** Loads all three queues together, toggling `loading` for the initial-render skeleton. */
+  async refreshAll(): Promise<void> {
+    this.loading.set(true);
+    try {
+      await Promise.all([this.loadArrived(), this.loadWaiting(), this.loadCalled()]);
+    } finally {
+      this.loading.set(false);
+    }
   }
 
   async loadArrived(): Promise<void> {

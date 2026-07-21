@@ -16,9 +16,13 @@
 
   <div class="list">
     @if (showArrived()) {
-      <div data-testid="arrived-group" class="group">
+      <div data-testid="arrived-group" class="group" [attr.aria-busy]="service.loading()">
         <div class="group-header">Arrived</div>
-        @if (service.arrived().length === 0) {
+        @if (service.loading()) {
+          @for (row of skeletonRows; track $index) {
+            <div class="row-skeleton" data-testid="triage-skeleton-row"><hc-skeleton /></div>
+          }
+        } @else if (service.arrived().length === 0) {
           <hc-empty title="No patients arriving." />
         } @else {
           @for (item of service.arrived(); track item.collectionRequestId) {
@@ -33,9 +37,13 @@
     }
 
     @if (showWaiting()) {
-      <div data-testid="waiting-group" class="group">
+      <div data-testid="waiting-group" class="group" [attr.aria-busy]="service.loading()">
         <div class="group-header">Waiting</div>
-        @if (service.waiting().length === 0) {
+        @if (service.loading()) {
+          @for (row of skeletonRows; track $index) {
+            <div class="row-skeleton" data-testid="triage-skeleton-row"><hc-skeleton /></div>
+          }
+        } @else if (service.waiting().length === 0) {
           <hc-empty title="No patients waiting." />
         } @else {
           @for (item of service.waiting(); track item.collectionRequestId) {
@@ -51,9 +59,13 @@
     }
 
     @if (showCalled()) {
-      <div data-testid="called-group" class="group">
+      <div data-testid="called-group" class="group" [attr.aria-busy]="service.loading()">
         <div class="group-header">Called</div>
-        @if (service.called().length === 0) {
+        @if (service.loading()) {
+          @for (row of skeletonRows; track $index) {
+            <div class="row-skeleton" data-testid="triage-skeleton-row"><hc-skeleton /></div>
+          }
+        } @else if (service.called().length === 0) {
           <hc-empty title="No patients called." />
         } @else {
           @for (item of service.called(); track item.collectionRequestId) {

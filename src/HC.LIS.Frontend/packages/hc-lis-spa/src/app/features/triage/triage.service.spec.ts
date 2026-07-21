@@ -7,6 +7,7 @@ import type { CollectionRequestSummary } from '../../core/domain/collection-requ
 describe('TriageService live updates', () => {
   let service: TriageService;
   let triageHandler: (payload: unknown) => void;
+  let mockPort: ICollectionRequestsPort;
 
   const row = (id: string, status: string): CollectionRequestSummary => ({
     collectionRequestId: id,
@@ -16,7 +17,7 @@ describe('TriageService live updates', () => {
   });
 
   beforeEach(() => {
-    const mockPort: ICollectionRequestsPort = {
+    mockPort = {
       loadArrived: vi.fn(),
       loadQueue: vi.fn(),
       loadCalled: vi.fn(),
@@ -46,6 +47,36 @@ describe('TriageService live updates', () => {
 
   it('subscribes to the triage topic on construction', () => {
     expect(triageHandler).toBeDefined();
+  });
+
+  it('loading signal starts as false', () => {
+    expect(service.loading()).toBe(false);
+  });
+
+  it('refreshAll() sets loading true while the queues are in flight and populates them', async () => {
+    let resolveArrived!: (rows: CollectionRequestSummary[]) => void;
+    vi.mocked(mockPort.loadArrived).mockReturnValue(new Promise((r) => { resolveArrived = r; }));
+    vi.mocked(mockPort.loadQueue).mockResolvedValue([]);
+    vi.mocked(mockPort.loadCalled).mockResolvedValue([]);
+
+    const pending = service.refreshAll();
+    expect(service.loading()).toBe(true);
+
+    resolveArrived([row('1', 'Arrived')]);
+    await pending;
+
+    expect(service.loading()).toBe(false);
+    expect(service.arrived()).toHaveLength(1);
+  });
+
+  it('refreshAll() resets loading to false when a queue load rejects', async () => {
+    vi.mocked(mockPort.loadArrived).mockRejectedValue(new Error('boom'));
+    vi.mocked(mockPort.loadQueue).mockResolvedValue([]);
+    vi.mocked(mockPort.loadCalled).mockResolvedValue([]);
+
+    await expect(service.refreshAll()).rejects.toThrow('boom');
+
+    expect(service.loading()).toBe(false);
   });
 
   it('add inserts a new row into the arrived queue', () => {
