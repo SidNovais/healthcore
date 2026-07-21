@@ -62,7 +62,7 @@
             <button hc-button variant="ghost" data-testid="cancel-anonymize-btn" (click)="showAnonymizeConfirm.set(false)">
               Cancel
             </button>
-            <button hc-button variant="destructive" data-testid="anonymize-confirm-btn" (click)="confirmAnonymize()">
+            <button hc-button variant="destructive" data-testid="anonymize-confirm-btn" (click)="confirmAnonymize()" [loading]="anonymizing()" [disabled]="anonymizing()">
               Confirm anonymize
             </button>
           </div>
@@ -73,8 +73,20 @@
     @if (isEditMode() && patient.status === 'Active') {
       <app-patient-form
         [initialValues]="toFormValues(patient)"
+        [pending]="submitting()"
         (formSubmit)="onFormSubmit($event)"
       />
     }
+  } @else if (patientsService.loadingDetails()) {
+    <div class="patient-header" data-testid="patient-detail-skeleton" aria-busy="true">
+      <hc-skeleton class="name-skeleton" />
+    </div>
+    <hc-card class="patient-card">
+      <div class="fields-skeleton">
+        @for (row of skeletonRows; track $index) {
+          <hc-skeleton />
+        }
+      </div>
+    </hc-card>
   }
 </div>

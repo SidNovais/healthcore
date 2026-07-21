@@ -47,6 +47,7 @@ describe('PatientSearchComponent (integration)', () => {
       search: vi.fn().mockResolvedValue(undefined),
       // Needed by the patient-detail slide-over mounted inside the search page.
       patient: signal<PatientDetails | null>(null),
+      loadingDetails: signal(false),
       loadDetails: vi.fn().mockResolvedValue(undefined),
       anonymize: vi.fn().mockResolvedValue(undefined),
       update: vi.fn().mockResolvedValue(undefined),

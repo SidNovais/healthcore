@@ -99,7 +99,8 @@
     type="submit"
     data-testid="patient-form-submit-btn"
     class="patient-form__submit"
-    [disabled]="form.invalid"
+    [loading]="pending()"
+    [disabled]="form.invalid || pending()"
   >
     Save
   </button>

@@ -17,6 +17,23 @@ hc-breadcrumb {
   margin-bottom: var(--space-3);
 }
 
+/* Loading placeholders shown while the patient record is fetched. */
+.name-skeleton {
+  height: var(--text-2xl);
+  width: 14rem;
+}
+
+.fields-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.fields-skeleton hc-skeleton {
+  height: var(--text-sm);
+  width: 60%;
+}
+
 .patient-header {
   display: flex;
   align-items: center;

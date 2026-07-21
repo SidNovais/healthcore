@@ -47,6 +47,7 @@ describe('PatientDetailComponent (integration)', () => {
 
     mockPatientsService = {
       patient: patientSignal,
+      loadingDetails: signal(false),
       loadDetails: vi.fn().mockResolvedValue(undefined),
       anonymize: vi.fn().mockResolvedValue(undefined),
       update: vi.fn().mockResolvedValue(undefined),

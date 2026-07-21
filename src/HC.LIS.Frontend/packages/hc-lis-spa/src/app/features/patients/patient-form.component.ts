@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, computed, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, computed, inject, input } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import type { RegisterPatientParams } from '../../core/domain/register-patient-params';
@@ -38,6 +38,8 @@ function todayIso(): string {
 })
 export class PatientFormComponent implements OnChanges {
   @Input() initialValues: RegisterPatientParams | null = null;
+  /** Set by the parent while its async save is in flight, to show the pending state. */
+  readonly pending = input(false);
   @Output() readonly formSubmit = new EventEmitter<RegisterPatientParams>();
 
   /** Nobody is born tomorrow. */

@@ -8,5 +8,5 @@
     <hc-alert variant="error" data-testid="register-patient-error">{{ message }}</hc-alert>
   }
 
-  <app-patient-form (formSubmit)="onFormSubmit($event)" />
+  <app-patient-form [pending]="submitting()" (formSubmit)="onFormSubmit($event)" />
 </hc-page>

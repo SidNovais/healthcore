@@ -13,11 +13,12 @@ import { HcCard } from '../../ui/card/card';
 import { HcDatePipe } from '../../ui/date/hc-date.pipe';
 import { HcDateTimePipe } from '../../ui/date/hc-datetime.pipe';
 import { HcDialog } from '../../ui/dialog/dialog';
+import { HcSkeleton, SKELETON_ROWS } from '../../ui/skeleton/skeleton';
 
 @Component({
   selector: 'app-patient-detail',
   standalone: true,
-  imports: [PatientFormComponent, HcAlert, HcBadge, HcBreadcrumb, HcButton, HcCard, HcDatePipe, HcDateTimePipe, HcDialog],
+  imports: [PatientFormComponent, HcAlert, HcBadge, HcBreadcrumb, HcButton, HcCard, HcDatePipe, HcDateTimePipe, HcDialog, HcSkeleton],
   templateUrl: './patient-detail.component.html',
   styleUrl: './patient-detail.component.css',
 })
@@ -32,8 +33,12 @@ export class PatientDetailComponent implements OnInit {
    */
   readonly patientId = input<string | undefined>(undefined);
 
+  protected readonly skeletonRows = SKELETON_ROWS;
+
   protected readonly isEditMode = signal(false);
   protected readonly showAnonymizeConfirm = signal(false);
+  protected readonly anonymizing = signal(false);
+  protected readonly submitting = signal(false);
   protected readonly error = signal<string | null>(null);
 
   /**
@@ -106,23 +111,29 @@ export class PatientDetailComponent implements OnInit {
 
   protected async confirmAnonymize(): Promise<void> {
     this.error.set(null);
+    this.anonymizing.set(true);
     try {
       await this.patientsService.anonymize(this.effectivePatientId);
       this.showAnonymizeConfirm.set(false);
       await this.loadWithRetry(p => p.status === 'Anonymized');
     } catch (err) {
       this.error.set(err instanceof Error ? err.message : 'Failed to anonymize patient');
+    } finally {
+      this.anonymizing.set(false);
     }
   }
 
   protected async onFormSubmit(data: UpdatePatientParams): Promise<void> {
     this.error.set(null);
+    this.submitting.set(true);
     try {
       await this.patientsService.update(this.effectivePatientId, data);
       this.isEditMode.set(false);
       await this.loadWithRetry(p => p.fullName === data.fullName && p.dateOfBirth === data.dateOfBirth);
     } catch (err) {
       this.error.set(err instanceof Error ? err.message : 'Failed to update patient');
+    } finally {
+      this.submitting.set(false);
     }
   }
 }

@@ -12,6 +12,7 @@ export class PatientsService {
   readonly patient = signal<PatientDetails | null>(null);
   readonly error = signal<string | null>(null);
   readonly searching = signal(false);
+  readonly loadingDetails = signal(false);
 
   async search(term: string): Promise<void> {
     this.searching.set(true);
@@ -36,11 +37,14 @@ export class PatientsService {
 
   async loadDetails(id: string): Promise<void> {
     this.patient.set(null);
+    this.loadingDetails.set(true);
     try {
       const details = await this.port.getDetails(id);
       this.patient.set(details);
     } catch (err) {
       this.error.set(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      this.loadingDetails.set(false);
     }
   }
 

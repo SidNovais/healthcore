@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { PatientsService } from './patients.service';
 import { PATIENTS_PORT, IPatientsPort } from './i-patients-port';
 import type { PatientSearchResult } from '../domain/patient-search-result';
+import type { PatientDetails } from '../domain/patient-details';
 import type { RegisterPatientParams } from '../domain/register-patient-params';
 import { ApiError } from '@hc-lis/api-client';
 
@@ -16,6 +17,20 @@ describe('PatientsService', () => {
   const registerParams: RegisterPatientParams = {
     fullName: 'Jane Doe',
     dateOfBirth: '1985-05-15',
+  };
+
+  const patientDetails: PatientDetails = {
+    id: 'p1',
+    fullName: 'John Doe',
+    dateOfBirth: '1990-01-01',
+    gender: null,
+    mothersFullName: null,
+    documentId: null,
+    phone: null,
+    email: null,
+    status: 'Active',
+    registeredAt: '2026-01-01T00:00:00Z',
+    anonymizedAt: null,
   };
 
   beforeEach(() => {
@@ -78,6 +93,31 @@ describe('PatientsService', () => {
     await service.search('fail');
 
     expect(service.searching()).toBe(false);
+  });
+
+  it('loadingDetails signal starts as false', () => {
+    expect(service.loadingDetails()).toBe(false);
+  });
+
+  it('loadDetails() sets loadingDetails true while the request is in flight', async () => {
+    let resolve!: (details: PatientDetails) => void;
+    vi.mocked(mockPort.getDetails).mockReturnValue(new Promise((r) => { resolve = r; }));
+
+    const pending = service.loadDetails('p1');
+    expect(service.loadingDetails()).toBe(true);
+
+    resolve(patientDetails);
+    await pending;
+    expect(service.loadingDetails()).toBe(false);
+    expect(service.patient()).toEqual(patientDetails);
+  });
+
+  it('loadDetails() resets loadingDetails to false when the port rejects', async () => {
+    vi.mocked(mockPort.getDetails).mockRejectedValue(new ApiError(404, 'Not found'));
+
+    await service.loadDetails('p1');
+
+    expect(service.loadingDetails()).toBe(false);
   });
 
   it('register() returns new patient id', async () => {
