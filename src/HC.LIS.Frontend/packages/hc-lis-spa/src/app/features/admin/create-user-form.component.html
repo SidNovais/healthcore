@@ -65,7 +65,8 @@
       variant="cta"
       data-testid="submit-create-user-btn"
       (click)="onSubmit()"
-      [disabled]="!email.trim() || !fullName.trim() || !birthdate"
+      [loading]="submitting()"
+      [disabled]="!email.trim() || !fullName.trim() || !birthdate || submitting()"
     >
       Create User
     </button>

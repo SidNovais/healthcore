@@ -120,6 +120,7 @@
             variant="ghost"
             data-testid="cancel-role-change-btn"
             (click)="cancelRoleChange()"
+            [disabled]="changingRole()"
           >
             Cancel
           </button>
@@ -128,6 +129,8 @@
             variant="cta"
             data-testid="confirm-role-change-btn"
             (click)="confirmRoleChange()"
+            [loading]="changingRole()"
+            [disabled]="changingRole()"
           >
             Change role
           </button>

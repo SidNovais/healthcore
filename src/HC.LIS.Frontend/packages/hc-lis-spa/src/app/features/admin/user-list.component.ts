@@ -17,7 +17,7 @@ import { HcEmpty } from '../../ui/empty/empty';
 import { HcIcon } from '../../ui/icon/icon';
 import { HcPage } from '../../ui/page/page';
 import { HcPagination } from '../../ui/pagination/pagination';
-import { HcSkeleton } from '../../ui/skeleton/skeleton';
+import { HcSkeleton, SKELETON_ROWS } from '../../ui/skeleton/skeleton';
 import { HcTable } from '../../ui/table/table';
 import { ToastService } from '../../ui/toast/toast.service';
 
@@ -62,7 +62,7 @@ export class UserListComponent implements OnInit {
   private readonly toast = inject(ToastService);
 
   protected readonly showCreateForm = signal(false);
-  protected readonly skeletonRows = Array.from({ length: 5 });
+  protected readonly skeletonRows = SKELETON_ROWS;
   protected readonly page = signal(1);
 
   protected readonly roles: readonly RoleOption[] = [
@@ -74,6 +74,7 @@ export class UserListComponent implements OnInit {
 
   protected readonly roleDialogOpen = signal(false);
   protected readonly pendingRoleChange = signal<PendingRoleChange | null>(null);
+  protected readonly changingRole = signal(false);
 
   protected readonly pageCount = computed(() =>
     Math.max(1, Math.ceil(this.service.users().length / PAGE_SIZE)),
@@ -109,11 +110,14 @@ export class UserListComponent implements OnInit {
 
   protected async confirmRoleChange(): Promise<void> {
     const pending = this.pendingRoleChange();
-    this.roleDialogOpen.set(false);
     if (pending === null) {
+      this.roleDialogOpen.set(false);
       return;
     }
-    this.pendingRoleChange.set(null);
+
+    // Keep the dialog open while the change is in flight so the confirm button can
+    // show its pending state; it closes once the outcome is known.
+    this.changingRole.set(true);
 
     // The API refuses some changes outright — a user who has not activated their
     // account cannot be reassigned. Without this catch the rejection escaped, the
@@ -126,6 +130,10 @@ export class UserListComponent implements OnInit {
         testId: 'role-change-error-toast',
       });
       return;
+    } finally {
+      this.changingRole.set(false);
+      this.roleDialogOpen.set(false);
+      this.pendingRoleChange.set(null);
     }
 
     this.toast.show(`Role updated to ${this.roleLabel(pending.newRole)}.`, {

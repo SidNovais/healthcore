@@ -29,8 +29,10 @@ export class CreateUserFormComponent {
   protected gender = 'Male';
   protected role: UserRole = 'Receptionist';
   protected readonly error = signal<string | null>(null);
+  protected readonly submitting = signal(false);
 
   protected async onSubmit(): Promise<void> {
+    this.submitting.set(true);
     try {
       await this.service.createUser({
         email: this.email.trim(),
@@ -43,6 +45,8 @@ export class CreateUserFormComponent {
       this.close.emit();
     } catch {
       this.error.set('Failed to create user. Please check the fields and try again.');
+    } finally {
+      this.submitting.set(false);
     }
   }
 }
