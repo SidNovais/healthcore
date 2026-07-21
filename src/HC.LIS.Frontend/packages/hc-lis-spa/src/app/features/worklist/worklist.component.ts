@@ -12,7 +12,7 @@ import {
   HcDropdownMenuItem,
   HcDropdownMenuTrigger,
 } from '../../ui/dropdown-menu/dropdown-menu';
-import { HcSkeleton } from '../../ui/skeleton/skeleton';
+import { HcSkeleton, SKELETON_ROWS } from '../../ui/skeleton/skeleton';
 import { HcTable } from '../../ui/table/table';
 import type { WorklistItemSummary } from '../../core/domain/worklist-item-summary';
 
@@ -43,7 +43,7 @@ const PAGE_SIZE = 10;
 })
 export class WorklistComponent implements OnInit {
   protected readonly service = inject(WorklistService);
-  protected readonly skeletonRows = Array.from({ length: 5 });
+  protected readonly skeletonRows = SKELETON_ROWS;
 
   protected readonly sortKey = signal<SortKey | null>(null);
   protected readonly sortDir = signal<SortDir>('asc');

@@ -17,7 +17,7 @@ import {
   HcDropdownMenuTrigger,
 } from '../../ui/dropdown-menu/dropdown-menu';
 import { HcSheet } from '../../ui/sheet/sheet';
-import { HcSkeleton } from '../../ui/skeleton/skeleton';
+import { HcSkeleton, SKELETON_ROWS } from '../../ui/skeleton/skeleton';
 import { HcTable } from '../../ui/table/table';
 import { MOTION, prefersReducedMotion } from '../../ui/motion/motion';
 import { PatientDetailComponent } from './patient-detail.component';
@@ -51,7 +51,7 @@ const PAGE_SIZE = 10;
 })
 export class PatientSearchComponent implements OnDestroy {
   protected readonly service = inject(PatientsService);
-  protected readonly skeletonRows = Array.from({ length: 5 });
+  protected readonly skeletonRows = SKELETON_ROWS;
   private readonly router = inject(Router);
   private readonly host = inject(ElementRef).nativeElement as HTMLElement;
 

@@ -5,7 +5,7 @@ import { OrdersService } from './orders.service';
 import { HcBadge } from '../../ui/badge/badge';
 import { HcDateTimePipe } from '../../ui/date/hc-datetime.pipe';
 import { HcEmpty } from '../../ui/empty/empty';
-import { HcSkeleton } from '../../ui/skeleton/skeleton';
+import { HcSkeleton, SKELETON_ROWS } from '../../ui/skeleton/skeleton';
 import { HcTable } from '../../ui/table/table';
 import { HcPage } from '../../ui/page/page';
 import { HcPagination } from '../../ui/pagination/pagination';
@@ -48,7 +48,7 @@ export class OrderListComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly host = inject(ElementRef).nativeElement as HTMLElement;
 
-  protected readonly skeletonRows = Array.from({ length: 5 });
+  protected readonly skeletonRows = SKELETON_ROWS;
 
   protected readonly sortKey = signal<SortKey | null>(null);
   protected readonly sortDir = signal<SortDir>('asc');
