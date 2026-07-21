@@ -39,6 +39,7 @@ export class NewOrderComponent implements OnInit {
 
   protected selectedPatient = signal<PatientSearchResult | null>(null);
   protected creating = signal(false);
+  protected addingExam = signal(false);
   protected createError = signal<string | null>(null);
 
   ngOnInit(): void {
@@ -64,6 +65,7 @@ export class NewOrderComponent implements OnInit {
 
   protected async onExamSubmit(params: RequestExamParams): Promise<void> {
     const orderId = this.ordersService.order()?.orderId ?? '';
+    this.addingExam.set(true);
     try {
       await this.ordersService.requestExam(orderId, params);
       this.toast.show(`Exam ${params.examMnemonic} added to order`, {
@@ -72,6 +74,8 @@ export class NewOrderComponent implements OnInit {
       });
     } catch (err) {
       this.toast.show(err instanceof Error ? err.message : 'Failed to add exam', { variant: 'error' });
+    } finally {
+      this.addingExam.set(false);
     }
   }
 }

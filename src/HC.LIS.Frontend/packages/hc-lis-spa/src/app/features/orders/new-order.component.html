@@ -33,7 +33,7 @@
       </div>
 
       <h2 class="section-title">Add Exam</h2>
-      <app-request-exam-form (examSubmitted)="onExamSubmit($event)" />
+      <app-request-exam-form [pending]="addingExam()" (examSubmitted)="onExamSubmit($event)" />
     </section>
   }
 </hc-page>

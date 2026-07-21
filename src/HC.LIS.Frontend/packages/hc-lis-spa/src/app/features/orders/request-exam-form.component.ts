@@ -1,4 +1,4 @@
-import { Component, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import type { RequestExamParams } from '../../core/application/i-orders-port';
 import { HcButton } from '../../ui/button/button';
@@ -15,6 +15,8 @@ import { HcLabel } from '../../ui/input/label';
 })
 export class RequestExamFormComponent {
   readonly examSubmitted = output<RequestExamParams>();
+  /** Set by the parent while the exam request is in flight, to show the pending state. */
+  readonly pending = input(false);
 
   protected examMnemonic = '';
   protected containerType = '';

@@ -35,7 +35,8 @@
     type="submit"
     data-testid="request-exam-btn"
     class="exam-form__submit"
-    [disabled]="!examMnemonic || !containerType"
+    [loading]="pending()"
+    [disabled]="!examMnemonic || !containerType || pending()"
   >
     Add Exam
   </button>
