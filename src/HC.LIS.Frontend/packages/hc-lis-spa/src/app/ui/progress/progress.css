@@ -1,0 +1,45 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.hc-progress__track {
+  display: block;
+  width: 100%;
+  height: 0.5rem;
+  overflow: hidden;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-full);
+}
+
+.hc-progress__fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--color-accent);
+  border-radius: var(--radius-full);
+  transition: width var(--motion-normal) ease;
+}
+
+/* Indeterminate: a fixed-width sliver sweeps across the track. */
+:host(.hc-progress--indeterminate) .hc-progress__fill {
+  width: 40%;
+  transition: none;
+  animation: hc-progress-sweep 1.2s ease-in-out infinite;
+}
+
+@keyframes hc-progress-sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hc-progress__fill { transition: none; }
+  :host(.hc-progress--indeterminate) .hc-progress__fill {
+    animation: none;
+    /* Show a steady partial fill instead of a sweep. */
+    transform: none;
+    width: 100%;
+    opacity: 0.5;
+  }
+}
