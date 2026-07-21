@@ -20,6 +20,7 @@ import {
 import { HcEmpty } from '../../ui/empty/empty';
 import { HcIcon } from '../../ui/icon/icon';
 import { HcInput } from '../../ui/input/input';
+import { HcSkeleton, SKELETON_ROWS } from '../../ui/skeleton/skeleton';
 import { HcTable } from '../../ui/table/table';
 import { ToastService } from '../../ui/toast/toast.service';
 import { MOTION, prefersReducedMotion } from '../../ui/motion/motion';
@@ -56,6 +57,7 @@ const STATUS_VARIANTS: Record<string, HcBadgeVariant> = {
     HcIcon,
     HcInput,
     HcPage,
+    HcSkeleton,
     HcTable,
   ],
   templateUrl: './order-detail.component.html',
@@ -77,8 +79,12 @@ export class OrderDetailComponent implements OnInit {
     { label: 'Order Detail' },
   ];
 
+  protected readonly skeletonRows = SKELETON_ROWS;
+
   protected readonly activeRejectItemId = signal<string | null>(null);
   protected readonly activeOnHoldItemId = signal<string | null>(null);
+  protected readonly rejecting = signal(false);
+  protected readonly holding = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
   protected rejectReason = '';
   protected onHoldReason = '';
@@ -155,6 +161,7 @@ export class OrderDetailComponent implements OnInit {
   protected async onReject(itemId: string): Promise<void> {
     const orderId = this.route.snapshot.params['id'] as string;
     this.errorMessage.set(null);
+    this.rejecting.set(true);
     try {
       await this.ordersService.rejectExam(orderId, itemId, this.rejectReason.trim());
       this.toast.show('Exam rejected', { variant: 'success' });
@@ -163,6 +170,8 @@ export class OrderDetailComponent implements OnInit {
       this.ordersService.applyExamStatus(itemId, 'Rejected');
     } catch (err: unknown) {
       this.errorMessage.set(err instanceof Error ? err.message : 'Unexpected error.');
+    } finally {
+      this.rejecting.set(false);
     }
   }
 
@@ -194,6 +203,7 @@ export class OrderDetailComponent implements OnInit {
   protected async onPlaceOnHold(itemId: string): Promise<void> {
     const orderId = this.route.snapshot.params['id'] as string;
     this.errorMessage.set(null);
+    this.holding.set(true);
     try {
       await this.ordersService.placeExamOnHold(orderId, itemId, this.onHoldReason.trim());
       this.toast.show('Exam placed on hold', { variant: 'success' });
@@ -202,6 +212,8 @@ export class OrderDetailComponent implements OnInit {
       this.ordersService.applyExamStatus(itemId, 'OnHold');
     } catch (err: unknown) {
       this.errorMessage.set(err instanceof Error ? err.message : 'Unexpected error.');
+    } finally {
+      this.holding.set(false);
     }
   }
 }

@@ -181,6 +181,30 @@ describe('OrdersService', () => {
     expect(service.orderDetails()).toEqual(sampleOrderDetails);
   });
 
+  it('loadingDetails signal starts as false', () => {
+    expect(service.loadingDetails()).toBe(false);
+  });
+
+  it('loadOrderDetails() sets loadingDetails true while the request is in flight', async () => {
+    let resolve!: (details: OrderDetails) => void;
+    vi.mocked(mockPort.getOrderDetails).mockReturnValue(new Promise((r) => { resolve = r; }));
+
+    const pending = service.loadOrderDetails('order-uuid-1');
+    expect(service.loadingDetails()).toBe(true);
+
+    resolve(sampleOrderDetails);
+    await pending;
+    expect(service.loadingDetails()).toBe(false);
+  });
+
+  it('loadOrderDetails() resets loadingDetails to false when the port rejects', async () => {
+    vi.mocked(mockPort.getOrderDetails).mockRejectedValue(new Error('boom'));
+
+    await expect(service.loadOrderDetails('order-uuid-1')).rejects.toThrow('boom');
+
+    expect(service.loadingDetails()).toBe(false);
+  });
+
   it('acceptExam() calls port.acceptExam with orderId and itemId', async () => {
     vi.mocked(mockPort.acceptExam).mockResolvedValue();
 

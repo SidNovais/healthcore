@@ -1,5 +1,5 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { signal } from '@angular/core';
+import { signal, type WritableSignal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { OrderDetailComponent } from './order-detail.component';
 import { OrdersService } from './orders.service';
@@ -73,6 +73,7 @@ describe('OrderDetailComponent (integration)', () => {
 
     mockService = {
       orderDetails: detailsSignal,
+      loadingDetails: signal(false),
       loadOrderDetails: vi.fn().mockResolvedValue(undefined),
       acceptExam: vi.fn().mockResolvedValue(undefined),
       cancelExam: vi.fn().mockResolvedValue(undefined),
@@ -107,6 +108,17 @@ describe('OrderDetailComponent (integration)', () => {
   it('renders the order-detail container', () => {
     const el = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="order-detail"]');
     expect(el).not.toBeNull();
+  });
+
+  it('shows a skeleton while the order details are loading and no data is present yet', () => {
+    (mockService.loadingDetails as WritableSignal<boolean>).set(true);
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelector('[data-testid="order-detail-skeleton"]')).not.toBeNull();
+    expect(host.querySelectorAll('[data-testid="order-detail-skeleton-row"]').length).toBeGreaterThan(0);
+    // The real content is not rendered while loading.
+    expect(host.querySelector('[data-testid="exam-items-table"]')).toBeNull();
   });
 
   it('renders exam-items-table when order details are loaded', () => {

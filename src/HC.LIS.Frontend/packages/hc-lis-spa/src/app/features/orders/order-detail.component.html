@@ -101,7 +101,8 @@
               size="sm"
               data-testid="confirm-reject-btn"
               (click)="onReject(itemId)"
-              [disabled]="!rejectReason.trim()"
+              [loading]="rejecting()"
+              [disabled]="!rejectReason.trim() || rejecting()"
             >Confirm Reject</button>
             <button hc-button variant="ghost" size="sm" data-testid="cancel-reject-btn" (click)="activeRejectItemId.set(null)">Cancel</button>
           </div>
@@ -130,12 +131,44 @@
               size="sm"
               data-testid="confirm-on-hold-btn"
               (click)="onPlaceOnHold(itemId)"
-              [disabled]="!onHoldReason.trim()"
+              [loading]="holding()"
+              [disabled]="!onHoldReason.trim() || holding()"
             >Confirm On Hold</button>
             <button hc-button variant="ghost" size="sm" data-testid="cancel-on-hold-btn" (click)="activeOnHoldItemId.set(null)">Cancel</button>
           </div>
         </div>
       }
     </hc-dialog>
+  } @else if (ordersService.loadingDetails()) {
+    <hc-card class="order-meta" data-testid="order-detail-skeleton">
+      <div hc-card-content class="meta-skeleton">
+        <hc-skeleton /><hc-skeleton /><hc-skeleton />
+      </div>
+    </hc-card>
+
+    <h2 class="section-title">Exam Items</h2>
+
+    <table hc-table class="items-table" aria-busy="true">
+      <thead>
+        <tr>
+          <th>Specimen</th>
+          <th>Material</th>
+          <th>Container</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of skeletonRows; track $index) {
+          <tr data-testid="order-detail-skeleton-row" class="skeleton-row">
+            <td><hc-skeleton /></td>
+            <td><hc-skeleton /></td>
+            <td><hc-skeleton /></td>
+            <td><hc-skeleton /></td>
+            <td><hc-skeleton /></td>
+          </tr>
+        }
+      </tbody>
+    </table>
   }
 </hc-page>

@@ -26,6 +26,7 @@ export class OrdersService {
   readonly orderList = signal<OrderListItem[]>([]);
   readonly orderDetails = signal<OrderDetails | null>(null);
   readonly loadingList = signal(false);
+  readonly loadingDetails = signal(false);
 
   constructor() {
     this.realtime.on('orders', (payload) => this.applyOrdersMessage(payload));
@@ -51,8 +52,13 @@ export class OrdersService {
   }
 
   async loadOrderDetails(orderId: string): Promise<void> {
-    const details = await this.port.getOrderDetails(orderId);
-    this.orderDetails.set(details);
+    this.loadingDetails.set(true);
+    try {
+      const details = await this.port.getOrderDetails(orderId);
+      this.orderDetails.set(details);
+    } finally {
+      this.loadingDetails.set(false);
+    }
   }
 
   async acceptExam(orderId: string, itemId: string): Promise<void> {
