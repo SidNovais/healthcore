@@ -1,6 +1,11 @@
 .shell {
+  /* The sidebar measure lives here, not on :root — it is a shell-layout concern. A modal
+     inherits it (custom properties inherit down the DOM tree even into the top layer) to
+     centre on the content region; a dialog opened outside the shell never sees it and
+     falls back to viewport centring. */
+  --sidebar-width: 240px;
   display: grid;
-  grid-template-columns: 240px 1fr;
+  grid-template-columns: var(--sidebar-width) 1fr;
   height: 100dvh;
   overflow: hidden;
 }

@@ -5,6 +5,16 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   padding: var(--space-6);
+  /*
+   * Centre on the content region, not the raw viewport. The fixed sidebar shifts the
+   * content right, so a viewport-centred modal reads as sitting left of centre. Moving
+   * the modal's start inset shifts its auto-margin centring box to
+   * [sidebar, viewport-right]. The 0px fallback keeps plain viewport centring anywhere
+   * no shell is in scope (--sidebar-width is defined on the shell host, not globally).
+   */
+  margin: auto;
+  inset: 0;
+  inset-inline-start: var(--sidebar-width, 0px);
 }
 
 /* Shrink-wrap to content, as the native <dialog> does. Fine for a confirm or a single
