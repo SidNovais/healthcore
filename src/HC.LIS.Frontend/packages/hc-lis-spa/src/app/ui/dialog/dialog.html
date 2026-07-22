@@ -1,3 +1,10 @@
-<dialog #dlg class="hc-dialog" [attr.data-testid]="testId()" (close)="onNativeClose()">
+<dialog
+  #dlg
+  class="hc-dialog"
+  [class.hc-dialog--narrow]="width() === 'narrow'"
+  [class.hc-dialog--wide]="width() === 'wide'"
+  [attr.data-testid]="testId()"
+  (close)="onNativeClose()"
+>
   <ng-content />
 </dialog>

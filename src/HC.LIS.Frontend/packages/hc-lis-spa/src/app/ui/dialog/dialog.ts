@@ -9,6 +9,13 @@ import {
 } from '@angular/core';
 
 /**
+ * How wide the dialog panel is. `narrow` shrink-wraps the content under a cap, as the
+ * native <dialog> does; `wide` sets an explicit forms measure, because a column of
+ * full-width inputs has too little intrinsic width to size a panel on its own.
+ */
+export type HcDialogWidth = 'narrow' | 'wide';
+
+/**
  * Modal dialog on the native <dialog> element — the browser supplies the focus
  * trap, Esc-to-close and top-layer rendering; the scrim is styled via ::backdrop.
  */
@@ -26,6 +33,12 @@ export class HcDialog {
    * never "visible" to a browser-driven test even when the dialog is on screen.
    */
   readonly testId = input<string | undefined>(undefined);
+  /**
+   * Dialogs hosting a multi-field form declare `wide`; single-control dialogs (one
+   * select, one textarea, a confirm) stay narrow. Content must not re-cap itself on top
+   * of this — that is what left create-user's form at 420px inside a 32rem panel.
+   */
+  readonly width = input<HcDialogWidth>('narrow');
 
   private readonly dialogRef = viewChild.required<ElementRef<HTMLDialogElement>>('dlg');
 

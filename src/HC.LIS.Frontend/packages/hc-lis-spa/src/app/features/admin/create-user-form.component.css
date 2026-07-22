@@ -1,8 +1,8 @@
+/* No max-width: the host hc-dialog owns the measure (width="wide"). */
 .create-form {
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
-  max-width: 420px;
 }
 
 .create-form h3 {

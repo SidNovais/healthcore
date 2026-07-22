@@ -14,8 +14,27 @@ class HostComponent {
   readonly open = signal(false);
 }
 
+@Component({
+  imports: [HcDialog],
+  template: `
+    <hc-dialog [(open)]="open" width="wide" testId="create-user-dialog">
+      <p>Print labels?</p>
+    </hc-dialog>
+  `,
+})
+class WideHostComponent {
+  readonly open = signal(false);
+}
+
 function render() {
   const fixture = TestBed.createComponent(HostComponent);
+  fixture.detectChanges();
+  const dialog = (fixture.nativeElement as HTMLElement).querySelector('dialog')!;
+  return { fixture, dialog };
+}
+
+function renderWide() {
+  const fixture = TestBed.createComponent(WideHostComponent);
   fixture.detectChanges();
   const dialog = (fixture.nativeElement as HTMLElement).querySelector('dialog')!;
   return { fixture, dialog };
@@ -40,6 +59,25 @@ describe('HcDialog', () => {
     expect(dialog).not.toBeNull();
     expect(dialog.classList).toContain('hc-dialog');
     expect(dialog.textContent).toContain('Print labels?');
+  });
+
+  // The width vocabulary exists so form-heavy dialogs stop re-declaring a private
+  // max-width on their projected content (create-user's form was capped at 420px inside
+  // a 32rem panel, which is what starved its fields).
+  it('caps the panel at the narrow measure by default', () => {
+    const { dialog } = render();
+
+    expect(dialog.classList).toContain('hc-dialog--narrow');
+    expect(dialog.classList).not.toContain('hc-dialog--wide');
+  });
+
+  it('applies the wide measure when width is "wide"', () => {
+    const { dialog } = renderWide();
+
+    expect(dialog.classList).toContain('hc-dialog--wide');
+    expect(dialog.classList).not.toContain('hc-dialog--narrow');
+    // The base class still has to survive the modifier binding
+    expect(dialog.classList).toContain('hc-dialog');
   });
 
   it('opens as a modal when the open model becomes true', async () => {

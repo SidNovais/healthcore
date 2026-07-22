@@ -5,7 +5,23 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   padding: var(--space-6);
+}
+
+/* Shrink-wrap to content, as the native <dialog> does. Fine for a confirm or a single
+ * control, where the content has real intrinsic width. */
+.hc-dialog--narrow {
   max-width: min(32rem, calc(100vw - 2rem));
+}
+
+/*
+ * An explicit measure, not just a cap. A form is a column of full-width inputs, which
+ * have virtually no intrinsic width — under a cap alone the panel collapses to its
+ * widest run of text (the heading) and the fields end up in a ~250px gutter. 40rem is
+ * the app's forms measure, matching --container-narrow.
+ * Layout-dependent, so jsdom specs can't catch a regression here: check it on screen.
+ */
+.hc-dialog--wide {
+  width: min(40rem, calc(100vw - 2rem));
 }
 
 .hc-dialog::backdrop {

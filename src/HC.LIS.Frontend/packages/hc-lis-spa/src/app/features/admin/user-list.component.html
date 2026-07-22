@@ -9,7 +9,7 @@
     <hc-icon name="plus" [size]="16" /> Create User
   </button>
 
-  <hc-dialog [(open)]="showCreateForm" testId="create-user-dialog">
+  <hc-dialog [(open)]="showCreateForm" width="wide" testId="create-user-dialog">
     @if (showCreateForm()) {
       <app-create-user-form (close)="showCreateForm.set(false)" />
     }
