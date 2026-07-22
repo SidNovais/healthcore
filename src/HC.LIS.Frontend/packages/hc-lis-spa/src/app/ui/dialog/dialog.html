@@ -5,6 +5,13 @@
   [class.hc-dialog--wide]="width() === 'wide'"
   [attr.data-testid]="testId()"
   (close)="onNativeClose()"
+  (mousedown)="onBackdropMouseDown($event)"
+  (click)="onBackdropClick($event)"
 >
-  <ng-content />
+  <!-- Content wrapper: keeps the panel padding off the <dialog> box so that only the
+       backdrop (never a click on the content or its surrounding padding) targets the
+       <dialog> element for light-dismiss. -->
+  <div class="hc-dialog__content">
+    <ng-content />
+  </div>
 </dialog>

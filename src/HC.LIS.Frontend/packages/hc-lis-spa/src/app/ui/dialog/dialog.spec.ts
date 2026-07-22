@@ -115,4 +115,46 @@ describe('HcDialog', () => {
 
     expect(fixture.componentInstance.open()).toBe(false);
   });
+
+  // Light-dismiss: a click on the backdrop closes the modal. A click on the <dialog>
+  // element itself is a backdrop click — projected content lives in an inner wrapper, so
+  // content clicks target that wrapper (or deeper) and never the <dialog>. The press must
+  // also START on the backdrop, so selecting text inside a field and releasing past the
+  // panel edge does not dismiss.
+  describe('backdrop dismiss', () => {
+    async function opened() {
+      const h = render();
+      h.fixture.componentInstance.open.set(true);
+      await h.fixture.whenStable();
+      const content = h.dialog.querySelector('p')!;
+      return { ...h, content };
+    }
+
+    it('closes when a press starts and ends on the backdrop', async () => {
+      const { fixture, dialog } = await opened();
+
+      dialog.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+      dialog.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(fixture.componentInstance.open()).toBe(false);
+    });
+
+    it('stays open when the click lands on projected content', async () => {
+      const { fixture, content } = await opened();
+
+      content.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+      content.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(fixture.componentInstance.open()).toBe(true);
+    });
+
+    it('stays open when a press starts inside and releases on the backdrop', async () => {
+      const { fixture, dialog, content } = await opened();
+
+      content.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+      dialog.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      expect(fixture.componentInstance.open()).toBe(true);
+    });
+  });
 });

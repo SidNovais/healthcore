@@ -4,7 +4,8 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
-  padding: var(--space-6);
+  /* Padding lives on .hc-dialog__content, not here — see dialog.html for why. */
+  padding: 0;
   /*
    * Centre on the content region, not the raw viewport. The fixed sidebar shifts the
    * content right, so a viewport-centred modal reads as sitting left of centre. Moving
@@ -34,6 +35,15 @@
   width: min(40rem, calc(100vw - 2rem));
 }
 
+.hc-dialog__content {
+  padding: var(--space-6);
+}
+
+/* The scrim behind the panel: a dark wash plus a frosted blur of the page beneath, so
+ * the modal reads as floating above a de-emphasised background. -webkit- prefix for
+ * Safari, which still ships backdrop-filter unprefixed only behind a flag. */
 .hc-dialog::backdrop {
-  background: rgb(15 23 42 / 0.5);
+  background: rgb(15 23 42 / 0.45);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
 }

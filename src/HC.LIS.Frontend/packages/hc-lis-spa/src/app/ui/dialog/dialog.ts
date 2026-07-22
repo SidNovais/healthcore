@@ -18,6 +18,7 @@ export type HcDialogWidth = 'narrow' | 'wide';
 /**
  * Modal dialog on the native <dialog> element — the browser supplies the focus
  * trap, Esc-to-close and top-layer rendering; the scrim is styled via ::backdrop.
+ * A click on that scrim light-dismisses the dialog (see onBackdropClick).
  */
 @Component({
   selector: 'hc-dialog',
@@ -42,6 +43,13 @@ export class HcDialog {
 
   private readonly dialogRef = viewChild.required<ElementRef<HTMLDialogElement>>('dlg');
 
+  /**
+   * Whether the current press began on the backdrop. Tracked so that selecting text
+   * inside a field and releasing past the panel edge does not dismiss — only a press
+   * that both starts and ends on the backdrop counts as a backdrop click.
+   */
+  private _pressStartedOnBackdrop = false;
+
   constructor() {
     afterRenderEffect(() => {
       const dialog = this.dialogRef().nativeElement;
@@ -65,5 +73,20 @@ export class HcDialog {
 
   protected onNativeClose(): void {
     this.open.set(false);
+  }
+
+  /**
+   * The <dialog> is the event target only for clicks on the backdrop or the panel's own
+   * border — projected content sits in an inner wrapper that swallows those clicks. A
+   * press that both starts and ends there is a backdrop dismiss.
+   */
+  protected onBackdropMouseDown(event: MouseEvent): void {
+    this._pressStartedOnBackdrop = event.target === this.dialogRef().nativeElement;
+  }
+
+  protected onBackdropClick(event: MouseEvent): void {
+    if (event.target === this.dialogRef().nativeElement && this._pressStartedOnBackdrop) {
+      this.open.set(false);
+    }
   }
 }
