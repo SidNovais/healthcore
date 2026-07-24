@@ -40,15 +40,19 @@ jobs:
       # generate a full solution from every project under src/ — this auto-includes
       # future modules and never drifts out of date. It is not committed.
       #
-      # HC.LIS.Tests.IntegrationEvents is excluded: it is a pre-existing broken,
-      # DB-dependent integration test (stale CreateBarcodeCommand / RecordSampleCollectionCommand
-      # references) that does not compile. It is not in HC.LIS.slnx either, so it has rotted
-      # unnoticed. TODO: fix and re-include it (tracked as a follow-up).
+      # Integration-test projects are excluded from this unit-test slice: they require a
+      # Postgres database + ASPNETCORE_HCLIS_IntegrationTests_ConnectionString to run, and are
+      # not exercised here. (They also currently trip the CA2025 analyzer in their TestBase
+      # files under newer SDKs.) They will be built and run in a dedicated integration-test job.
+      # HC.LIS.Tests.IntegrationEvents is a pre-existing broken, DB-dependent integration test
+      # (stale CreateBarcodeCommand / RecordSampleCollectionCommand references) that does not
+      # compile at all. TODO: fix and re-include both (tracked as a follow-up).
       - name: Generate solution
         run: |
           dotnet new sln -n HealthCore --format slnx
           find src -name '*.csproj' \
             -not -path '*/.worktrees/*' \
+            -not -path '*/Tests/IntegrationTests/*' \
             -not -path '*/HC.LIS.Tests/IntegrationEvents/*' \
             -print0 \
             | xargs -0 dotnet sln HealthCore.slnx add
