@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Cancel superseded runs for the same ref (e.g. new push to an open PR).
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Build & Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        # SDK version is read from global.json at the repo root.
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/Directory.Packages.props') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      # There is no comprehensive solution file (HC.LIS.slnx is incomplete), so
+      # generate a full solution from every project under src/ — this auto-includes
+      # future modules and never drifts out of date. It is not committed.
+      #
+      # HC.LIS.Tests.IntegrationEvents is excluded: it is a pre-existing broken,
+      # DB-dependent integration test (stale CreateBarcodeCommand / RecordSampleCollectionCommand
+      # references) that does not compile. It is not in HC.LIS.slnx either, so it has rotted
+      # unnoticed. TODO: fix and re-include it (tracked as a follow-up).
+      - name: Generate solution
+        run: |
+          dotnet new sln -n HealthCore --format slnx
+          find src -name '*.csproj' \
+            -not -path '*/.worktrees/*' \
+            -not -path '*/HC.LIS.Tests/IntegrationEvents/*' \
+            -print0 \
+            | xargs -0 dotnet sln HealthCore.slnx add
+
+      - name: Restore
+        run: dotnet restore HealthCore.slnx
+
+      # Strict build: TreatWarningsAsErrors + full analyzers gate the whole codebase.
+      - name: Build
+        run: dotnet build HealthCore.slnx -c Release --no-restore
+
+      # Run every unit-test project (matched by Tests/UnitTests/ directory path, since
+      # TcpMessage's project is named *.Tests.csproj). Run all even if one fails, then
+      # fail the step if any failed.
+      - name: Unit tests
+        run: |
+          fail=0
+          while IFS= read -r -d '' proj; do
+            echo "::group::Testing $proj"
+            dotnet test "$proj" --no-build -c Release \
+              --logger "trx;LogFileName=$(basename "$proj" .csproj).trx" \
+              --collect:"XPlat Code Coverage" \
+              --results-directory "$PWD/TestResults" || fail=1
+            echo "::endgroup::"
+          done < <(find src -path '*/Tests/UnitTests/*.csproj' -not -path '*/.worktrees/*' -print0)
+          exit $fail
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: TestResults/
+          if-no-files-found: warn
