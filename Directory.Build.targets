@@ -33,6 +33,14 @@
     <ProjectReference Include="..\..\Infrastructure\*.csproj" />
     <ProjectReference Include="$(CoreIntegrationTests)" />
   </ItemGroup>
+  <!-- CA2025 false-positives on the sync-over-async setup in integration-test fixtures:
+       DB connections / TCP clients are passed into task-returning methods inside a `using`,
+       but those tasks always complete before disposal (via GetAwaiter().GetResult() in the
+       TestBase constructors, and Task.WhenAll in TcpExchangeTests). The analyzer only
+       recognizes `await`, so it flags them. Suppress it for integration-test projects only. -->
+  <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.IntegrationTests'))">
+    <NoWarn>$(NoWarn);CA2025</NoWarn>
+  </PropertyGroup>
   <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.UnitTests')) and !$(MSBuildProjectName.Contains('Core'))">
     <ProjectReference Include="$(CoreUnitTests)" />
   </ItemGroup>
