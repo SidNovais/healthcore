@@ -90,6 +90,9 @@ jobs:
   integration-tests:
     name: Integration Tests
     runs-on: ubuntu-latest
+    # Backstop so a hung test can never burn the full runner budget. The per-test
+    # --blame-hang-timeout below should trip first; this is the outer guard.
+    timeout-minutes: 30
 
     # A single Postgres instance shared by every module's integration tests. Each module owns
     # its own schema and truncates only its own tables per test, so one database is sufficient.
@@ -157,6 +160,10 @@ jobs:
       # Run every integration-test project (matched by Tests/IntegrationTests/ directory path).
       # Sequential — they share the single Postgres instance. Run all even if one fails, then
       # fail the step if any failed.
+      #
+      # --blame-hang-timeout aborts (and fails) any single test that stalls for 5m and writes a
+      # hang dump into the results dir, so a stuck test surfaces as a failure with diagnostics
+      # instead of hanging the job. (The TcpMessage TCP tests are the known offender.)
       - name: Integration tests
         run: |
           fail=0
@@ -165,6 +172,8 @@ jobs:
             dotnet test "$proj" --no-build -c Release \
               --logger "trx;LogFileName=$(basename "$proj" .csproj).trx" \
               --collect:"XPlat Code Coverage" \
+              --blame-hang-timeout 5m \
+              --blame-hang-dump-type mini \
               --results-directory "$PWD/TestResults" || fail=1
             echo "::endgroup::"
           done < <(find src -path '*/Tests/IntegrationTests/*.csproj' -not -path '*/.worktrees/*' -print0)
