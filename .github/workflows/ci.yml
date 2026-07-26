@@ -42,11 +42,10 @@ jobs:
       #
       # Integration-test projects are excluded from this unit-test slice: they require a
       # Postgres database + ASPNETCORE_HCLIS_IntegrationTests_ConnectionString to run, and are
-      # not exercised here. (They also currently trip the CA2025 analyzer in their TestBase
-      # files under newer SDKs.) They will be built and run in a dedicated integration-test job.
+      # not exercised here. They are built and run in the dedicated `integration-tests` job below.
       # HC.LIS.Tests.IntegrationEvents is a pre-existing broken, DB-dependent integration test
       # (stale CreateBarcodeCommand / RecordSampleCollectionCommand references) that does not
-      # compile at all. TODO: fix and re-include both (tracked as a follow-up).
+      # compile at all. TODO: fix and re-include it (tracked as a follow-up).
       - name: Generate solution
         run: |
           dotnet new sln -n HealthCore --format slnx
@@ -85,5 +84,96 @@ jobs:
         if: always()
         with:
           name: test-results
+          path: TestResults/
+          if-no-files-found: warn
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+
+    # A single Postgres instance shared by every module's integration tests. Each module owns
+    # its own schema and truncates only its own tables per test, so one database is sufficient.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: Healthcore.Dev
+          POSTGRES_USER: dev
+          POSTGRES_PASSWORD: dev
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dev -d Healthcore.Dev"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    # The migrations tool reads *_DATABASE_CONNECTION_STRING; every test TestBase reads
+    # *_IntegrationTests_ConnectionString. Both point at the service container above.
+    env:
+      ASPNETCORE_HCLIS_DATABASE_CONNECTION_STRING: "Host=localhost;Port=5432;Database=Healthcore.Dev;Username=dev;Password=dev"
+      ASPNETCORE_HCLIS_IntegrationTests_ConnectionString: "Host=localhost;Port=5432;Database=Healthcore.Dev;Username=dev;Password=dev"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        # SDK version is read from global.json at the repo root.
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/Directory.Packages.props') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      # Same on-the-fly solution as the unit-test job, but this time the integration-test
+      # projects ARE included. Only worktrees and the broken HC.LIS.Tests.IntegrationEvents
+      # project (does not compile) are excluded.
+      - name: Generate solution
+        run: |
+          dotnet new sln -n HealthCore --format slnx
+          find src -name '*.csproj' \
+            -not -path '*/.worktrees/*' \
+            -not -path '*/HC.LIS.Tests/IntegrationEvents/*' \
+            -print0 \
+            | xargs -0 dotnet sln HealthCore.slnx add
+
+      - name: Restore
+        run: dotnet restore HealthCore.slnx
+
+      # Strict build: TreatWarningsAsErrors + full analyzers gate the whole codebase.
+      - name: Build
+        run: dotnet build HealthCore.slnx -c Release --no-restore
+
+      # Apply FluentMigrator relational migrations + create every module's Marten event-store
+      # schema. Must run before the tests, which truncate those tables during setup.
+      - name: Apply database migrations
+        run: dotnet run --project src/HC.LIS/HC.LIS.Database -c Release --no-build
+
+      # Run every integration-test project (matched by Tests/IntegrationTests/ directory path).
+      # Sequential — they share the single Postgres instance. Run all even if one fails, then
+      # fail the step if any failed.
+      - name: Integration tests
+        run: |
+          fail=0
+          while IFS= read -r -d '' proj; do
+            echo "::group::Testing $proj"
+            dotnet test "$proj" --no-build -c Release \
+              --logger "trx;LogFileName=$(basename "$proj" .csproj).trx" \
+              --collect:"XPlat Code Coverage" \
+              --results-directory "$PWD/TestResults" || fail=1
+            echo "::endgroup::"
+          done < <(find src -path '*/Tests/IntegrationTests/*.csproj' -not -path '*/.worktrees/*' -print0)
+          exit $fail
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: integration-test-results
           path: TestResults/
           if-no-files-found: warn
