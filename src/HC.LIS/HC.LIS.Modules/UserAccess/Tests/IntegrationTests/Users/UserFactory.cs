@@ -31,7 +31,7 @@ public class UserFactory(IUserAccessModule userAccessModule)
         await _userAccessModule.ExecuteCommandAsync(new ActivateUserCommand(
             UserSampleData.UserId,
             UserSampleData.InvitationToken,
-            UserSampleData.PasswordHash,
+            UserSampleData.Password,
             SystemClock.Now
         )).ConfigureAwait(false);
     }
