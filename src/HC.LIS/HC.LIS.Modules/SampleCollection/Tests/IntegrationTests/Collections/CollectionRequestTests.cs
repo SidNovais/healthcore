@@ -208,7 +208,10 @@ public class CollectionRequestTests : TestBase
                 CollectionRequestSampleData.CollectedAt)).ConfigureAwait(true);
 
         var details = await GetEventually(
-            new GetSampleDetailsFromSampleCollectionProbe(sampleId, SampleCollectionModule),
+            new GetSampleDetailsFromSampleCollectionProbe(
+                sampleId,
+                SampleCollectionModule,
+                d => d?.Status == SampleStatus.Collected.Value),
             15000).ConfigureAwait(true);
 
         details.Should().NotBeNull();

@@ -8,14 +8,17 @@ namespace HC.LIS.Modules.SampleCollection.IntegrationTests.Collections;
 
 public class GetSampleDetailsFromSampleCollectionProbe(
     Guid expectedSampleId,
-    ISampleCollectionModule sampleCollectionModule
+    ISampleCollectionModule sampleCollectionModule,
+    Func<SampleDetailsDto?, bool>? satisfied = null
 ) : IProbe<SampleDetailsDto>
 {
     private readonly Guid _expectedSampleId = expectedSampleId;
     private readonly ISampleCollectionModule _sampleCollectionModule = sampleCollectionModule;
+    private readonly Func<SampleDetailsDto?, bool> _satisfied =
+        satisfied ?? (sample => sample is not null);
 
     public string DescribeFailureTo() =>
-        $"SampleDetails not found for {_expectedSampleId}";
+        $"SampleDetails not found or condition unmet for {_expectedSampleId}";
 
     public async Task<SampleDetailsDto?> GetSampleAsync()
     {
@@ -24,5 +27,5 @@ public class GetSampleDetailsFromSampleCollectionProbe(
             .ConfigureAwait(false);
     }
 
-    public bool IsSatisfied(SampleDetailsDto? sample) => sample is not null;
+    public bool IsSatisfied(SampleDetailsDto? sample) => _satisfied(sample);
 }
