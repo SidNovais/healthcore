@@ -141,20 +141,24 @@ public class TcpExchangeTests() : TestBase()
         const string examMnemonic = "GLUC";
         var (sampleId, barcode, _) = await SeedAndWaitAsync("TCPQ002", examMnemonic);
 
-        // Phase 1: barcode query → sets status to InfoDispatched
-        using var qbpClient = new TcpTestClient(BoundPort);
-        await qbpClient.SendAsync(HL7MessageBuilder.BuildQbpQ11(barcode, "MSG001"));
-        await qbpClient.ReceiveAsync();
+        // The server serves one full exchange per connection: it answers the barcode query and
+        // then reads the result frame on the SAME connection. Query and result must therefore be
+        // sent over a single client, in order — a second connection would block behind this one.
+        using var client = new TcpTestClient(BoundPort);
+
+        // Phase 1: barcode query → RSP, sets status to InfoDispatched
+        await client.SendAsync(HL7MessageBuilder.BuildQbpQ11(barcode, "MSG001"));
+        byte[] rspBytes = await client.ReceiveAsync();
+        Encoding.UTF8.GetString(rspBytes).Should().Contain("RSP^K11");
 
         var dispatched = await GetEventually(
             new AnalyzerSampleDetailsProbe(sampleId, AnalyzerModule, d => d?.Status == "InfoDispatched"),
             timeoutMs: 15_000);
         dispatched.Should().NotBeNull("sample should reach InfoDispatched before result can be forwarded");
 
-        // Phase 2: result forward → immediate ACK, then domain processing
-        using var oruClient = new TcpTestClient(BoundPort);
-        await oruClient.SendAsync(HL7MessageBuilder.BuildOruR01(barcode, examMnemonic, "7.5", "MSG002"));
-        byte[] ackBytes = await oruClient.ReceiveAsync();
+        // Phase 2: result forward on the same connection → immediate ACK, then domain processing
+        await client.SendAsync(HL7MessageBuilder.BuildOruR01(barcode, examMnemonic, "7.5", "MSG002"));
+        byte[] ackBytes = await client.ReceiveAsync();
 
         string ack = Encoding.UTF8.GetString(ackBytes);
         ack.Should().Contain("MSA|AA");
@@ -176,16 +180,24 @@ public class TcpExchangeTests() : TestBase()
         var (_, barcode1, _) = await SeedAndWaitAsync("TCPQ003", "GLUC");
         var (_, barcode2, _) = await SeedAndWaitAsync("TCPQ004", "HBA1C");
 
-        using var client1 = new TcpTestClient(BoundPort);
-        using var client2 = new TcpTestClient(BoundPort);
-
-        var task1 = DoQbpExchangeAsync(client1, barcode1, "MSG001");
-        var task2 = DoQbpExchangeAsync(client2, barcode2, "MSG002");
+        // The server processes one connection at a time (SemaphoreSlim(1,1)) and treats each
+        // connection as a full exchange, so a barcode-only client must close to end its exchange
+        // and release the server for the next connection. Fire both concurrently: whichever the
+        // server accepts first is served to completion, then the second — both must succeed.
+        var task1 = QbpThenCloseAsync(BoundPort, barcode1, "MSG001");
+        var task2 = QbpThenCloseAsync(BoundPort, barcode2, "MSG002");
 
         string[] responses = await Task.WhenAll(task1, task2);
 
         responses[0].Should().Contain("RSP^K11");
         responses[1].Should().Contain("RSP^K11");
+    }
+
+    private static async Task<string> QbpThenCloseAsync(int port, string barcode, string msgId)
+    {
+        using var client = new TcpTestClient(port);
+        await client.SendAsync(HL7MessageBuilder.BuildQbpQ11(barcode, msgId));
+        return Encoding.UTF8.GetString(await client.ReceiveAsync());
     }
 
     private async Task<(Guid SampleId, string Barcode, string ExamMnemonic)> SeedAndWaitAsync(
@@ -210,13 +222,6 @@ public class TcpExchangeTests() : TestBase()
         details.Should().NotBeNull($"seeded sample '{barcode}' should appear in projection within 15 seconds");
 
         return (sampleId, barcode, examMnemonic);
-    }
-
-    private static async Task<string> DoQbpExchangeAsync(TcpTestClient client, string barcode, string msgId)
-    {
-        await client.SendAsync(HL7MessageBuilder.BuildQbpQ11(barcode, msgId));
-        byte[] response = await client.ReceiveAsync();
-        return Encoding.UTF8.GetString(response);
     }
 }
 
