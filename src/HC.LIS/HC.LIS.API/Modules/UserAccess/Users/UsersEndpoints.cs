@@ -1,4 +1,5 @@
 using HC.LIS.API.Common;
+using HC.LIS.API.Configuration.RateLimiting;
 using HC.LIS.API.Modules.UserAccess.Users.ActivateUser;
 using HC.LIS.API.Modules.UserAccess.Users.ChangeRole;
 using HC.LIS.API.Modules.UserAccess.Users.CreateUser;
@@ -44,10 +45,12 @@ internal static class UsersEndpoints
 
         group.MapPost("{userId:guid}/activate", ActivateUserEndpoint.Handle)
             .AllowAnonymous()
+            .RequireRateLimiting(RateLimitPolicies.Auth)
             .WithName("ActivateUser")
             .WithSummary("Activate a user account using an invitation token.")
             .Produces(StatusCodes.Status204NoContent)
-            .ProducesProblem(StatusCodes.Status400BadRequest);
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status429TooManyRequests);
 
         return group;
     }

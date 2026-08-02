@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Net;
 using Asp.Versioning;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -6,6 +7,7 @@ using HC.Core.Application;
 using HC.LIS.API.Configuration.Authentication;
 using HC.LIS.API.Configuration.ExecutionContext;
 using HC.LIS.API.Configuration.Extensions;
+using HC.LIS.API.Configuration.RateLimiting;
 using HC.LIS.API.Configuration.Validation;
 using HC.LIS.API.Modules.Analyzer;
 using HC.LIS.API.Modules.Analyzer.AnalyzerSamples;
@@ -31,6 +33,7 @@ using HC.Core.Infrastructure.RealTime;
 using HC.LIS.API.Modules.PatientManagement;
 using HC.LIS.API.Modules.PatientManagement.Patients;
 using HC.LIS.Modules.PatientManagement.Infrastructure.Configurations;
+using Microsoft.AspNetCore.HttpOverrides;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -144,6 +147,32 @@ try
         builder.Configuration["API_TITLE"] ?? "HC.LIS API",
         builder.Configuration["API_DESCRIPTION"] ?? "Laboratory Information System — Modular Monolith API");
 
+    // ─── Forwarded headers ─────────────────────────────────────────────────
+    // Recover the real client IP/scheme when running behind a proxy/ingress so per-IP rate limits
+    // are meaningful. Only explicitly declared proxies are trusted (ASPNETCORE_HCLIS_KNOWN_PROXIES,
+    // comma-separated) — the loopback-only default prevents a spoofed X-Forwarded-For from defeating
+    // the per-IP auth limiter.
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+
+        var knownProxies = builder.Configuration["KNOWN_PROXIES"];
+        if (!string.IsNullOrWhiteSpace(knownProxies))
+        {
+            options.KnownProxies.Clear();
+            options.KnownIPNetworks.Clear();
+            foreach (var ip in knownProxies.Split(
+                ',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            {
+                if (IPAddress.TryParse(ip, out var parsed))
+                    options.KnownProxies.Add(parsed);
+            }
+        }
+    });
+
+    // ─── Rate limiting ─────────────────────────────────────────────────────
+    builder.Services.AddHcLisRateLimiting(builder.Configuration);
+
     // ─── Build ─────────────────────────────────────────────────────────────
     var app = builder.Build();
 
@@ -171,6 +200,8 @@ try
     busProvider.StartConsuming();
 
     // ─── Middleware pipeline ────────────────────────────────────────────────
+    app.UseForwardedHeaders();
+
     if (app.Environment.IsDevelopment())
         app.UseCors("DevCors");
 
@@ -180,6 +211,9 @@ try
 
     app.UseAuthentication();
     app.UseAuthorization();
+
+    // After authentication so per-user partitioning can read the resolved identity.
+    app.UseRateLimiter();
 
     // ─── Versioned endpoint groups ──────────────────────────────────────────
     var versionSet = app.NewApiVersionSet()
@@ -206,7 +240,7 @@ try
     v1.MapGroup("users").MapUsersEndpoints();
     v1.MapGroup("audit-log").MapAuditLogEndpoints();
     v1.MapGroup("patients").MapPatientsEndpoints();
-    v1.MapGroup("events").MapEventStreamEndpoints();
+    v1.MapGroup("events").MapEventStreamEndpoints().RequireRateLimiting(RateLimitPolicies.Stream);
 
     await app.RunAsync().ConfigureAwait(false);
 }

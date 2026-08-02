@@ -169,6 +169,20 @@ Cross-cutting rules (keep behaviour identical across features):
 
 Always use `SystemClock.Now` (from `HC.Core.Domain`) instead of `DateTime.UtcNow` or `DateTime.Now` throughout all application and API code. Tests use `SystemClock.Set(DateTime)` to freeze time and `SystemClock.Clear()` to reset it.
 
+### Rate Limiting (API)
+
+The API uses the built-in `Microsoft.AspNetCore.RateLimiting` middleware, wired in `Configuration/RateLimiting/` (`RateLimitingExtensions.AddHcLisRateLimiting` + `UseRateLimiter`):
+
+- **Global limiter** — per-user (else per-IP) baseline on every `/api/*` endpoint. Swagger, `/health*`, and the SSE stream are exempt.
+- **`RateLimitPolicies.Auth`** — strict per-IP window; attach with `.RequireRateLimiting(RateLimitPolicies.Auth)` to *anonymous* abuse-prone endpoints (login, activation).
+- **`RateLimitPolicies.Stream`** — per-user concurrency cap for the long-lived SSE endpoint (a window limiter would hold its permit forever).
+
+Rules to follow when extending it:
+- Tune limits via the `RateLimit` config section (`ASPNETCORE_HCLIS_RateLimit__*`); never hard-code limits at call sites — only attach policy names.
+- `RateLimit:Enabled=false` makes every limiter inert — **set it in e2e / integration-test environments** so repeated logins don't flake.
+- Rejections return **429** with `Retry-After` + a `ProblemDetails` body (see `OnRejected`), consistent with `UseHcLisExceptionHandler`.
+- Per-IP partitioning depends on `UseForwardedHeaders`; only proxies listed in `ASPNETCORE_HCLIS_KNOWN_PROXIES` are trusted (loopback-only otherwise) so `X-Forwarded-For` can't be spoofed to defeat the auth limiter.
+
 ### Testing Pattern
 
 Tests follow **Arrange–Act–Assert** with FluentAssertions. `TestBase` provides `AssertPublishedDomainEvent<T>()` to verify events raised on aggregates. `OrderSampleData` holds shared test data; `OrderFactory` builds test aggregates.

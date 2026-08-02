@@ -81,7 +81,7 @@ State advances through cross-module choreography: `SampleCollection` collecting 
 
 ### API
 
-An ASP.NET Core **Minimal API**, versioned under `/api/v1`, secured with JWT (delivered as an `HttpOnly` cookie), documented with Swagger, and streaming real-time updates over **Server-Sent Events**.
+An ASP.NET Core **Minimal API**, versioned under `/api/v1`, secured with JWT (delivered as an `HttpOnly` cookie), documented with Swagger, streaming real-time updates over **Server-Sent Events**, and protected by a configurable **rate limiter** (strict per-IP throttling on the anonymous auth surface, a per-user baseline elsewhere, and a concurrency cap on the SSE stream).
 
 | Group | Purpose |
 |---|---|
@@ -293,6 +293,11 @@ Configuration is read from environment variables prefixed **`ASPNETCORE_HCLIS_`*
 | `ASPNETCORE_HCLIS_JWT_AUDIENCE` | API | ✅ | JWT audience |
 | `ASPNETCORE_HCLIS_JWT_SECRET_KEY` | API | ✅ | HMAC signing key (min 32 chars) |
 | `ASPNETCORE_HCLIS_JWT_COOKIE_NAME` | API | — | Cookie the JWT is read from (default `ACCESS_TOKEN`) |
+| `ASPNETCORE_HCLIS_RateLimit__Enabled` | API | — | Master rate-limit switch (default `true`); set `false` for e2e / integration-test runs |
+| `ASPNETCORE_HCLIS_RateLimit__Global__PermitLimit` / `__Global__WindowSeconds` | API | — | Per-user (else per-IP) baseline for all `/api/*` (default `100` / `60`s) |
+| `ASPNETCORE_HCLIS_RateLimit__Auth__PermitLimit` / `__Auth__WindowSeconds` | API | — | Strict per-IP limit on anonymous auth endpoints — login, activation (default `10` / `60`s) |
+| `ASPNETCORE_HCLIS_RateLimit__Stream__PermitLimit` | API | — | Max concurrent SSE `/events/stream` connections per user (default `5`) |
+| `ASPNETCORE_HCLIS_KNOWN_PROXIES` | API | — | Comma-separated trusted proxy IPs; enables `X-Forwarded-For` so per-IP limits see the real client (default: loopback only) |
 | `ASPNETCORE_HCLIS_EventBus__Type` | API | — | `rabbitmq` (default) or `memory` (in-process) |
 | `ASPNETCORE_HCLIS_EventBus__ConnectionString` | API | — | AMQP URI; default `amqp://guest:guest@localhost:5672/` (compose uses `amqp://dev:dev@localhost:5672/`) |
 | `ASPNETCORE_HCLIS_Tcp__Port` | TcpMessage | — | HL7/MLLP listener port (default `8890`) |
