@@ -96,6 +96,18 @@ An ASP.NET Core **Minimal API**, versioned under `/api/v1`, secured with JWT (de
 
 Authorization policies: **`ITAdmin`** and **`PatientManagement`** (Receptionist or ITAdmin).
 
+#### Rate limiting
+
+The API is fronted by ASP.NET Core's built-in rate limiter, wired in three tiers:
+
+| Tier | Applies to | Strategy | Default |
+|---|---|---|---|
+| **Global** | Every `/api/*` endpoint (Swagger, `/health*`, and the SSE stream are exempt) | Fixed window, partitioned **per-user** (falls back to per-IP when anonymous) | `100` req / `60`s |
+| **`Auth`** | The anonymous, abuse-prone surface — **login** and **user activation** (`{userId}/activate`) | Strict fixed window, **per-IP** | `10` req / `60`s |
+| **`Stream`** | The long-lived SSE endpoint `GET /api/v1/events/stream` | **Concurrency** cap, per-user — a window limiter would hold its permit for the life of the connection | `5` concurrent |
+
+Rejections return **`429 Too Many Requests`** with a `Retry-After` header and an `application/problem+json` `ProblemDetails` body, consistent with the API's exception handler. Per-IP partitioning relies on `UseForwardedHeaders`; only proxies listed in `ASPNETCORE_HCLIS_KNOWN_PROXIES` are trusted (loopback otherwise), so `X-Forwarded-For` can't be spoofed to slip past the auth limiter. Setting `RateLimit__Enabled=false` makes every limiter inert — do this in e2e / integration-test runs so repeated logins don't trip the auth window. All limits are tunable via the `ASPNETCORE_HCLIS_RateLimit__*` variables in [Configuration](#configuration).
+
 ### Frontend
 
 An **Angular 21** single-page app (Yarn workspaces monorepo) covering login, orders, patients, triage/reception, and the analysis worklist — with skeleton/spinner/progress loading standards, GSAP motion, and a11y-gated e2e tests. Its API client (`@hc-lis/api-client`) is generated from the API's OpenAPI schema, so the SPA stays in lockstep with the backend contract.
