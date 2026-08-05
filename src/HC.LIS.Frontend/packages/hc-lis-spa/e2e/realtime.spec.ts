@@ -1,35 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { loginAsReceptionist } from './fixtures/auth';
-
-// The well-known seed patient id the TestOrders module accepts (see orders.spec.ts).
-const SEED_PATIENT_ID = '00000000-0000-0000-0000-000000000001';
-
-// Mocks patient search and selects the seed patient via the picker, so an order can be created
-// without depending on pre-seeded patient data.
-async function pickSeedPatient(page: Page): Promise<void> {
-  await page.route(/\/api\/v1\/patients(\?.*)?$/, async route => {
-    if (route.request().method() === 'GET') {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify([{
-          id: SEED_PATIENT_ID,
-          fullName: 'Seeded Test Patient',
-          dateOfBirth: '1990-01-01',
-          documentId: 'SEED-001',
-          status: 'Active',
-        }]),
-      });
-    } else {
-      await route.continue();
-    }
-  });
-
-  await page.getByTestId('patient-picker-input').fill('Seeded');
-  await page.waitForResponse(r => r.url().includes('/api/v1/patients') && r.request().method() === 'GET');
-  await page.getByTestId('patient-picker-result-item').first().click();
-  await expect(page.getByTestId('patient-picker-selected-card')).toBeVisible({ timeout: 5_000 });
-}
+import { startOrder } from './fixtures/orders';
 
 // Opens an order's detail and waits for the exam row, retrying the navigation until the
 // outbox-driven exam projection (Quartz, ~2s) has committed.
@@ -79,7 +50,7 @@ test.describe('Real-time feed — cross-session updates', () => {
       await loginAsReceptionist(watcher);
 
       // Actor creates an order and requests one exam.
-      await pickSeedPatient(actor);
+      await startOrder(actor);
       await actor.getByTestId('create-order-submit-btn').click();
       await expect(actor.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
       const orderId = (await actor.getByTestId('order-created').getAttribute('data-order-id'))!;
@@ -128,7 +99,7 @@ test.describe('Real-time feed — cross-session updates', () => {
         .toHaveAttribute('data-status', 'live', { timeout: 10_000 });
 
       // Actor creates an order and requests one exam.
-      await pickSeedPatient(actor);
+      await startOrder(actor);
       await actor.getByTestId('create-order-submit-btn').click();
       await expect(actor.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
       const orderId = (await actor.getByTestId('order-created').getAttribute('data-order-id'))!;

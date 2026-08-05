@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { loginAsPhysician, loginAsReceptionist } from './fixtures/auth';
+import { ensurePhysician, pickPhysician } from './fixtures/physicians';
 
 test.describe('Patient Picker in New Order', () => {
   test.beforeEach(async ({ context }) => {
@@ -12,6 +13,9 @@ test.describe('Patient Picker in New Order', () => {
     // Register a unique patient so we have a known name + document ID to search for
     const uniqueName = `PickerPatient-${Date.now()}`;
     const documentId = `DOC-PKR-${Date.now()}`;
+
+    // An order also needs a registered physician; this spec is about the patient half of it.
+    const physician = await ensurePhysician(page);
 
     await page.goto('/patients/new');
     await page.getByTestId('patient-full-name-input').fill(uniqueName);
@@ -68,7 +72,9 @@ test.describe('Patient Picker in New Order', () => {
     await expect(page.getByTestId('patient-picker-selected-card')).toContainText(uniqueName);
     await expect(page.getByTestId('patient-picker-selected-card')).toContainText(documentId);
 
-    // Submit is now enabled
+    // A patient alone is not enough — the order also needs a referring physician.
+    await expect(page.getByTestId('create-order-submit-btn')).toBeDisabled();
+    await pickPhysician(page, physician.fullName);
     await expect(page.getByTestId('create-order-submit-btn')).toBeEnabled();
 
     // Create the order
@@ -90,6 +96,7 @@ test.describe('Patient Picker in New Order', () => {
 
     // Register a patient to search for
     const uniqueName = `PickerClear-${Date.now()}`;
+    const physician = await ensurePhysician(page);
 
     await page.goto('/patients/new');
     await page.getByTestId('patient-full-name-input').fill(uniqueName);
@@ -123,6 +130,8 @@ test.describe('Patient Picker in New Order', () => {
     await page.getByTestId('patient-picker-result-item').first().click();
 
     await expect(page.getByTestId('patient-picker-selected-card')).toBeVisible({ timeout: 5_000 });
+
+    await pickPhysician(page, physician.fullName);
     await expect(page.getByTestId('create-order-submit-btn')).toBeEnabled();
 
     // Click the clear button
