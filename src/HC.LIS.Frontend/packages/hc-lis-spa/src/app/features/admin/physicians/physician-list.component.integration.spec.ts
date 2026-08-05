@@ -137,12 +137,15 @@ describe('PhysicianListComponent (integration)', () => {
     ).toBe('');
   });
 
-  it('opens the form prefilled with the row being edited', () => {
+  it('opens the form prefilled with the row being edited', async () => {
     physiciansSignal.set(activeAndInactive);
     fixture.detectChanges();
 
     openActions(rows()[0]);
     click('[data-testid="physician-action-edit"]');
+    // NgModel pushes the initial value to the DOM in a microtask, not during the pass
+    // that created the control.
+    await fixture.whenStable();
 
     const form = host().querySelector('[data-testid="physician-form"]')!;
     expect(

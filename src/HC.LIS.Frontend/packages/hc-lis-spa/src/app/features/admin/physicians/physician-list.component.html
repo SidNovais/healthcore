@@ -1,0 +1,171 @@
+<hc-page title="Physician Registry" subtitle="Referring physicians who order exams." width="wide" testId="physicians">
+  <button
+    hc-page-actions
+    hc-button
+    variant="cta"
+    data-testid="create-physician-btn"
+    (click)="openRegisterForm()"
+  >
+    <hc-icon name="plus" [size]="16" /> Register Physician
+  </button>
+
+  <hc-dialog
+    [open]="formOpen()"
+    (openChange)="onFormOpenChange($event)"
+    width="wide"
+    testId="physician-form-dialog"
+  >
+    @if (formOpen()) {
+      <app-physician-form [physician]="editing()" (close)="closeForm()" />
+    }
+  </hc-dialog>
+
+  @if (service.loading()) {
+    <table hc-table class="physicians-table" aria-busy="true">
+      <thead>
+        <tr>
+          <th>Full Name</th>
+          <th>Licence Number</th>
+          <th>Status</th>
+          <th class="actions-column"><span class="sr-only">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of skeletonRows; track $index) {
+          <tr data-testid="physicians-skeleton-row" class="skeleton-row">
+            <td><hc-skeleton /></td>
+            <td><hc-skeleton /></td>
+            <td><hc-skeleton /></td>
+            <td><hc-skeleton /></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else if (service.physicians().length === 0) {
+    <hc-empty
+      data-testid="empty-state"
+      title="No physicians registered"
+      description="Register a referring physician so receptionists can select one on a new order."
+    />
+  } @else {
+    <table hc-table class="physicians-table" data-testid="physician-list-table">
+      <thead>
+        <tr>
+          <th>Full Name</th>
+          <th>Licence Number</th>
+          <th>Status</th>
+          <th class="actions-column"><span class="sr-only">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (physician of pagedPhysicians(); track physician.id) {
+          <tr data-testid="physician-list-row">
+            <td>{{ physician.fullName }}</td>
+            <td data-testid="physician-licence-cell">{{ physician.licenceNumber ?? noLicence }}</td>
+            <td>
+              <hc-badge
+                data-testid="physician-status-badge"
+                [variant]="physician.status === 'Active' ? 'success' : 'neutral'"
+              >
+                {{ physician.status }}
+              </hc-badge>
+            </td>
+            <td class="actions-column">
+              <hc-dropdown-menu testId="physician-actions" ariaLabel="Physician actions">
+                <button
+                  type="button"
+                  class="actions-trigger"
+                  hc-dropdown-trigger
+                  data-testid="physician-actions-trigger"
+                  [attr.aria-label]="'Actions for ' + physician.fullName"
+                >
+                  <hc-icon name="more-horizontal" [size]="16" />
+                </button>
+                <button
+                  hc-dropdown-item
+                  data-testid="physician-action-edit"
+                  (select)="openEditForm(physician)"
+                >
+                  Edit
+                </button>
+                @if (physician.status === 'Active') {
+                  <button
+                    hc-dropdown-item
+                    data-testid="physician-action-deactivate"
+                    (select)="requestStatusChange(physician, 'deactivate')"
+                  >
+                    Deactivate
+                  </button>
+                } @else {
+                  <button
+                    hc-dropdown-item
+                    data-testid="physician-action-reactivate"
+                    (select)="requestStatusChange(physician, 'reactivate')"
+                  >
+                    Reactivate
+                  </button>
+                }
+              </hc-dropdown-menu>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (pageCount() > 1) {
+      <div class="physicians-footer">
+        <hc-pagination
+          testId="physicians-pagination"
+          ariaLabel="Physician registry pages"
+          [page]="displayPage()"
+          [pageCount]="pageCount()"
+          (pageChange)="page.set($event)"
+        />
+      </div>
+    }
+  }
+
+  <hc-dialog
+    [open]="statusDialogOpen()"
+    (openChange)="onStatusDialogOpenChange($event)"
+    testId="physician-status-dialog"
+  >
+    @if (pendingStatusChange(); as pending) {
+      <div class="status-dialog">
+        <h3 class="status-dialog__title">
+          {{ pending.action === 'deactivate' ? 'Deactivate physician' : 'Reactivate physician' }}
+        </h3>
+        <p class="status-dialog__body">
+          @if (pending.action === 'deactivate') {
+            Deactivate <strong>{{ pending.fullName }}</strong>? They stay on existing orders but can
+            no longer be selected on new ones.
+          } @else {
+            Reactivate <strong>{{ pending.fullName }}</strong>? They become selectable on new orders
+            again.
+          }
+        </p>
+        <div class="status-dialog__actions">
+          <button
+            hc-button
+            variant="ghost"
+            data-testid="cancel-physician-status-btn"
+            (click)="cancelStatusChange()"
+            [disabled]="changingStatus()"
+          >
+            Cancel
+          </button>
+          <button
+            hc-button
+            variant="cta"
+            data-testid="confirm-physician-status-btn"
+            (click)="confirmStatusChange()"
+            [loading]="changingStatus()"
+            [disabled]="changingStatus()"
+          >
+            {{ pending.action === 'deactivate' ? 'Deactivate' : 'Reactivate' }}
+          </button>
+        </div>
+      </div>
+    }
+  </hc-dialog>
+</hc-page>
