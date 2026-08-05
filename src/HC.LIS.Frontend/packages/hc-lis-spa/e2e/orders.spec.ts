@@ -1,39 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { loginAsLabTechnician, loginAsReceptionist } from './fixtures/auth';
-
-// Mock the patient search endpoint and select a patient via the picker.
-// The fake patient ID is the well-known seed UUID accepted by the TestOrders module.
-async function pickPatient(
-  page: import('@playwright/test').Page,
-  patientId = '00000000-0000-0000-0000-000000000001',
-): Promise<void> {
-  await page.route(/\/api\/v1\/patients(\?.*)?$/, async route => {
-    if (route.request().method() === 'GET') {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify([{
-          id: patientId,
-          fullName: 'Seeded Test Patient',
-          dateOfBirth: '1990-01-01',
-          documentId: 'SEED-001',
-          status: 'Active',
-        }]),
-      });
-    } else {
-      await route.continue();
-    }
-  });
-
-  await page.getByTestId('patient-picker-input').fill('Seeded');
-  await page.waitForResponse(r =>
-    r.url().includes('/api/v1/patients') &&
-    r.request().method() === 'GET',
-  );
-  await expect(page.getByTestId('patient-picker-result-item').first()).toBeVisible({ timeout: 5_000 });
-  await page.getByTestId('patient-picker-result-item').first().click();
-  await expect(page.getByTestId('patient-picker-selected-card')).toBeVisible({ timeout: 5_000 });
-}
+import { startOrder } from './fixtures/orders';
 
 test.describe('Test Order Request', () => {
   test.beforeEach(async ({ context }) => {
@@ -42,7 +9,7 @@ test.describe('Test Order Request', () => {
 
   test('Receptionist creates an order and requests an exam — confirmation visible', async ({ page }) => {
     await loginAsReceptionist(page);
-    await pickPatient(page);
+    await startOrder(page);
 
     await Promise.all([
       page.waitForResponse(r =>
@@ -79,15 +46,14 @@ test.describe('Order List', () => {
     await loginAsReceptionist(page);
     await page.goto('/orders');
     await expect(page.getByTestId('order-list-table')).toBeVisible({ timeout: 5_000 });
-    // The "Requested By" column (a raw user id) has been removed.
-    await expect(page.getByTestId('order-list-sort-requested-by')).toHaveCount(0);
+    await expect(page.getByTestId('order-list-sort-requested-by')).toBeVisible({ timeout: 5_000 });
   });
 
   test('Clicking an order row navigates to /orders/:id', async ({ page }) => {
     await loginAsReceptionist(page);
 
     // Create an order so the list has at least one row
-    await pickPatient(page);
+    await startOrder(page);
     await page.getByTestId('create-order-submit-btn').click();
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
 
@@ -184,10 +150,11 @@ test.describe('Order Detail', () => {
 
   test('Receptionist sees order detail page at /orders/:id', async ({ page }) => {
     await loginAsReceptionist(page);
-    await pickPatient(page);
+    const physician = await startOrder(page);
 
     await page.getByTestId('create-order-submit-btn').click();
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
+    const orderId = (await page.getByTestId('order-created').getAttribute('data-order-id'))!;
     await page.getByTestId('exam-mnemonic-input').fill('GLU');
     await page.getByTestId('container-type-input').fill('RedTop');
     await page.getByTestId('request-exam-btn').click();
@@ -195,22 +162,26 @@ test.describe('Order Detail', () => {
 
     await page.goto('/orders');
     await expect(page.getByTestId('order-list-table')).toBeVisible({ timeout: 5_000 });
-    await page.getByTestId('order-list-row').first().click();
+    const ourRow = page.locator(`[data-testid="order-list-row"][data-order-id="${orderId}"]`);
+    await expect(ourRow.getByTestId('requested-by-cell')).toHaveText(physician.fullName, {
+      timeout: 5_000,
+    });
+    await ourRow.click();
     await expect(page).toHaveURL(
       /\/orders\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
       { timeout: 5_000 }
     );
 
     await expect(page.getByTestId('order-detail')).toBeVisible({ timeout: 5_000 });
-    // Patient shows a name (or the friendly placeholder), never a raw id; and the
-    // raw "Requested By" user id has been removed entirely.
+    // Patient and physician show a name (or the friendly placeholder), never a raw id.
     await expect(page.getByTestId('patient-name')).not.toContainText(/^[0-9a-f]{8}-[0-9a-f]{4}-/i);
-    await expect(page.getByTestId('requested-by')).toHaveCount(0);
+    await expect(page.getByTestId('requested-by')).toHaveText(physician.fullName, { timeout: 5_000 });
+    await expect(page.getByTestId('requested-by')).not.toContainText(/^[0-9a-f]{8}-[0-9a-f]{4}-/i);
   });
 
   test('Order detail page shows exam items table with one row', async ({ page }) => {
     await loginAsReceptionist(page);
-    await pickPatient(page);
+    await startOrder(page);
 
     await page.getByTestId('create-order-submit-btn').click();
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
@@ -237,7 +208,7 @@ test.describe('Order Detail', () => {
 
   test('Receptionist can Accept a Requested exam item — status updates to Accepted', async ({ page }) => {
     await loginAsReceptionist(page);
-    await pickPatient(page);
+    await startOrder(page);
 
     await page.getByTestId('create-order-submit-btn').click();
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
@@ -263,7 +234,7 @@ test.describe('Order Detail', () => {
 
   test('Receptionist can Reject an exam item with a reason — status updates to Rejected', async ({ page }) => {
     await loginAsReceptionist(page);
-    await pickPatient(page);
+    await startOrder(page);
 
     await page.getByTestId('create-order-submit-btn').click();
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
@@ -291,7 +262,7 @@ test.describe('Order Detail', () => {
 
   test('Receptionist can Cancel a Requested exam item — status updates to Canceled', async ({ page }) => {
     await loginAsReceptionist(page);
-    await pickPatient(page);
+    await startOrder(page);
 
     await page.getByTestId('create-order-submit-btn').click();
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
@@ -314,7 +285,7 @@ test.describe('Order Detail', () => {
 
   test('Receptionist can Place a Requested exam On Hold with reason — status updates to OnHold', async ({ page }) => {
     await loginAsReceptionist(page);
-    await pickPatient(page);
+    await startOrder(page);
 
     await page.getByTestId('create-order-submit-btn').click();
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
@@ -343,7 +314,7 @@ test.describe('Order Detail', () => {
 
   test('Shows exam-action-error when an exam action returns a 409 business rule error', async ({ page }) => {
     await loginAsReceptionist(page);
-    await pickPatient(page);
+    await startOrder(page);
 
     await page.getByTestId('create-order-submit-btn').click();
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });

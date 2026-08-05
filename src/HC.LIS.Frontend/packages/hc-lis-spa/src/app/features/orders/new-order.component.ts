@@ -3,9 +3,10 @@ import { FormsModule } from '@angular/forms';
 import { OrdersService } from './orders.service';
 import { RequestExamFormComponent } from './request-exam-form.component';
 import { PatientPickerComponent } from './patient-picker.component';
-import { AuthService } from '../../core/application/auth.service';
+import { PhysicianPickerComponent } from './physician-picker.component';
 import type { RequestExamParams } from '../../core/application/i-orders-port';
 import type { PatientSearchResult } from '../../core/domain/patient-search-result';
+import type { PhysicianSearchResult } from '../../core/domain/physician-search-result';
 import { HcAlert } from '../../ui/alert/alert';
 import { HcButton } from '../../ui/button/button';
 import { HcCard, HcCardContent } from '../../ui/card/card';
@@ -21,6 +22,7 @@ import { ToastService } from '../../ui/toast/toast.service';
     FormsModule,
     RequestExamFormComponent,
     PatientPickerComponent,
+    PhysicianPickerComponent,
     HcAlert,
     HcButton,
     HcCard,
@@ -34,10 +36,10 @@ import { ToastService } from '../../ui/toast/toast.service';
 })
 export class NewOrderComponent implements OnInit {
   protected readonly ordersService = inject(OrdersService);
-  private readonly authService = inject(AuthService);
   private readonly toast = inject(ToastService);
 
   protected selectedPatient = signal<PatientSearchResult | null>(null);
+  protected selectedPhysician = signal<PhysicianSearchResult | null>(null);
   protected creating = signal(false);
   protected addingExam = signal(false);
   protected createError = signal<string | null>(null);
@@ -48,13 +50,14 @@ export class NewOrderComponent implements OnInit {
 
   protected async createOrder(): Promise<void> {
     const patient = this.selectedPatient();
-    if (!patient) return;
+    const physician = this.selectedPhysician();
+    if (!patient || !physician) return;
     this.creating.set(true);
     this.createError.set(null);
     try {
       await this.ordersService.createOrder({
         patientId: patient.id,
-        requestedBy: this.authService.currentUser()?.userId ?? '',
+        requestedBy: physician.id,
       });
     } catch (err) {
       this.createError.set(err instanceof Error ? err.message : 'Failed to create order');

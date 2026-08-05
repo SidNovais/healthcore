@@ -53,9 +53,10 @@ public class FullWorkflowTests : TestBase
         var orderId     = Guid.NewGuid();
         var orderItemId = Guid.NewGuid();
 
-        // Step 1: TestOrders — place order, request exam, accept exam
+        // Step 1: TestOrders — register the referring physician, place order, request exam, accept exam
+        var physicianId = await RequestingPhysicianFactory.RegisterAsync(_testOrders);
         await _testOrders.ExecuteCommandAsync(new CreateOrderCommand(
-            orderId, patientId, ExecutionContext.UserId, "Routine", SystemClock.Now));
+            orderId, patientId, physicianId, "Routine", SystemClock.Now));
         await _testOrders.ExecuteCommandAsync(new RequestExamCommand(
             orderId, orderItemId, examMnemonic, "BLOOD", "Whole Blood",
             "EDTA Tube", "EDTA", "Centrifuge", "Room Temperature", SystemClock.Now));

@@ -18,6 +18,7 @@ using HC.LIS.API.Modules.SampleCollection.CollectionRequests;
 using HC.LIS.API.Modules.SampleCollection.Samples;
 using HC.LIS.API.Modules.TestOrders;
 using HC.LIS.API.Modules.TestOrders.Orders;
+using HC.LIS.API.Modules.TestOrders.Physicians;
 using HC.LIS.Modules.Analyzer.Infrastructure.Configurations;
 using HC.LIS.Modules.LabAnalysis.Infrastructure.Configurations;
 using HC.LIS.Modules.SampleCollection.Infrastructure.Configurations;
@@ -118,6 +119,7 @@ try
     {
         options.AddPolicy("ITAdmin", policy => policy.RequireRole("ITAdmin"));
         options.AddPolicy("PatientManagement", policy => policy.RequireRole("Receptionist", "ITAdmin"));
+        options.AddPolicy("OrderEntry", policy => policy.RequireRole("Receptionist", "ITAdmin"));
     });
 
     if (builder.Environment.IsDevelopment())
@@ -240,6 +242,7 @@ try
     v1.MapGroup("users").MapUsersEndpoints();
     v1.MapGroup("audit-log").MapAuditLogEndpoints();
     v1.MapGroup("patients").MapPatientsEndpoints();
+    v1.MapGroup("physicians").MapPhysiciansEndpoints();
     v1.MapGroup("events").MapEventStreamEndpoints().RequireRateLimiting(RateLimitPolicies.Stream);
 
     await app.RunAsync().ConfigureAwait(false);

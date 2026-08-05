@@ -13,8 +13,8 @@ describe('OrderListComponent (integration)', () => {
   let loadingSignal: ReturnType<typeof signal<boolean>>;
 
   const twoOrders: OrderListItem[] = [
-    { orderId: 'o-1', patientId: 'p-1', patientName: 'Ana Souza', requestedBy: 'u-1', orderPriority: 'Routine', requestedAt: '2026-05-11T00:00:00Z', itemCount: 2 },
-    { orderId: 'o-2', patientId: 'p-2', patientName: 'João Lima', requestedBy: 'u-1', orderPriority: 'Urgent', requestedAt: '2026-05-12T00:00:00Z', itemCount: 1 },
+    { orderId: 'o-1', patientId: 'p-1', patientName: 'Ana Souza', requestedBy: 'u-1', requestedByName: 'Dr. Ana Lima', orderPriority: 'Routine', requestedAt: '2026-05-11T00:00:00Z', itemCount: 2 },
+    { orderId: 'o-2', patientId: 'p-2', patientName: 'João Lima', requestedBy: 'u-1', requestedByName: 'Dr. Bruno Reis', orderPriority: 'Urgent', requestedAt: '2026-05-12T00:00:00Z', itemCount: 1 },
   ];
 
   function makeOrders(n: number): OrderListItem[] {
@@ -23,6 +23,7 @@ describe('OrderListComponent (integration)', () => {
       patientId: `p-${i + 1}`,
       patientName: `Patient ${i + 1}`,
       requestedBy: 'u-1',
+      requestedByName: `Dr. Physician ${i + 1}`,
       orderPriority: 'Routine',
       requestedAt: '2026-05-11T00:00:00Z',
       itemCount: 1,
@@ -67,11 +68,36 @@ describe('OrderListComponent (integration)', () => {
     );
   }
 
-  it('does not render a Requested By column (raw user id removed)', () => {
+  function requestedByCells(): string[] {
+    return rows().map(
+      r => r.querySelector('[data-testid="requested-by-cell"]')!.textContent!.trim(),
+    );
+  }
+
+  it('renders the requesting physician name, never the raw id', () => {
     orderListSignal.set(twoOrders);
     fixture.detectChanges();
 
-    expect(host().querySelector('[data-testid="order-list-sort-requested-by"]')).toBeNull();
+    expect(host().querySelector('[data-testid="order-list-sort-requested-by"]')).not.toBeNull();
+    expect(requestedByCells()).toEqual(['Dr. Ana Lima', 'Dr. Bruno Reis']);
+    requestedByCells().forEach(text => expect(text).not.toMatch(/^[0-9a-f]{8}-/i));
+  });
+
+  it('falls back to a placeholder when an order has no registered physician', () => {
+    orderListSignal.set([{ ...twoOrders[0], requestedByName: null }]);
+    fixture.detectChanges();
+
+    expect(requestedByCells()).toEqual(['Unknown physician']);
+  });
+
+  it('sorts by requesting physician name', () => {
+    orderListSignal.set([twoOrders[1], twoOrders[0]]);
+    fixture.detectChanges();
+
+    host().querySelector<HTMLButtonElement>('[data-testid="order-list-sort-requested-by"]')!.click();
+    fixture.detectChanges();
+
+    expect(requestedByCells()).toEqual(['Dr. Ana Lima', 'Dr. Bruno Reis']);
   });
 
   it('shows skeleton rows while the list is loading', () => {

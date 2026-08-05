@@ -7,8 +7,10 @@ using HC.Core.Infrastructure;
 using HC.Core.Infrastructure.Data;
 using HC.LIS.Modules.TestOrders.Application;
 using HC.LIS.Modules.TestOrders.Application.Patients;
+using HC.LIS.Modules.TestOrders.Domain.Physicians;
 using HC.LIS.Modules.TestOrders.Infrastructure.Configurations.AggregateStore;
 using HC.LIS.Modules.TestOrders.Infrastructure.Patients;
+using HC.LIS.Modules.TestOrders.Infrastructure.Physicians;
 using Marten;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -66,6 +68,10 @@ internal class DataAccessModule(
         ;
         builder.RegisterType<PatientSnapshotRepository>()
         .As<IPatientSnapshotRepository>()
+        .InstancePerLifetimeScope()
+        ;
+        builder.RegisterType<RequestingPhysicianProvider>()
+        .As<IRequestingPhysicianProvider>()
         .InstancePerLifetimeScope()
         ;
     }

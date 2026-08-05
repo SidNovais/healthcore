@@ -12,7 +12,8 @@ public class WorklistItemCreatedIntegrationEvent(
     string examCode,
     string? patientName = null,
     DateTime? patientDateOfBirth = null,
-    string? patientGender = null
+    string? patientGender = null,
+    string? requestedByName = null
 ) : IntegrationEvent(id, occurredAt)
 {
     public Guid WorklistItemId { get; } = worklistItemId;
@@ -22,4 +23,5 @@ public class WorklistItemCreatedIntegrationEvent(
     public string? PatientName { get; } = patientName;
     public DateTime? PatientDateOfBirth { get; } = patientDateOfBirth;
     public string? PatientGender { get; } = patientGender;
+    public string? RequestedByName { get; } = requestedByName;
 }

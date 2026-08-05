@@ -21,6 +21,7 @@ internal class GetOrdersListQueryHandler(
             ""OrderDetails"".""PatientId"" AS ""{nameof(OrderListItemDto.PatientId)}"",
             ""PatientSnapshot"".""FullName"" AS ""{nameof(OrderListItemDto.PatientName)}"",
             ""OrderDetails"".""RequestedBy"" AS ""{nameof(OrderListItemDto.RequestedBy)}"",
+            ""Physician"".""FullName"" AS ""{nameof(OrderListItemDto.RequestedByName)}"",
             ""OrderDetails"".""Priority"" AS ""{nameof(OrderListItemDto.OrderPriority)}"",
             ""OrderDetails"".""RequestedAt"" AS ""{nameof(OrderListItemDto.RequestedAt)}"",
             COUNT(""OrderItemDetails"".""Id"")::int AS ""{nameof(OrderListItemDto.ItemCount)}""
@@ -29,11 +30,14 @@ internal class GetOrdersListQueryHandler(
                 ON ""OrderDetails"".""Id"" = ""OrderItemDetails"".""OrderId""
             LEFT JOIN ""test_orders"".""PatientSnapshotDetails"" AS ""PatientSnapshot""
                 ON ""PatientSnapshot"".""Id"" = ""OrderDetails"".""PatientId""
+            LEFT JOIN ""test_orders"".""PhysicianDetails"" AS ""Physician""
+                ON ""Physician"".""Id"" = ""OrderDetails"".""RequestedBy""
             GROUP BY
                 ""OrderDetails"".""Id"",
                 ""OrderDetails"".""PatientId"",
                 ""PatientSnapshot"".""FullName"",
                 ""OrderDetails"".""RequestedBy"",
+                ""Physician"".""FullName"",
                 ""OrderDetails"".""Priority"",
                 ""OrderDetails"".""RequestedAt""
             ORDER BY ""OrderDetails"".""RequestedAt"" DESC";

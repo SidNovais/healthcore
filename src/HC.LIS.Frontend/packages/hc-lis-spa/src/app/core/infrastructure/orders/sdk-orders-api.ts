@@ -56,6 +56,7 @@ export class SdkOrdersApi implements IOrdersApi {
       patientId: dto.patientId ?? '',
       patientName: dto.patientName ?? null,
       requestedBy: dto.requestedBy ?? '',
+      requestedByName: dto.requestedByName ?? null,
       orderPriority: dto.orderPriority ?? '',
       requestedAt: dto.requestedAt ?? '',
       itemCount: dto.itemCount ?? 0,
@@ -69,6 +70,7 @@ export class SdkOrdersApi implements IOrdersApi {
       orderId: dto?.orderId ?? '',
       patientId: dto?.patientId ?? '',
       requestedBy: dto?.requestedBy ?? '',
+      requestedByName: dto?.requestedByName ?? null,
       orderPriority: dto?.orderPriority ?? '',
       requestedAt: dto?.requestedAt ?? '',
       items: (dto?.items ?? []).map(item => ({

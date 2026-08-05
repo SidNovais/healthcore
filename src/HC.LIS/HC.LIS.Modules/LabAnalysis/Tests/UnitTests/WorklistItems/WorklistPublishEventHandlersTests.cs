@@ -2,7 +2,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using HC.Core.Infrastructure.EventBus;
+using HC.LIS.Modules.LabAnalysis.Application.Orders;
 using HC.LIS.Modules.LabAnalysis.Application.Patients;
+using HC.LIS.Modules.LabAnalysis.Application.Physicians;
 using HC.LIS.Modules.LabAnalysis.Application.WorklistItems.CreateWorklistItem;
 using HC.LIS.Modules.LabAnalysis.Application.WorklistItems.GenerateReport;
 using HC.LIS.Modules.LabAnalysis.Application.WorklistItems.RecordAnalysisResult;
@@ -18,25 +20,60 @@ public sealed class WorklistPublishEventHandlersTests
     private readonly Guid _itemId = Guid.NewGuid();
     private readonly Guid _patientId = Guid.NewGuid();
 
+    private readonly Guid _orderId = Guid.NewGuid();
+
     [Fact]
     public async Task CreatedHandlerEnrichesTheEventWithThePatientSnapshot()
     {
         var patients = Substitute.For<IPatientSnapshotRepository>();
         patients.GetByIdAsync(_patientId).Returns(
             new PatientSnapshotView("Ana Souza", new DateTime(1990, 1, 1), "Female"));
-        var sut = new WorklistItemCreatedPublishEventNotificationHandler(_bus, patients);
+        var sut = new WorklistItemCreatedPublishEventNotificationHandler(
+            _bus, patients, Substitute.For<IOrderPhysicianRepository>());
 
-        await sut.Handle(
-            new WorklistItemCreatedNotification(
-                new WorklistItemCreatedDomainEvent(
-                    _itemId, Guid.NewGuid(), "BC-1", "HGB", _patientId, Guid.NewGuid(), Guid.NewGuid(), DateTime.UtcNow),
-                Guid.NewGuid()),
-            CancellationToken.None).ConfigureAwait(true);
+        await sut.Handle(CreatedNotification(), CancellationToken.None).ConfigureAwait(true);
 
         await _bus.Received(1).Publish(Arg.Is<WorklistItemCreatedIntegrationEvent>(
             e => e.WorklistItemId == _itemId && e.PatientName == "Ana Souza" && e.PatientGender == "Female"))
             .ConfigureAwait(true);
     }
+
+    [Fact]
+    public async Task CreatedHandlerEnrichesTheEventWithTheRequestingPhysician()
+    {
+        var orders = Substitute.For<IOrderPhysicianRepository>();
+        orders.GetRequestingPhysicianAsync(_orderId).Returns(
+            new PhysicianSnapshotView("Ana Lima", "CRM-12345"));
+        var sut = new WorklistItemCreatedPublishEventNotificationHandler(
+            _bus, Substitute.For<IPatientSnapshotRepository>(), orders);
+
+        await sut.Handle(CreatedNotification(), CancellationToken.None).ConfigureAwait(true);
+
+        await _bus.Received(1).Publish(Arg.Is<WorklistItemCreatedIntegrationEvent>(
+            e => e.WorklistItemId == _itemId && e.RequestedByName == "Ana Lima"))
+            .ConfigureAwait(true);
+    }
+
+    [Fact]
+    public async Task CreatedHandlerPublishesANullPhysicianWhenTheMappingHasNotArrivedYet()
+    {
+        var orders = Substitute.For<IOrderPhysicianRepository>();
+        orders.GetRequestingPhysicianAsync(_orderId).Returns((PhysicianSnapshotView?)null);
+        var sut = new WorklistItemCreatedPublishEventNotificationHandler(
+            _bus, Substitute.For<IPatientSnapshotRepository>(), orders);
+
+        await sut.Handle(CreatedNotification(), CancellationToken.None).ConfigureAwait(true);
+
+        await _bus.Received(1).Publish(Arg.Is<WorklistItemCreatedIntegrationEvent>(
+            e => e.WorklistItemId == _itemId && e.RequestedByName == null))
+            .ConfigureAwait(true);
+    }
+
+    private WorklistItemCreatedNotification CreatedNotification() =>
+        new(
+            new WorklistItemCreatedDomainEvent(
+                _itemId, Guid.NewGuid(), "BC-1", "HGB", _patientId, _orderId, Guid.NewGuid(), DateTime.UtcNow),
+            Guid.NewGuid());
 
     [Fact]
     public async Task ResultRecordedHandlerPublishesIntegrationEventWithWorklistItemId()

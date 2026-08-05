@@ -6,9 +6,13 @@ using HC.Core.Infastructure;
 using HC.Core.Infrastructure;
 using HC.Core.Infrastructure.Data;
 using HC.LIS.Modules.LabAnalysis.Application;
+using HC.LIS.Modules.LabAnalysis.Application.Orders;
 using HC.LIS.Modules.LabAnalysis.Application.Patients;
+using HC.LIS.Modules.LabAnalysis.Application.Physicians;
 using HC.LIS.Modules.LabAnalysis.Infrastructure.Configurations.AggregateStore;
+using HC.LIS.Modules.LabAnalysis.Infrastructure.Orders;
 using HC.LIS.Modules.LabAnalysis.Infrastructure.Patients;
+using HC.LIS.Modules.LabAnalysis.Infrastructure.Physicians;
 using Marten;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -66,6 +70,14 @@ internal class DataAccessModule(
         ;
         builder.RegisterType<PatientSnapshotRepository>()
             .As<IPatientSnapshotRepository>()
+            .InstancePerLifetimeScope();
+
+        builder.RegisterType<PhysicianSnapshotRepository>()
+            .As<IPhysicianSnapshotRepository>()
+            .InstancePerLifetimeScope();
+
+        builder.RegisterType<OrderPhysicianRepository>()
+            .As<IOrderPhysicianRepository>()
             .InstancePerLifetimeScope();
 
     }

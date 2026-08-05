@@ -9,6 +9,8 @@ public readonly struct OrderSampleData
     public static readonly Guid OrderItemId = Guid.Parse("019b6c5d-fbf9-7e35-aa12-c38922ec5026");
     public static readonly Guid PatientId = Guid.Parse("019b664c-52a4-7f37-a794-6da2481550c0");
     public static readonly Guid RequestedBy = Guid.Parse("019b664c-79f0-7f45-87f3-84664a00e635");
+    public static readonly string RequestedByFullName = "Dr. Ana Lima";
+    public static readonly Guid UnregisteredPhysicianId = Guid.Parse("019b7d31-0c92-7b48-9d11-52f0a6c73b84");
     public static readonly string OrderPriority = "Routine";
     public static readonly string ExamMnemonic = "CBC";
     public static readonly string SpecimenMnemonic = "BLD";

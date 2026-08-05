@@ -17,8 +17,8 @@ describe('WorklistComponent (integration)', () => {
   const physician: UserSession = { userId: 'physician-1', userName: 'physician@hclis.local', role: 'Physician' };
 
   const twoItems: WorklistItemSummary[] = [
-    { id: 'wi-1', sampleBarcode: 'BC-001', examCode: 'HGB', patientId: 'p-1', patientName: 'Ana Souza', patientDateOfBirth: '1990-01-01', patientGender: 'Female', status: 'InProgress', createdAt: '2026-05-05T08:00:00Z' },
-    { id: 'wi-2', sampleBarcode: 'BC-002', examCode: 'WBC', patientId: 'p-2', patientName: 'João Lima', patientDateOfBirth: '1985-05-20', patientGender: 'Male', status: 'Completed', createdAt: '2026-05-05T09:00:00Z' },
+    { id: 'wi-1', sampleBarcode: 'BC-001', examCode: 'HGB', patientId: 'p-1', patientName: 'Ana Souza', patientDateOfBirth: '1990-01-01', patientGender: 'Female', requestedByName: 'Ana Lima', status: 'InProgress', createdAt: '2026-05-05T08:00:00Z' },
+    { id: 'wi-2', sampleBarcode: 'BC-002', examCode: 'WBC', patientId: 'p-2', patientName: 'João Lima', patientDateOfBirth: '1985-05-20', patientGender: 'Male', requestedByName: 'Bruno Reis', status: 'Completed', createdAt: '2026-05-05T09:00:00Z' },
   ];
 
   function makeItems(n: number): WorklistItemSummary[] {
@@ -39,6 +39,12 @@ describe('WorklistComponent (integration)', () => {
   function patientNames(): string[] {
     return rows().map(
       r => r.querySelector('[data-testid="patient-name-cell"]')!.textContent!.trim(),
+    );
+  }
+
+  function requestedByNames(): string[] {
+    return rows().map(
+      r => r.querySelector('[data-testid="requested-by-cell"]')!.textContent!.trim(),
     );
   }
 
@@ -172,6 +178,60 @@ describe('WorklistComponent (integration)', () => {
     fixture.detectChanges();
     expect(patientNames()).toEqual(['Cora', 'Bea', 'Ana']);
     expect(th.getAttribute('aria-sort')).toBe('descending');
+  });
+
+  it('renders the requesting physician name for each worklist item', () => {
+    itemsSignal.set(twoItems);
+    fixture.detectChanges();
+
+    expect(requestedByNames()).toEqual(['Ana Lima', 'Bruno Reis']);
+  });
+
+  it('falls back to a placeholder when the item has no requesting physician', () => {
+    itemsSignal.set([{ ...twoItems[0], requestedByName: null }]);
+    fixture.detectChanges();
+
+    expect(requestedByNames()).toEqual(['Unknown physician']);
+    expect(requestedByNames()[0]).not.toMatch(/^[0-9a-f]{8}-/i);
+  });
+
+  it('sorts by requesting physician and toggles direction on repeated header clicks', () => {
+    itemsSignal.set([
+      { ...twoItems[0], id: 'c', requestedByName: 'Cora' },
+      { ...twoItems[0], id: 'a', requestedByName: 'Ana' },
+      { ...twoItems[0], id: 'b', requestedByName: 'Bea' },
+    ]);
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    const header = host.querySelector<HTMLButtonElement>('[data-testid="worklist-sort-requested-by"]')!;
+    const th = header.closest('th')!;
+
+    header.click();
+    fixture.detectChanges();
+    expect(requestedByNames()).toEqual(['Ana', 'Bea', 'Cora']);
+    expect(th.getAttribute('aria-sort')).toBe('ascending');
+
+    header.click();
+    fixture.detectChanges();
+    expect(requestedByNames()).toEqual(['Cora', 'Bea', 'Ana']);
+    expect(th.getAttribute('aria-sort')).toBe('descending');
+  });
+
+  it('keeps the skeleton row cell count aligned with the data row cell count', () => {
+    loadingSignal.set(true);
+    fixture.detectChanges();
+    const host = fixture.nativeElement as HTMLElement;
+    const skeletonCells = host
+      .querySelector('[data-testid="worklist-skeleton-row"]')!
+      .querySelectorAll('td').length;
+
+    loadingSignal.set(false);
+    itemsSignal.set(twoItems);
+    fixture.detectChanges();
+    const dataCells = rows()[0].querySelectorAll('td').length;
+
+    expect(skeletonCells).toBe(dataCells);
   });
 
   it('offers a per-row action menu whose View selects the item without the trigger selecting it', () => {

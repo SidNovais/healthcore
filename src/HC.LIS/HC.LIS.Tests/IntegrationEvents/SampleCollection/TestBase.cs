@@ -49,8 +49,10 @@ public abstract class TestBase : HC.LIS.Tests.IntegrationEvents.TestBase
         var orderId = Guid.NewGuid();
         var orderItemId = Guid.NewGuid();
 
+        var physicianId = await RequestingPhysicianFactory.RegisterAsync(TestOrdersModule);
+
         await TestOrdersModule.ExecuteCommandAsync(new CreateOrderCommand(
-            orderId, patientId, ExecutionContext.UserId, "Routine", SystemClock.Now));
+            orderId, patientId, physicianId, "Routine", SystemClock.Now));
 
         await TestOrdersModule.ExecuteCommandAsync(new RequestExamCommand(
             orderId, orderItemId, examMnemonic, "BLOOD", "Whole Blood",

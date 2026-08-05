@@ -31,6 +31,7 @@ export class SdkWorklistApi implements IWorklistApi {
       patientName: item.patientName ?? null,
       patientDateOfBirth: item.patientDateOfBirth ?? null,
       patientGender: item.patientGender ?? null,
+      requestedByName: item.requestedByName ?? null,
       status: item.status ?? '',
       createdAt: item.createdAt ?? '',
     }));
@@ -58,6 +59,7 @@ export class SdkWorklistApi implements IWorklistApi {
       patientName: d.patientName ?? null,
       patientDateOfBirth: d.patientDateOfBirth ?? null,
       patientGender: d.patientGender ?? null,
+      requestedByName: d.requestedByName ?? null,
       orderId: d.orderId ?? '',
       orderItemId: d.orderItemId ?? '',
       status: d.status ?? '',

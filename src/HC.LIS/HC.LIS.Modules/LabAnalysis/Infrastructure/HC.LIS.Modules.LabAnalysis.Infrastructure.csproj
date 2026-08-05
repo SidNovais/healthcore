@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Analyzer\IntegrationEvents\HC.LIS.Modules.Analyzer.IntegrationEvents.csproj" />
     <ProjectReference Include="..\..\PatientManagement\IntegrationEvents\HC.LIS.Modules.PatientManagement.IntegrationEvents.csproj" />
+    <ProjectReference Include="..\..\TestOrders\IntegrationEvents\HC.LIS.Modules.TestOrders.IntegrationEvents.csproj" />
   </ItemGroup>
 
 </Project>

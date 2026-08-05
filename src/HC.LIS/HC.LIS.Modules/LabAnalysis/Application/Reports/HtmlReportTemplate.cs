@@ -15,6 +15,11 @@ internal static class HtmlReportTemplate
         Guid signedBy,
         DateTime signedAt)
     {
+        const string UnknownPhysician = "Unknown physician";
+        string requestingPhysician = string.IsNullOrWhiteSpace(dto.RequestedByName)
+            ? UnknownPhysician
+            : dto.RequestedByName;
+
         var sb = new StringBuilder();
         sb.Append("""
             <!DOCTYPE html>
@@ -51,6 +56,9 @@ internal static class HtmlReportTemplate
                     </div>
                     <div>
                         <label>Sample Barcode</label><span>{EscapeHtml(dto.SampleBarcode)}</span>
+                    </div>
+                    <div>
+                        <label>Requesting Physician</label><span>{EscapeHtml(requestingPhysician)}</span>
                     </div>
                     <div>
                         <label>Report Date</label><span>{signedAt:yyyy-MM-dd HH:mm:ss} UTC</span>

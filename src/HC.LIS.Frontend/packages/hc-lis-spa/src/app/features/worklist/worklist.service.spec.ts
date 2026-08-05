@@ -11,8 +11,8 @@ describe('WorklistService', () => {
   let worklistHandler: (payload: unknown) => void;
 
   const summaryItems: WorklistItemSummary[] = [
-    { id: 'wi-1', sampleBarcode: 'BC-001', examCode: 'HGB', patientId: 'p-1', patientName: 'Ana Souza', patientDateOfBirth: '1990-01-01', patientGender: 'Female', status: 'InProgress', createdAt: '2026-05-05T08:00:00Z' },
-    { id: 'wi-2', sampleBarcode: 'BC-002', examCode: 'WBC', patientId: 'p-2', patientName: 'João Lima', patientDateOfBirth: '1985-05-20', patientGender: 'Male', status: 'Completed', createdAt: '2026-05-05T09:00:00Z' },
+    { id: 'wi-1', sampleBarcode: 'BC-001', examCode: 'HGB', patientId: 'p-1', patientName: 'Ana Souza', patientDateOfBirth: '1990-01-01', patientGender: 'Female', requestedByName: 'Ana Lima', status: 'InProgress', createdAt: '2026-05-05T08:00:00Z' },
+    { id: 'wi-2', sampleBarcode: 'BC-002', examCode: 'WBC', patientId: 'p-2', patientName: 'João Lima', patientDateOfBirth: '1985-05-20', patientGender: 'Male', requestedByName: 'Bruno Reis', status: 'Completed', createdAt: '2026-05-05T09:00:00Z' },
   ];
 
   const itemDetails: WorklistItemDetails = {
@@ -24,6 +24,7 @@ describe('WorklistService', () => {
     patientName: 'Ana Souza',
     patientDateOfBirth: '1990-01-01',
     patientGender: 'Female',
+    requestedByName: 'Ana Lima',
     orderId: 'o-1',
     orderItemId: 'oi-1',
     status: 'Completed',

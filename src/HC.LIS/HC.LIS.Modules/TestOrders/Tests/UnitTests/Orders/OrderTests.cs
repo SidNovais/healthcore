@@ -6,7 +6,6 @@ using HC.LIS.Modules.TestOrders.Domain.Orders;
 using HC.LIS.Modules.TestOrders.Domain.Orders.Events;
 using HC.LIS.Modules.TestOrders.Domain.Orders.Rules;
 using HC.LIS.Modules.TestOrders.Domain.Patients;
-using HC.LIS.Modules.TestOrders.Domain.Physicians;
 using HC.LIS.Modules.TestOrders.UnitTests.Orders;
 
 namespace HC.Lis.Modules.TestOrders.UnitTests.Orders;
@@ -42,6 +41,34 @@ public class OrderTests : TestBase
         orderCreatedDomainEvent.RequestedBy.Should().Be(OrderSampleData.RequestedBy);
         orderCreatedDomainEvent.OrderPriority.Should().Be(OrderSampleData.OrderPriority);
         orderCreatedDomainEvent.RequestedAt.Should().Be(OrderSampleData.RequestedAt);
+    }
+
+    [Fact]
+    public void CreateOrderThrowsWhenPhysicianIsNotRegistered()
+    {
+        void action() => Order.Create(
+            OrderSampleData.OrderId,
+            new PatientId(OrderSampleData.PatientId),
+            null,
+            OrderPriority.Of(OrderSampleData.OrderPriority),
+            OrderSampleData.RequestedAt
+        );
+
+        AssertBrokenRule<OrderMustReferenceRegisteredPhysicianRule>(action);
+    }
+
+    [Fact]
+    public void CreateOrderThrowsWhenPhysicianIsInactive()
+    {
+        void action() => Order.Create(
+            OrderSampleData.OrderId,
+            new PatientId(OrderSampleData.PatientId),
+            OrderFactory.InactivePhysician(),
+            OrderPriority.Of(OrderSampleData.OrderPriority),
+            OrderSampleData.RequestedAt
+        );
+
+        AssertBrokenRule<OrderMustReferenceActivePhysicianRule>(action);
     }
 
     [Fact]
@@ -241,7 +268,7 @@ public class OrderTests : TestBase
         Order urgentOrder = Order.Create(
             OrderSampleData.OrderId,
             new PatientId(OrderSampleData.PatientId),
-            new PhysicianId(OrderSampleData.RequestedBy),
+            OrderFactory.ActivePhysician(),
             OrderPriority.Of("Urgent"),
             OrderSampleData.RequestedAt
         );

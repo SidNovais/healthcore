@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using HC.Core.Infrastructure.EventBus;
+using HC.LIS.Modules.TestOrders.Application.Configuration.Queries;
 using HC.LIS.Modules.TestOrders.Application.Orders.CancelExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.CompleteExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.CreateOrder;
@@ -11,6 +12,7 @@ using HC.LIS.Modules.TestOrders.Application.Orders.PlaceExamOnHold;
 using HC.LIS.Modules.TestOrders.Application.Orders.RejectExam;
 using HC.LIS.Modules.TestOrders.Application.Orders.RequestExam;
 using HC.LIS.Modules.TestOrders.Application.Patients;
+using HC.LIS.Modules.TestOrders.Application.Physicians.GetPhysicianDetails;
 using HC.LIS.Modules.TestOrders.Domain.Orders.Events;
 using HC.LIS.Modules.TestOrders.IntegrationEvents;
 using NSubstitute;
@@ -29,7 +31,7 @@ public sealed class OrdersPublishEventHandlersTests
         var patients = Substitute.For<IPatientSnapshotRepository>();
         var patientId = Guid.NewGuid();
         patients.GetFullNameByIdAsync(patientId).Returns("Maria Silva");
-        var sut = new OrderCreatedPublishEventNotificationHandler(_bus, patients);
+        var sut = new OrderCreatedPublishEventNotificationHandler(_bus, patients, PhysicianDetailsQueryReturning(null));
 
         await sut.Handle(
             new OrderCreatedNotification(
@@ -39,6 +41,50 @@ public sealed class OrdersPublishEventHandlersTests
         await _bus.Received(1).Publish(Arg.Is<OrderCreatedIntegrationEvent>(
             e => e.OrderId == _orderId && e.PatientName == "Maria Silva" && e.OrderPriority == "Routine"))
             .ConfigureAwait(true);
+    }
+
+    [Fact]
+    public async Task CreatedHandlerEnrichesTheEventWithTheRequestingPhysicianName()
+    {
+        var physicianId = Guid.NewGuid();
+        var sut = new OrderCreatedPublishEventNotificationHandler(
+            _bus,
+            Substitute.For<IPatientSnapshotRepository>(),
+            PhysicianDetailsQueryReturning(new PhysicianDetailsDto { Id = physicianId, FullName = "Dr. Ana Lima" }));
+
+        await sut.Handle(
+            new OrderCreatedNotification(
+                new OrderCreatedDomainEvent(_orderId, Guid.NewGuid(), physicianId, "Routine", DateTime.UtcNow), Guid.NewGuid()),
+            CancellationToken.None).ConfigureAwait(true);
+
+        await _bus.Received(1).Publish(Arg.Is<OrderCreatedIntegrationEvent>(
+            e => e.OrderId == _orderId && e.RequestedBy == physicianId && e.RequestedByName == "Dr. Ana Lima"))
+            .ConfigureAwait(true);
+    }
+
+    [Fact]
+    public async Task CreatedHandlerLeavesThePhysicianNameNullWhenTheRegistryHasNoRow()
+    {
+        var sut = new OrderCreatedPublishEventNotificationHandler(
+            _bus,
+            Substitute.For<IPatientSnapshotRepository>(),
+            PhysicianDetailsQueryReturning(null));
+
+        await sut.Handle(
+            new OrderCreatedNotification(
+                new OrderCreatedDomainEvent(_orderId, Guid.NewGuid(), Guid.NewGuid(), "Routine", DateTime.UtcNow), Guid.NewGuid()),
+            CancellationToken.None).ConfigureAwait(true);
+
+        await _bus.Received(1).Publish(Arg.Is<OrderCreatedIntegrationEvent>(
+            e => e.OrderId == _orderId && e.RequestedByName == null)).ConfigureAwait(true);
+    }
+
+    private static IQueryHandler<GetPhysicianDetailsQuery, PhysicianDetailsDto?> PhysicianDetailsQueryReturning(
+        PhysicianDetailsDto? physician)
+    {
+        var handler = Substitute.For<IQueryHandler<GetPhysicianDetailsQuery, PhysicianDetailsDto?>>();
+        handler.Handle(Arg.Any<GetPhysicianDetailsQuery>(), Arg.Any<CancellationToken>()).Returns(physician);
+        return handler;
     }
 
     [Fact]

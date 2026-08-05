@@ -1,4 +1,5 @@
 using HC.LIS.Modules.TestOrders.Domain.Orders.Events;
+using HC.LIS.Modules.TestOrders.Domain.Physicians.Events;
 using JasperFx;
 using JasperFx.Events;
 using Marten;
@@ -25,6 +26,10 @@ public static class MartenConfig
             options.Events.AddEventType<OrderItemPlacedOnHoldDomainEvent>();
             options.Events.AddEventType<OrderItemRejectedDomainEvent>();
             options.Events.AddEventType<OrderItemRequestedDomainEvent>();
+            options.Events.AddEventType<PhysicianRegisteredDomainEvent>();
+            options.Events.AddEventType<PhysicianUpdatedDomainEvent>();
+            options.Events.AddEventType<PhysicianDeactivatedDomainEvent>();
+            options.Events.AddEventType<PhysicianReactivatedDomainEvent>();
             // Add projections if you have them
             // options.Projections.Snapshot<UserAggregate>();
         });

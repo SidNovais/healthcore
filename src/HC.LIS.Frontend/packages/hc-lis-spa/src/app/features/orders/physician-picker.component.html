@@ -1,0 +1,93 @@
+@if (selectedPhysician(); as physician) {
+  <div class="selected-card" data-testid="physician-picker-selected-card">
+    <div class="card-info">
+      <span class="physician-name">{{ physician.fullName }}</span>
+      @if (physician.licenceNumber) {
+        <span class="physician-meta">{{ physician.licenceNumber }}</span>
+      }
+    </div>
+    <button
+      type="button"
+      class="clear-btn"
+      data-testid="physician-picker-clear-btn"
+      (click)="clearSelection()"
+    >✕</button>
+  </div>
+} @else {
+  <hc-combobox
+    [options]="options()"
+    placeholder="Search by name or licence number..."
+    inputTestId="physician-picker-input"
+    listboxTestId="physician-picker-results"
+    optionTestId="physician-picker-result-item"
+    (queryChange)="onSearchInput($event)"
+    (selected)="onOptionSelected($event)"
+  />
+
+  @if (canQuickAdd()) {
+    <button
+      hc-button
+      variant="ghost"
+      size="sm"
+      type="button"
+      class="quick-add-trigger"
+      data-testid="physician-picker-quick-add-btn"
+      (click)="openQuickAdd()"
+    >
+      No match — register a new physician
+    </button>
+  }
+}
+
+<hc-dialog [(open)]="quickAddOpen" width="wide" testId="physician-quick-add-dialog">
+  @if (quickAddOpen()) {
+    <div class="quick-add">
+      <h3 class="quick-add__title">Register Physician</h3>
+
+      <hc-field>
+        <label hc-label for="quick-add-physician-name">Full Name</label>
+        <input
+          hc-input
+          id="quick-add-physician-name"
+          data-testid="physician-quick-add-name-input"
+          type="text"
+          [(ngModel)]="quickAddName"
+          (keydown.enter)="submitQuickAdd()"
+          placeholder="First Last"
+        />
+      </hc-field>
+
+      <hc-field helper="Optional">
+        <label hc-label for="quick-add-physician-licence">Licence Number</label>
+        <input
+          hc-input
+          id="quick-add-physician-licence"
+          data-testid="physician-quick-add-licence-input"
+          type="text"
+          [(ngModel)]="quickAddLicence"
+          (keydown.enter)="submitQuickAdd()"
+          placeholder="e.g. CRM-12345"
+        />
+      </hc-field>
+
+      @if (quickAddError(); as msg) {
+        <hc-alert variant="error" data-testid="physician-quick-add-error">{{ msg }}</hc-alert>
+      }
+
+      <div class="quick-add__actions">
+        <button hc-button variant="ghost" type="button" (click)="closeQuickAdd()">Cancel</button>
+        <button
+          hc-button
+          variant="cta"
+          type="button"
+          data-testid="physician-quick-add-submit-btn"
+          [loading]="quickAddPending()"
+          [disabled]="!quickAddName.trim() || quickAddPending()"
+          (click)="submitQuickAdd()"
+        >
+          Register
+        </button>
+      </div>
+    </div>
+  }
+</hc-dialog>

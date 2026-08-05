@@ -21,6 +21,7 @@ internal static class DatabaseCleaner
             DELETE FROM ""test_orders"".""OutboxMessages"";
             DELETE FROM ""test_orders"".""OrderItemDetails"";
             DELETE FROM ""test_orders"".""OrderDetails"";
+            DELETE FROM ""test_orders"".""PhysicianDetails"";
             DELETE FROM ""test_orders"".""mt_events"";
             DELETE FROM ""test_orders"".""mt_streams"";");
 
@@ -54,6 +55,8 @@ internal static class DatabaseCleaner
             DELETE FROM ""lab_analysis"".""worklist_item_analyte_results"";
             DELETE FROM ""lab_analysis"".""signed_report_details"";
             DELETE FROM ""lab_analysis"".""worklist_item_details"";
+            DELETE FROM ""lab_analysis"".""OrderPhysicianSnapshotDetails"";
+            DELETE FROM ""lab_analysis"".""PhysicianSnapshotDetails"";
             DELETE FROM ""lab_analysis"".""mt_events"";
             DELETE FROM ""lab_analysis"".""mt_streams"";");
 }

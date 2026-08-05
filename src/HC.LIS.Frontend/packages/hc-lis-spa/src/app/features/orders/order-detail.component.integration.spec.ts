@@ -62,7 +62,8 @@ describe('OrderDetailComponent (integration)', () => {
   const baseOrder: OrderDetails = {
     orderId,
     patientId: 'patient-1',
-    requestedBy: 'Dr. Smith',
+    requestedBy: '019b664c-79f0-7f45-87f3-84664a00e635',
+    requestedByName: 'Dr. Ana Lima',
     orderPriority: 'Routine',
     requestedAt: '2026-05-14T07:00:00Z',
     items: [requestedItem, acceptedItem],
@@ -159,11 +160,21 @@ describe('OrderDetailComponent (integration)', () => {
     expect(el?.textContent?.trim()).toBe('Unknown patient');
   });
 
-  it('no longer renders the raw requested-by user id', () => {
+  it('renders the requesting physician name, never the raw id', () => {
     detailsSignal.set(baseOrder);
     fixture.detectChanges();
 
-    expect((fixture.nativeElement as HTMLElement).querySelector('[data-testid="requested-by"]')).toBeNull();
+    const el = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="requested-by"]');
+    expect(el?.textContent?.trim()).toBe('Dr. Ana Lima');
+    expect(el?.textContent?.trim()).not.toMatch(/^[0-9a-f]{8}-/i);
+  });
+
+  it('shows a friendly placeholder when the order has no registered physician', () => {
+    detailsSignal.set({ ...baseOrder, requestedByName: null });
+    fixture.detectChanges();
+
+    const el = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="requested-by"]');
+    expect(el?.textContent?.trim()).toBe('Unknown physician');
   });
 
   it('shows an hc-empty in the empty-items cell when items array is empty', () => {

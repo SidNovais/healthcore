@@ -1,0 +1,64 @@
+.selected-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem var(--space-3);
+  background: var(--color-accent-light);
+  border-left: 3px solid var(--color-accent);
+}
+
+.card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.physician-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.physician-meta {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.clear-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  padding: var(--space-1) var(--space-2);
+  line-height: 1;
+  border-radius: 2px;
+}
+
+.clear-btn:hover {
+  color: var(--color-text);
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.quick-add-trigger {
+  margin-top: var(--space-2);
+}
+
+.quick-add {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.quick-add__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.quick-add__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

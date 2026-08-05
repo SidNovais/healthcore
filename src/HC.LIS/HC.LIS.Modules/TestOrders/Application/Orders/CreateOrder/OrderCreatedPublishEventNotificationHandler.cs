@@ -1,27 +1,33 @@
 using MediatR;
 using HC.Core.Infrastructure.EventBus;
+using HC.LIS.Modules.TestOrders.Application.Configuration.Queries;
 using HC.LIS.Modules.TestOrders.Application.Patients;
+using HC.LIS.Modules.TestOrders.Application.Physicians.GetPhysicianDetails;
 using HC.LIS.Modules.TestOrders.IntegrationEvents;
 
 namespace HC.LIS.Modules.TestOrders.Application.Orders.CreateOrder;
 
 public class OrderCreatedPublishEventNotificationHandler(
     IEventsBus eventsBus,
-    IPatientSnapshotRepository patientSnapshots)
+    IPatientSnapshotRepository patientSnapshots,
+    IQueryHandler<GetPhysicianDetailsQuery, PhysicianDetailsDto?> physicianDetails)
     : INotificationHandler<OrderCreatedNotification>
 {
     private readonly IEventsBus _eventsBus = eventsBus;
     private readonly IPatientSnapshotRepository _patientSnapshots = patientSnapshots;
+    private readonly IQueryHandler<GetPhysicianDetailsQuery, PhysicianDetailsDto?> _physicianDetails = physicianDetails;
 
     public async Task Handle(
         OrderCreatedNotification notification,
         CancellationToken cancellationToken
     )
     {
-        // Enrich with the patient name so the live-added list row matches a fresh load
-        // (the orders-list query joins the patient snapshot for the name).
         string? patientName = await _patientSnapshots
             .GetFullNameByIdAsync(notification.DomainEvent.PatientId).ConfigureAwait(false);
+
+        PhysicianDetailsDto? physician = await _physicianDetails.Handle(
+            new GetPhysicianDetailsQuery(notification.DomainEvent.RequestedBy),
+            cancellationToken).ConfigureAwait(false);
 
         await _eventsBus.Publish(new OrderCreatedIntegrationEvent(
             notification.Id,
@@ -31,7 +37,8 @@ public class OrderCreatedPublishEventNotificationHandler(
             notification.DomainEvent.RequestedBy,
             notification.DomainEvent.OrderPriority,
             notification.DomainEvent.RequestedAt,
-            patientName
+            patientName,
+            physician?.FullName
         )).ConfigureAwait(false);
     }
 }

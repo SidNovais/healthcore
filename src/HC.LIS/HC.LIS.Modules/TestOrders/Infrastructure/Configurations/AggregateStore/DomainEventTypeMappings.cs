@@ -1,4 +1,5 @@
 using HC.LIS.Modules.TestOrders.Domain.Orders.Events;
+using HC.LIS.Modules.TestOrders.Domain.Physicians.Events;
 
 namespace HC.LIS.Modules.TestOrders.Infrastructure.Configurations.AggregateStore;
 
@@ -19,6 +20,10 @@ internal static class DomainEventTypeMappings
             { "OrderItemPlacedOnHoldDomainEvent", typeof(OrderItemPlacedOnHoldDomainEvent) },
             { "OrderItemRejectedDomainEvent", typeof(OrderItemRejectedDomainEvent) },
             { "OrderItemRequestedDomainEvent", typeof(OrderItemRequestedDomainEvent) },
+            { "PhysicianRegisteredDomainEvent", typeof(PhysicianRegisteredDomainEvent) },
+            { "PhysicianUpdatedDomainEvent", typeof(PhysicianUpdatedDomainEvent) },
+            { "PhysicianDeactivatedDomainEvent", typeof(PhysicianDeactivatedDomainEvent) },
+            { "PhysicianReactivatedDomainEvent", typeof(PhysicianReactivatedDomainEvent) },
         };
     }
 }

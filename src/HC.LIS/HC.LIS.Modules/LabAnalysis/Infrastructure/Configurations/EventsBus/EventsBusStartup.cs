@@ -4,6 +4,7 @@ using HC.Core.Infrastructure.EventBus;
 using HC.LIS.Modules.Analyzer.IntegrationEvents;
 using HC.LIS.Modules.PatientManagement.IntegrationEvents;
 using HC.LIS.Modules.SampleCollection.IntegrationEvents;
+using HC.LIS.Modules.TestOrders.IntegrationEvents;
 
 namespace HC.LIS.Modules.LabAnalysis.Infrastructure.Configurations.EventBus;
 
@@ -24,6 +25,11 @@ internal static class EventsBusStartup
         SubscribeToIntegrationEvent<PatientRegisteredIntegrationEvent>(eventBus, logger);
         SubscribeToIntegrationEvent<PatientUpdatedIntegrationEvent>(eventBus, logger);
         SubscribeToIntegrationEvent<PatientAnonymizedIntegrationEvent>(eventBus, logger);
+        SubscribeToIntegrationEvent<OrderCreatedIntegrationEvent>(eventBus, logger);
+        SubscribeToIntegrationEvent<PhysicianRegisteredIntegrationEvent>(eventBus, logger);
+        SubscribeToIntegrationEvent<PhysicianUpdatedIntegrationEvent>(eventBus, logger);
+        SubscribeToIntegrationEvent<PhysicianDeactivatedIntegrationEvent>(eventBus, logger);
+        SubscribeToIntegrationEvent<PhysicianReactivatedIntegrationEvent>(eventBus, logger);
     }
 
     private static void SubscribeToIntegrationEvent<T>(IEventsBus eventBus, ILogger logger)

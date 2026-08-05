@@ -12,10 +12,22 @@ internal static class OrderFactory
         Order order = Order.Create(
             OrderSampleData.OrderId,
             new PatientId(OrderSampleData.PatientId),
-            new PhysicianId(OrderSampleData.RequestedBy),
+            ActivePhysician(),
             OrderPriority.Of(OrderSampleData.OrderPriority),
             OrderSampleData.RequestedAt
         );
         return order;
     }
+
+    public static RequestingPhysician ActivePhysician() => RequestingPhysician.Of(
+        new PhysicianId(OrderSampleData.RequestedBy),
+        OrderSampleData.RequestedByFullName,
+        isActive: true
+    );
+
+    public static RequestingPhysician InactivePhysician() => RequestingPhysician.Of(
+        new PhysicianId(OrderSampleData.RequestedBy),
+        OrderSampleData.RequestedByFullName,
+        isActive: false
+    );
 }
