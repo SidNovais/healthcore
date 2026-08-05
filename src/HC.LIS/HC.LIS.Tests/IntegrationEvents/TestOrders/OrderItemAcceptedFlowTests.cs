@@ -21,9 +21,10 @@ public class OrderItemAcceptedFlowTests : TestBase
         var patientId = Guid.NewGuid();
         var orderId = Guid.NewGuid();
         var orderItemId = Guid.NewGuid();
+        var physicianId = await RequestingPhysicianFactory.RegisterAsync(TestOrdersModule);
 
         await TestOrdersModule.ExecuteCommandAsync(new CreateOrderCommand(
-            orderId, patientId, ExecutionContext.UserId, "Routine", SystemClock.Now));
+            orderId, patientId, physicianId, "Routine", SystemClock.Now));
 
         await TestOrdersModule.ExecuteCommandAsync(new RequestExamCommand(
             orderId, orderItemId, "HGB", "BLOOD", "Whole Blood",
@@ -48,9 +49,10 @@ public class OrderItemAcceptedFlowTests : TestBase
         var orderId = Guid.NewGuid();
         var orderItemId1 = Guid.NewGuid();
         var orderItemId2 = Guid.NewGuid();
+        var physicianId = await RequestingPhysicianFactory.RegisterAsync(TestOrdersModule);
 
         await TestOrdersModule.ExecuteCommandAsync(new CreateOrderCommand(
-            orderId, patientId, ExecutionContext.UserId, "Routine", SystemClock.Now));
+            orderId, patientId, physicianId, "Routine", SystemClock.Now));
 
         await TestOrdersModule.ExecuteCommandAsync(new RequestExamCommand(
             orderId, orderItemId1, "HGB", "BLOOD", "Whole Blood",

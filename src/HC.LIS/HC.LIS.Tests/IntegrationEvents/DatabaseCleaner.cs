@@ -21,6 +21,7 @@ internal static class DatabaseCleaner
             DELETE FROM ""test_orders"".""OutboxMessages"";
             DELETE FROM ""test_orders"".""OrderItemDetails"";
             DELETE FROM ""test_orders"".""OrderDetails"";
+            DELETE FROM ""test_orders"".""PhysicianDetails"";
             DELETE FROM ""test_orders"".""mt_events"";
             DELETE FROM ""test_orders"".""mt_streams"";");
 
