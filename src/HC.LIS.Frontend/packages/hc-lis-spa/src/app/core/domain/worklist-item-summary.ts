@@ -6,6 +6,7 @@ export interface WorklistItemSummary {
   patientName: string | null;
   patientDateOfBirth: string | null;
   patientGender: string | null;
+  requestedByName: string | null;
   status: string;
   createdAt: string;
 }

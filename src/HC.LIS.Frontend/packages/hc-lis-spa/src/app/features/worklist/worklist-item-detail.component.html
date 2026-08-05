@@ -7,6 +7,7 @@
   @if (item.patientGender) {
     <p data-testid="patient-gender">Gender: {{ item.patientGender }}</p>
   }
+  <p data-testid="requested-by">Requesting physician: {{ item.requestedByName ?? 'Unknown physician' }}</p>
   <p class="status-line">Status: <hc-badge variant="accent">{{ item.status }}</hc-badge></p>
 
   @if (item.analyteResults.length > 0) {

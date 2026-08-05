@@ -16,7 +16,7 @@ import { HcSkeleton, SKELETON_ROWS } from '../../ui/skeleton/skeleton';
 import { HcTable } from '../../ui/table/table';
 import type { WorklistItemSummary } from '../../core/domain/worklist-item-summary';
 
-type SortKey = 'sampleBarcode' | 'examCode' | 'patientName' | 'status' | 'createdAt';
+type SortKey = 'sampleBarcode' | 'examCode' | 'patientName' | 'requestedByName' | 'status' | 'createdAt';
 type SortDir = 'asc' | 'desc';
 
 const PAGE_SIZE = 10;

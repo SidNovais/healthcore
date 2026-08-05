@@ -8,6 +8,7 @@
               <th>Barcode</th>
               <th>Exam</th>
               <th>Patient</th>
+              <th>Requesting Physician</th>
               <th>Status</th>
               <th>Created</th>
               <th class="actions-col"><span class="sr-only">Actions</span></th>
@@ -16,6 +17,7 @@
           <tbody>
             @for (row of skeletonRows; track $index) {
               <tr data-testid="worklist-skeleton-row" class="skeleton-row">
+                <td><hc-skeleton /></td>
                 <td><hc-skeleton /></td>
                 <td><hc-skeleton /></td>
                 <td><hc-skeleton /></td>
@@ -45,6 +47,9 @@
               <th [attr.aria-sort]="ariaSort('patientName')">
                 <button type="button" class="sort-btn" data-testid="worklist-sort-patient" (click)="toggleSort('patientName')">Patient</button>
               </th>
+              <th [attr.aria-sort]="ariaSort('requestedByName')">
+                <button type="button" class="sort-btn" data-testid="worklist-sort-requested-by" (click)="toggleSort('requestedByName')">Requesting Physician</button>
+              </th>
               <th [attr.aria-sort]="ariaSort('status')">
                 <button type="button" class="sort-btn" data-testid="worklist-sort-status" (click)="toggleSort('status')">Status</button>
               </th>
@@ -65,6 +70,7 @@
                 <td class="mono">{{ item.sampleBarcode }}</td>
                 <td>{{ item.examCode }}</td>
                 <td data-testid="patient-name-cell">{{ item.patientName ?? 'Unknown patient' }}</td>
+                <td data-testid="requested-by-cell">{{ item.requestedByName ?? 'Unknown physician' }}</td>
                 <td><hc-badge variant="accent">{{ item.status }}</hc-badge></td>
                 <td class="tabular-nums">{{ item.createdAt | hcDateTime }}</td>
                 <td class="actions-col" (click)="$event.stopPropagation()">
