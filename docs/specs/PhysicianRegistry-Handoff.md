@@ -310,7 +310,7 @@ Finish by documenting the registry in `CLAUDE.md`.
 - [x] **Part 3** — Physician picker + new-order form
 - [x] **Part 4** — Enforce the physician on order creation
 - [x] **Part 5** — Physician name on order views
-- [ ] **Part 6** — LabAnalysis worklist + report
+- [x] **Part 6** — LabAnalysis worklist + report
 - [ ] **Part 7** — ITAdmin physician registry page
 - [ ] **Part 8** — Full verification
 
@@ -371,3 +371,17 @@ _(append one line per completed part: date, branch, commits, anything the next s
 - **Verified:** TestOrders unit 41 → **43**, HC.LIS.API.Tests 5 → **7** (new `RealTime/UiNotificationTranslatorTests.cs` pins the SSE `OrderAdded` frame), every other unit + arch suite green, `dotnet build` clean. SPA `yarn test` 374 → **377/377** across 52 files, `yarn build` clean apart from the pre-existing `jsbarcode` warning, `tsc --noEmit` clean over `e2e/`.
 - **Not executed, same reason as every prior part:** the new `IntegrationTests/Orders/GetOrdersWithPhysicianNameTests.cs` (4 facts, incl. a raw-SQL legacy `OrderDetails` row proving the LEFT JOIN yields NULL rather than dropping the order) and `yarn e2e`. No Docker/Postgres on this box.
 - **Still pre-existing and untouched:** `LabAnalysis.ArchTests.InternalCommandShouldHaveConstructorWithJsonConstructorAttribute` (the three patient-snapshot commands — fix in Part 6), and `HC.LIS.Tests.IntegrationEvents` does not compile.
+
+**2026-08-05 — Part 6 done.** Branch `feat/physician-registry`, commits `6211e94` (fix) → `de4cbbe`. Notes for the next session:
+
+- **The pre-existing `InternalCommandShouldHaveConstructorWithJsonConstructorAttribute` failure is fixed, and it was a real bug, not a test nit.** The three patient-snapshot commands imported `System.Text.Json.Serialization.JsonConstructor`, but `ProcessInternalCommandsCommandHandler` rehydrates internal commands with Newtonsoft's `JsonConvert.DeserializeObject`. Newtonsoft never saw the attribute and was binding only via its single-public-constructor fallback. **Every internal command in this repo must use `Newtonsoft.Json.JsonConstructor`** — the arch test checks the Newtonsoft attribute specifically.
+- **`WorklistItemSummaryDto` had no construction sites outside its own declaration**, so the positional-record arity change the plan warned about cost nothing. Dapper maps it by column name.
+- **Two repositories, not one.** `IPhysicianSnapshotRepository` (Application/Physicians) owns the registry mirror; `IOrderPhysicianRepository` (Application/Orders) owns the mapping *and* the `GetRequestingPhysicianAsync(orderId)` join across both tables. Keeping the join out of the physician repo is what stops the two concerns bleeding together.
+- `UpdatePhysicianSnapshotByPhysicianIdCommand` carries `UpdatedAt`, so `IPhysicianSnapshotRepository.UpdateAsync` takes it too (the plan implied a 3-arg signature); otherwise the command would silently discard it. `ReactivateAsync` clears `DeactivatedAt` and stamps `UpdatedAt`.
+- **`OrderCreatedIntegrationEvent` now has three consumers** — the UI translator, and LabAnalysis via both the new `StoreOrderPhysician` handler. Only ever append trailing nullable fields to it.
+- The worklist SSE frame races the mapping internal command by design: `WorklistItemCreatedPublishEventNotificationHandler` publishes `RequestedByName = null` when the mapping has not landed. Two unit tests pin both branches. **An e2e must assert the reloaded value, never the live frame.**
+- Report: both `HtmlReportTemplate` and `QuestPdfGenerator` print `Unknown physician` for legacy items. The HTML name goes through `EscapeHtml` — there is a test pinning that, because the name is free text from the registry.
+- **The SDK was regenerated and both worklist DTOs now carry `requestedByName`.** To boot the API for `yarn generate` on a box with no Docker you need **four** env vars, not the three the Part 5 note lists: `ASPNETCORE_HCLIS_DATABASE_CONNECTION_STRING` is also required (`Program.cs:182` throws without it) even though nothing connects. Add it to `EventBus__Type=memory` + the three `JWT_*` values.
+- **Verified:** every project builds clean (0 warnings) except the pre-existing broken `HC.LIS.Tests.IntegrationEvents`; all unit + arch suites green — LabAnalysis unit 35 → **51**, LabAnalysis arch **22/22** (was 21/22), TestOrders unit 43, HC.LIS.API.Tests 7 → **9**, HC.LIS.Tests.ArchTests 8. SPA `yarn test` 377 → **381/381** across 52 files, `yarn build` clean apart from the pre-existing `jsbarcode` warning, `tsc --noEmit` clean over `e2e/`.
+- **Not executed, same reason as every prior part** (no Docker/Postgres on this box): the new `IntegrationTests/WorklistItems/WorklistItemRequestingPhysicianTests.cs` (4 facts) and `yarn e2e`, including the new route-mocked `worklist row shows the requesting physician name` test. **Run the two new migrations before them** — `TestBase.ClearDatabase` and `DatabaseCleaner` now delete from both new tables, so an un-migrated database fails every LabAnalysis integration test.
+- **Still pre-existing and untouched:** `HC.LIS.Tests.IntegrationEvents` does not compile (`CreateBarcodeCommand` does not exist; `RecordSampleCollectionCommand` takes 4 args, not 7). Part 8's plan to extend `FullWorkflowTests` is blocked until that drift is fixed.
