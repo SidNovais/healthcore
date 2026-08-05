@@ -305,7 +305,7 @@ Finish by documenting the registry in `CLAUDE.md`.
 
 ## Progress
 
-- [ ] **Part 1** — Physician registry (backend + API)
+- [x] **Part 1** — Physician registry (backend + API)
 - [ ] **Part 2** — SDK + physicians port
 - [ ] **Part 3** — Physician picker + new-order form
 - [ ] **Part 4** — Enforce the physician on order creation
@@ -317,3 +317,13 @@ Finish by documenting the registry in `CLAUDE.md`.
 ### Session notes
 
 _(append one line per completed part: date, branch, commits, anything the next session needs)_
+
+**2026-08-05 — Part 1 done.** Branch `feat/physician-registry`, commits `59c2314`…`ec4f4dd` (test → feat pairs for domain, migration, application, API). Notes for the next session:
+
+- **`SearchPhysiciansQuery` is a plain class, not a positional record.** A record's `init` accessors report `CanWrite == true`, which the `QueryShouldBeImmutable` arch test rejects. Property names are still `SearchTerm` / `IncludeInactive`; the constructor parameters are camelCase, so call it as `new SearchPhysiciansQuery(term, includeInactive: false)`.
+- The query passes `"%"` when the search term is blank (instead of a null parameter), so the admin page can list everything through the same handler.
+- All four registration points from the Part 1 table are done: `DomainEventTypeMappings`, `MartenConfig`, the `TestOrdersStartup` domain-notification BiMap, and `HcLisEventRegistry`. Notifications themselves need no DI edit — `ProcessingModule` already auto-registers every closed `IDomainEventNotification<>` in the Application assembly.
+- API routes are mounted at `v1.MapGroup("physicians")`; the new `OrderEntry` policy (Receptionist + ITAdmin) sits beside `ITAdmin` / `PatientManagement` in `Program.cs`.
+- **Run the migration before the integration tests** — `PhysicianDetails` is new and `TestBase.ClearDatabase` now deletes from it, so an un-migrated database fails every TestOrders integration test, not just the physician ones.
+- **Verified:** `dotnet build` clean (0 warnings) across every project except the pre-existing broken `HC.LIS.Tests.IntegrationEvents`; all unit + arch suites green (TestOrders unit 39, arch 22). **The physician integration tests were never executed** — this box has no Docker/Postgres, so CI is the first real run.
+- **Pre-existing failure, unrelated, but it will bite Part 6:** `LabAnalysis.ArchTests.InternalCommandShouldHaveConstructorWithJsonConstructorAttribute` fails — `StorePatientSnapshotByPatientIdCommand`, `UpdatePatientSnapshotByPatientIdCommand` and `AnonymizePatientSnapshotByPatientIdCommand` lack `[method: JsonConstructor]` (since `b5cacd3`, 2026-06-11). Part 6 adds five more internal commands to that same module — fix those three while you are there.
