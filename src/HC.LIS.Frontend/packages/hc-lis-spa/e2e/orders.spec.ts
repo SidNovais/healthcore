@@ -46,8 +46,7 @@ test.describe('Order List', () => {
     await loginAsReceptionist(page);
     await page.goto('/orders');
     await expect(page.getByTestId('order-list-table')).toBeVisible({ timeout: 5_000 });
-    // The "Requested By" column (a raw user id) has been removed.
-    await expect(page.getByTestId('order-list-sort-requested-by')).toHaveCount(0);
+    await expect(page.getByTestId('order-list-sort-requested-by')).toBeVisible({ timeout: 5_000 });
   });
 
   test('Clicking an order row navigates to /orders/:id', async ({ page }) => {
@@ -151,10 +150,11 @@ test.describe('Order Detail', () => {
 
   test('Receptionist sees order detail page at /orders/:id', async ({ page }) => {
     await loginAsReceptionist(page);
-    await startOrder(page);
+    const physician = await startOrder(page);
 
     await page.getByTestId('create-order-submit-btn').click();
     await expect(page.getByTestId('exam-section')).toBeVisible({ timeout: 5_000 });
+    const orderId = (await page.getByTestId('order-created').getAttribute('data-order-id'))!;
     await page.getByTestId('exam-mnemonic-input').fill('GLU');
     await page.getByTestId('container-type-input').fill('RedTop');
     await page.getByTestId('request-exam-btn').click();
@@ -162,17 +162,21 @@ test.describe('Order Detail', () => {
 
     await page.goto('/orders');
     await expect(page.getByTestId('order-list-table')).toBeVisible({ timeout: 5_000 });
-    await page.getByTestId('order-list-row').first().click();
+    const ourRow = page.locator(`[data-testid="order-list-row"][data-order-id="${orderId}"]`);
+    await expect(ourRow.getByTestId('requested-by-cell')).toHaveText(physician.fullName, {
+      timeout: 5_000,
+    });
+    await ourRow.click();
     await expect(page).toHaveURL(
       /\/orders\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
       { timeout: 5_000 }
     );
 
     await expect(page.getByTestId('order-detail')).toBeVisible({ timeout: 5_000 });
-    // Patient shows a name (or the friendly placeholder), never a raw id; and the
-    // raw "Requested By" user id has been removed entirely.
+    // Patient and physician show a name (or the friendly placeholder), never a raw id.
     await expect(page.getByTestId('patient-name')).not.toContainText(/^[0-9a-f]{8}-[0-9a-f]{4}-/i);
-    await expect(page.getByTestId('requested-by')).toHaveCount(0);
+    await expect(page.getByTestId('requested-by')).toHaveText(physician.fullName, { timeout: 5_000 });
+    await expect(page.getByTestId('requested-by')).not.toContainText(/^[0-9a-f]{8}-[0-9a-f]{4}-/i);
   });
 
   test('Order detail page shows exam items table with one row', async ({ page }) => {

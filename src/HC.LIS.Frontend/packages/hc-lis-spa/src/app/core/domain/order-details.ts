@@ -32,6 +32,7 @@ export interface OrderDetails {
   orderId: string;
   patientId: string;
   requestedBy: string;
+  requestedByName: string | null;
   orderPriority: string;
   requestedAt: string;
   items: ExamItem[];
