@@ -308,7 +308,7 @@ Finish by documenting the registry in `CLAUDE.md`.
 - [x] **Part 1** — Physician registry (backend + API)
 - [x] **Part 2** — SDK + physicians port
 - [x] **Part 3** — Physician picker + new-order form
-- [ ] **Part 4** — Enforce the physician on order creation
+- [x] **Part 4** — Enforce the physician on order creation
 - [ ] **Part 5** — Physician name on order views
 - [ ] **Part 6** — LabAnalysis worklist + report
 - [ ] **Part 7** — ITAdmin physician registry page
@@ -349,3 +349,14 @@ _(append one line per completed part: date, branch, commits, anything the next s
 - The picker filters `Inactive` client-side even though `search()` already passes `includeInactive: false`; that is parity with the patient picker, not a load-bearing check.
 - `ensurePhysician` polls `GET /api/v1/physicians?search=` until the new row is findable before returning, so specs never race the projection.
 - **Verified:** `yarn test` 374/374 green across 52 files (`physician-picker.component.spec.ts` = 8, new-order integration 6 → 7), `yarn build` clean apart from the pre-existing `jsbarcode` warning, and `tsc --noEmit` clean over `e2e/`. **`yarn e2e` was NOT run** — this box has no Docker/Postgres, so the API cannot serve `/api/v1/physicians`. The e2e specs are unexecuted, exactly as the Part 1 integration tests were.
+
+**2026-08-05 — Part 4 done.** Branch `feat/physician-registry`, commits `9079d41` (test) → `7c47983` (feat). Notes for the next session:
+
+- **`Order.Create`'s 3rd parameter is `RequestingPhysician?`, not `RequestingPhysician`.** The nullability is load-bearing: it is the only way `OrderMustReferenceRegisteredPhysicianRule` can live in the Domain instead of leaking a null-check into the command handler. `CheckRule` is invisible to the compiler's flow analysis, so the event construction that follows uses `requestedBy!.PhysicianId.Value`.
+- `IRequestingPhysicianProvider.GetByIdAsync` takes a `CancellationToken` (the plan wrote `GetByIdAsync(Guid)`); that matches the repo's only other domain-defined provider, `IWorklistItemForSigningProvider`.
+- **The `PhysicianDetails` projection is eventually consistent**, so any test that creates an order must register the physician *and wait for the projection row* first. Both new helpers do exactly that — `IntegrationTests/Orders/OrderFactory.RegisterRequestingPhysicianAsync` (polls `GetPhysicianDetailsFromTestOrdersProbe`, 15 s) and `HC.LIS.Tests/IntegrationEvents/RequestingPhysicianFactory.RegisterAsync` (same, via `IntegrationTestAssert.AssertEventually`). Do not create an order straight after `RegisterPhysicianCommand`.
+- **xUnit1030 is an error in the integration-test project**: a `Func<Task> action = async () => await …ConfigureAwait(false);` written *inside* a `[Fact]` fails the build. Use `ConfigureAwait(true)` in test-method bodies.
+- New integration file `Orders/CreateOrderPhysicianEnforcementTests.cs` covers unregistered → `OrderMustReferenceRegisteredPhysicianRule`, deactivated → `OrderMustReferenceActivePhysicianRule`, and the happy path.
+- **Verified:** every unit + arch suite green — TestOrders unit 39 → **41**, TestOrders arch 22, HC.LIS.Tests.ArchTests 8, and Analyzer/LabAnalysis/PatientManagement/SampleCollection/UserAccess/HC.Core all green. `dotnet build` clean (0 warnings) for the API and every test project that compiles.
+- **Two pre-existing failures confirmed unrelated and untouched:** (1) `LabAnalysis.ArchTests.InternalCommandShouldHaveConstructorWithJsonConstructorAttribute` (still the three patient-snapshot commands — fix in Part 6); (2) `HC.LIS.Tests.IntegrationEvents` does not compile — `CreateBarcodeCommand` does not exist anywhere in SampleCollection and `RecordSampleCollectionCommand` takes 4 args, not 7. **The Part 4 edits to that project were applied and are correct, but the project cannot be built until that pre-existing drift is fixed.**
+- **The physician integration tests were again never executed** — no Docker/Postgres on this box. CI is the first real run for Parts 1 and 4 both. Run the migration before them.
