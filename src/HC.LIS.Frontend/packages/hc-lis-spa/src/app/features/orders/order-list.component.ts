@@ -18,7 +18,7 @@ import { HcIcon } from '../../ui/icon/icon';
 import { MOTION, prefersReducedMotion } from '../../ui/motion/motion';
 import type { OrderListItem } from '../../core/domain/order-list-item';
 
-type SortKey = 'patientName' | 'orderPriority' | 'requestedAt' | 'itemCount';
+type SortKey = 'patientName' | 'requestedByName' | 'orderPriority' | 'requestedAt' | 'itemCount';
 type SortDir = 'asc' | 'desc';
 
 const PAGE_SIZE = 10;
