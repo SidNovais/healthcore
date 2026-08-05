@@ -128,6 +128,7 @@ internal static class UiNotificationTranslator
                 patientName = e.PatientName,
                 patientDateOfBirth = e.PatientDateOfBirth,
                 patientGender = e.PatientGender,
+                requestedByName = e.RequestedByName,
                 status = "Pending",
                 createdAt = e.OccurredAt,
             },
