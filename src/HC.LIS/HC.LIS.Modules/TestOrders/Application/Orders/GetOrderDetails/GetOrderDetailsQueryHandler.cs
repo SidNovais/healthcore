@@ -22,9 +22,11 @@ internal class GetOrderDetailsQueryHandler(
         od.""Id"" AS ""OrderId"",
         od.""PatientId"",
         od.""RequestedBy"",
+        p.""FullName"" AS ""RequestedByName"",
         od.""Priority"" AS ""OrderPriority"",
         od.""RequestedAt""
       FROM test_orders.""OrderDetails"" od
+      LEFT JOIN test_orders.""PhysicianDetails"" p ON p.""Id"" = od.""RequestedBy""
       WHERE od.""Id"" = @OrderId;
 
       SELECT

@@ -11,7 +11,8 @@ public class OrderCreatedIntegrationEvent(
     Guid requestedBy,
     string orderPriority,
     DateTime requestedAt,
-    string? patientName = null
+    string? patientName = null,
+    string? requestedByName = null
 ) : IntegrationEvent(id, occurredAt)
 {
     public Guid OrderId { get; } = orderId;
@@ -20,4 +21,5 @@ public class OrderCreatedIntegrationEvent(
     public string OrderPriority { get; } = orderPriority;
     public DateTime RequestedAt { get; } = requestedAt;
     public string? PatientName { get; } = patientName;
+    public string? RequestedByName { get; } = requestedByName;
 }

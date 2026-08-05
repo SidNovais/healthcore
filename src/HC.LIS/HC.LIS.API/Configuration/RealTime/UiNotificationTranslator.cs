@@ -67,6 +67,7 @@ internal static class UiNotificationTranslator
                 patientId = e.PatientId,
                 patientName = e.PatientName,
                 requestedBy = e.RequestedBy,
+                requestedByName = e.RequestedByName,
                 orderPriority = e.OrderPriority,
                 requestedAt = e.RequestedAt,
                 itemCount = 0,
