@@ -26,6 +26,8 @@ import { SdkUsersApi } from './core/infrastructure/users/sdk-users-api';
 import { SdkUsersAdapter } from './core/infrastructure/users/sdk-users-adapter';
 import { PATIENTS_PORT } from './core/application/i-patients-port';
 import { SdkPatientsAdapter } from './core/infrastructure/patients/sdk-patients-adapter';
+import { PHYSICIANS_PORT } from './core/application/i-physicians-port';
+import { SdkPhysiciansAdapter } from './core/infrastructure/physicians/sdk-physicians-adapter';
 
 function initializeApp(authService: AuthService): () => Promise<void> {
   return () => {
@@ -49,6 +51,7 @@ export const appConfig: ApplicationConfig = {
     { provide: USERS_API, useClass: SdkUsersApi },
     { provide: USERS_PORT, useClass: SdkUsersAdapter },
     { provide: PATIENTS_PORT, useClass: SdkPatientsAdapter },
+    { provide: PHYSICIANS_PORT, useClass: SdkPhysiciansAdapter },
     {
       provide: APP_INITIALIZER,
       useFactory: initializeApp,

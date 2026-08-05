@@ -306,7 +306,7 @@ Finish by documenting the registry in `CLAUDE.md`.
 ## Progress
 
 - [x] **Part 1** — Physician registry (backend + API)
-- [ ] **Part 2** — SDK + physicians port
+- [x] **Part 2** — SDK + physicians port
 - [ ] **Part 3** — Physician picker + new-order form
 - [ ] **Part 4** — Enforce the physician on order creation
 - [ ] **Part 5** — Physician name on order views
@@ -329,3 +329,13 @@ _(append one line per completed part: date, branch, commits, anything the next s
 - **Run the migration before the integration tests** — `PhysicianDetails` is new and `TestBase.ClearDatabase` now deletes from it, so an un-migrated database fails every TestOrders integration test, not just the physician ones.
 - **Verified:** `dotnet build` clean (0 warnings) across every project except the pre-existing broken `HC.LIS.Tests.IntegrationEvents`; all unit + arch suites green (TestOrders unit 39, arch 22). **The physician integration tests were never executed** — this box has no Docker/Postgres, so CI is the first real run.
 - **Pre-existing failure, unrelated, but it will bite Part 6:** `LabAnalysis.ArchTests.InternalCommandShouldHaveConstructorWithJsonConstructorAttribute` fails — `StorePatientSnapshotByPatientIdCommand`, `UpdatePatientSnapshotByPatientIdCommand` and `AnonymizePatientSnapshotByPatientIdCommand` lack `[method: JsonConstructor]` (since `b5cacd3`, 2026-06-11). Part 6 adds five more internal commands to that same module — fix those three while you are there.
+
+**2026-08-05 — Part 2 done.** Branch `feat/physician-registry`. Notes for the next session:
+
+- **There is no `chore(sdk):` commit — `src/generated/` is gitignored** (`packages/hc-lis-api-client/.gitignore`) and CI never builds the frontend, so the generated client is *not* committed. Risk-register item 7 is wrong on this point. Every contributor must run `yarn generate && yarn build` in `hc-lis-api-client` themselves after an API change.
+- **Trap that cost the most time: `packages/hc-lis-spa/node_modules/@hc-lis/api-client` was a stale June copy shadowing the workspace symlink.** `yarn generate && yarn build` in the api-client package appeared to do nothing — the spa kept compiling against months-old types. Fix: `rm -rf packages/hc-lis-spa/node_modules/@hc-lis` so resolution falls through to the root symlink. **If a new SDK function "has no exported member", check this first.**
+- To run the API for `yarn generate` on a box with no Docker: it boots fine without Postgres (Marten/EF connect lazily), but **set `ASPNETCORE_HCLIS_EventBus__Type=memory`** or startup stalls retrying RabbitMQ. Swagger then answers on `http://localhost:5000/swagger/v1/swagger.json`.
+- `IPhysiciansPort.list(includeInactive)` sends a **blank** search term, which the Part 1 handler turns into `"%"` — one endpoint serves both the picker and the Part 7 admin page, exactly as designed.
+- `search(term)` passes `includeInactive: false`, so **inactive physicians are already excluded server-side**. Part 3's picker still filters client-side for parity with the patient picker, but it is belt-and-braces, not load-bearing.
+- New domain file beyond the two the plan listed: `core/domain/register-physician-params.ts` (`RegisterPhysicianParams` / `UpdatePhysicianParams`), mirroring `register-patient-params.ts`. `PhysicianStatus` (`'Active' | 'Inactive'`) is exported from `physician-search-result.ts`.
+- **Verified:** `yarn test` 365/365 green across 51 files (new `sdk-physicians-adapter.spec.ts` = 7 tests), and `yarn build` clean apart from the pre-existing `jsbarcode` CommonJS warning.
