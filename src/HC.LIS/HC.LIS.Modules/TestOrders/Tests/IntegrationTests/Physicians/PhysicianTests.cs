@@ -160,14 +160,14 @@ public class PhysicianTests : TestBase
         await RegisterBothPhysiciansAsync().ConfigureAwait(true);
 
         IReadOnlyCollection<PhysicianSearchResultDto> byName = await TestOrdersModule
-            .ExecuteQueryAsync(new SearchPhysiciansQuery("ana", IncludeInactive: false))
+            .ExecuteQueryAsync(new SearchPhysiciansQuery("ana", includeInactive: false))
             .ConfigureAwait(true);
 
         byName.Should().ContainSingle();
         byName.Single().Id.Should().Be(PhysicianSampleData.PhysicianId);
 
         IReadOnlyCollection<PhysicianSearchResultDto> byLicence = await TestOrdersModule
-            .ExecuteQueryAsync(new SearchPhysiciansQuery("998877", IncludeInactive: false))
+            .ExecuteQueryAsync(new SearchPhysiciansQuery("998877", includeInactive: false))
             .ConfigureAwait(true);
 
         byLicence.Should().ContainSingle();
@@ -191,14 +191,14 @@ public class PhysicianTests : TestBase
         ).ConfigureAwait(true);
 
         IReadOnlyCollection<PhysicianSearchResultDto> activeOnly = await TestOrdersModule
-            .ExecuteQueryAsync(new SearchPhysiciansQuery("Dr.", IncludeInactive: false))
+            .ExecuteQueryAsync(new SearchPhysiciansQuery("Dr.", includeInactive: false))
             .ConfigureAwait(true);
 
         activeOnly.Should().ContainSingle();
         activeOnly.Single().Id.Should().Be(PhysicianSampleData.PhysicianId);
 
         IReadOnlyCollection<PhysicianSearchResultDto> all = await TestOrdersModule
-            .ExecuteQueryAsync(new SearchPhysiciansQuery("Dr.", IncludeInactive: true))
+            .ExecuteQueryAsync(new SearchPhysiciansQuery("Dr.", includeInactive: true))
             .ConfigureAwait(true);
 
         all.Should().HaveCount(2);
