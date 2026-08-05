@@ -5,8 +5,6 @@ namespace HC.LIS.Database.TestOrders;
 [Migration(20260805120000)]
 public class TestOrdersModuleAddTablePhysicianDetails : Migration
 {
-    // No foreign key from "OrderDetails"."RequestedBy": historical rows hold UserAccess user ids,
-    // which have no matching physician and would violate the constraint.
     public override void Up()
     {
         Create.Table("PhysicianDetails").InSchema("test_orders")

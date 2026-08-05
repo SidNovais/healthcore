@@ -146,6 +146,24 @@ The public API of each module is a single facade class (e.g., `TestOrdersModule`
 - 4 spaces indentation
 - Private fields: `_camelCase`, static fields: `s_camelCase`, constants: `PascalCase`
 
+### Comments
+
+**Do not comment the implementation.** If something needs saying, say it in the code — a named local, a named constant, a rule class, a clearer method or type name. A comment that restates what the line does is noise, and it rots as soon as the line changes.
+
+```csharp
+// Bad — the comment carries the meaning
+// A blank term matches everything so the admin page can list the registry
+SearchTerm = string.IsNullOrWhiteSpace(query.SearchTerm) ? "%" : $"{query.SearchTerm}%"
+
+// Good — the code carries the meaning
+const string MatchEveryPhysician = "%";
+string prefixPattern = string.IsNullOrWhiteSpace(query.SearchTerm)
+    ? MatchEveryPhysician
+    : $"{query.SearchTerm}%";
+```
+
+Design decisions and rationale belong in the commit message, the handoff/spec document under `docs/specs/`, or this file — not in a code comment. The narrow exceptions are the existing `// ─── Section ───` banners in `Program.cs` and XML doc comments on a public contract.
+
 ### Loading & Feedback (Frontend)
 
 The SPA gives **uniform** feedback while the system is working. Pick the affordance by the **kind of operation**, not by page:

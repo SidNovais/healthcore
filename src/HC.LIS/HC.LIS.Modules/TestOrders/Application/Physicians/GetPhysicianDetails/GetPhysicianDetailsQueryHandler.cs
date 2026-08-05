@@ -16,23 +16,26 @@ internal class GetPhysicianDetailsQueryHandler(
         CancellationToken cancellationToken
     )
     {
-        const string sql = @"
-            SELECT
-                ""Id"",
-                ""FullName"",
-                ""LicenceNumber"",
-                ""Status"",
-                ""RegisteredAt"",
-                ""UpdatedAt"",
-                ""DeactivatedAt""
-            FROM test_orders.""PhysicianDetails""
-            WHERE ""Id"" = @PhysicianId";
+        string sql = @$"SELECT
+            ""PhysicianDetails"".""Id"" AS ""{nameof(PhysicianDetailsDto.Id)}"",
+            ""PhysicianDetails"".""FullName"" AS ""{nameof(PhysicianDetailsDto.FullName)}"",
+            ""PhysicianDetails"".""LicenceNumber"" AS ""{nameof(PhysicianDetailsDto.LicenceNumber)}"",
+            ""PhysicianDetails"".""Status"" AS ""{nameof(PhysicianDetailsDto.Status)}"",
+            ""PhysicianDetails"".""RegisteredAt"" AS ""{nameof(PhysicianDetailsDto.RegisteredAt)}"",
+            ""PhysicianDetails"".""UpdatedAt"" AS ""{nameof(PhysicianDetailsDto.UpdatedAt)}"",
+            ""PhysicianDetails"".""DeactivatedAt"" AS ""{nameof(PhysicianDetailsDto.DeactivatedAt)}""
+            FROM ""test_orders"".""PhysicianDetails"" AS ""PhysicianDetails""
+            WHERE ""PhysicianDetails"".""Id"" = @PhysicianId";
 
-        IDbConnection connection = _sqlConnectionFactory.GetConnection()
+        IDbConnection? connection = _sqlConnectionFactory.GetConnection()
             ?? throw new InvalidOperationException("Must exist connection to get physician details");
 
-        return await connection
-            .QueryFirstOrDefaultAsync<PhysicianDetailsDto>(sql, new { query.PhysicianId })
-            .ConfigureAwait(false);
+        return await connection.QueryFirstOrDefaultAsync<PhysicianDetailsDto>(
+            sql,
+            new
+            {
+                query.PhysicianId
+            }
+        ).ConfigureAwait(false);
     }
 }

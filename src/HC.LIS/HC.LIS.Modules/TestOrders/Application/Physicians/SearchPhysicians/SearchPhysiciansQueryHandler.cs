@@ -16,27 +16,34 @@ internal class SearchPhysiciansQueryHandler(
         CancellationToken cancellationToken
     )
     {
-        const string sql = @"
-            SELECT
-                ""Id"",
-                ""FullName"",
-                ""LicenceNumber"",
-                ""Status""
-            FROM test_orders.""PhysicianDetails""
-            WHERE (""FullName"" ILIKE @SearchTerm OR ""LicenceNumber"" ILIKE @SearchTerm)
-              AND (@IncludeInactive OR ""Status"" = 'Active')
-            ORDER BY ""FullName""";
+        string sql = @$"SELECT
+            ""PhysicianDetails"".""Id"" AS ""{nameof(PhysicianSearchResultDto.Id)}"",
+            ""PhysicianDetails"".""FullName"" AS ""{nameof(PhysicianSearchResultDto.FullName)}"",
+            ""PhysicianDetails"".""LicenceNumber"" AS ""{nameof(PhysicianSearchResultDto.LicenceNumber)}"",
+            ""PhysicianDetails"".""Status"" AS ""{nameof(PhysicianSearchResultDto.Status)}""
+            FROM ""test_orders"".""PhysicianDetails"" AS ""PhysicianDetails""
+            WHERE (""PhysicianDetails"".""FullName"" ILIKE @SearchTerm
+                OR ""PhysicianDetails"".""LicenceNumber"" ILIKE @SearchTerm)
+              AND (@IncludeInactive OR ""PhysicianDetails"".""Status"" = 'Active')
+            ORDER BY ""PhysicianDetails"".""FullName""";
 
-        IDbConnection connection = _sqlConnectionFactory.GetConnection()
+        IDbConnection? connection = _sqlConnectionFactory.GetConnection()
             ?? throw new InvalidOperationException("Must exist connection to search physicians");
 
+        const string MatchEveryPhysician = "%";
+        string prefixPattern = string.IsNullOrWhiteSpace(query.SearchTerm)
+            ? MatchEveryPhysician
+            : $"{query.SearchTerm}%";
+
         IEnumerable<PhysicianSearchResultDto> results = await connection
-            .QueryAsync<PhysicianSearchResultDto>(sql, new
-            {
-                SearchTerm = string.IsNullOrWhiteSpace(query.SearchTerm) ? "%" : $"%{query.SearchTerm}%",
-                query.IncludeInactive
-            })
-            .ConfigureAwait(false);
+            .QueryAsync<PhysicianSearchResultDto>(
+                sql,
+                new
+                {
+                    SearchTerm = prefixPattern,
+                    query.IncludeInactive
+                }
+            ).ConfigureAwait(false);
 
         return results.ToList().AsReadOnly();
     }

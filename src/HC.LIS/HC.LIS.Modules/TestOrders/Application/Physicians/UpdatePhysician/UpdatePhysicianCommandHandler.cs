@@ -16,7 +16,7 @@ internal class UpdatePhysicianCommandHandler(
         CancellationToken cancellationToken
     )
     {
-        Physician physician = await _aggregateStore.Load(new PhysicianId(command.PhysicianId)).ConfigureAwait(false) ??
+        Physician? physician = await _aggregateStore.Load(new PhysicianId(command.PhysicianId)).ConfigureAwait(false) ??
             throw new InvalidCommandException("Physician must exist to update");
 
         physician.Update(command.FullName, command.LicenceNumber, command.UpdatedAt);

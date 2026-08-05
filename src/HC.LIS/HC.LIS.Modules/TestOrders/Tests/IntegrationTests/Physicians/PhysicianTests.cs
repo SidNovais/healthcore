@@ -155,23 +155,47 @@ public class PhysicianTests : TestBase
     }
 
     [Fact]
-    public async Task SearchPhysiciansMatchesPartialNameAndLicenceNumber()
+    public async Task SearchPhysiciansMatchesNamePrefixAndLicencePrefix()
     {
         await RegisterBothPhysiciansAsync().ConfigureAwait(true);
 
         IReadOnlyCollection<PhysicianSearchResultDto> byName = await TestOrdersModule
-            .ExecuteQueryAsync(new SearchPhysiciansQuery("ana", includeInactive: false))
+            .ExecuteQueryAsync(new SearchPhysiciansQuery("dr. ana", includeInactive: false))
             .ConfigureAwait(true);
 
         byName.Should().ContainSingle();
         byName.Single().Id.Should().Be(PhysicianSampleData.PhysicianId);
 
         IReadOnlyCollection<PhysicianSearchResultDto> byLicence = await TestOrdersModule
-            .ExecuteQueryAsync(new SearchPhysiciansQuery("998877", includeInactive: false))
+            .ExecuteQueryAsync(new SearchPhysiciansQuery("CRM-RJ", includeInactive: false))
             .ConfigureAwait(true);
 
         byLicence.Should().ContainSingle();
         byLicence.Single().Id.Should().Be(PhysicianSampleData.OtherPhysicianId);
+    }
+
+    [Fact]
+    public async Task SearchPhysiciansDoesNotMatchMidNameTerms()
+    {
+        await RegisterBothPhysiciansAsync().ConfigureAwait(true);
+
+        IReadOnlyCollection<PhysicianSearchResultDto> results = await TestOrdersModule
+            .ExecuteQueryAsync(new SearchPhysiciansQuery("Lima", includeInactive: false))
+            .ConfigureAwait(true);
+
+        results.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task SearchPhysiciansWithoutTermListsEveryActivePhysician()
+    {
+        await RegisterBothPhysiciansAsync().ConfigureAwait(true);
+
+        IReadOnlyCollection<PhysicianSearchResultDto> results = await TestOrdersModule
+            .ExecuteQueryAsync(new SearchPhysiciansQuery(null, includeInactive: false))
+            .ConfigureAwait(true);
+
+        results.Should().HaveCount(2);
     }
 
     [Fact]

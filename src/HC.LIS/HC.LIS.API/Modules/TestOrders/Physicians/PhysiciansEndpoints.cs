@@ -16,8 +16,6 @@ internal static class PhysiciansEndpoints
     {
         group.WithTags("Physicians");
 
-        // OrderEntry covers both the ITAdmin registry page and the receptionist's
-        // inline quick-add from the new-order form.
         group.MapGet("", SearchPhysiciansEndpoint.Handle)
             .RequireAuthorization("OrderEntry")
             .WithName("SearchPhysicians")

@@ -119,8 +119,6 @@ try
     {
         options.AddPolicy("ITAdmin", policy => policy.RequireRole("ITAdmin"));
         options.AddPolicy("PatientManagement", policy => policy.RequireRole("Receptionist", "ITAdmin"));
-        // Covers the ITAdmin physician registry page and the receptionist's quick-add
-        // while placing an order.
         options.AddPolicy("OrderEntry", policy => policy.RequireRole("Receptionist", "ITAdmin"));
     });
 

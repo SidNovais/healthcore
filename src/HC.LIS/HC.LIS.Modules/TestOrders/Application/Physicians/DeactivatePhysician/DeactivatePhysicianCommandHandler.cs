@@ -16,7 +16,7 @@ internal class DeactivatePhysicianCommandHandler(
         CancellationToken cancellationToken
     )
     {
-        Physician physician = await _aggregateStore.Load(new PhysicianId(command.PhysicianId)).ConfigureAwait(false) ??
+        Physician? physician = await _aggregateStore.Load(new PhysicianId(command.PhysicianId)).ConfigureAwait(false) ??
             throw new InvalidCommandException("Physician must exist to deactivate");
 
         physician.Deactivate(command.DeactivatedAt);
