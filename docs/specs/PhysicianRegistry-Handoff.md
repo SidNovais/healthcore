@@ -311,7 +311,7 @@ Finish by documenting the registry in `CLAUDE.md`.
 - [x] **Part 4** — Enforce the physician on order creation
 - [x] **Part 5** — Physician name on order views
 - [x] **Part 6** — LabAnalysis worklist + report
-- [ ] **Part 7** — ITAdmin physician registry page
+- [x] **Part 7** — ITAdmin physician registry page
 - [ ] **Part 8** — Full verification
 
 ### Session notes
@@ -385,3 +385,14 @@ _(append one line per completed part: date, branch, commits, anything the next s
 - **Verified:** every project builds clean (0 warnings) except the pre-existing broken `HC.LIS.Tests.IntegrationEvents`; all unit + arch suites green — LabAnalysis unit 35 → **51**, LabAnalysis arch **22/22** (was 21/22), TestOrders unit 43, HC.LIS.API.Tests 7 → **9**, HC.LIS.Tests.ArchTests 8. SPA `yarn test` 377 → **381/381** across 52 files, `yarn build` clean apart from the pre-existing `jsbarcode` warning, `tsc --noEmit` clean over `e2e/`.
 - **Not executed, same reason as every prior part** (no Docker/Postgres on this box): the new `IntegrationTests/WorklistItems/WorklistItemRequestingPhysicianTests.cs` (4 facts) and `yarn e2e`, including the new route-mocked `worklist row shows the requesting physician name` test. **Run the two new migrations before them** — `TestBase.ClearDatabase` and `DatabaseCleaner` now delete from both new tables, so an un-migrated database fails every LabAnalysis integration test.
 - **Still pre-existing and untouched:** `HC.LIS.Tests.IntegrationEvents` does not compile (`CreateBarcodeCommand` does not exist; `RecordSampleCollectionCommand` takes 4 args, not 7). Part 8's plan to extend `FullWorkflowTests` is blocked until that drift is fixed.
+
+**2026-08-05 — Part 7 done.** Branch `feat/physician-admin-page` (off `main`, post-merge), commits `dc4572f` (test) → `bcb1b8f` (feat). **Frontend only — no backend or SDK change, so nothing to regenerate.** Notes for the next session:
+
+- **There is no "Registered" column, and the plan's implied parity with the users table does not hold.** `PhysicianSearchResultDto` carries only `Id`, `FullName`, `LicenceNumber`, `Status` — no `RegisteredAt` — and `IPhysiciansPort.list()` is that same search endpoint. Columns are Full Name · Licence Number · Status · Actions. Adding the date means a trailing field on the search DTO + handler + SDK regen; it was judged out of scope for a frontend-only part.
+- **The list calls `port.list(true)`.** Inactive physicians are the only rows the reactivate action can act on, so filtering them out would hide exactly what the page exists to fix. Each row offers deactivate *or* reactivate, never both — a test pins that.
+- **`PhysicianFormComponent` prefills in `ngOnInit`, not an `effect()`.** The first attempt used an effect and the edit dialog rendered with empty inputs for one change-detection pass; the unit test caught it. The host recreates the component on every dialog open (`@if (formOpen())`), so the row is known before the first pass. Separately, **`NgModel` writes the initial DOM value in a microtask** — the prefill spec must `await fixture.whenStable()` before reading `input.value`, which is why that one test is async.
+- The dialogs bind `[open]` + `(openChange)` rather than `[(open)]`, because Esc/backdrop dismissal also has to clear `editing` / `pendingStatusChange`.
+- New `stethoscope` glyph in `ui/icon/icon.ts` — `/patients` already owns `user` and Users owns `users`.
+- **Enumerating specs checked, only one needed an edit:** `e2e/a11y.spec.ts` gained `/admin/physicians`. `nav.spec.ts` only asserts the Users link is active on landing, and `command-palette.spec.ts` filters `"work"` (which "Physicians" does not match) — both are unaffected. `hipaa.spec.ts` never visits the route.
+- **Verified:** SPA `yarn test` 381 → **407/407** across 54 files (`physicians.service.spec.ts` = 10, `physician-list.component.integration.spec.ts` = 16), `yarn build` clean apart from the pre-existing `jsbarcode` warning, and `tsc --noEmit` clean over `e2e/`.
+- **Not executed, same reason as every prior part** (no Docker/Postgres on this box): the new `e2e/admin-physicians.spec.ts` (4 tests — create→edit→deactivate, reactivate, Receptionist role guard, nav-link visibility) and the two new a11y route scans.
