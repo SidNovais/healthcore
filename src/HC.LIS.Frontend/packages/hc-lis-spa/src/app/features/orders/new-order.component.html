@@ -7,6 +7,11 @@
           <app-patient-picker (patientSelected)="selectedPatient.set($event)" />
         </hc-field>
 
+        <hc-field>
+          <label hc-label>Referring Physician</label>
+          <app-physician-picker (physicianSelected)="selectedPhysician.set($event)" />
+        </hc-field>
+
         @if (createError(); as msg) {
           <hc-alert variant="error">{{ msg }}</hc-alert>
         }
@@ -18,7 +23,7 @@
           data-testid="create-order-submit-btn"
           class="create-order-submit"
           [loading]="creating()"
-          [disabled]="!selectedPatient() || creating()"
+          [disabled]="!selectedPatient() || !selectedPhysician() || creating()"
         >
           Create Order
         </button>
