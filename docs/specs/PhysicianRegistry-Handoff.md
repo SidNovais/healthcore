@@ -309,7 +309,7 @@ Finish by documenting the registry in `CLAUDE.md`.
 - [x] **Part 2** — SDK + physicians port
 - [x] **Part 3** — Physician picker + new-order form
 - [x] **Part 4** — Enforce the physician on order creation
-- [ ] **Part 5** — Physician name on order views
+- [x] **Part 5** — Physician name on order views
 - [ ] **Part 6** — LabAnalysis worklist + report
 - [ ] **Part 7** — ITAdmin physician registry page
 - [ ] **Part 8** — Full verification
@@ -360,3 +360,14 @@ _(append one line per completed part: date, branch, commits, anything the next s
 - **Verified:** every unit + arch suite green — TestOrders unit 39 → **41**, TestOrders arch 22, HC.LIS.Tests.ArchTests 8, and Analyzer/LabAnalysis/PatientManagement/SampleCollection/UserAccess/HC.Core all green. `dotnet build` clean (0 warnings) for the API and every test project that compiles.
 - **Two pre-existing failures confirmed unrelated and untouched:** (1) `LabAnalysis.ArchTests.InternalCommandShouldHaveConstructorWithJsonConstructorAttribute` (still the three patient-snapshot commands — fix in Part 6); (2) `HC.LIS.Tests.IntegrationEvents` does not compile — `CreateBarcodeCommand` does not exist anywhere in SampleCollection and `RecordSampleCollectionCommand` takes 4 args, not 7. **The Part 4 edits to that project were applied and are correct, but the project cannot be built until that pre-existing drift is fixed.**
 - **The physician integration tests were again never executed** — no Docker/Postgres on this box. CI is the first real run for Parts 1 and 4 both. Run the migration before them.
+
+**2026-08-05 — Part 5 done.** Branch `feat/physician-registry`, commits `a1dc871` (test) → `2755f23` (feat) → `ca611b1` (test) → `0f6c00d` (feat). Notes for the next session:
+
+- **Regenerate the SDK before touching the SPA** — both order DTOs gained `requestedByName`, and `src/generated` is gitignored (see the Part 2 note), so a fresh clone compiles against the old shape. `yarn generate` needs the API on `localhost:5000`; on a box with no Docker it also needs `ASPNETCORE_HCLIS_JWT_{ISSUER,AUDIENCE,SECRET_KEY}` set or startup throws before Swagger is served — `EventBus__Type=memory` alone is not enough. Values that work: `healthcore` / `healthcore` / `supersecretkey1234567890abcdefgh`.
+- **`GetOrderDetailsQueryHandler` does not follow the `AS "{nameof(Dto.Prop)}"` convention** — it predates it and uses literal aliases (`od`, `p`). The new join matches the file's existing idiom rather than half-converting one column; converting the whole handler is a separate cleanup.
+- The e2e order-detail test no longer clicks `order-list-row.first()`. It captures its own `orderId` and targets `[data-order-id="…"]`, because asserting an *exact* physician name on whatever row happens to sort first is flakeable by an order a previous spec left behind.
+- The two `page.route`-mocked order-list tests in `orders.spec.ts` (the patient-name ones) deliberately omit `requestedByName`, so those rows render `Unknown physician`. Nothing asserts on it — that is the legacy-row path getting incidental coverage.
+- `OrderCreatedIntegrationEvent`'s new field is trailing and nullable, so Part 6's LabAnalysis consumer can ignore it; the physician *id* is still what travels for the snapshot join.
+- **Verified:** TestOrders unit 41 → **43**, HC.LIS.API.Tests 5 → **7** (new `RealTime/UiNotificationTranslatorTests.cs` pins the SSE `OrderAdded` frame), every other unit + arch suite green, `dotnet build` clean. SPA `yarn test` 374 → **377/377** across 52 files, `yarn build` clean apart from the pre-existing `jsbarcode` warning, `tsc --noEmit` clean over `e2e/`.
+- **Not executed, same reason as every prior part:** the new `IntegrationTests/Orders/GetOrdersWithPhysicianNameTests.cs` (4 facts, incl. a raw-SQL legacy `OrderDetails` row proving the LEFT JOIN yields NULL rather than dropping the order) and `yarn e2e`. No Docker/Postgres on this box.
+- **Still pre-existing and untouched:** `LabAnalysis.ArchTests.InternalCommandShouldHaveConstructorWithJsonConstructorAttribute` (the three patient-snapshot commands — fix in Part 6), and `HC.LIS.Tests.IntegrationEvents` does not compile.
