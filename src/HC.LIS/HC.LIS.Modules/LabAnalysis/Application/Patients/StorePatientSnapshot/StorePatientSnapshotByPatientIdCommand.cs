@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 using HC.LIS.Modules.LabAnalysis.Application.Configuration.Commands;
 
 namespace HC.LIS.Modules.LabAnalysis.Application.Patients.StorePatientSnapshot;
