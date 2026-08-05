@@ -17,7 +17,8 @@ internal class UpdatePhysicianSnapshotByPhysicianIdCommandHandler(
         await _physicianSnapshotRepository.UpdateAsync(
             command.PhysicianId,
             command.FullName,
-            command.LicenceNumber
+            command.LicenceNumber,
+            command.UpdatedAt
         ).ConfigureAwait(false);
     }
 }

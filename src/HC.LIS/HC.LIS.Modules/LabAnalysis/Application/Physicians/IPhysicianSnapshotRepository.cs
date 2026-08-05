@@ -10,7 +10,7 @@ public interface IPhysicianSnapshotRepository
 
     Task StoreAsync(Guid physicianId, string fullName, string? licenceNumber, DateTime registeredAt);
 
-    Task UpdateAsync(Guid physicianId, string fullName, string? licenceNumber);
+    Task UpdateAsync(Guid physicianId, string fullName, string? licenceNumber, DateTime updatedAt);
 
     Task DeactivateAsync(Guid physicianId, DateTime deactivatedAt);
 

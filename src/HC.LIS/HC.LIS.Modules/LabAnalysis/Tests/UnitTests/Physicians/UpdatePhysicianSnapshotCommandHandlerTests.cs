@@ -33,7 +33,8 @@ public class UpdatePhysicianSnapshotCommandHandlerTests
         await repo.Received(1).UpdateAsync(
             PhysicianId,
             "Ana Lima Souza",
-            "CRM-99999"
+            "CRM-99999",
+            UpdatedAt
         ).ConfigureAwait(true);
     }
 
