@@ -13,6 +13,50 @@ test.describe('Doctor Worklist', () => {
     await expect(page).toHaveURL('/unauthorized', { timeout: 5_000 });
   });
 
+  test('worklist row shows the requesting physician name, never a raw id', async ({ page }) => {
+    await page.route(/\/api\/v1\/worklist-items(\?.*)?$/, async route => {
+      if (route.request().method() === 'GET') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify([
+            {
+              id: '00000000-0000-0000-0000-0000000000b1',
+              sampleBarcode: 'BC-E2E-001',
+              examCode: 'HGB',
+              patientId: '00000000-0000-0000-0000-000000000001',
+              patientName: 'Maria Silva',
+              requestedByName: 'Ana Lima',
+              status: 'Pending',
+              createdAt: new Date().toISOString(),
+            },
+            {
+              id: '00000000-0000-0000-0000-0000000000b2',
+              sampleBarcode: 'BC-E2E-002',
+              examCode: 'WBC',
+              patientId: '00000000-0000-0000-0000-000000000001',
+              patientName: 'Maria Silva',
+              requestedByName: null,
+              status: 'Pending',
+              createdAt: new Date().toISOString(),
+            },
+          ]),
+        });
+        return;
+      }
+      await route.continue();
+    });
+
+    await loginAsPhysician(page);
+    await page.reload();
+    await expect(page.getByTestId('worklist-row').first()).toBeVisible({ timeout: 10_000 });
+
+    const cells = page.getByTestId('requested-by-cell');
+    await expect(cells.first()).toHaveText('Ana Lima');
+    await expect(cells.nth(1)).toHaveText('Unknown physician');
+    await expect(cells.first()).not.toContainText(/^[0-9a-f]{8}-/i);
+  });
+
   // Requires a WorklistItem ready for signing (completed sample analysis).
   // Depends on the full TestOrders→SampleCollection→LabAnalysis pipeline running via RabbitMQ.
   // Run with the complete event infrastructure to enable this test.
@@ -33,6 +77,10 @@ test.describe('Doctor Worklist', () => {
 
     // Assert patient name in detail panel is not displayed as UUID
     await expect(page.getByTestId('patient-name')).not.toContainText(/^[0-9a-f]{8}-/i);
+
+    // The requesting physician is carried forward from the order, never as a raw id.
+    await expect(page.getByTestId('requested-by')).toBeVisible();
+    await expect(page.getByTestId('requested-by')).not.toContainText(/^[0-9a-f]{8}-/i);
 
     // Fill signature and sign report
     await page.getByTestId('signature-input').fill('Dr. House');
