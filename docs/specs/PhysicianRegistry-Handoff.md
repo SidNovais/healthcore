@@ -307,7 +307,7 @@ Finish by documenting the registry in `CLAUDE.md`.
 
 - [x] **Part 1** — Physician registry (backend + API)
 - [x] **Part 2** — SDK + physicians port
-- [ ] **Part 3** — Physician picker + new-order form
+- [x] **Part 3** — Physician picker + new-order form
 - [ ] **Part 4** — Enforce the physician on order creation
 - [ ] **Part 5** — Physician name on order views
 - [ ] **Part 6** — LabAnalysis worklist + report
@@ -339,3 +339,13 @@ _(append one line per completed part: date, branch, commits, anything the next s
 - `search(term)` passes `includeInactive: false`, so **inactive physicians are already excluded server-side**. Part 3's picker still filters client-side for parity with the patient picker, but it is belt-and-braces, not load-bearing.
 - New domain file beyond the two the plan listed: `core/domain/register-physician-params.ts` (`RegisterPhysicianParams` / `UpdatePhysicianParams`), mirroring `register-patient-params.ts`. `PhysicianStatus` (`'Active' | 'Inactive'`) is exported from `physician-search-result.ts`.
 - **Verified:** `yarn test` 365/365 green across 51 files (new `sdk-physicians-adapter.spec.ts` = 7 tests), and `yarn build` clean apart from the pre-existing `jsbarcode` CommonJS warning.
+
+**2026-08-05 — Part 3 done.** Branch `feat/physician-registry`, commits `af58241` (test) → `7cd3cb1` (feat). Notes for the next session:
+
+- **`e2e/fixtures/orders.ts` is new and now owns patient selection too.** `startOrder(page)` = `ensurePhysician` + `pickPatient` + `pickPhysician` and asserts the submit button is enabled before returning. `orders.spec.ts` and `realtime.spec.ts` deleted their local `pickPatient` / `pickSeedPatient` copies and call it; `order-patient-picker.spec.ts` keeps its own real-patient flow and only adds the physician half. **Part 4 needs no e2e edits — every order-creating spec already sends a registered id.**
+- **Nested `<form>` is the trap in the quick-add dialog.** The dialog lives inside `app-physician-picker`, which sits inside the new-order `<form>`; a `<form>` in the dialog would be nested, and its submit button can fire the *outer* form's `ngSubmit`. The dialog therefore uses `(click)="submitQuickAdd()"` (the `create-user-form` idiom) plus `(keydown.enter)` on the inputs — do not "fix" it into a form.
+- `NgModel` inside the picker does **not** attach to the outer `NgForm` (`NgModel` injects its parent with `@Host()`, which stops at the component boundary), so the quick-add inputs need neither `name` nor `standalone: true`.
+- Quick-add is offered only after a search **completes** with zero active rows (`searchReturnedEmpty` + empty `results`), never before the first search — the spec pins both halves.
+- The picker filters `Inactive` client-side even though `search()` already passes `includeInactive: false`; that is parity with the patient picker, not a load-bearing check.
+- `ensurePhysician` polls `GET /api/v1/physicians?search=` until the new row is findable before returning, so specs never race the projection.
+- **Verified:** `yarn test` 374/374 green across 52 files (`physician-picker.component.spec.ts` = 8, new-order integration 6 → 7), `yarn build` clean apart from the pre-existing `jsbarcode` warning, and `tsc --noEmit` clean over `e2e/`. **`yarn e2e` was NOT run** — this box has no Docker/Postgres, so the API cannot serve `/api/v1/physicians`. The e2e specs are unexecuted, exactly as the Part 1 integration tests were.
