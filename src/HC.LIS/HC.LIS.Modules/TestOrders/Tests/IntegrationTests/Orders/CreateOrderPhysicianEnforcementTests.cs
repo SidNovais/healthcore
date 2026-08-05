@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using FluentAssertions;
 using HC.Core.Domain;
@@ -25,7 +25,7 @@ public class CreateOrderPhysicianEnforcementTests : TestBase
                 OrderSampleData.OrderPriority,
                 OrderSampleData.RequestedAt
             )
-        ).ConfigureAwait(false);
+        ).ConfigureAwait(true);
 
         (await action.Should().ThrowAsync<BaseBusinessRuleException>().ConfigureAwait(true))
             .Which.Rule.Should().BeOfType<OrderMustReferenceRegisteredPhysicianRule>();
@@ -55,7 +55,7 @@ public class CreateOrderPhysicianEnforcementTests : TestBase
                 OrderSampleData.OrderPriority,
                 OrderSampleData.RequestedAt
             )
-        ).ConfigureAwait(false);
+        ).ConfigureAwait(true);
 
         (await action.Should().ThrowAsync<BaseBusinessRuleException>().ConfigureAwait(true))
             .Which.Rule.Should().BeOfType<OrderMustReferenceActivePhysicianRule>();

@@ -4,6 +4,7 @@ using System.Linq;
 using HC.Core.Domain;
 using HC.Core.Domain.EventSourcing;
 using HC.LIS.Modules.TestOrders.Domain.Orders.Events;
+using HC.LIS.Modules.TestOrders.Domain.Orders.Rules;
 using HC.LIS.Modules.TestOrders.Domain.Patients;
 using HC.LIS.Modules.TestOrders.Domain.Physicians;
 
@@ -21,16 +22,18 @@ public class Order : AggregateRoot
     public static Order Create(
         Guid id,
         PatientId patientId,
-        PhysicianId requestedBy,
+        RequestingPhysician? requestedBy,
         OrderPriority orderPriority,
         DateTime requestedAt
     )
     {
+        CheckRule(new OrderMustReferenceRegisteredPhysicianRule(requestedBy));
+        CheckRule(new OrderMustReferenceActivePhysicianRule(requestedBy));
         Order order = new();
         OrderCreatedDomainEvent orderCreatedDomainEvent = new(
             id,
             patientId.Value,
-            requestedBy.Value,
+            requestedBy!.PhysicianId.Value,
             orderPriority.Value,
             requestedAt
         );

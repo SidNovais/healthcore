@@ -7,19 +7,25 @@ using HC.LIS.Modules.TestOrders.Domain.Physicians;
 namespace HC.LIS.Modules.TestOrders.Application.Orders.CreateOrder;
 
 internal class CreateOrderCommandHandler(
-    IAggregateStore aggregateStore
+    IAggregateStore aggregateStore,
+    IRequestingPhysicianProvider requestingPhysicianProvider
 ) : ICommandHandler<CreateOrderCommand, Guid>
 {
     private readonly IAggregateStore _aggregateStore = aggregateStore;
+    private readonly IRequestingPhysicianProvider _requestingPhysicianProvider = requestingPhysicianProvider;
     public async Task<Guid> Handle(
         CreateOrderCommand command,
         CancellationToken cancellationToken
     )
     {
+        RequestingPhysician? requestedBy = await _requestingPhysicianProvider
+            .GetByIdAsync(command.RequestedBy, cancellationToken)
+            .ConfigureAwait(false);
+
         Order order = Order.Create(
             command.OrderId,
             new PatientId(command.PatientId),
-            new PhysicianId(command.RequestedBy),
+            requestedBy,
             OrderPriority.Of(command.OrderPriority),
             command.RequestedAt
         );
