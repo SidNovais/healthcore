@@ -57,6 +57,13 @@ internal class QuestPdfGenerator : IPdfGenerator
                         });
                         row.RelativeItem().Column(c =>
                         {
+                            c.Item().Text("Requesting Physician").SemiBold().FontColor(Colors.Grey.Darken2);
+                            c.Item().Text(string.IsNullOrWhiteSpace(worklistItemDetails.RequestedByName)
+                                ? "Unknown physician"
+                                : worklistItemDetails.RequestedByName);
+                        });
+                        row.RelativeItem().Column(c =>
+                        {
                             c.Item().Text("Report Date").SemiBold().FontColor(Colors.Grey.Darken2);
                             c.Item().Text(signedAt.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture) + " UTC");
                         });
