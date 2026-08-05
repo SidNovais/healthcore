@@ -3,6 +3,7 @@ using System.Text.Json;
 using FluentAssertions;
 using HC.Core.Infrastructure.RealTime;
 using HC.LIS.API.Configuration.RealTime;
+using HC.LIS.Modules.LabAnalysis.IntegrationEvents;
 using HC.LIS.Modules.TestOrders.IntegrationEvents;
 
 namespace HC.LIS.API.Tests.RealTime;
@@ -47,6 +48,43 @@ public sealed class UiNotificationTranslatorTests
             Guid.NewGuid(),
             "Routine",
             DateTime.UtcNow));
+
+        JsonElement entity = JsonDocument.Parse(notification.Data).RootElement.GetProperty("entity");
+        entity.GetProperty("requestedByName").ValueKind.Should().Be(JsonValueKind.Null);
+    }
+
+    [Fact]
+    public void WorklistAddCarriesTheRequestingPhysicianName()
+    {
+        var worklistItemId = Guid.NewGuid();
+
+        UiNotification notification = UiNotificationTranslator.WorklistAdd(new WorklistItemCreatedIntegrationEvent(
+            Guid.NewGuid(),
+            DateTime.UtcNow,
+            worklistItemId,
+            Guid.NewGuid(),
+            "BC-1",
+            "HGB",
+            "Maria Silva",
+            new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            "Female",
+            "Ana Lima"));
+
+        JsonElement entity = JsonDocument.Parse(notification.Data).RootElement.GetProperty("entity");
+        entity.GetProperty("id").GetGuid().Should().Be(worklistItemId);
+        entity.GetProperty("requestedByName").GetString().Should().Be("Ana Lima");
+    }
+
+    [Fact]
+    public void WorklistAddEmitsANullPhysicianNameWhenTheMappingHasNotArrivedYet()
+    {
+        UiNotification notification = UiNotificationTranslator.WorklistAdd(new WorklistItemCreatedIntegrationEvent(
+            Guid.NewGuid(),
+            DateTime.UtcNow,
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            "BC-1",
+            "HGB"));
 
         JsonElement entity = JsonDocument.Parse(notification.Data).RootElement.GetProperty("entity");
         entity.GetProperty("requestedByName").ValueKind.Should().Be(JsonValueKind.Null);
