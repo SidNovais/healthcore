@@ -8,5 +8,6 @@ public record WorklistItemSummaryDto(
     string? PatientName,
     DateTime? PatientDateOfBirth,
     string? PatientGender,
+    string? RequestedByName,
     string Status,
     DateTime CreatedAt);

@@ -31,6 +31,7 @@ internal class GetWorklistItemDetailsQueryHandler(
                 psd.""FullName""     AS ""PatientName"",
                 psd.""DateOfBirth""  AS ""PatientDateOfBirth"",
                 psd.""Gender""       AS ""PatientGender"",
+                phy.""FullName""     AS ""RequestedByName"",
                 wid.order_id         AS ""OrderId"",
                 wid.order_item_id    AS ""OrderItemId"",
                 wid.status           AS ""Status"",
@@ -40,6 +41,8 @@ internal class GetWorklistItemDetailsQueryHandler(
                 wid.completed_at     AS ""CompletedAt""
             FROM lab_analysis.worklist_item_details AS wid
             LEFT JOIN lab_analysis.""PatientSnapshotDetails"" AS psd ON psd.""Id"" = wid.patient_id
+            LEFT JOIN lab_analysis.""OrderPhysicianSnapshotDetails"" AS ops ON ops.""OrderId"" = wid.order_id
+            LEFT JOIN lab_analysis.""PhysicianSnapshotDetails"" AS phy ON phy.""Id"" = ops.""PhysicianId""
             WHERE wid.id = @WorklistItemId;
 
             SELECT

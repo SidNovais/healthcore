@@ -13,6 +13,7 @@ public class WorklistItemDetailsDto
     public string? PatientName { get; set; }
     public DateTime? PatientDateOfBirth { get; set; }
     public string? PatientGender { get; set; }
+    public string? RequestedByName { get; set; }
     public Guid OrderId { get; set; }
     public Guid OrderItemId { get; set; }
     public string Status { get; set; } = string.Empty;
