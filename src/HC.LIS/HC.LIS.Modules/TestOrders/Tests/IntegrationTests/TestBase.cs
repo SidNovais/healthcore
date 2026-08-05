@@ -91,6 +91,7 @@ public class TestBase : IDisposable
         DELETE FROM ""test_orders"".""OrderDetails"";
         DELETE FROM ""test_orders"".""OrderItemDetails"";
         DELETE FROM ""test_orders"".""PatientSnapshotDetails"";
+        DELETE FROM ""test_orders"".""PhysicianDetails"";
         DELETE FROM ""test_orders"".""mt_doc_deadletterevent"";
         DELETE FROM ""test_orders"".""mt_event_progression"";
         DELETE FROM ""test_orders"".""mt_events"";
