@@ -13,10 +13,10 @@ namespace HC.LIS.Tests.IntegrationEvents.LabAnalysis;
 public abstract class TestBase : HC.LIS.Tests.IntegrationEvents.Analyzer.TestBase
 {
     protected async Task<(Guid worklistItemId, Guid orderItemId)>
-        SetupWorklistItemWithResultAsync(string barcode, string examMnemonic)
+        SetupWorklistItemWithResultAsync(string examMnemonic)
     {
-        var (_, orderItemId, _, _, worklistItemId) =
-            await SetupExamResultReadyAsync(barcode, examMnemonic);
+        var (_, orderItemId, _, barcode, worklistItemId) =
+            await SetupExamResultReadyAsync(examMnemonic);
 
         await AnalyzerModule.ExecuteCommandAsync(
             new ForwardRawResultCommand(BuildOruR01(barcode, examMnemonic)));

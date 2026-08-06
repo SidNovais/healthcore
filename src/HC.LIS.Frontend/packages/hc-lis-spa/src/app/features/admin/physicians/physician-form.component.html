@@ -1,0 +1,49 @@
+<hc-card data-testid="physician-form" class="physician-form">
+  <h3>{{ physician() ? 'Edit Physician' : 'Register Physician' }}</h3>
+
+  <hc-field>
+    <label hc-label for="physician-full-name">Full Name</label>
+    <input
+      hc-input
+      id="physician-full-name"
+      data-testid="physician-full-name-input"
+      type="text"
+      [(ngModel)]="fullName"
+      (keydown.enter)="onSubmit()"
+      placeholder="Ana Lima"
+    />
+  </hc-field>
+
+  <hc-field>
+    <label hc-label for="physician-licence">Licence Number</label>
+    <input
+      hc-input
+      id="physician-licence"
+      data-testid="physician-licence-input"
+      type="text"
+      [(ngModel)]="licenceNumber"
+      (keydown.enter)="onSubmit()"
+      placeholder="Optional"
+    />
+  </hc-field>
+
+  @if (error(); as msg) {
+    <hc-alert variant="error">{{ msg }}</hc-alert>
+  }
+
+  <div class="form-actions">
+    <button
+      hc-button
+      variant="cta"
+      data-testid="physician-form-submit-btn"
+      (click)="onSubmit()"
+      [loading]="submitting()"
+      [disabled]="!fullName.trim() || submitting()"
+    >
+      {{ physician() ? 'Save Changes' : 'Register Physician' }}
+    </button>
+    <button hc-button variant="ghost" data-testid="physician-form-cancel-btn" (click)="close.emit()">
+      Cancel
+    </button>
+  </div>
+</hc-card>

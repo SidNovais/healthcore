@@ -1,0 +1,17 @@
+/* No max-width: the host hc-dialog owns the measure (width="wide"). */
+.physician-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.physician-form h3 {
+  margin: 0 0 0.3rem;
+  color: var(--color-text);
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: var(--space-2);
+}

@@ -14,6 +14,7 @@ type Login = (page: Page) => Promise<void>;
 const ROUTES: ReadonlyArray<{ route: string; login: Login | null }> = [
   { route: '/login', login: null },
   { route: '/admin/users', login: loginAsITAdmin },
+  { route: '/admin/physicians', login: loginAsITAdmin },
   { route: '/patients', login: loginAsReceptionist },
   { route: '/patients/new', login: loginAsReceptionist },
   { route: '/orders', login: loginAsReceptionist },

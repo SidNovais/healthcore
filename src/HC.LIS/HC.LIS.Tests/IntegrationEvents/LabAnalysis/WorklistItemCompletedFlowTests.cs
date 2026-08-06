@@ -11,7 +11,7 @@ public class WorklistItemCompletedFlowTests : TestBase
     public async Task WorklistItemCompletedCompletesExamInTestOrders()
     {
         // Arrange + Act
-        var (worklistItemId, orderItemId) = await SetupWorklistItemWithResultAsync("BC-P6-001", "HGB");
+        var (worklistItemId, orderItemId) = await SetupWorklistItemWithResultAsync("HGB");
         await LabAnalysisModule.ExecuteCommandAsync(
             new CompleteWorklistItemCommand(worklistItemId, SystemClock.Now));
 

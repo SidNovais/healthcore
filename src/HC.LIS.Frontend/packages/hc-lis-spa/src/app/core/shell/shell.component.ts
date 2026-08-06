@@ -70,12 +70,13 @@ const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
     { label: 'Worklist', route: '/worklist', icon: 'table', testId: 'nav-worklist-link' },
   ],
   ITAdmin: [
-    { label: 'New Order', route: '/orders/new',  icon: 'file-text',      testId: 'nav-new-order-link' },
-    { label: 'Orders',    route: '/orders',      icon: 'list',           testId: 'nav-orders-link'    },
-    { label: 'Patients',  route: '/patients',    icon: 'user',           testId: 'nav-patients'       },
-    { label: 'Triage',    route: '/triage',      icon: 'clipboard-list', testId: 'nav-triage-link'    },
-    { label: 'Worklist',  route: '/worklist',    icon: 'table',          testId: 'nav-worklist-link'  },
-    { label: 'Users',     route: '/admin/users', icon: 'users',          testId: 'nav-users-link'     },
+    { label: 'New Order',  route: '/orders/new',       icon: 'file-text',      testId: 'nav-new-order-link'  },
+    { label: 'Orders',     route: '/orders',           icon: 'list',           testId: 'nav-orders-link'     },
+    { label: 'Patients',   route: '/patients',         icon: 'user',           testId: 'nav-patients'        },
+    { label: 'Triage',     route: '/triage',           icon: 'clipboard-list', testId: 'nav-triage-link'     },
+    { label: 'Worklist',   route: '/worklist',         icon: 'table',          testId: 'nav-worklist-link'   },
+    { label: 'Users',      route: '/admin/users',      icon: 'users',          testId: 'nav-users-link'      },
+    { label: 'Physicians', route: '/admin/physicians', icon: 'stethoscope',    testId: 'nav-physicians-link' },
   ],
 };
 

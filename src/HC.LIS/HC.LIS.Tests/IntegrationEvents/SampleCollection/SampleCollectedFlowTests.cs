@@ -8,7 +8,7 @@ public class SampleCollectedFlowTests : TestBase
     [Fact]
     public async Task SampleCollectedPlacesExamInProgressInTestOrders()
     {
-        var (_, orderItemId, _, _) = await SetupCollectedSampleAsync("BC-P4-001", "HGB");
+        var (_, orderItemId, _, _) = await SetupCollectedSampleAsync("HGB");
 
         await IntegrationTestAssert.AssertEventually(
             new GetExamInProgressFromTestOrdersProbe(orderItemId, TestOrdersModule),
@@ -18,7 +18,7 @@ public class SampleCollectedFlowTests : TestBase
     [Fact]
     public async Task SampleCollectedCreatesAnalyzerSample()
     {
-        var (_, _, _, barcode) = await SetupCollectedSampleAsync("BC-P4-002", "HGB");
+        var (_, _, _, barcode) = await SetupCollectedSampleAsync("HGB");
 
         await IntegrationTestAssert.AssertEventually(
             new GetAnalyzerSampleFromAnalyzerProbe(barcode, AnalyzerModule),
@@ -28,7 +28,7 @@ public class SampleCollectedFlowTests : TestBase
     [Fact]
     public async Task SampleCollectedCreatesWorklistItemInLabAnalysis()
     {
-        var (_, _, _, barcode) = await SetupCollectedSampleAsync("BC-P4-003", "HGB");
+        var (_, _, _, barcode) = await SetupCollectedSampleAsync("HGB");
 
         await IntegrationTestAssert.AssertEventually(
             new GetWorklistItemFromLabAnalysisProbe(barcode, "HGB", AnalyzerModule, LabAnalysisModule),
@@ -38,7 +38,7 @@ public class SampleCollectedFlowTests : TestBase
     [Fact]
     public async Task SampleCollectedAssignsWorklistItemToAnalyzerExam()
     {
-        var (_, _, _, barcode) = await SetupCollectedSampleAsync("BC-P4-004", "HGB");
+        var (_, _, _, barcode) = await SetupCollectedSampleAsync("HGB");
 
         await IntegrationTestAssert.AssertEventually(
             new GetWorklistItemAssignedFromAnalyzerProbe(barcode, "HGB", AnalyzerModule),

@@ -62,6 +62,14 @@ export const routes: Routes = [
           import('./features/admin/user-list.component').then(m => m.UserListComponent),
       },
       {
+        path: 'admin/physicians',
+        canActivate: [roleGuard('ITAdmin')],
+        loadComponent: () =>
+          import('./features/admin/physicians/physician-list.component').then(
+            m => m.PhysicianListComponent,
+          ),
+      },
+      {
         path: 'patients',
         canActivate: [roleGuard('Receptionist', 'ITAdmin')],
         loadComponent: () =>

@@ -9,6 +9,8 @@ namespace HC.LIS.Tests.IntegrationEvents;
 
 internal static class RequestingPhysicianFactory
 {
+    public const string FullName = "Dr. Ana Lima";
+
     public static async Task<Guid> RegisterAsync(ITestOrdersModule testOrdersModule)
     {
         Guid physicianId = Guid.CreateVersion7();
@@ -16,7 +18,7 @@ internal static class RequestingPhysicianFactory
         await testOrdersModule.ExecuteCommandAsync(
             new RegisterPhysicianCommand(
                 physicianId,
-                "Dr. Ana Lima",
+                FullName,
                 "CRM-SP 123456",
                 SystemClock.Now)).ConfigureAwait(false);
 
