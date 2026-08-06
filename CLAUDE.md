@@ -123,6 +123,34 @@ This pattern ensures transactional safety — the Inbox processes the event, the
 
 The public API of each module is a single facade class (e.g., `TestOrdersModule` implementing `ITestOrdersModule`).
 
+### Referring-Physician Registry
+
+External doctors who order exams and have **no system login**. Master data owned by **TestOrders** (schema `test_orders`), not a `UserAccess` user.
+
+- **Aggregate** — `TestOrders/Domain/Physicians/Physician.cs`, event-sourced via Marten. It must stay event-sourced: `TestOrdersUnitOfWork` commits only `IDocumentSession.SaveChangesAsync()`, so an EF-mapped aggregate would silently never persist and never dispatch a domain event. `PhysicianId : AggregateId<Physician>`.
+- **Rules** — `FullName` required; licence number optional with **no uniqueness rule**; Active/Inactive lifecycle.
+- **Read model** — `test_orders."PhysicianDetails"`, fed by `PhysicianDetailsProjector`. There is **no FK** from `OrderDetails."RequestedBy"`: historical rows hold user ids and would violate it.
+- **Search** — one `SearchPhysiciansQuery` serves both the order picker and the ITAdmin admin page. It is **prefix-only** (`term%`, never `%term%`) and a blank term becomes `%` so the admin page lists everything through the same handler.
+- **API** — `/api/v1/physicians`; reads plus register use the `OrderEntry` policy (Receptionist + ITAdmin), mutations use `ITAdmin`.
+
+**Order creation enforces the physician.** `Order.Create`'s third parameter is `RequestingPhysician?` — the nullability is load-bearing, since it lets `OrderMustReferenceRegisteredPhysicianRule` live in the Domain instead of leaking a null check into the handler. The handler resolves it through the domain-defined `IRequestingPhysicianProvider`, never inline SQL.
+
+**Propagation carries the physician *id*, never the name**, so renames propagate everywhere:
+
+```
+TestOrders  Physician ──► test_orders."PhysicianDetails" ──┐ LEFT JOIN on OrderDetails."RequestedBy"
+     │ Physician{Registered,Updated,Deactivated,Reactivated}IntegrationEvent   → order list + detail
+     ▼
+LabAnalysis  "PhysicianSnapshotDetails"      ◄── physician events
+             "OrderPhysicianSnapshotDetails" ◄── OrderCreatedIntegrationEvent
+                 └─ join: worklist_item_details.order_id → OrderPhysician… → PhysicianSnapshot…
+                    → worklist list + detail + signed report header
+```
+
+`OrderCreatedIntegrationEvent` now has three consumers (UI translator, and LabAnalysis' order→physician mapping) — only ever **append trailing nullable fields** to it, never reorder.
+
+**Legacy rows show `Unknown physician`.** Pre-registry `OrderDetails."RequestedBy"` values are user ids, so the LEFT JOIN yields NULL — same treatment as the existing `PatientName ?? 'Unknown patient'`. A cross-schema backfill would violate module isolation, so this is by design.
+
 ---
 
 ## Conventions
