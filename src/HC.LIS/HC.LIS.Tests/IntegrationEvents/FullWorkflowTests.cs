@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HC.Core.Domain;
 using HC.Core.IntegrationTests.Probing;
+using HC.LIS.Modules.Analyzer.Application.AnalyzerSamples.DispatchSampleInfo;
 using HC.LIS.Modules.Analyzer.Application.AnalyzerSamples.ForwardRawResult;
 using HC.LIS.Modules.Analyzer.Application.AnalyzerSamples.GetSampleInfoByBarcode;
 using HC.LIS.Modules.Analyzer.Application.Contracts;
@@ -14,7 +15,6 @@ using HC.LIS.Modules.LabAnalysis.Application.WorklistItems.GetWorklistItemDetail
 using HC.LIS.Modules.LabAnalysis.Infrastructure;
 using HC.LIS.Modules.SampleCollection.Application.Collections.CallPatient;
 using HC.LIS.Modules.SampleCollection.Application.Collections.GetSamplesByCollectionRequestId;
-using HC.LIS.Modules.SampleCollection.Application.Collections.CreateBarcode;
 using HC.LIS.Modules.SampleCollection.Application.Collections.MovePatientToWaiting;
 using HC.LIS.Modules.SampleCollection.Application.Collections.RecordSampleCollection;
 using HC.LIS.Modules.SampleCollection.Infrastructure;
@@ -47,7 +47,6 @@ public class FullWorkflowTests : TestBase
     [Fact]
     public async Task FullLaboratoryWorkflowFromOrderAcceptanceToCompletion()
     {
-        const string barcode      = "BC-P7-001";
         const string examMnemonic = "HGB";
         var patientId   = Guid.NewGuid();
         var orderId     = Guid.NewGuid();
@@ -68,17 +67,22 @@ public class FullWorkflowTests : TestBase
         var collectionRequestId = (await crProbe.GetSampleAsync())!.CollectionRequestId;
 
         // Step 3: Drive SampleCollection state machine + record sample
-        await _sampleCollection.ExecuteCommandAsync(new MovePatientToWaitingCommand(collectionRequestId, SystemClock.Now));
-        await _sampleCollection.ExecuteCommandAsync(new CreateBarcodeCommand(collectionRequestId, "EDTA Tube", barcode, SystemClock.Now));
-        await _sampleCollection.ExecuteCommandAsync(new CallPatientCommand(collectionRequestId, ExecutionContext.UserId, SystemClock.Now));
-
         var samples = await _sampleCollection.ExecuteQueryAsync(
             new GetSamplesByCollectionRequestIdQuery(collectionRequestId));
         var sampleId = samples!.Single().Id;
 
+        // Moving the patient to waiting is what schedules barcode generation
+        await _sampleCollection.ExecuteCommandAsync(new MovePatientToWaitingCommand(collectionRequestId, SystemClock.Now));
+
+        var barcodeProbe = new GetGeneratedBarcodeFromSampleCollectionProbe(
+            collectionRequestId, sampleId, _sampleCollection);
+        await IntegrationTestAssert.AssertEventually(barcodeProbe, timeoutMs: 60_000);
+        string barcode = (await barcodeProbe.GetSampleAsync())!.Barcode!;
+
+        await _sampleCollection.ExecuteCommandAsync(new CallPatientCommand(collectionRequestId, ExecutionContext.UserId, SystemClock.Now));
+
         await _sampleCollection.ExecuteCommandAsync(new RecordSampleCollectionCommand(
-            collectionRequestId, sampleId, ExecutionContext.UserId,
-            "Test Patient", new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc), "M", SystemClock.Now));
+            collectionRequestId, sampleId, ExecutionContext.UserId, SystemClock.Now));
 
         // Step 4: Assert fan-out from SampleCollectedIntegrationEvent (all downstream effects)
         await IntegrationTestAssert.AssertEventually(
@@ -93,7 +97,15 @@ public class FullWorkflowTests : TestBase
         var sampleInfo = await _analyzer.ExecuteQueryAsync(new GetSampleInfoByBarcodeQuery(barcode));
         var worklistItemId = sampleInfo!.Exams.Single(e => e.ExamMnemonic == examMnemonic).WorklistItemId!.Value;
 
-        // Step 5: Analyzer — forward raw HL7 result
+        // The requesting physician reaches the worklist over two async hops — OrderCreatedIntegrationEvent
+        // into the order→physician mapping, and the physician snapshot itself — so it lands after the item.
+        await IntegrationTestAssert.AssertEventually(
+            new RequestingPhysicianOnWorklistItemProbe(
+                worklistItemId, RequestingPhysicianFactory.FullName, _labAnalysis),
+            timeoutMs: 60_000);
+
+        // Step 5: Analyzer — hand the instrument the sample info, then forward the raw HL7 result
+        await _analyzer.ExecuteCommandAsync(new DispatchSampleInfoCommand(sampleInfo.Id, SystemClock.Now));
         await _analyzer.ExecuteCommandAsync(new ForwardRawResultCommand(BuildOruR01(barcode, examMnemonic)));
 
         // Step 6: Assert analysis result recorded + report auto-generated
@@ -117,6 +129,23 @@ public class FullWorkflowTests : TestBase
             $"SPM|||{barcode}\r" +
             $"OBX|1|NM|{examMnemonic}^Description||5.0|mg/dL|3.5-7.0\r";
         return Encoding.UTF8.GetBytes(msg);
+    }
+
+    private sealed class RequestingPhysicianOnWorklistItemProbe(
+        Guid worklistItemId,
+        string expectedFullName,
+        ILabAnalysisModule module) : IProbe<WorklistItemDetailsDto>
+    {
+        public string DescribeFailureTo() =>
+            $"WorklistItem {worklistItemId} did not carry RequestedByName '{expectedFullName}'";
+
+        public async Task<WorklistItemDetailsDto?> GetSampleAsync() =>
+            await module
+                .ExecuteQueryAsync(new GetWorklistItemDetailsQuery(worklistItemId))
+                .ConfigureAwait(false);
+
+        public bool IsSatisfied(WorklistItemDetailsDto? sample) =>
+            sample?.RequestedByName == expectedFullName;
     }
 
     private sealed class ReportGeneratedProbe(

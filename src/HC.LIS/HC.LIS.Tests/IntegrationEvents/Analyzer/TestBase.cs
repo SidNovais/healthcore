@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HC.Core.Domain;
+using HC.LIS.Modules.Analyzer.Application.AnalyzerSamples.DispatchSampleInfo;
 using HC.LIS.Modules.Analyzer.Application.AnalyzerSamples.ForwardRawResult;
 using HC.LIS.Modules.Analyzer.Application.AnalyzerSamples.GetSampleInfoByBarcode;
 using HC.LIS.Tests.IntegrationEvents.Probes;
@@ -27,10 +29,10 @@ public abstract class TestBase : HC.LIS.Tests.IntegrationEvents.SampleCollection
     }
 
     protected async Task<(Guid orderId, Guid orderItemId, Guid sampleId, string barcode, Guid worklistItemId)>
-        SetupExamResultReadyAsync(string barcode, string examMnemonic)
+        SetupExamResultReadyAsync(string examMnemonic)
     {
         // Run full Group B chain (SetupCollectedSampleAsync from SampleCollection.TestBase)
-        var (orderId, orderItemId, sampleId, _) = await SetupCollectedSampleAsync(barcode, examMnemonic);
+        var (orderId, orderItemId, sampleId, barcode) = await SetupCollectedSampleAsync(examMnemonic);
 
         // Wait for two-hop: SampleCollected → WorklistItemCreated → AssignWorklistItem
         await IntegrationTestAssert.AssertEventually(
@@ -40,6 +42,10 @@ public abstract class TestBase : HC.LIS.Tests.IntegrationEvents.SampleCollection
         // Retrieve worklistItemId from Analyzer facade (WorklistItemId is populated after assignment)
         var sampleInfo = await AnalyzerModule.ExecuteQueryAsync(new GetSampleInfoByBarcodeQuery(barcode));
         var worklistItemId = sampleInfo!.Exams.Single(e => e.ExamMnemonic == examMnemonic).WorklistItemId!.Value;
+
+        // The instrument must be handed the sample info before it may report a result
+        await AnalyzerModule.ExecuteCommandAsync(
+            new DispatchSampleInfoCommand(sampleInfo.Id, SystemClock.Now));
 
         return (orderId, orderItemId, sampleId, barcode, worklistItemId);
     }

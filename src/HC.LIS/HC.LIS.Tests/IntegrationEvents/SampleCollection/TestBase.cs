@@ -7,7 +7,6 @@ using HC.LIS.Modules.Analyzer.Infrastructure;
 using HC.LIS.Modules.LabAnalysis.Application.Contracts;
 using HC.LIS.Modules.LabAnalysis.Infrastructure;
 using HC.LIS.Modules.SampleCollection.Application.Collections.CallPatient;
-using HC.LIS.Modules.SampleCollection.Application.Collections.CreateBarcode;
 using HC.LIS.Modules.SampleCollection.Application.Collections.GetSamplesByCollectionRequestId;
 using HC.LIS.Modules.SampleCollection.Application.Collections.MovePatientToWaiting;
 using HC.LIS.Modules.SampleCollection.Application.Collections.RecordSampleCollection;
@@ -42,7 +41,6 @@ public abstract class TestBase : HC.LIS.Tests.IntegrationEvents.TestBase
     public override Task DisposeAsync() => base.DisposeAsync();
 
     protected async Task<(Guid orderId, Guid orderItemId, Guid sampleId, string barcode)> SetupCollectedSampleAsync(
-        string barcode,
         string examMnemonic)
     {
         var patientId = Guid.NewGuid();
@@ -73,8 +71,10 @@ public abstract class TestBase : HC.LIS.Tests.IntegrationEvents.TestBase
         await SampleCollectionModule.ExecuteCommandAsync(
             new MovePatientToWaitingCommand(collectionRequestId, SystemClock.Now));
 
-        await SampleCollectionModule.ExecuteCommandAsync(
-            new CreateBarcodeCommand(collectionRequestId, "EDTA Tube", barcode, SystemClock.Now));
+        var barcodeProbe = new GetGeneratedBarcodeFromSampleCollectionProbe(
+            collectionRequestId, sampleId, SampleCollectionModule);
+        await IntegrationTestAssert.AssertEventually(barcodeProbe, timeoutMs: 15_000);
+        string barcode = (await barcodeProbe.GetSampleAsync())!.Barcode!;
 
         await SampleCollectionModule.ExecuteCommandAsync(
             new CallPatientCommand(collectionRequestId, ExecutionContext.UserId, SystemClock.Now));
@@ -84,9 +84,6 @@ public abstract class TestBase : HC.LIS.Tests.IntegrationEvents.TestBase
                 collectionRequestId,
                 sampleId,
                 ExecutionContext.UserId,
-                "Test Patient",
-                new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                "M",
                 SystemClock.Now));
 
         return (orderId, orderItemId, sampleId, barcode);

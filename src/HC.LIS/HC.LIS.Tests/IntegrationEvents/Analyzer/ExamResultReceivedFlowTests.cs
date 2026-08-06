@@ -10,8 +10,8 @@ public class ExamResultReceivedFlowTests : TestBase
     public async Task ExamResultReceivedRecordsAnalysisResultInLabAnalysis()
     {
         // Arrange + Act
-        var (_, _, _, _, worklistItemId) = await SetupExamResultReadyAsync("BC-P5-001", "HGB");
-        await AnalyzerModule.ExecuteCommandAsync(new ForwardRawResultCommand(BuildOruR01("BC-P5-001", "HGB")));
+        var (_, _, _, barcode, worklistItemId) = await SetupExamResultReadyAsync("HGB");
+        await AnalyzerModule.ExecuteCommandAsync(new ForwardRawResultCommand(BuildOruR01(barcode, "HGB")));
 
         // Assert
         await IntegrationTestAssert.AssertEventually(
