@@ -16,6 +16,52 @@ async function submitForm(page: Page, method: 'POST' | 'PUT'): Promise<void> {
   ]);
 }
 
+/**
+ * Two things make a plain locator assertion unreliable here.
+ *
+ * `PhysicianDetails` is a projection, so a 2xx from the API does not mean the row is
+ * queryable yet — and the list is fetched once per page load, so retrying the locator
+ * alone can never succeed; the page has to be reloaded until the projection catches up.
+ *
+ * The registry is also paginated at 10 rows with no search box, and every run leaves its
+ * physicians behind (there is no delete endpoint), so a newly registered name is often
+ * not on page one. Walk the pages rather than assuming it is.
+ */
+async function expectRowEventually(page: Page, fullName: string, status?: string): Promise<void> {
+  await expect(async () => {
+    await page.goto('/admin/physicians');
+    await expect(page.getByTestId('physician-list-table')).toBeVisible({ timeout: 5_000 });
+
+    const pageButtons = page.locator('[data-testid^="physicians-pagination-page-"]');
+    const pageCount = Math.max(1, await pageButtons.count());
+
+    for (let p = 1; p <= pageCount && (await row(page, fullName).count()) === 0; p++) {
+      if (p === 1) continue;
+      // Compare raw innerText in-browser: toHaveText normalises whitespace, which makes
+      // "the rows changed" pass instantly and lets the walk skip a page.
+      const before = await page.getByTestId('physician-list-row').first().innerText();
+      await page.getByTestId(`physicians-pagination-page-${p}`).click();
+      await page.waitForFunction(
+        prev => document.querySelector<HTMLElement>('[data-testid="physician-list-row"]')?.innerText !== prev,
+        before,
+        { timeout: 5_000 },
+      );
+    }
+
+    if ((await row(page, fullName).count()) === 0) {
+      throw new Error(`physician "${fullName}" is not on any of the ${pageCount} registry pages yet`);
+    }
+
+    const target = row(page, fullName);
+    await expect(target).toBeVisible({ timeout: 2_000 });
+    if (status) {
+      await expect(target.getByTestId('physician-status-badge')).toHaveText(status, {
+        timeout: 2_000,
+      });
+    }
+  }).toPass({ timeout: 30_000, intervals: [500, 1_000, 2_000] });
+}
+
 test.describe('Physician Registry', () => {
   test.beforeEach(async ({ context }) => {
     await context.clearCookies();
@@ -39,8 +85,7 @@ test.describe('Physician Registry', () => {
     await page.getByTestId('physician-licence-input').fill(licence);
     await submitForm(page, 'POST');
 
-    await expect(row(page, fullName)).toBeVisible({ timeout: 10_000 });
-    await expect(row(page, fullName).getByTestId('physician-status-badge')).toHaveText('Active');
+    await expectRowEventually(page, fullName, 'Active');
 
     // Edit — the form reopens carrying the stored values, so only the name changes.
     const editedName = `${fullName} Jr`;
@@ -51,7 +96,7 @@ test.describe('Physician Registry', () => {
     await page.getByTestId('physician-full-name-input').fill(editedName);
     await submitForm(page, 'PUT');
 
-    await expect(row(page, editedName)).toBeVisible({ timeout: 10_000 });
+    await expectRowEventually(page, editedName);
 
     // Deactivate — confirmed in a dialog, then the row's badge flips in place.
     await row(page, editedName).getByTestId('physician-actions-trigger').click();
@@ -65,10 +110,7 @@ test.describe('Physician Registry', () => {
     ]);
 
     await expect(page.getByTestId('physician-status-toast')).toBeVisible({ timeout: 5_000 });
-    await expect(row(page, editedName).getByTestId('physician-status-badge')).toHaveText(
-      'Inactive',
-      { timeout: 10_000 },
-    );
+    await expectRowEventually(page, editedName, 'Inactive');
   });
 
   test('a deactivated physician can be reactivated from the same menu', async ({ page }) => {
@@ -85,10 +127,7 @@ test.describe('Physician Registry', () => {
     const { id } = (await created.json()) as { id: string };
     expect((await page.request.post(`/api/v1/physicians/${id}/deactivate`)).ok()).toBe(true);
 
-    await page.goto('/admin/physicians');
-    await expect(row(page, fullName).getByTestId('physician-status-badge')).toHaveText('Inactive', {
-      timeout: 15_000,
-    });
+    await expectRowEventually(page, fullName, 'Inactive');
 
     await row(page, fullName).getByTestId('physician-actions-trigger').click();
     await page.getByTestId('physician-action-reactivate').click();
@@ -99,9 +138,7 @@ test.describe('Physician Registry', () => {
       page.getByTestId('confirm-physician-status-btn').click(),
     ]);
 
-    await expect(row(page, fullName).getByTestId('physician-status-badge')).toHaveText('Active', {
-      timeout: 10_000,
-    });
+    await expectRowEventually(page, fullName, 'Active');
   });
 
   test('Receptionist is redirected to /unauthorized when accessing /admin/physicians', async ({
